@@ -1,0 +1,749 @@
+2016-09-24  Stefan Reuther  <streu@gmx.de>
+
+	* afl/net/http/client.cpp: fix shutdown behaviour if client is closed while working on requests
+
+2016-09-10  Stefan Reuther  <streu@gmx.de>
+
+	* afl/io/nullfilesystem.cpp, afl/io/nullfilesystem.hpp: new
+	* afl/string/posixfilenames.cpp, afl/string/posixfilenames.hpp: new
+
+2016-08-29  Stefan Reuther  <streu@gmx.de>
+
+	* arch/posix/posixcontrollerimpl.cpp, afl/net/http/clientconnection.cpp: deal with servers that unexpectedly close
+	* afl/net/http/client.cpp: fix restart behaviour if a connection closes but we already have a request for it
+
+2016-08-26  Stefan Reuther  <streu@gmx.de>
+
+	* afl/net/parameterencoder.cpp, afl/net/parameterencoder.hpp: new
+
+2016-08-22  Stefan Reuther  <streu@gmx.de>
+
+	* afl/io/textwriter.cpp, afl/io/textwriter.hpp (writeText): handle embedded newlines
+	* afl/io/nulltextwriter.cpp, afl/io/nulltextwriter.hpp (doFlush): add missing method
+
+2016-08-20  Stefan Reuther  <streu@gmx.de>
+
+	* afl/charset/unicode.hpp (getUpperCase, getLowerCase): new
+
+2016-07-31  Stefan Reuther  <streu@gmx.de>
+
+	* afl/io/nulltextwriter.cpp, afl/io/nulltextwriter.hpp: new
+
+2016-07-29  Stefan Reuther  <streu@gmx.de>
+
+	* afl/sys/environment.hpp (attachTextWriter, attachTextReader, attachStream): new
+
+2016-07-28  Stefan Reuther  <streu@gmx.de>
+
+	* afl/io/textreader.cpp, afl/io/textreader.hpp: new
+	* afl/io/textwriter.cpp, afl/io/textwriter.hpp: new
+
+2016-07-17  Stefan Reuther  <streu@gmx.de>
+
+	* afl/base/closure.hpp (clone): must be const!
+
+2016-07-10  Stefan Reuther  <streu@gmx.de>
+
+	* afl/charset/utf8.cpp (charToBytePos, byteToCharPos): deal with large positions
+
+2016-06-26  Stefan Reuther  <streu@gmx.de>
+
+	* afl/except/assertionfailedexception.hpp: new [cpluslib/assert.h, sort-of]
+
+2016-06-19  Stefan Reuther  <streu@gmx.de>
+
+	* afl/sys/longcommandlineparser.cpp, afl/sys/longcommandlineparser.hpp: new
+
+2016-06-12  Stefan Reuther  <streu@gmx.de>
+
+	* afl/string/proxytranslator.cpp, afl/string/proxytranslator.hpp: new
+
+2016-05-28  Stefan Reuther  <streu@gmx.de>
+
+	* afl/net/http/simpledownloadlistener.cpp, afl/net/http/simpledownloadlistener.hpp: new
+
+2016-05-23  Stefan Reuther  <streu@gmx.de>
+
+	* afl/io/directoryentry.hpp: add flags (Hidden, Link)
+
+2016-05-22  Stefan Reuther  <streu@gmx.de>
+
+	* afl/sys/thread.cpp (Thread): fix leak
+	* afl/base/signal.hpp (addNewClosure): new
+	* afl/sys/loglistener.hpp (write): new method to log exceptions
+
+2016-05-16  Stefan Reuther  <streu@gmx.de>
+
+	* afl/sys/environment.hpp (getInstallationDirectoryName): new
+
+2016-05-12  Stefan Reuther  <streu@gmx.de>
+
+	* arch/environment.hpp: split into separate platform parts
+
+2016-05-09  Stefan Reuther  <streu@gmx.de>
+
+	* afl/sys/environment.hpp (getSettingsDirectoryName): new
+
+2016-04-30  Stefan Reuther  <streu@gmx.de>
+
+	* afl/sys/commandlineparser.hpp: new [pcc-v2/util/cmdline.h, sort-of]
+	* afl/sys/standardcommandlineparser.cpp, afl/sys/standardcommandlineparser.hpp: new [pcc-v2/util/cmdline.h, sort-of]
+
+	* afl/base/enumerator.hpp: convert from has/get to atomic get style
+
+2016-04-11  Stefan Reuther  <streu@gmx.de>
+
+	* afl/base/nothingtype.hpp: new
+
+2016-04-09  Stefan Reuther  <streu@gmx.de>
+
+	* afl/io/datasink.cpp: handleFullData(), analogous to Stream::fullWrite()
+
+2016-04-04  Stefan Reuther  <streu@gmx.de>
+
+	* afl/data/floatvalue.hpp, afl/data/integervalue.hpp: add()
+
+2016-04-02  Stefan Reuther  <streu@gmx.de>
+
+	* afl/data/namequery.cpp, afl/data/namequery.hpp: new [pcc-v2/int/names.h]
+	* afl/base/memory.hpp: add find(), findFirstOf(), atEnd(), removeEnd()
+	* afl/base/growablememory.hpp: add find(), findFirstOf(), clear(), resize(), atEnd(), removeEnd()
+
+2016-03-27  Stefan Reuther  <streu@gmx.de>
+
+	* afl/base/signal.hpp: changed signature from <a,b,c> to <T(a,b,c)>
+	* afl/base/closure.hpp: changed signature from <a,b,c> to <T(a,b,c)>
+	* afl/base/inlineoptional.hpp: new [cpluslib/maybe.h]
+	* afl/bits/smallset.hpp: add comparison to unit
+	* afl/container/ptrvector.hpp: add sort
+	* afl/string/char.hpp: add charIsDigit, charIsAlphanumeric
+
+2016-03-19  Stefan Reuther  <streu@gmx.de>
+
+	* afl/charset/charset.hpp: make clonable
+	* afl/base/clonable.hpp: new
+
+2016-03-18  Stefan Reuther  <streu@gmx.de>
+
+	* afl/io/internalfilemapping.cpp, afl/io/internalfilemapping.hpp: use GrowableMemory
+	* afl/io/internalsink.cpp, afl/io/internalsink.hpp: use GrowableMemory
+	* afl/io/internalstream.cpp, afl/io/internalstream.hpp: use GrowableMemory
+	* afl/base/growablememory.hpp: new [cpluslib/buffer.h]
+
+2016-03-05  Stefan Reuther  <streu@gmx.de>
+
+	* afl/functional/stringtable.hpp: new [pcc-v2/util/strtab.h]
+	* afl/functional/binaryfunction.hpp: new
+	* afl/functional/mapping.hpp: new
+	* afl/functional/unaryfunction.hpp: new
+
+2016-02-28  Stefan Reuther  <streu@gmx.de>
+
+	* afl/io/filemapping.cpp, afl/io/filemapping.hpp: new
+	* afl/io/internalfilemapping.cpp, afl/io/internalfilemapping.hpp: new
+
+2016-01-03  Stefan Reuther  <streu@gmx.de>
+
+	* afl/charset/defaultcharsetfactory.cpp, afl/charset/defaultcharsetfactory.hpp: new [pcc-v2/util/recode.h]
+	* afl/charset/charsetfactory.hpp: new [pcc-v2/util/recode.h]
+
+2016-01-02  Stefan Reuther  <streu@gmx.de>
+
+	* afl/io/xml/basereader.hpp: new [pcc-v2/util/xmlread.h]
+	* afl/io/xml/defaultentityhandler.cpp, afl/io/xml/defaultentityhandler.hpp: new [pcc-v2/util/xmlread.h]
+	* afl/io/xml/entityhandler.hpp: new [pcc-v2/util/xmlread.h]
+	* afl/io/xml/reader.cpp, afl/io/xml/reader.hpp: new [pcc-v2/util/xmlread.h]
+
+2015-12-31  Stefan Reuther  <streu@gmx.de>
+
+	* afl/container/ptrmap.hpp: add ability to have a 'const T' value type
+	* afl/container/ptrqueue.hpp: add ability to have a 'const T' value type
+	* afl/container/ptrvector.hpp: add ability to have a 'const T' value type
+
+2015-12-19  Stefan Reuther  <streu@gmx.de>
+
+	* afl/net/http/formparser.cpp, afl/net/http/formparser.hpp: created
+	* afl/io/textsink.cpp, afl/io/textsink.hpp: created
+
+2015-12-18  Stefan Reuther  <streu@gmx.de>
+
+	* afl/net/http/page.hpp: created
+	* afl/net/http/pagedispatcher.cpp, afl/net/http/pagedispatcher.hpp: created
+	* afl/net/http/pagerequest.cpp, afl/net/http/pagerequest.hpp: created
+	* afl/net/http/pageresponse.cpp, afl/net/http/pageresponse.hpp: created
+
+2015-12-05  Stefan Reuther  <streu@gmx.de>
+
+	* afl/net/http/dispatcher.hpp: created
+	* afl/net/http/errorresponse.cpp, afl/net/http/errorresponse.hpp: created
+	* afl/net/http/protocolhandler.cpp, afl/net/http/protocolhandler.hpp: created
+	* afl/net/http/request.cpp, afl/net/http/request.hpp: created
+	* afl/net/http/response.hpp: created
+	* app/httpserver.cpp: created
+
+2015-11-01  Stefan Reuther  <streu@gmx.de>
+
+	* afl/net/commandhandler.cpp, afl/net/commandhandler.hpp: rename from CommandClient
+
+2015-10-31  Stefan Reuther  <streu@gmx.de>
+
+	* afl/net/resp/protocolhandler.cpp, afl/net/resp/protocolhandler.hpp: created
+	* afl/container/ptrqueue.hpp: created
+	* afl/data/errorvalue.hpp: add source parameter
+	* afl/io/datasink.hpp: add name parameter
+
+2015-10-25  Stefan Reuther  <streu@gmx.de>
+
+	* afl/net/redis/internaldatabase.cpp, afl/net/redis/internaldatabase.hpp: created (int/string/keyspace/hash operations)
+
+2015-10-24  Stefan Reuther  <streu@gmx.de>
+
+	* afl/data/segmentview.cpp, afl/data/segmentview.cpp: created [pcc-v2/int/args.h]
+	* afl/net/redis/integersetkey.cpp, afl/net/redis/integersetkey.hpp: created [planetscentral/dbclient/dbset.h]
+	* afl/net/redis/integersetoperation.cpp, afl/net/redis/integersetoperation.hpp: created [planetscentral/dbclient/dbset.h]
+	* afl/net/redis/setkey.cpp, afl/net/redis/setkey.hpp: created [planetscentral/dbclient/dbset.h]
+	* afl/net/redis/stringsetkey.cpp, afl/net/redis/stringsetkey.hpp: created [planetscentral/dbclient/dbset.h]
+	* afl/net/redis/stringsetoperation.cpp, afl/net/redis/stringsetoperation.hpp: created [planetscentral/dbclient/dbset.h]
+	* afl/net/redis/sortoperation.cpp, afl/net/redis/sortoperation.hpp: created [planetscentral/dbclient/dbsort.h]
+	* afl/net/redis/integerlistkey.cpp, afl/net/redis/integerlistkey.hpp: created [planetscentral/dbclient/dblist.h]
+	* afl/net/redis/stringlistkey.cpp, afl/net/redis/stringlistkey.hpp: created [planetscentral/dbclient/dblist.h]
+	* afl/net/redis/listkey.cpp, afl/net/redis/listkey.hpp: created [planetscentral/dbclient/dblist.h]
+
+2015-10-22  Stefan Reuther  <streu@gmx.de>
+
+	* afl/net/redis/subtree.cpp, afl/net/redis/subtree.hpp: created [planetscentral/dbclient/dbsubtree.h]
+	* afl/net/redis/field.cpp, afl/net/redis/field.hpp: created [planetscentral/dbclient/dbhash.h]
+	* afl/net/redis/hashkey.cpp, afl/net/redis/hashkey.hpp: created [planetscentral/dbclient/dbhash.h]
+	* afl/net/redis/integerfield.cpp, afl/net/redis/integerfield.hpp: created [planetscentral/dbclient/dbhash.h]
+	* afl/net/redis/stringfield.cpp, afl/net/redis/stringfield.hpp: created [planetscentral/dbclient/dbhash.h]
+
+2015-10-20  Stefan Reuther  <streu@gmx.de>
+
+	* afl/net/redis/stringkey.cpp, afl/net/redis/stringkey.hpp: created [planetscentral/dbclient/dbstring.h]
+
+2015-10-18  Stefan Reuther  <streu@gmx.de>
+
+	* afl/net/redis/key.cpp, afl/net/redis/key.hpp: created [planetscentral/dbclient/dbkey.h]
+	* afl/net/redis/integerkey.cpp, afl/net/redis/integerkey.hpp: created [planetscentral/dbclient/dbint.h]
+	* afl/io/bufferedsink.cpp, afl/io/bufferedsink.hpp: remove auto_ptr
+	* afl/io/inflatedatasink.cpp, afl/io/inflatedatasink.hpp: remove auto_ptr
+	* afl/io/limiteddatasink.cpp, afl/io/limiteddatasink.hpp: remove auto_ptr
+	* afl/io/transformdatasink.cpp, afl/io/transformdatasink.hpp: remove auto_ptr
+	* afl/net/http/chunkedsink.cpp, afl/net/http/chunkedsink.hpp: remove auto_ptr
+	* afl/net/http/clientconnection.cpp, afl/net/http/clientconnection.hpp: remove auto_ptr
+	* afl/net/resp/client.cpp, afl/net/resp/client.hpp: new [planetscentral/dbclient/dbclient.h]
+
+2015-10-17  Stefan Reuther  <streu@gmx.de>
+
+	* afl/async/communicationsink.cpp, afl/async/communicationsink.hpp: new
+
+2015-10-15  Stefan Reuther  <streu@gmx.de>
+
+	* afl/net/commandclient.cpp, afl/net/commandclient.hpp: new
+
+2015-10-14  Stefan Reuther  <streu@gmx.de>
+
+	* afl/data/access.cpp: add toStringList(), toIntegerList()
+
+2015-10-11  Stefan Reuther  <streu@gmx.de>
+
+	* afl/io/internalsink.cpp, afl/io/internalsink.hpp: new
+	* afl/io/bufferedsink.cpp, afl/io/bufferedsink.hpp: new
+	* afl/io/resp/writer.cpp, afl/io/resp/writer.hpp: convert to use a DataSink
+	* afl/data/segment.hpp: add methods to push native values
+	* afl/data/stringlist.hpp: new
+	* afl/data/integerlist.hpp: new
+	* arch/atomicinteger.hpp: add support for gcc-4.7 atomics
+
+2015-10-10  Stefan Reuther  <streu@gmx.de>
+
+	* afl/io/resp/parser.cpp, afl/io/resp/parser.hpp: converted to push-parser
+	* afl/base/memory.hpp: add splitUpdate()
+	* afl/data/defaultvaluefactory.hpp: add createError()
+	* afl/data/valuefactory.hpp: add createError()
+
+2015-10-08  Stefan Reuther  <streu@gmx.de>
+
+	* afl/data/errorvalue.cpp, afl/data/errorvalue.hpp: new
+	* afl/data/visitor.hpp: add visitError()
+	* afl/io/resp/writer.cpp: add visitError()
+
+2015-10-03  Stefan Reuther  <streu@gmx.de>
+
+	* afl/io/inflatetransform.hpp: implement using TransformDataSink
+	* afl/io/transformdatasink.hpp, afl/io/transformdatasink.cpp: new
+	* afl/io/transform.hpp: new
+	* afl/io/inflatetransform.cpp: new
+	* afl/base/optional.hpp: rework to remove type-punning warnings
+
+2015-08-21  Stefan Reuther  <Streu@gmx.de>
+
+	* afl/base/optional.hpp: created [cpluslib/maybe.h]
+	* afl/io/stream.hpp (flush): new interface method
+
+2015-08-19  Stefan Reuther  <Streu@gmx.de>
+
+	* afl/bits/uint16be.hpp, afl/bits/uint32be.hpp, afl/bits/uint64be.hpp: created
+	* afl/bits/int16be.hpp, afl/bits/int32be.hpp, afl/bits/int64be.hpp: created
+	* afl/checksums/hash.cpp (computePBKDF2): new
+	* config.sh: fix detection of libraries; add detection of SChannel
+	* afl/checksums/sha1.cpp, afl/checksums/sha1.hpp: created
+
+2015-08-17  Stefan Reuther  <Streu@gmx.de>
+
+	* afl/checksums/hash.cpp, afl/checksums/hash.hpp: created
+	* afl/checksums/md5.cpp, afl/checksums/md5.hpp: created [integrator/src/net/md5.h]
+
+2015-08-16  Stefan Reuther  <Streu@gmx.de>
+
+	* cxxtest/TestController.h: new
+	* afl/io/multidirectory.hpp: ensure instances are created on the heap
+	* config/openssl/opensslsocket.cpp: implement flushing for proper timing behaviour
+
+2015-08-08  Stefan Reuther  <Streu@gmx.de>
+
+	* app/chatserver.cpp: add SSL support
+	* afl/net/securenetworkstack.cpp: clean up
+
+2015-08-02  Stefan Reuther  <Streu@gmx.de>
+
+	* afl/net/securecontext.hpp: new, initial version
+
+2015-08-01  Stefan Reuther  <Streu@gmx.de>
+
+	* afl/net/securenetworkstack.cpp: new
+	* config/openssl/opensslsocket.cpp: finished it
+
+2015-07-31  Stefan Reuther  <Streu@gmx.de>
+
+	* config/openssl/: new folder for config-dependant modules
+
+2015-07-26  Stefan Reuther  <Streu@gmx.de>
+
+	* afl/net/securesocket.cpp: initial (incomplete) version
+
+2015-07-21  Stefan Reuther  <Streu@gmx.de>
+
+	* afl/net/url.cpp (parse): handle path beginning with "?"
+
+2015-03-17  Stefan Reuther  <Streu@gmx.de>
+
+	* afl/io/multiplexablestream.cpp (activateChild): change activation order to be exception-safe
+	* afl/net/http/client.hpp: implement timeouts
+
+2015-03-16  Stefan Reuther  <Streu@gmx.de>
+
+	* afl/net/http/client.hpp (cancelRequest): new
+	* config.sh, config.h: reworked config handling
+	* afl/sys/loglistener.cpp, afl/sys/loglistener.hpp: new; added proper locking
+
+2015-03-15  Stefan Reuther  <Streu@gmx.de>
+
+	* afl/net/http/manager.hpp: add support for cookies
+	* afl/net/http/cookiejar.cpp, afl/net/http/cookiejar.hpp: new
+	* afl/net/http/cookie.cpp, afl/net/http/cookie.hpp: new
+	* afl/sys/time.hpp (getUnixTime, fromUnixTime): new
+	* afl/net/headerfield.cpp: add options to preserve comments/quotes
+
+2015-03-13  Stefan Reuther  <Streu@gmx.de>
+
+	* afl/net/http/downloadlistener.cpp, afl/net/http/downloadlistener.hpp: new
+	* afl/net/http/manager.cpp, afl/net/http/manager.hpp: new
+	* afl/net/http/defaultconnectionprovider.cpp, afl/net/http/defaultconnectionprovider.hpp: new
+	* afl/net/headerfield.cpp, afl/net/headerfield.hpp: new [parts of planetscentral/net/mimeparser.h]
+	* afl/net/headertable.cpp, afl/net/headertable.hpp: new
+
+2015-03-12  Stefan Reuther  <Streu@gmx.de>
+
+	* afl/sys/log.cpp, afl/sys/log.hpp: new [parts of pcc-v2/util/console.h]
+	* afl/net/http/clientconnection.cpp: implement Content-Encoding: gzip
+	* afl/io/inflatedatasink.cpp, afl/io/inflatedatasink.cpp: new [pcc-v2/io/zipstream.h]
+	* afl/except/unsupportedexception.cpp, afl/except/unsupportedexception.hpp: new
+	* afl/io/limiteddatasink.cpp: new
+	* afl/net/http/chunkedsink.cpp, afl/net/http/chunkedsink.hpp: new
+	* afl/io/datasink.hpp: new
+
+2015-03-11  Stefan Reuther  <Streu@gmx.de>
+
+	* afl/net/http/client.hpp, afl/net/http/client.cpp: new [integrator/src/net/http.h]
+	* afl/net/http/clientconnection.hpp, afl/net/http/clientconnection.cpp: new
+	* afl/net/name.hpp (operator!=,operator==): new
+	* afl/net/http/clientrequest.hpp: new
+	* afl/net/http/clientconnectionprovider.hpp: new
+
+2015-03-10  Stefan Reuther  <Streu@gmx.de>
+
+	* afl/net/http/clientresponse.hpp, afl/net/http/clientresponse.cpp: new
+	* afl/string/parsememory.hpp, afl/string/parsememory.cpp: new
+	* afl/string/parse.cpp (strToInteger): add ability to parse long long and made totally more robust
+
+2015-03-09  Stefan Reuther  <Streu@gmx.de>
+
+	* afl/string/string.hpp (String_t): also place in global namespace
+	* config.mk: add minimal compile-time configuration
+
+2015-03-07  Stefan Reuther  <Streu@gmx.de>
+
+	* afl/async/notifier.cpp: new
+
+2015-03-01  Stefan Reuther  <Streu@gmx.de>
+
+	* afl/net/name.hpp: add signatures that take a port number, not a string
+
+2015-02-28  Stefan Reuther  <Streu@gmx.de>
+
+	* afl/net/socket.hpp (getPeerName): new
+
+2015-02-22  Stefan Reuther  <Streu@gmx.de>
+
+	* afl/net/headerconsumer.hpp: new
+	* afl/net/headerparser.hpp: new
+	* afl/net/protocolhandlerfactory.hpp: new
+	* afl/net/protocolhandler.hpp: new
+	* afl/net/simpleserver.hpp: new
+
+2015-02-18  Stefan Reuther  <Streu@gmx.de>
+
+	* afl/net/acceptoperation.hpp: new
+	* afl/net/listener.hpp (acceptAsync): new method, needed for single-threaded multi-connection servers
+
+2015-02-15  Stefan Reuther  <Streu@gmx.de>
+
+	* afl/net/url.cpp: new
+
+2014-12-13  Stefan Reuther  <Streu@gmx.de>
+
+	* afl/string/formattraits.cpp (formatToString): fixed '%.1f' formatting of small values
+
+2014-11-22  Stefan Reuther  <Streu@gmx.de>
+
+	* afl/io/resp/writer.cpp, afl/io/resp/writer.cpp: created [planetscentral/dbclient/connection.h]
+	* afl/io/resp/parser.cpp, afl/io/resp/parser.hpp: created [planetscentral/dbclient/connection.h]
+	* afl/except/remoteerrorexception.cpp, afl/except/remoteerrorexception.hpp: created
+	* afl/except/invaliddataexception.cpp, afl/except/invaliddataexception.hpp: created
+	* afl/data/access.cpp, afl/data/access.hpp: created [planetscentral/dbclient/connection.h]
+
+2014-11-20  Stefan Reuther  <Streu@gmx.de>
+
+	* afl/string/parse.cpp, afl/string/parse.cpp: created [pcc-v2/util/misc.h]
+
+2014-11-19  Stefan Reuther  <Streu@gmx.de>
+
+	* afl/io/json/writer.cpp, afl/io/json/writer.hpp: created [c2server/server/jsonout.h]
+	* afl/io/json/parser.cpp, afl/io/json/parser.hpp: created [c2server/server/jsonin.h]
+
+2014-11-16  Stefan Reuther  <Streu@gmx.de>
+
+	* afl/data/defaultvaluefactory.cpp, afl/data/defaultvaluefactory.hpp: created
+	* afl/data/valuefactory.hpp: created
+	* afl/async/communicationobject.hpp (getName): new
+	* afl/data/vector.cpp, afl/data/vector.hpp: created [pcc-v2/int/array.h]
+	* afl/data/vectorvalue.cpp, afl/data/vectorvalue.hpp: created [pcc-v2/int/array.h]
+
+2014-11-15  Stefan Reuther  <Streu@gmx.de>
+
+	* afl/data/hash.cpp, afl/data/hash.hpp: created [pcc-v2/int/hash.h]
+	* afl/data/hashvalue.cpp, afl/data/hashvalue.hpp: created [pcc-v2/int/hash.h]
+
+2014-11-12  Stefan Reuther  <Streu@gmx.de>
+
+	* afl/data/segment.cpp, afl/data/segment.hpp created [pcc-v2/int/data.h]
+
+2014-11-09  Stefan Reuther  <Streu@gmx.de>
+
+	* afl/data/visitor.hpp, afl/data/value.hpp, etc: created
+
+2014-11-07  Stefan Reuther  <Streu@gmx.de>
+
+	* afl/data/namemap.cpp, afl/data/namemap.hpp: created [pcc-v2/int/names.h]
+
+2014-11-05  Stefan Reuther  <Streu@gmx.de>
+
+	* arch/thread.hpp: thread names for POSIX
+
+2014-11-02  Stefan Reuther  <Streu@gmx.de>
+
+	* afl/async/communicationstream.cpp, afl/async/communicationstream.hpp: created
+
+2014-11-01  Stefan Reuther  <Streu@gmx.de>
+
+	* afl/sys/environment.hpp: created
+	* afl/net/socket.hpp: changed to be based on afl::async::CommunicationObject
+
+2014-10-29  Stefan Reuther  <Streu@gmx.de>
+
+	* arch/posix/posixcontrollerimpl.hpp: implement using select()
+
+2014-10-26  Stefan Reuther  <Streu@gmx.de>
+
+	* arch/posix/posixcontrollerimpl.cpp, arch/posix/posixcontrollerimpl.hpp: created [partial]
+	* afl/async/timer.cpp, afl/async/timer.hpp: created
+	* afl/async/messageexchange.cpp, afl/async/messageexchange.hpp: created
+
+2014-10-25  Stefan Reuther  <Streu@gmx.de>
+
+	* afl/async/mutex.cpp, afl/async/mutex.hpp: created
+
+2014-10-24  Stefan Reuther  <Streu@gmx.de>
+
+	* afl/async/: initial, incomplete version
+	* arch/semaphore.hpp: fix timedDown for POSIX
+
+2014-10-19  Stefan Reuther  <Streu@gmx.de>
+
+	* afl/sys/thread.hpp: add sleep, name
+	* afl/io/directoryentry.hpp (getModificationTime): new
+	* afl/sys/time.cpp, afl/sys/time.hpp: created
+	* afl/sys/duration.cpp, afl/sys/duration.hpp: created
+	* afl/sys/parsedtime.hpp: created
+	* arch/posix/posixtime.cpp, arch/posix/posixtime.hpp: created
+
+2014-10-15  Stefan Reuther  <Streu@gmx.de>
+
+	* afl/base/memory.hpp (Bytes_t, ConstBytes_t): new, use it everywhere
+
+2014-10-12  Stefan Reuther  <Streu@gmx.de>
+
+	* afl/net/name.hpp (setService, setName): new
+	* afl/charset/base64.cpp, afl/charset/base64.hpp: created [integrator/src/net/encoding.h]
+	* afl/charset/quotedprintable.cpp, afl/charset/quotedprintable.hpp: created [integrator/src/net/encoding.h]
+	* afl/charset/urlencoding.cpp, afl/charset/urlencoding.hpp: created [integrator/src/net/encoding.h]
+	* arch/win32/win32networkstack.hpp, arch/win32/win32networkstack.cpp: created
+
+2014-10-11  Stefan Reuther  <Streu@gmx.de>
+
+	* afl/bits/fixedstring.hpp, afl/bits/fixedstring.cpp: created [pcc-v2/io/io.cc]
+	* arch/posix/posixnetworkstack.cpp: created [integrator/os/nix/socket.h]
+	* afl/net/socket.hpp, afl/net/socket.cpp: created
+	* afl/net/networkstack.hpp, afl/net/networkstack.cpp: created
+	* afl/net/listener.hpp: created
+	* afl/net/name.hpp: created
+	* afl/io/textfile.hpp: implement in terms of BufferedStream
+	* afl/io/bufferedstream.cpp, afl/io/bufferedstream.hpp: created
+
+2014-10-10  Stefan Reuther  <Streu@gmx.de>
+
+	* afl/io/textfile.cpp, afl/io/textfile.hpp: created [pcc-v2/io/textfile.h]
+
+2014-10-08  Stefan Reuther  <Streu@gmx.de>
+
+	* afl/base/memory.hpp (reset, at): new
+
+2014-10-07  Stefan Reuther  <Streu@gmx.de>
+
+	* afl/charset/utf8.cpp (substrMemory): new; (substr): fixed 'count' handling
+
+2014-10-06  Stefan Reuther  <Streu@gmx.de>
+
+	* afl/charset/codepagecharset.cpp, afl/charset/codepagecharset.hpp: created [pcc-v2/util/charsets/...]
+
+2014-10-05  Stefan Reuther  <Streu@gmx.de>
+
+	* afl/charset/codepage.hpp, afl/charset/codepage_XXX.cpp: created [pcc-v2/util/charsets/...]
+	* afl/charset/utf8charset.cpp, afl/charset/utf8charset.hpp: created
+	* afl/charset/charset.hpp: created
+	* afl/bits/value.hpp: created
+	* afl/string/nulltranslator.cpp, afl/string/nulltranslator.hpp: created
+	* afl/string/translator.cpp, afl/string/translator.hpp: created
+	* afl/string/messages.hpp: created
+	* afl/io/internalstream.cpp (getContent): new
+	* afl/base/memory.hpp: add construction from std::vector
+
+2014-10-03  Stefan Reuther  <Streu@gmx.de>
+
+	* afl/base/ptr.hpp (operator==, operator!=): new
+	* afl/io/internaldirectory.cpp, afl/io/internaldirectory.hpp: created [pcc-v2/io/memdir.h]
+	* afl/io/multiplexablestream.cpp: created [pcc-v2/io/stream.h]
+	* afl/io/stream.hpp (createChild): new
+
+2014-10-02  Stefan Reuther  <stefan@royale>
+
+	* arch/posix/posixdirectory.cpp: portability
+
+2014-09-28  Stefan Reuther  <stefan@royale>
+
+	* afl/io/internalstream.cpp, afl/io/internalstream.hpp: created [pcc-v2/io/memstream.h]
+	* afl/io/constmemorystream.cpp, afl/io/constmemorystream.hpp: created
+	* afl/io/memorystream.cpp, afl/io/memorystream.hpp: created
+	* afl/io/multidirectory.cpp, afl/io/multidirectory.hpp: created
+	* arch/win32/win32.cpp, arch/win32/win32.hpp: created
+	* arch/win32/win32directory.cpp, arch/win32/win32directory.hpp: created
+	* arch/win32/win32filesystem.cpp, arch/win32/win32filesystem.hpp: created
+	* arch/win32/win32root.cpp, arch/win32/win32root.hpp: created
+	* arch/win32/win32stream.cpp, arch/win32/win32stream.hpp: created
+
+2014-09-27  Stefan Reuther  <stefan@royale>
+
+	* arch/posix/posixroot.cpp, arch/posix/posixroot.hpp: created
+	* afl/io/directoryentry.cpp, afl/io/directoryentry.hpp (getLinkText): new
+	* afl/io/directory.cpp, afl/io/directory.hpp: created [pcc-v2/io/dirs.h]
+	* afl/io/directoryentry.cpp, afl/io/directoryentry.hpp: created [pcc-v2/io/dirs.h]
+
+2014-09-26  Stefan Reuther  <stefan@royale>
+
+	* afl/io/nullstream.cpp, afl/io/nullstream.hpp: created
+
+2014-09-25  Stefan Reuther  <stefan@royale>
+
+	* arch/posix/posix.cpp, arch/posix/posixfilesystem.cpp: portability
+	* afl/io/filesystem.cpp, afl/io/filesystem.hpp, arch/filesystem.hpp: add POSIX FileSystem implementation
+	* afl/io/stream.hpp, arch/posix/posix.cpp, arch/posix/posix.hpp: add POSIX FileSystem implementation
+	* arch/posix/posixfilesystem.cpp, arch/posix/posixfilesystem.hpp: created
+	* arch/posix/posixstream.cpp, arch/posix/posixstream.hpp: created
+
+2014-09-24  Stefan Reuther  <stefan@royale>
+
+	* afl/base/memory.hpp (trim): added
+	* afl/except/fileformatexception.cpp, afl/except/fileformatexception.hpp: created
+	* afl/except/fileproblemexception.cpp, afl/except/fileproblemexception.hpp: created
+	* afl/except/filesystemexception.cpp, afl/except/filesystemexception.hpp: created
+	* afl/except/filetooshortexception.cpp, afl/except/filetooshortexception.hpp: created
+	* afl/except/systemexception.cpp, afl/except/systemexception.hpp: created
+	* afl/io/stream.cpp, afl/io/stream.hpp: created [pcc-v2/io/streams.h]
+	* afl/io/filesystem.hpp: created [pcc-v2/io/dirs.h]
+
+2014-09-21  Stefan Reuther  <stefan@royale>
+
+	* arch/error.hpp, arch/mutex.hpp, arch/semaphore.hpp, arch/thread.hpp: add win32 support
+
+2014-09-20  Stefan Reuther  <stefan@royale>
+
+	* afl/charset/utf8.cpp, afl/charset/utf8reader.cpp: add AllowErrorEscapes
+	* afl/sys/error.cpp, afl/sys/error.hpp, arch/error.hpp: created
+	* arch/posix/posix.cpp, arch/posix/posix.hpp: created
+	* afl/sys/mutex.cpp, afl/sys/semaphore.cpp, afl/sys/thread.cpp: separate arch-dependant code
+	* afl/sys/atomicinteger.cpp: add i386 asm version
+
+2014-09-14  Stefan Reuther  <stefan@royale>
+
+	* afl/bits/int16le.hpp, afl/bits/int32le.hpp, afl/bits/int64le.hpp, afl/bits/int8.hpp: created
+
+2014-09-13  Stefan Reuther  <stefan@royale>
+
+	* afl/base/memory.hpp: fixed const propagation
+	* afl/bits/pack.hpp: created
+	* afl/bits/uint16le.hpp, afl/bits/uint32le.hpp, afl/bits/uint64le.hpp, afl/bits/uint8.hpp: created
+
+2014-09-10  Stefan Reuther  <stefan@royale>
+
+	* afl/charset/unicode.hpp: created [cpluslib/utf8.h]
+	* afl/charset/utf8.cpp, afl/charset/utf8.hpp: created [cpluslib/utf8.h]
+	* afl/charset/utf8reader.cpp, afl/charset/utf8reader.hpp: created [cpluslib/utf8.h]
+	* afl/base/memory.hpp: use CopyCV
+	* afl/tmp/copycv.hpp: created
+
+2014-09-06  Stefan Reuther  <stefan@royale>
+
+	* afl/base/memory.hpp (toBytes, eatN): new members
+
+2014-08-31  Stefan Reuther  <stefan@royale>
+
+	* afl/container/dereferencingiterator.hpp: created [cpluslib/iterator.h]
+	* afl/container/memberiterator.hpp: created [cpluslib/iterator.h]
+	* afl/tmp/dereferencetype.hpp: created
+	* afl/string/format.cpp, afl/string/format.hpp: clean up types
+	* afl/string/formatstate.cpp, afl/string/formatstate.hpp: clean up types
+	* afl/string/formattraits.cpp: clean up types
+
+2014-08-30  Stefan Reuther  <stefan@royale>
+
+	* afl/string/format.cpp, afl/string/format.hpp: clean up, add floating point
+	* afl/string/formattraits.cpp, afl/string/formattraits.hpp: clean up, add floating point
+	* afl/string/formatunion.hpp: clean up
+
+2014-08-29  Stefan Reuther  <stefan@royale>
+
+	* afl/string/format.cpp, afl/string/format.hpp: portability fixes
+
+2014-08-27  Stefan Reuther  <stefan@royale>
+
+	* afl/tmp/typelist.hpp: created
+	* afl/tmp/issametype.hpp: created
+	* afl/tmp/sizedint.hpp, afl/tmp/sizeduint.hpp: created
+
+2014-08-26  Stefan Reuther  <stefan@royale>
+
+	* afl/string/format.cpp, afl/string/format.hpp: created [cpluslib/format.h; incomplete]
+	* afl/string/string.cpp, afl/string/string.hpp: created [cpluslib/string.h]
+	* afl/string/formatstate.cpp, afl/string/formatstate.hpp: created [cpluslib/format.h]
+
+2014-08-24  Stefan Reuther  <stefan@royale>
+
+	* afl/string/string.cpp, afl/string/string.hpp: created [cpluslib/string.h]
+	* afl/string/char.hpp: created [cpluslib/string.h]
+	* afl/base/memory.hpp: implement missing methods
+	* afl/tmp/stripcv.hpp: created
+	* afl/checksums/adler32.cpp, afl/checksums/adler32.hpp: created
+	* afl/checksums/bytesum.cpp, afl/checksums/bytesum.hpp: created
+	* afl/checksums/checksum.hpp: created
+	* afl/checksums/crc16.cpp, afl/checksums/crc16.hpp: created
+	* afl/checksums/crc32.cpp, afl/checksums/crc32.hpp: created
+
+2014-08-23  Stefan Reuther  <stefan@royale>
+
+	* afl/bits/bits.cpp, afl/bits/bits.hpp: created [cpluslib/bits.h]
+	* afl/bits/rotate.hpp: created [cpluslib/bits.h]
+
+2014-08-22  Stefan Reuther  <stefan@royale>
+
+	* afl/base/ptr.cpp, afl/base/ptr.hpp: created [cpluslib/smartptr.h]
+
+2014-08-21  Stefan Reuther  <stefan@royale>
+
+	* afl/base/refcounted.hpp: created [cpluslib/object.h]
+
+2014-08-19  Stefan Reuther  <stefan@royale>
+
+	* afl/sys/atomicinteger.cpp, afl/sys/atomicinteger.hpp: created
+
+2014-08-18  Stefan Reuther  <stefan@royale>
+
+	* Doxyfile: created
+
+2014-08-17  Stefan Reuther  <stefan@royale>
+
+	* afl/base/signal.cpp, afl/base/signal.hpp: created [cpluslib/signal.h]
+	* afl/base/signalconnection.cpp, afl/base/signalconnection.hpp: created [cpluslib/signal.h]
+	* afl/bits/smallset.hpp: created [cpluslib/smallset.h]
+	* afl/base/countof.hpp: created
+
+2014-08-16  Stefan Reuther  <stefan@royale>
+
+	* afl/base/signalhandler.cpp, afl/base/signalhandler.hpp: created [cpluslib/signal.h]
+	* afl/base/clonableref.hpp: created
+	* afl/base/closure.cpp, afl/base/closure.hpp: created [cpluslib/call.h]
+
+2014-08-14  Stefan Reuther  <stefan@royale>
+
+	* afl/base/staticassert.hpp: created [cpluslib/assert.h]
+	* afl/tmp/ifthenelse.hpp: created
+	* afl/container/ptrmultilistbase.cpp: created [cpluslib/ptrmultilist.h]
+	* afl/container/ptrmultilist.hpp, afl/container/ptrmultilistbase.hpp: created [cpluslib/ptrmultilist.h]
+	* afl/base/enumerator.hpp: created [cpluslib/enum.h]
+
+2014-08-13  Stefan Reuther  <stefan@royale>
+
+	* afl/container/ptrmap.hpp: created [cpluslib/ptrmap.h]
+	* afl/container/ptrvector.hpp: update afl::container::PtrContainer more to new format
+	* afl/base/deleter.cpp, afl/base/deleter.hpp: created [cpluslib/holder.h]
+
+2014-08-12  Stefan Reuther  <stefan@royale>
+
+	* afl/base/deletable.hpp: created
+	* afl/base/runnable.hpp: created
+	* afl/sys/guard.hpp: created
+	* afl/sys/mutex.cpp: created
+	* afl/sys/mutexguard.hpp: created [integrator/src/scopedlock.h]
+	* afl/sys/semaphore.cpp, afl/sys/semaphore.hpp: created [integrator/os/nix/sem.h]
+	* afl/sys/thread.cpp, afl/sys/thread.hpp: created [integrator/os/nix/thread.h]
+
+2014-08-05  Stefan Reuther  <stefan@royale>
+
+	* afl/base/uncopyable.hpp: created [compiler/util/noncopyable.h]
+	* afl/sys/mutex.cpp, afl/sys/mutex.hpp: created
+	* afl/container/ptrvector.hpp: created [cpluslib/ptrvector.h]
+
+2014-08-04  Stefan Reuther  <stefan@royale>
+
+	* afl/base/memory.hpp: created [cpluslib/bufferdescriptor.h]
+	* afl/base/types.hpp: created [cpluslib/types.h]

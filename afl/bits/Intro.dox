@@ -1,0 +1,8 @@
+/** \file afl/bits/Intro.dox
+    \brief Namespace afl::bits */
+
+/** \namespace afl::bits
+    \brief Bitwise Operations
+
+    This namespace contains utilities for dealing with bits:
+    re-arranging bits, accessing bit-wise quantities, etc. */

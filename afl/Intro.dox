@@ -1,0 +1,14 @@
+/** \file afl/Intro.dox
+    \brief Namespace afl */
+
+/** \namespace afl
+    \brief Main Namespace
+
+    This is the main namespace of AFL.
+    Actual code is in sub-namespaces. */
+
+
+/** \mainpage
+    AFL is a Foundation Library.
+    It contains fundamental algorithms, functions, and operating system bindings merged from several projects,
+    intended to replace the separate implementations. */

@@ -1,0 +1,21 @@
+/** \file afl/except/Intro.dox
+    \brief Namespace afl::except */
+
+/** \namespace afl::except
+    \brief Exceptions
+
+    This namespace contains exception classes. */
+
+
+/** \namespace std
+    \brief Standard C++ library */
+
+/** \class std::exception
+    \brief Standard C++ exception base class */
+
+/** \class std::runtime_error
+    \brief Standard C++ runtime error base class */
+namespace std {
+    class exception { };
+    class runtime_error : public exception { };
+}

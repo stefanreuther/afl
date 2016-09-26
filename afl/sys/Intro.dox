@@ -1,0 +1,8 @@
+/** \file afl/sys/Intro.dox
+    \brief Namespace afl::sys */
+
+/** \namespace afl::sys
+    \brief System Interfaces
+
+    This namespace contains interfaces to the operating system,
+    with focus on multi-threading. */

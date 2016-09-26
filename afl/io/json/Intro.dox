@@ -1,0 +1,7 @@
+/** \file afl/io/json/Intro.dox
+    \brief Namespace afl::io::json */
+
+/** \namespace afl::io::json
+    \brief JSON Input/Output
+
+    This namespace contains classes for creating and parsing data in JSON (JavaScript Object Notation) format. */

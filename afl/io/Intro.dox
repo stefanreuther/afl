@@ -1,0 +1,7 @@
+/** \file afl/io/Intro.dox
+    \brief Namespace afl::io */
+
+/** \namespace afl::io
+    \brief Input/Output
+
+    This namespace contains classes for file access. */

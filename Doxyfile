@@ -1,0 +1,26 @@
+PROJECT_NAME           = "A Foundation Library"
+PROJECT_NUMBER         = 0.0
+
+OUTPUT_DIRECTORY       = doxy_docs
+
+JAVADOC_AUTOBRIEF      = YES
+INLINE_INHERITED_MEMB  = YES
+
+EXTRACT_ALL            = YES
+EXTRACT_PRIVATE        = YES
+
+WARN_LOGFILE           = doxy_docs/Warnings
+
+INPUT                  = afl
+FILE_PATTERNS          = *.cpp *.hpp *.dox *.c *.h
+RECURSIVE              = YES
+
+ALPHABETICAL_INDEX     = YES
+
+GENERATE_HTML          = YES
+GENERATE_LATEX         = NO
+
+GENERATE_TAGFILE       = doxy_docs/Tagfile
+
+HAVE_DOT               = YES
+

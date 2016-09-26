@@ -1,0 +1,14 @@
+[req]
+default_bits            = 2048
+default_keyfile         = PRIVKEY.pem
+distinguished_name      = req_distinguished_name
+prompt                  = no
+string_mask             = utf8only
+
+[req_distinguished_name]
+countryName             = XE
+stateOrProvinceName     = Example Province
+localityName            = Example City
+0.organizationName      = Example Ltd.
+commonName              = example.org
+emailAddress            = user@example.org

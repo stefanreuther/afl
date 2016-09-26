@@ -1,0 +1,7 @@
+/** \file afl/io/resp/Intro.dox
+    \brief Namespace afl::io::resp */
+
+/** \namespace afl::io::resp
+    \brief RESP Input/Output
+
+    This namespace contains classes for creating and parsing data in RESP (Redis Serialisation Protocol) format. */

@@ -1,0 +1,7 @@
+/** \file afl/charset/Intro.dox
+    \brief Namespace afl::charset */
+
+/** \namespace afl::charset
+    \brief Character Sets
+
+    This namespace contains functions to encode and decode numerous character sets. */

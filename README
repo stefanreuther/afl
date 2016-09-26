@@ -1,0 +1,74 @@
+A Foundation Library
+=====================
+
+This is a C++ foundation library. It contains fundamental algorithms,
+functions, and operating system bindings merged from several projects
+of mine, intended to replace the separate implementations. Operating
+system bindings include threads and synchronisation, time, and
+networking. On top, we implement a few network protocols.
+
+It is written in C++03, and thus it's probably not too exciting if you
+can use all of Boost, or have a full C++1y compiler at hand. On the
+plus side, it's simple and lean.
+
+In addition to a number of simple off-the-shelf algorithms (that can
+of course be handy by themselves), two comparatively-novel approaches
+are taken for
+
+- memory buffers. Instead of pointer,length pairs, the library uses
+  descriptors (afl::base::Memory) that support all operations you'd
+  want on a buffer (copy, split, etc.). The idea is it to make harder
+  to program buffer overflows.
+
+- asynchronous operations. The afl::async framework can be used for
+  inter-thread communication and for networking. Instead of requiring
+  callbacks, you post operations to a controller, which returns you
+  these operations as they complete. The operation object also is a
+  handle to cancel an operation mid-way should you change your mind.
+
+
+Testsuite
+----------
+
+The library comes with an extensive testsuite.
+
+The testsuite will also test a number of timed operations. To keep the
+total running time of the testsuite low, timeouts sometimes are pretty
+tight. This requires you to run the testsuite on an idle processor to
+avoid sporadic failures.
+
+
+Building
+---------
+
+You need a 'config.mk' file. A template is provided as 'config.def'. 
+You also need a 'afl/config.h' file.A template is provided as
+'afl/config.def'.
+
+On Unix, 'sh config.sh' will create both files for you.
+
+To compile, use 'make' (Unix) or 'make -f Makefile.min' (Win32 with
+MinGW). You may have luck with 'make -f Makefile.bor' (Win32 with
+Borland compiler) but this is largely untested.
+
+To modify the project, get the 'proj9' makefile generator. Edit the
+files in P9/ and regenerate Makefiles using 'proj9 update'.
+
+
+Source Code Layout
+-------------------
+
+- P9/       Makefile generator inputs.
+- afl/      Main library.
+- app/      Example applications.
+- arch/     Platform specifics. Do not include in your applications.
+            These expect a target macro (TARGET_OS_POSIX, TARGET_OS_WIN32)
+            to be set, which is done by the Makefile (but which is most
+            likely not set in user code).
+- config/   Configuration specifics. Do not include in your applications.
+            These expect a macro from afl/config.h to be set.
+- etc/      Extra (non source) files.
+- u/        Unit tests.
+
+For compiling your own applications, point "-I" to the source root
+directory, so you can include afl header files as "afl/...".

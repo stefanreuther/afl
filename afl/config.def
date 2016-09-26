@@ -1,0 +1,7 @@
+/*
+ *  Configuration file for compiler.
+ *  Copy to config.h and edit as needed.
+ */
+
+#define HAVE_OPENSSL 1
+#define HAVE_ZLIB 1

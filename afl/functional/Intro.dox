@@ -1,0 +1,13 @@
+/** \file afl/functional/Intro.dox
+    \brief Namespace afl::functional */
+
+/** \namespace afl::functional
+    \brief Working with functions
+
+    This namespace contains classes that represent functions.
+    A special case of functions are mappings from a discrete, enumerable set.
+
+    We provide higher-order functions like fold().
+
+    The general idea is that functions are constructed on the stack, as temporaries.
+    Therefore, no special means to manage lifetime have been provided. */

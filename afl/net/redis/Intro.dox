@@ -1,0 +1,8 @@
+/** \file afl/net/redis/Intro.dox
+    \brief Namespace afl::net::redis */
+
+/** \namespace afl::net::redis
+    \brief Redis interface
+
+    This namespace contains classes for accessing a redis data store.
+    For entry points, see afl::net::redis::Subtree and afl::net::redis::Key. */

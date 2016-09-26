@@ -1,0 +1,30 @@
+/**
+  *  \file afl/data/hashvalue.cpp
+  *  \brief Class afl::data::HashValue
+  */
+
+#include <cassert>
+#include "afl/data/hashvalue.hpp"
+#include "afl/data/visitor.hpp"
+
+afl::data::HashValue::HashValue(afl::base::Ptr<Hash> pHash)
+    : Value(),
+      m_pHash(pHash)
+{
+    assert(m_pHash.get() != 0);
+}
+
+afl::data::HashValue::~HashValue()
+{ }
+
+void
+afl::data::HashValue::visit(Visitor& visitor) const
+{
+    visitor.visitHash(*m_pHash);
+}
+
+afl::data::HashValue*
+afl::data::HashValue::clone() const
+{
+    return new HashValue(m_pHash);
+}

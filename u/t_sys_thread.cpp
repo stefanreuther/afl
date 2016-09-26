@@ -1,0 +1,49 @@
+/**
+  *  \file u/t_sys_thread.cpp
+  *  \brief Test for afl::sys::Thread
+  */
+
+#include "afl/sys/thread.hpp"
+
+#include "u/t_sys.hpp"
+#include "afl/base/runnable.hpp"
+#include "afl/sys/time.hpp"
+
+/** Simple test. */
+void
+TestSysThread::testIt()
+{
+    class MyRunnable : public afl::base::Runnable {
+     public:
+        MyRunnable()
+            : m_value(false)
+            { }
+        void run()
+            { m_value = true; }
+        bool get()
+            { return m_value; }
+     private:
+        bool m_value;
+    };
+
+    MyRunnable a;
+    TS_ASSERT(!a.get());
+
+    afl::sys::Thread t("TestSysThread", a);
+    TS_ASSERT(!a.get());
+
+    t.start();
+    t.join();
+    TS_ASSERT(a.get());
+}
+
+void
+TestSysThread::testSleep()
+{
+    uint32_t a = afl::sys::Time::getTickCounter();
+    afl::sys::Thread::sleep(300);
+    uint32_t elapsed = afl::sys::Time::getTickCounter() - a;
+
+    TS_ASSERT(elapsed > 100);
+    TS_ASSERT(elapsed < 500);
+}

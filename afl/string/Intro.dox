@@ -1,0 +1,15 @@
+/** \file afl/string/Intro.dox
+    \brief Namespace afl::string */
+
+/** \namespace afl::string
+    \brief String Handling
+
+    This namespace contains common utility functions to deal with strings.
+
+    As a general convention, whenever AFL uses a string, it uses the typedef afl::sys::String_t.
+    Where it matters, documentation should specify the encoding a string is expected in;
+    the default is UTF-8. */
+
+
+/** \namespace afl::string::detail
+    \brief Implementation details */

@@ -1,0 +1,415 @@
+# -*- makefile -*-
+#
+#  Project Root
+#
+
+##
+##  Configuration (FIXME)
+##
+CXXTESTDIR = $(CONFIG_AFL_CXXTESTDIR)
+PERL = $(CONFIG_AFL_PERL)
+CXX = $(CONFIG_AFL_CXX)
+CXXFLAGS = $(CONFIG_AFL_CXXFLAGS) -I.
+LIBS = $(CONFIG_AFL_LIBS)
+LDFLAGS = $(CONFIG_AFL_LDFLAGS)
+
+include config.mk
+
+# This defines the Makefiles we want to make:
+GENERATE = Makefile Makefile.bor Makefile.min
+INCLUDE_Makefile = Rules-unix.mak Settings-unix.mak
+INCLUDE_Makefile.bor = Rules-win32.mak Settings-win32.mak
+INCLUDE_Makefile.min = Rules-mingw.mak Settings-mingw.mak
+
+PROJ_AUTO += afl:afl/*pp testsuite:u/*pp
+
+
+##
+##  Main Library
+##
+TARGETS += afl
+FILES_afl = afl/io/nullfilesystem.cpp afl/io/nullfilesystem.hpp \
+    afl/string/posixfilenames.hpp afl/string/posixfilenames.cpp \
+    afl/net/parameterencoder.cpp afl/net/parameterencoder.hpp \
+    afl/charset/unicode.cpp afl/io/nulltextwriter.cpp \
+    afl/io/nulltextwriter.hpp afl/io/textwriter.cpp afl/io/textwriter.hpp \
+    afl/io/textreader.cpp afl/io/textreader.hpp \
+    afl/except/assertionfailedexception.cpp \
+    afl/sys/longcommandlineparser.cpp afl/sys/longcommandlineparser.hpp \
+    afl/string/proxytranslator.cpp afl/string/proxytranslator.hpp \
+    afl/net/http/simpledownloadlistener.cpp \
+    afl/net/http/simpledownloadlistener.hpp \
+    afl/sys/standardcommandlineparser.cpp \
+    afl/sys/standardcommandlineparser.hpp afl/sys/commandlineparser.hpp \
+    afl/base/nothingtype.hpp afl/io/datasink.cpp afl/data/namequery.cpp \
+    afl/data/namequery.hpp afl/base/inlineoptional.hpp afl/base/clonable.hpp \
+    afl/base/growablememory.hpp arch/win32/win32filemapping.hpp \
+    arch/win32/win32filemapping.cpp afl/functional/stringtable.hpp \
+    afl/functional/mapping.hpp afl/functional/binaryfunction.hpp \
+    afl/functional/unaryfunction.hpp arch/filemapping.hpp \
+    arch/posix/posixfilemapping.hpp arch/posix/posixfilemapping.cpp \
+    arch/posix/posixenvironment.hpp arch/posix/posixenvironment.cpp \
+    arch/win32/win32environment.hpp arch/win32/win32environment.cpp \
+    afl/io/internalfilemapping.cpp afl/io/internalfilemapping.hpp \
+    afl/io/filemapping.hpp afl/charset/defaultcharsetfactory.cpp \
+    afl/charset/defaultcharsetfactory.hpp afl/charset/charsetfactory.hpp \
+    afl/io/xml/defaultentityhandler.cpp afl/io/xml/defaultentityhandler.hpp \
+    afl/io/xml/reader.cpp afl/io/xml/entityhandler.hpp afl/io/xml/reader.hpp \
+    afl/io/xml/basereader.hpp afl/net/http/formparser.cpp \
+    afl/net/http/formparser.hpp afl/io/textsink.cpp afl/io/textsink.hpp \
+    afl/net/http/pageresponse.cpp afl/net/http/pagerequest.cpp \
+    afl/net/http/pageresponse.hpp afl/net/http/pagerequest.hpp \
+    afl/net/http/pagedispatcher.cpp afl/net/http/pagedispatcher.hpp \
+    afl/net/http/page.hpp afl/net/http/errorresponse.cpp \
+    afl/net/http/errorresponse.hpp afl/net/http/request.cpp \
+    afl/net/http/protocolhandler.cpp afl/net/http/dispatcher.hpp \
+    afl/net/http/response.hpp afl/net/http/request.hpp \
+    afl/net/http/protocolhandler.hpp afl/net/commandhandler.cpp \
+    afl/net/commandhandler.hpp afl/net/resp/protocolhandler.cpp \
+    afl/container/ptrqueue.hpp afl/net/resp/protocolhandler.hpp \
+    afl/net/redis/internaldatabase.cpp afl/net/redis/internaldatabase.hpp \
+    afl/data/segmentview.cpp afl/data/segmentview.hpp \
+    afl/net/redis/stringsetoperation.cpp \
+    afl/net/redis/integersetoperation.cpp afl/net/redis/stringsetkey.cpp \
+    afl/net/redis/integersetkey.cpp afl/net/redis/stringsetoperation.hpp \
+    afl/net/redis/integersetoperation.hpp afl/net/redis/stringsetkey.hpp \
+    afl/net/redis/integersetkey.hpp afl/net/redis/setkey.cpp \
+    afl/net/redis/setkey.hpp afl/net/redis/sortoperation.cpp \
+    afl/net/redis/sortoperation.hpp afl/net/redis/stringlistkey.cpp \
+    afl/net/redis/stringlistkey.hpp afl/net/redis/integerlistkey.cpp \
+    afl/net/redis/integerlistkey.hpp afl/net/redis/listkey.cpp \
+    afl/net/redis/listkey.hpp afl/net/redis/subtree.cpp \
+    afl/net/redis/subtree.hpp afl/net/redis/stringfield.cpp \
+    afl/net/redis/stringfield.hpp afl/net/redis/integerfield.cpp \
+    afl/net/redis/integerfield.hpp afl/net/redis/field.cpp \
+    afl/net/redis/field.hpp afl/net/redis/hashkey.cpp \
+    afl/net/redis/hashkey.hpp afl/net/redis/stringkey.cpp \
+    afl/net/redis/stringkey.hpp afl/net/redis/integerkey.cpp \
+    afl/net/redis/integerkey.hpp afl/net/redis/key.cpp afl/net/redis/key.hpp \
+    afl/async/communicationsink.cpp afl/async/communicationsink.hpp \
+    afl/net/resp/client.cpp afl/net/resp/client.hpp afl/io/internalsink.cpp \
+    afl/io/internalsink.hpp afl/io/bufferedsink.cpp afl/io/bufferedsink.hpp \
+    afl/data/integerlist.hpp afl/data/stringlist.hpp afl/data/errorvalue.cpp \
+    afl/data/errorvalue.hpp afl/io/transformdatasink.cpp \
+    afl/io/transformdatasink.hpp afl/io/inflatetransform.cpp \
+    afl/io/inflatetransform.hpp afl/io/transform.hpp \
+    arch/win32/win32root.hpp arch/win32/win32root.cpp \
+    arch/win32/win32directory.hpp arch/win32/win32directory.cpp \
+    arch/win32/win32stream.hpp arch/win32/win32stream.cpp \
+    arch/win32/win32filesystem.hpp arch/win32/win32filesystem.cpp \
+    afl/base/memory.hpp afl/base/types.hpp afl/container/ptrvector.hpp \
+    afl/sys/mutex.cpp afl/sys/mutex.hpp afl/sys/thread.hpp \
+    afl/sys/semaphore.hpp afl/sys/types.hpp afl/sys/semaphore.cpp \
+    afl/sys/thread.cpp afl/sys/guard.hpp afl/sys/mutexguard.hpp \
+    afl/base/runnable.hpp afl/base/deleter.hpp afl/base/deleter.cpp \
+    afl/container/ptrmap.hpp afl/base/enumerator.hpp \
+    afl/container/ptrmultilist.hpp afl/container/ptrmultilistbase.hpp \
+    afl/container/ptrmultilistbase.cpp afl/tmp/ifthenelse.hpp \
+    afl/base/staticassert.hpp afl/base/closure.hpp afl/base/clonableref.hpp \
+    afl/base/signalhandler.hpp afl/base/signalhandler.cpp \
+    afl/base/countof.hpp afl/bits/smallset.hpp afl/base/signalconnection.hpp \
+    afl/base/signalconnection.cpp afl/base/signal.hpp \
+    afl/sys/atomicinteger.hpp afl/sys/atomicinteger.cpp \
+    afl/base/refcounted.hpp afl/base/ptr.hpp afl/base/ptr.cpp \
+    afl/bits/rotate.hpp afl/bits/bits.hpp afl/bits/bits.cpp \
+    afl/checksums/checksum.hpp afl/checksums/bytesum.hpp \
+    afl/checksums/bytesum.cpp afl/checksums/crc32.hpp \
+    afl/checksums/crc32.cpp afl/checksums/crc16.hpp afl/checksums/crc16.cpp \
+    afl/checksums/adler32.hpp afl/checksums/adler32.cpp \
+    afl/string/string.hpp afl/tmp/stripcv.hpp afl/string/string.cpp \
+    afl/string/char.hpp afl/string/format.hpp afl/string/format.cpp \
+    afl/string/formatstate.hpp afl/string/formatstate.cpp \
+    afl/tmp/sizedint.hpp afl/tmp/sizeduint.hpp afl/tmp/issametype.hpp \
+    afl/tmp/typelist.hpp afl/string/formatunion.hpp \
+    afl/string/formattraits.hpp afl/string/formattraits.cpp \
+    afl/tmp/dereferencetype.hpp afl/container/dereferencingiterator.hpp \
+    afl/container/memberiterator.hpp afl/charset/utf8reader.hpp \
+    afl/charset/unicode.hpp afl/charset/utf8reader.cpp afl/charset/utf8.hpp \
+    afl/charset/utf8.cpp afl/tmp/copycv.hpp afl/bits/uint8.hpp \
+    afl/bits/uint16le.hpp afl/bits/uint32le.hpp afl/bits/uint64le.hpp \
+    afl/bits/pack.hpp afl/bits/int16le.hpp afl/bits/int32le.hpp \
+    afl/bits/int64le.hpp afl/bits/int8.hpp arch/mutex.hpp arch/thread.hpp \
+    arch/atomicinteger.hpp arch/semaphore.hpp afl/sys/error.hpp \
+    afl/sys/error.cpp arch/posix/posix.cpp arch/posix/posix.hpp \
+    arch/error.hpp arch/win32/win32.cpp arch/win32/win32.hpp \
+    afl/io/stream.hpp afl/io/filesystem.hpp \
+    afl/except/fileproblemexception.hpp afl/except/fileproblemexception.cpp \
+    afl/except/fileformatexception.hpp afl/except/fileformatexception.cpp \
+    afl/except/filetooshortexception.hpp \
+    afl/except/filetooshortexception.cpp afl/except/filesystemexception.hpp \
+    afl/except/filesystemexception.cpp afl/except/systemexception.hpp \
+    afl/except/systemexception.cpp afl/io/stream.cpp afl/io/filesystem.cpp \
+    arch/filesystem.hpp arch/posix/posixfilesystem.cpp \
+    arch/posix/posixfilesystem.hpp arch/posix/posixstream.cpp \
+    arch/posix/posixstream.hpp afl/io/nullstream.hpp afl/io/nullstream.cpp \
+    afl/io/directory.hpp afl/io/directoryentry.hpp afl/io/directoryentry.cpp \
+    afl/io/directory.cpp arch/posix/posixdirectory.cpp \
+    arch/posix/posixdirectory.hpp arch/posix/posixroot.cpp \
+    arch/posix/posixroot.hpp afl/io/multidirectory.hpp \
+    afl/io/multidirectory.cpp afl/io/memorystream.hpp \
+    afl/io/memorystream.cpp afl/io/constmemorystream.hpp \
+    afl/io/constmemorystream.cpp afl/io/internalstream.hpp \
+    afl/io/internalstream.cpp afl/io/multiplexablestream.hpp \
+    afl/io/multiplexablestream.cpp afl/io/internaldirectory.hpp \
+    afl/io/internaldirectory.cpp afl/string/translator.hpp \
+    afl/string/translator.cpp afl/string/nulltranslator.hpp \
+    afl/string/nulltranslator.cpp afl/string/messages.hpp afl/bits/value.hpp \
+    afl/charset/charset.hpp afl/charset/utf8charset.hpp \
+    afl/charset/utf8charset.cpp afl/charset/codepage.hpp \
+    afl/charset/codepage_1250.cpp afl/charset/codepage_1251.cpp \
+    afl/charset/codepage_1252.cpp afl/charset/codepage_437.cpp \
+    afl/charset/codepage_850.cpp afl/charset/codepage_852.cpp \
+    afl/charset/codepage_866.cpp afl/charset/codepage_koi8r.cpp \
+    afl/charset/codepage_latin1.cpp afl/charset/codepage_latin2.cpp \
+    afl/charset/codepagecharset.hpp afl/charset/codepagecharset.cpp \
+    afl/io/textfile.hpp afl/io/textfile.cpp afl/io/bufferedstream.hpp \
+    afl/io/bufferedstream.cpp afl/net/socket.hpp afl/net/name.hpp \
+    afl/net/name.cpp afl/net/listener.hpp afl/net/networkstack.hpp \
+    afl/net/networkstack.cpp arch/networkstack.hpp \
+    arch/posix/posixnetworkstack.cpp arch/posix/posixnetworkstack.hpp \
+    afl/bits/fixedstring.hpp afl/bits/fixedstring.cpp \
+    arch/win32/win32networkstack.cpp arch/win32/win32networkstack.hpp \
+    afl/charset/quotedprintable.hpp afl/charset/quotedprintable.cpp \
+    afl/charset/urlencoding.hpp afl/charset/urlencoding.cpp \
+    afl/charset/base64.hpp afl/charset/base64.cpp afl/sys/time.hpp \
+    afl/sys/parsedtime.hpp afl/sys/time.cpp arch/time.hpp \
+    arch/posix/posixtime.cpp arch/posix/posixtime.hpp afl/sys/duration.hpp \
+    afl/sys/duration.cpp arch/win32/win32time.cpp arch/win32/win32time.hpp \
+    afl/async/controller.hpp afl/async/operation.hpp \
+    afl/async/operationlist.hpp afl/async/controller.cpp \
+    afl/async/semaphore.hpp afl/async/semaphore.cpp afl/async/operation.cpp \
+    afl/async/cancelable.hpp afl/async/mutex.hpp afl/async/mutex.cpp \
+    afl/async/sendoperation.hpp afl/async/receiveoperation.hpp \
+    afl/async/messageexchange.hpp afl/async/messageexchange.cpp \
+    afl/async/timer.hpp afl/async/timer.cpp \
+    arch/posix/posixcontrollerimpl.hpp arch/posix/posixcontrollerimpl.cpp \
+    arch/controller.hpp afl/async/communicationobject.hpp \
+    afl/async/synchronisationobject.hpp afl/async/receiveoperation.cpp \
+    arch/posix/posixfiledescriptor.cpp arch/posix/posixfiledescriptor.hpp \
+    arch/posix/selectrequest.hpp afl/sys/environment.hpp \
+    afl/sys/environment.cpp arch/environment.hpp \
+    arch/win32/win32controllerimpl.hpp arch/win32/win32controllerimpl.cpp \
+    arch/win32/waitrequest.hpp afl/async/communicationstream.hpp \
+    afl/async/communicationstream.cpp afl/data/value.hpp \
+    afl/data/namemap.hpp afl/data/namemap.cpp afl/data/scalarvalue.hpp \
+    afl/data/integervalue.hpp afl/data/booleanvalue.hpp \
+    afl/data/integervalue.cpp afl/data/booleanvalue.cpp \
+    afl/data/stringvalue.hpp afl/data/stringvalue.cpp afl/data/visitor.hpp \
+    afl/data/visitor.cpp afl/data/floatvalue.hpp afl/data/floatvalue.cpp \
+    afl/data/segment.hpp afl/data/segment.cpp afl/data/hash.hpp \
+    afl/data/hash.cpp afl/data/hashvalue.hpp afl/data/hashvalue.cpp \
+    afl/data/vector.hpp afl/data/vector.cpp afl/data/vectorvalue.hpp \
+    afl/data/vectorvalue.cpp afl/data/valuefactory.hpp \
+    afl/data/defaultvaluefactory.hpp afl/data/defaultvaluefactory.cpp \
+    afl/io/json/parser.hpp afl/io/json/parser.cpp afl/io/json/writer.hpp \
+    afl/io/json/writer.cpp afl/string/parse.hpp afl/string/parse.cpp \
+    afl/data/access.hpp afl/data/access.cpp \
+    afl/except/remoteerrorexception.hpp afl/except/remoteerrorexception.cpp \
+    afl/except/invaliddataexception.hpp afl/except/invaliddataexception.cpp \
+    afl/io/resp/writer.hpp afl/io/resp/writer.cpp afl/io/resp/parser.hpp \
+    afl/io/resp/parser.cpp afl/net/url.hpp afl/net/url.cpp \
+    afl/net/acceptoperation.hpp afl/net/protocolhandler.hpp \
+    afl/net/protocolhandlerfactory.hpp afl/net/simpleserver.hpp \
+    afl/net/simpleserver.cpp afl/net/headerconsumer.hpp \
+    afl/net/headerparser.hpp afl/net/headerparser.cpp afl/async/notifier.hpp \
+    afl/async/notifier.cpp afl/net/http/client.hpp \
+    afl/net/http/clientrequest.hpp afl/net/http/clientconnection.hpp \
+    afl/net/http/client.cpp afl/net/http/clientresponse.hpp \
+    afl/net/http/clientresponse.cpp afl/string/parsememory.hpp \
+    afl/string/parsememory.cpp afl/net/http/clientconnection.cpp \
+    afl/net/http/clientconnectionprovider.hpp afl/io/datasink.hpp \
+    afl/net/http/chunkedsink.hpp afl/net/http/chunkedsink.cpp \
+    afl/io/limiteddatasink.hpp afl/io/limiteddatasink.cpp \
+    afl/io/inflatedatasink.hpp afl/except/unsupportedexception.hpp \
+    afl/except/unsupportedexception.cpp afl/io/inflatedatasink.cpp \
+    afl/sys/log.hpp afl/sys/log.cpp afl/net/headerfield.hpp \
+    afl/net/headerfield.cpp afl/net/headertable.hpp afl/net/headertable.cpp \
+    afl/net/http/defaultconnectionprovider.hpp \
+    afl/net/http/defaultconnectionprovider.cpp afl/net/http/manager.hpp \
+    afl/net/http/downloadlistener.hpp afl/net/http/manager.cpp \
+    afl/net/http/cookie.hpp afl/net/http/cookie.cpp \
+    afl/net/http/cookiejar.hpp afl/net/http/cookiejar.cpp \
+    afl/sys/loglistener.hpp afl/sys/loglistener.cpp afl/net/securesocket.hpp \
+    afl/net/securesocket.cpp config/openssl/opensslexception.cpp \
+    config/openssl/opensslexception.hpp config/openssl/opensslsocket.cpp \
+    config/openssl/opensslsocket.hpp afl/net/securenetworkstack.hpp \
+    afl/net/securenetworkstack.cpp afl/net/securecontext.hpp \
+    config/openssl/opensslcontext.cpp config/openssl/opensslcontext.hpp \
+    afl/net/securecontext.cpp afl/checksums/hash.hpp afl/checksums/md5.hpp \
+    afl/checksums/md5.cpp afl/checksums/hash.cpp afl/checksums/sha1.hpp \
+    afl/checksums/sha1.cpp afl/bits/int16be.hpp afl/bits/int32be.hpp \
+    afl/bits/int64be.hpp afl/bits/uint16be.hpp afl/bits/uint32be.hpp \
+    afl/bits/uint64be.hpp afl/base/optional.hpp
+TYPE_afl = lib
+
+##
+##  Applications
+##
+TARGETS += date
+FILES_date = app/date.cpp
+TYPE_date = app
+DEPEND_date = afl
+
+TARGETS += ls
+FILES_ls = app/ls.cpp
+TYPE_ls = app
+DEPEND_ls = afl
+
+TARGETS += chatserver
+FILES_chatserver = app/chatserver.cpp
+TYPE_chatserver = app
+DEPEND_chatserver = afl
+
+TARGETS += wget
+FILES_wget = app/wget.cpp
+TYPE_wget = app
+DEPEND_wget = afl
+
+TARGETS += secureio
+FILES_secureio = app/secureio.cpp
+TYPE_secureio = app
+DEPEND_secureio = afl
+
+TARGETS += respclient
+FILES_respclient = app/respclient.cpp
+TYPE_respclient = app
+DEPEND_respclient = afl
+
+TARGETS += respserver
+FILES_respserver = app/respserver.cpp
+TYPE_respserver = app
+DEPEND_respserver = afl
+
+TARGETS += httpserver
+FILES_httpserver = app/httpserver.cpp
+TYPE_httpserver = app
+DEPEND_httpserver = afl
+
+TARGETS += env
+FILES_env = app/env.cpp
+TYPE_env = app
+DEPEND_env = afl
+
+##
+##  Testsuite
+##
+TARGETS += testsuite
+FILES_testsuite = u/t_io_nullfilesystem.cpp u/t_string_posixfilenames.cpp \
+    u/t_net_http_client.cpp u/t_net_parameterencoder.cpp \
+    u/t_io_nulltextwriter.cpp u/t_io_textreader.cpp u/t_io_textwriter.cpp \
+    u/t_except_assertionfailedexception.cpp \
+    u/t_sys_longcommandlineparser.cpp u/t_string_proxytranslator.cpp \
+    u/t_sys_standardcommandlineparser.cpp u/t_sys_commandlineparser.cpp \
+    u/t_data_namequery.cpp u/t_base_inlineoptional.cpp u/t_base_clonable.cpp \
+    u/t_base_growablememory.cpp u/t_functional_stringtable.cpp \
+    u/t_functional_mapping.cpp u/t_functional_binaryfunction.cpp \
+    u/t_functional_unaryfunction.cpp u/t_functional.hpp \
+    u/t_io_internalfilemapping.cpp u/t_io_filemapping.cpp \
+    u/t_charset_defaultcharsetfactory.cpp u/t_charset_charsetfactory.cpp \
+    u/t_io_xml_defaultentityhandler.cpp u/t_io_xml_entityhandler.cpp \
+    u/t_io_xml_basereader.cpp u/t_io_xml_reader.cpp u/t_io_xml.hpp \
+    u/t_net_http_formparser.cpp u/t_io_textsink.cpp \
+    u/t_net_http_pagedispatcher.cpp u/t_net_http_page.cpp \
+    u/t_net_http_pageresponse.cpp u/t_net_http_pagerequest.cpp \
+    u/t_net_http_response.cpp u/t_net_http_dispatcher.cpp \
+    u/t_net_http_request.cpp u/t_net_commandhandler.cpp \
+    u/t_net_resp_protocolhandler.cpp u/t_container_ptrqueue.cpp \
+    u/t_net_redis_internaldatabase.cpp u/t_net_redis.hpp \
+    u/t_data_segmentview.cpp u/t_net_resp_client.cpp u/t_net_resp.hpp \
+    u/t_async_communicationsink.cpp u/t_io_bufferedsink.cpp \
+    u/t_io_internalsink.cpp u/t_data_stringlist.cpp u/t_data_integerlist.cpp \
+    u/t_data_errorvalue.cpp u/t_io_transformdatasink.cpp \
+    u/t_io_inflatetransform.cpp u/t_io_transform.cpp testsuite.cpp \
+    u/t_base.hpp u/t_base_memory.cpp u/t_container.hpp \
+    u/t_container_ptrvector.cpp u/t_sys.hpp u/t_sys_mutex.cpp \
+    u/t_sys_thread.cpp u/t_base_runnable.cpp u/t_base_deletable.cpp \
+    u/t_sys_mutexguard.cpp u/t_sys_semaphore.cpp u/t_base_deleter.cpp \
+    u/t_container_ptrmap.cpp u/t_base_enumerator.cpp \
+    u/t_container_ptrmultilist.cpp u/t_container_ptrmultilistbase.cpp \
+    u/t_tmp_ifthenelse.cpp u/t_base_staticassert.cpp u/t_tmp.hpp \
+    u/t_base_closure.cpp u/t_base_clonableref.cpp u/t_base_signalhandler.cpp \
+    u/t_base_countof.cpp u/t_bits_smallset.cpp u/t_bits.hpp \
+    u/t_base_signalconnection.cpp u/t_base_signal.cpp \
+    u/t_sys_atomicinteger.cpp u/t_base_refcounted.cpp u/t_base_ptr.cpp \
+    u/t_bits_rotate.cpp u/t_bits_bits.cpp u/t_checksums.hpp \
+    u/t_checksums_bytesum.cpp u/t_checksums_crc32.cpp \
+    u/t_checksums_crc16.cpp u/t_checksums_adler32.cpp u/t_tmp_stripcv.cpp \
+    u/t_string.hpp u/t_string_char.cpp u/t_string_string.cpp \
+    u/t_string_format.cpp u/t_string_formatstate.cpp u/t_tmp_sizedint.cpp \
+    u/t_tmp_sizeduint.cpp u/t_tmp_issametype.cpp u/t_tmp_typelist.cpp \
+    u/t_container_dereferencingiterator.cpp u/t_container_memberiterator.cpp \
+    u/t_tmp_dereferencetype.cpp u/t_charset.hpp u/t_charset_utf8reader.cpp \
+    u/t_tmp_copycv.cpp u/t_charset_utf8.cpp u/t_charset_unicode.cpp \
+    u/t_bits_pack.cpp u/t_bits_uint8.cpp u/t_bits_uint16le.cpp \
+    u/t_bits_uint32le.cpp u/t_bits_uint64le.cpp u/t_bits_int16le.cpp \
+    u/t_bits_int32le.cpp u/t_bits_int8.cpp u/t_bits_int64le.cpp \
+    u/t_sys_error.cpp u/t_io.hpp u/t_io_stream.cpp u/t_except.hpp \
+    u/t_except.cpp u/t_io_filesystem.cpp u/t_io_nullstream.cpp \
+    u/t_io_directoryentry.cpp u/t_io_directory.cpp u/t_io_memorystream.cpp \
+    u/t_io_constmemorystream.cpp u/t_io_internalstream.cpp \
+    u/t_io_multiplexablestream.cpp u/t_io_internaldirectory.cpp \
+    u/t_string_translator.cpp u/t_string_nulltranslator.cpp \
+    u/t_string_messages.cpp u/t_bits_value.cpp u/t_charset_charset.cpp \
+    u/t_charset_utf8charset.cpp u/t_charset_codepage.cpp \
+    u/t_charset_codepagecharset.cpp u/t_io_textfile.cpp \
+    u/t_io_bufferedstream.cpp u/t_net.hpp u/t_net_name.cpp \
+    u/t_net_socket.cpp u/t_net_networkstack.cpp u/t_net_listener.cpp \
+    u/t_bits_fixedstring.cpp u/t_charset_quotedprintable.cpp \
+    u/t_charset_urlencoding.cpp u/t_charset_base64.cpp u/t_sys_duration.cpp \
+    u/t_sys_time.cpp u/t_async.hpp u/t_async_semaphore.cpp \
+    u/t_async_mutex.cpp u/t_async_messageexchange.cpp u/t_async_timer.cpp \
+    u/t_async_sendoperation.cpp u/t_async_receiveoperation.cpp \
+    u/t_async_cancelable.cpp u/t_async_communicationobject.cpp \
+    u/t_async_synchronisationobject.cpp u/t_async_controller.cpp \
+    u/t_async_operation.cpp u/t_async_operationlist.cpp \
+    u/t_sys_environment.cpp u/t_async_communicationstream.cpp u/t_data.hpp \
+    u/t_data_namemap.cpp u/t_data_value.cpp u/t_data_scalarvalue.cpp \
+    u/t_data_integervalue.cpp u/t_data_booleanvalue.cpp \
+    u/t_data_floatvalue.cpp u/t_data_stringvalue.cpp u/t_data_segment.cpp \
+    u/t_data_hash.cpp u/t_data_hashvalue.cpp u/t_data_vector.cpp \
+    u/t_data_vectorvalue.cpp u/t_data_valuefactory.cpp \
+    u/t_data_defaultvaluefactory.cpp u/t_io_json.hpp u/t_io_json_parser.cpp \
+    u/t_io_json_writer.cpp u/t_string_parse.cpp u/t_data_access.cpp \
+    u/t_io_resp.hpp u/t_io_resp_writer.cpp u/t_io_resp_parser.cpp \
+    u/t_net_url.cpp u/t_net_acceptoperation.cpp u/t_net_protocolhandler.cpp \
+    u/t_net_protocolhandlerfactory.cpp u/t_net_simpleserver.cpp \
+    u/t_net_headerconsumer.cpp u/t_net_headerparser.cpp \
+    u/t_async_notifier.cpp u/t_string_parsememory.cpp u/t_net_http.hpp \
+    u/t_net_http_clientresponse.cpp \
+    u/t_net_http_clientconnectionprovider.cpp u/t_net_http_clientrequest.cpp \
+    u/t_net_http_clientconnection.cpp u/t_io_datasink.cpp \
+    u/t_net_http_chunkedsink.cpp u/t_io_limiteddatasink.cpp \
+    u/t_io_inflatedatasink.cpp u/t_sys_log.cpp u/t_net_headerfield.cpp \
+    u/t_net_headertable.cpp u/t_net_http_defaultconnectionprovider.cpp \
+    u/t_net_http_downloadlistener.cpp u/t_net_http_cookie.cpp \
+    u/t_net_http_cookiejar.cpp u/t_sys_loglistener.cpp u/t_base_types.cpp \
+    u/t_base_uncopyable.cpp u/t_checksums_checksum.cpp u/t_data_visitor.cpp \
+    u/t_string_formatunion.cpp u/t_string_formattraits.cpp u/t_sys_types.cpp \
+    u/t_sys_parsedtime.cpp u/t_net_securesocket.cpp \
+    u/t_net_securecontext.cpp u/t_net_securenetworkstack.cpp \
+    u/t_io_multidirectory.cpp u/t_checksums_md5.cpp u/t_checksums_hash.cpp \
+    u/t_checksums_sha1.cpp u/t_bits_int16be.cpp u/t_bits_int32be.cpp \
+    u/t_bits_int64be.cpp u/t_bits_uint16be.cpp u/t_bits_uint32be.cpp \
+    u/t_bits_uint64be.cpp u/t_base_optional.cpp
+TYPE_testsuite = app
+DEPEND_testsuite = afl
+
+HEADERS_testsuite = u/t_*.hpp
+
+test: $(OUTPUT_testsuite)
+	./testsuite
+
+testsuite.cpp: $(HEADERS_testsuite)
+	@echo "        Generating test driver..."
+	@$(PERL) $(CXXTESTDIR)/cxxtestgen.pl --gui=TestController --have-eh --error-printer -o $@ $(HEADERS_testsuite)
+
+distclean: 
+	$(RM) testsuite.cpp
+
+# Must rename some object files because ar only looks at basenames.
+PROJ_UNIQUE_STEMS = 1
+
+# We must define _CXXTEST_HAVE_EH and _CXXTEST_HAVE_STD for test cases,
+# but not for testsuite.cpp, where cxxtest automatically defines it.
+CXXFLAGS_$(FILES_testsuite) +:= -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g
+CXXFLAGS_testsuite.cpp +:= -U_CXXTEST_HAVE_EH -U_CXXTEST_HAVE_STD -O0

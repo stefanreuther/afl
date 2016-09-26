@@ -1,0 +1,7 @@
+/** \file afl/container/Intro.dox
+    \brief Namespace afl::container */
+
+/** \namespace afl::container
+    \brief Containers
+
+    This namespace contains container classes and utilities to deal with existing containers. */

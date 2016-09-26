@@ -1,0 +1,7 @@
+/** \file afl/data/Intro.dox
+    \brief Namespace afl::data */
+
+/** \namespace afl::data
+    \brief Data
+
+    This namespace contains classes to manage variably-typed runtime data, such as JSON objects. */

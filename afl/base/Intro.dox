@@ -1,0 +1,11 @@
+/** \file afl/base/Intro.dox
+    \brief Namespace afl::base */
+
+/** \namespace afl::base
+    \brief Fundamentals
+
+    This namespace contains fundamental types and algorithms that are needed almost everywhere. */
+
+
+/** \namespace afl::base::detail
+    \brief Implementation details */

@@ -1,0 +1,7 @@
+/** \file afl/net/Intro.dox
+    \brief Namespace afl::net */
+
+/** \namespace afl::net
+    \brief Networking
+
+    This namespace contains classes for network access. */

@@ -1,0 +1,8 @@
+/** \file afl/checksums/Intro.dox
+    \brief Namespace afl::checksums */
+
+/** \namespace afl::checksums
+    \brief Checksums
+
+    This namespace contains checksum algorithms.
+    The definition of a checksum is given in the afl::checksums::Checksum interface. */

@@ -1,0 +1,9 @@
+# Default config file for Make.
+# Copy to config.mk and edit as you wish.
+
+CONFIG_AFL_CXX        = g++
+CONFIG_AFL_CXXFLAGS   = -O2 -W -Wall -ansi -pedantic -I. -fmessage-length=0 -Wno-long-long -Wconversion
+CONFIG_AFL_PERL       = perl
+CONFIG_AFL_CXXTESTDIR = /home/stefan/software/cxxtest
+CONFIG_AFL_LDFLAGS    =
+CONFIG_AFL_LIBS       =

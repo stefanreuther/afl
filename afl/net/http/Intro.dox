@@ -1,0 +1,7 @@
+/** \file afl/net/http/Intro.dox
+    \brief Namespace afl::net::http */
+
+/** \namespace afl::net::http
+    \brief HTTP
+
+    This namespace contains utilities for working with HTTP (Hyper-Text Transfer Protocol). */

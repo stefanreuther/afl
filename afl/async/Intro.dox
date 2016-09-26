@@ -1,0 +1,7 @@
+/** \file afl/async/Intro.dox
+    \brief Namespace afl::async */
+
+/** \namespace afl::async
+    \brief Asynchronous I/O and Communication
+
+    This namespace contains classes for asynchronous I/O and communications. */

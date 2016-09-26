@@ -1,0 +1,8 @@
+/** \file afl/net/resp/Intro.dox
+    \brief Namespace afl::net::resp */
+
+/** \namespace afl::net::resp
+    \brief RESP (Redis Serialisation Protocol)
+
+    This namespace contains classes for building applications that implement or use RESP (Redis Serialisation Protocol).
+    The redis client in (afl::net::redis) is based on this. */

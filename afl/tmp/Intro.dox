@@ -1,0 +1,8 @@
+/** \file afl/tmp/Intro.dox
+    \brief Namespace afl::tmp */
+
+/** \namespace afl::tmp
+    \brief Template Metaprogramming
+
+    This namespace contains templates for template metaprogramming.
+    None of the templates in this namespace generates actual code. */
