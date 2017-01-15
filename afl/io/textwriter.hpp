@@ -6,11 +6,12 @@
 #define AFL_AFL_IO_TEXTWRITER_HPP
 
 #include "afl/string/string.hpp"
+#include "afl/base/refcounted.hpp"
 
 namespace afl { namespace io {
 
     /** Interface for writing text. */
-    class TextWriter {
+    class TextWriter : public afl::base::RefCounted {
      public:
         virtual ~TextWriter();
 

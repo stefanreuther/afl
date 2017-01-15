@@ -25,14 +25,14 @@ namespace afl { namespace base {
             Like p->clone(), but allows p to be null.
             \param p Object to clone
             \return newly-allocated clone of object or null */
-        static T* cloneOf(T* p);
+        static T* cloneOf(const T* p);
     };
 
 } }
 
 template<typename T>
 T*
-afl::base::Clonable<T>::cloneOf(T* p)
+afl::base::Clonable<T>::cloneOf(const T* p)
 {
     if (p != 0) {
         return p->clone();

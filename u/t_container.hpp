@@ -25,6 +25,15 @@ class TestContainerPtrMap : public CxxTest::TestSuite {
     void testConst();
 };
 
+class TestContainerPtrMultiList : public CxxTest::TestSuite {
+ public:
+    void testTyped();
+    void testTypedMerge();
+    void testTypedSort();
+    void testRemove();
+    void testInsert();
+};
+
 class TestContainerPtrMultiListBase : public CxxTest::TestSuite {
  public:
     void testBasic();
@@ -38,17 +47,11 @@ class TestContainerPtrMultiListBase : public CxxTest::TestSuite {
     void testBasicInsert4();
 };
 
-class TestContainerPtrMultiList : public CxxTest::TestSuite {
- public:
-    void testTyped();
-    void testTypedMerge();
-    void testTypedSort();
-};
-
 class TestContainerPtrQueue : public CxxTest::TestSuite {
  public:
     void testIt();
     void testConst();
+    void testPush();
 };
 
 class TestContainerPtrVector : public CxxTest::TestSuite {
@@ -59,6 +62,7 @@ class TestContainerPtrVector : public CxxTest::TestSuite {
     void testSort2();
     void testSort3();
     void testSort4();
+    void testResize();
 };
 
 #endif

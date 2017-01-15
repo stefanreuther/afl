@@ -26,17 +26,34 @@ TestSysThread::testIt()
         bool m_value;
     };
 
-    MyRunnable a;
-    TS_ASSERT(!a.get());
+    // Test "const char*" signature
+    {
+        MyRunnable a;
+        TS_ASSERT(!a.get());
 
-    afl::sys::Thread t("TestSysThread", a);
-    TS_ASSERT(!a.get());
+        afl::sys::Thread t("TestSysThread", a);
+        TS_ASSERT(!a.get());
 
-    t.start();
-    t.join();
-    TS_ASSERT(a.get());
+        t.start();
+        t.join();
+        TS_ASSERT(a.get());
+    }
+
+    // Test "String_t" signature
+    {
+        MyRunnable a;
+        TS_ASSERT(!a.get());
+
+        afl::sys::Thread t(String_t("TestSysThread"), a);
+        TS_ASSERT(!a.get());
+
+        t.start();
+        t.join();
+        TS_ASSERT(a.get());
+    }
 }
 
+/** Test sleep function. */
 void
 TestSysThread::testSleep()
 {

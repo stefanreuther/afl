@@ -21,8 +21,8 @@ namespace arch { namespace win32 {
 
         Win32NetworkStack();
 
-        virtual afl::base::Ptr<afl::net::Listener> listen(const afl::net::Name& name, int backlogSize);
-        virtual afl::base::Ptr<afl::net::Socket> connect(const afl::net::Name& name, afl::sys::Timeout_t timeout = afl::sys::INFINITE_TIMEOUT);
+        virtual afl::base::Ref<afl::net::Listener> listen(const afl::net::Name& name, int backlogSize);
+        virtual afl::base::Ref<afl::net::Socket> connect(const afl::net::Name& name, afl::sys::Timeout_t timeout = afl::sys::INFINITE_TIMEOUT);
     };
 
 } }

@@ -10,24 +10,28 @@
 class TestChecksumsAdler32 : public CxxTest::TestSuite {
  public:
     void testIt();
+    void testInterface();
 };
 
 class TestChecksumsByteSum : public CxxTest::TestSuite {
  public:
     void testIt();
-};
-
-class TestChecksumsChecksum : public CxxTest::TestSuite {
- public:
-    void testIt();
+    void testInterface();
 };
 
 class TestChecksumsCRC16 : public CxxTest::TestSuite {
  public:
     void testIt();
+    void testInterface();
 };
 
 class TestChecksumsCRC32 : public CxxTest::TestSuite {
+ public:
+    void testIt();
+    void testInterface();
+};
+
+class TestChecksumsChecksum : public CxxTest::TestSuite {
  public:
     void testIt();
 };

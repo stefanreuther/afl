@@ -34,7 +34,7 @@ void
 TestSysLongCommandLineParser::testLong()
 {
     static const char*const args[] = { "--help", "--foo", "bar", "--a=b", "--x=", "--y" };
-    afl::sys::LongCommandLineParser p(new Tester(args));
+    afl::sys::LongCommandLineParser p(*new Tester(args));
 
     String_t value;
     bool opt;
@@ -89,7 +89,7 @@ void
 TestSysLongCommandLineParser::testLong2()
 {
     static const char*const args[] = { "-help", "-foo", "bar", "-a=b", "-x=", "-y" };
-    afl::sys::LongCommandLineParser p(new Tester(args));
+    afl::sys::LongCommandLineParser p(*new Tester(args));
 
     String_t value;
     bool opt;
@@ -144,7 +144,7 @@ void
 TestSysLongCommandLineParser::testNonOption()
 {
     static const char*const args[] = { "", "-", "a", "--", "-a", "a", "--", "b" };
-    afl::sys::LongCommandLineParser p(new Tester(args));
+    afl::sys::LongCommandLineParser p(*new Tester(args));
 
     String_t value;
     bool opt;

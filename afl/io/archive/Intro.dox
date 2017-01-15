@@ -1,0 +1,7 @@
+/** \file afl/io/archive/Intro.dox
+    \brief Namespace afl::io:archive */
+
+/** \namespace afl::io::archive
+    \brief Archive Input/Output
+
+    This namespace contains classes to access archive files (containers). */

@@ -581,7 +581,7 @@ arch::win32::Win32NetworkStack::Win32NetworkStack()
     } init;
 }
 
-afl::base::Ptr<afl::net::Listener>
+afl::base::Ref<afl::net::Listener>
 arch::win32::Win32NetworkStack::listen(const afl::net::Name& name, int backlogSize)
 {
     // Create listener socket
@@ -592,14 +592,14 @@ arch::win32::Win32NetworkStack::listen(const afl::net::Name& name, int backlogSi
     unsigned long one = 1;
     ::ioctlsocket(fd, FIONBIO, &one);
 
-    return new Listener(fd, name.toString());
+    return *new Listener(fd, name.toString());
 }
 
-afl::base::Ptr<afl::net::Socket>
+afl::base::Ref<afl::net::Socket>
 arch::win32::Win32NetworkStack::connect(const afl::net::Name& name, afl::sys::Timeout_t timeout)
 {
     SOCKET fd = Connect(timeout).toName(name);
-    return new Socket(fd, name.toString());
+    return *new Socket(fd, name.toString());
 }
 #else
 int g_variableToMakeWin32NetworkStackObjectFileNotEmpty;

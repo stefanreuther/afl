@@ -5,19 +5,19 @@
 
 #include "afl/data/hash.hpp"
 
-afl::base::Ptr<afl::data::Hash>
+afl::base::Ref<afl::data::Hash>
 afl::data::Hash::create()
 {
-    return new Hash();
+    return *new Hash();
 }
 
-afl::base::Ptr<afl::data::Hash>
+afl::base::Ref<afl::data::Hash>
 afl::data::Hash::create(NameMap& keys, Segment& values)
 {
-    afl::base::Ptr<afl::data::Hash> hash = new Hash();
+    afl::base::Ref<afl::data::Hash> hash = *new Hash();
     hash->m_keys.swap(keys);
     hash->m_values.swap(values);
-    return hash;
+    return *hash;
 }
 
 inline

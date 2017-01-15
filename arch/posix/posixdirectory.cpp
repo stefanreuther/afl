@@ -27,19 +27,19 @@
 /** DirectoryEntry implementation for POSIX. */
 class arch::posix::PosixDirectory::Entry : public afl::io::DirectoryEntry {
  public:
-    Entry(afl::base::Ptr<PosixDirectory> parent, String_t name);
+    Entry(afl::base::Ref<PosixDirectory> parent, String_t name);
     virtual String_t getTitle();
     virtual String_t getPathName();
-    virtual afl::base::Ptr<afl::io::Stream> openFile(afl::io::FileSystem::OpenMode mode);
-    virtual afl::base::Ptr<afl::io::Directory> openDirectory();
-    virtual afl::base::Ptr<afl::io::Directory> openContainingDirectory();
+    virtual afl::base::Ref<afl::io::Stream> openFile(afl::io::FileSystem::OpenMode mode);
+    virtual afl::base::Ref<afl::io::Directory> openDirectory();
+    virtual afl::base::Ref<afl::io::Directory> openContainingDirectory();
     virtual void updateInfo(uint32_t requested);
     virtual void doRename(String_t newName);
     virtual void doErase();
     virtual void doCreateAsDirectory();
 
  private:
-    afl::base::Ptr<PosixDirectory> m_parent;
+    afl::base::Ref<PosixDirectory> m_parent;
     String_t m_name;
 
     static FileType convertFileType(mode_t mode);
@@ -49,12 +49,12 @@ class arch::posix::PosixDirectory::Entry : public afl::io::DirectoryEntry {
 /** DirectoryEntry enumerator implementation for POSIX. */
 class arch::posix::PosixDirectory::Enum : public afl::base::Enumerator<afl::base::Ptr<afl::io::DirectoryEntry> > {
  public:
-    Enum(afl::base::Ptr<PosixDirectory> dir);
+    Enum(afl::base::Ref<PosixDirectory> dir);
     virtual ~Enum();
     virtual bool getNextElement(afl::base::Ptr<afl::io::DirectoryEntry>& result);
 
  private:
-    afl::base::Ptr<PosixDirectory> m_dir;
+    afl::base::Ref<PosixDirectory> m_dir;
     DIR* m_dirHandle;
     afl::base::Ptr<afl::io::DirectoryEntry> m_currentEntry;
 
@@ -65,7 +65,7 @@ class arch::posix::PosixDirectory::Enum : public afl::base::Enumerator<afl::base
 /************************* PosixDirectory::Entry *************************/
 
 inline
-arch::posix::PosixDirectory::Entry::Entry(afl::base::Ptr<PosixDirectory> parent, String_t name)
+arch::posix::PosixDirectory::Entry::Entry(afl::base::Ref<PosixDirectory> parent, String_t name)
     : m_parent(parent),
       m_name(name)
 { }
@@ -82,19 +82,19 @@ arch::posix::PosixDirectory::Entry::getPathName()
     return PosixFileSystem().makePathName(m_parent->getDirectoryName(), m_name);
 }
 
-afl::base::Ptr<afl::io::Stream>
+afl::base::Ref<afl::io::Stream>
 arch::posix::PosixDirectory::Entry::openFile(afl::io::FileSystem::OpenMode mode)
 {
     return PosixFileSystem().openFile(getPathName(), mode);
 }
 
-afl::base::Ptr<afl::io::Directory>
+afl::base::Ref<afl::io::Directory>
 arch::posix::PosixDirectory::Entry::openDirectory()
 {
     return PosixFileSystem().openDirectory(getPathName());
 }
 
-afl::base::Ptr<afl::io::Directory>
+afl::base::Ref<afl::io::Directory>
 arch::posix::PosixDirectory::Entry::openContainingDirectory()
 {
     return m_parent;
@@ -103,46 +103,53 @@ arch::posix::PosixDirectory::Entry::openContainingDirectory()
 void
 arch::posix::PosixDirectory::Entry::updateInfo(uint32_t requested)
 {
-    // Convert path name
-    const afl::io::FileSystem::FileName_t sysName = convertUtf8ToPathName(getPathName());
+    try {
+        // Convert path name
+        const afl::io::FileSystem::FileName_t sysName = convertUtf8ToPathName(getPathName());
 
-    // Obtain information
-    if ((requested & (InfoSize | InfoType | InfoModificationTime | InfoFlags)) != 0) {
-        // Read inode.
-        struct stat st;
-        bool isLink = false;
-        bool ok = false;
-        if (::lstat(sysName.c_str(), &st) == 0) {
-            if (S_ISLNK(st.st_mode)) {
-                isLink = true;
-                ok = (::stat(sysName.c_str(), &st) == 0);
-            } else {
-                ok = true;
+        // Obtain information
+        if ((requested & (InfoSize | InfoType | InfoModificationTime | InfoFlags)) != 0) {
+            // Read inode.
+            struct stat st;
+            bool isLink = false;
+            bool ok = false;
+            if (::lstat(sysName.c_str(), &st) == 0) {
+                if (S_ISLNK(st.st_mode)) {
+                    isLink = true;
+                    ok = (::stat(sysName.c_str(), &st) == 0);
+                } else {
+                    ok = true;
+                }
+            }
+
+            if (ok) {
+                setFileType(convertFileType(st.st_mode));
+                setFileSize(st.st_size);
+                setModificationTime(afl::sys::Time(PosixTime::fromSysTime(st.st_mtime, 0)));
+            }
+
+            // Build flags
+            FileFlags_t flags;
+            if (isLink) {
+                flags += Link;
+            }
+            if (!m_name.empty() && m_name[0] == '.') {
+                flags += Hidden;
+            }
+            setFlags(flags);
+        }
+        if ((requested & InfoLinkText) != 0) {
+            // Read symbolic link.
+            afl::base::GrowableMemory<char> buffer;
+            if (readlinkWrap(sysName.c_str(), buffer)) {
+                setLinkText(convertExternalToUtf8(buffer));
             }
         }
-
-        if (ok) {
-            setFileType(convertFileType(st.st_mode));
-            setFileSize(st.st_size);
-            setModificationTime(afl::sys::Time(PosixTime::fromSysTime(st.st_mtime, 0)));
-        }
-
-        // Build flags
-        FileFlags_t flags;
-        if (isLink) {
-            flags += Link;
-        }
-        if (!m_name.empty() && m_name[0] == '.') {
-            flags += Hidden;
-        }
-        setFlags(flags);
     }
-    if ((requested & InfoLinkText) != 0) {
-        // Read symbolic link.
-        afl::base::GrowableMemory<char> buffer;
-        if (readlinkWrap(sysName.c_str(), buffer)) {
-            setLinkText(convertExternalToUtf8(buffer));
-        }
+    catch (afl::except::FileProblemException&) {
+        // These exceptions come from convertUtf8ToPathName() if the file name is not convertible (for example, LC_CTYPE=C).
+        // This means the file does not (can not) exist.
+        // -> Ignore the request. Caller will produce default information.
     }
 }
 
@@ -253,7 +260,7 @@ arch::posix::PosixDirectory::Entry::errorMeansIsDirectory(int err)
 /************************** PosixDirectory::Enum *************************/
 
 inline
-arch::posix::PosixDirectory::Enum::Enum(afl::base::Ptr<PosixDirectory> dir)
+arch::posix::PosixDirectory::Enum::Enum(afl::base::Ref<PosixDirectory> dir)
     : m_dir(dir),
       m_dirHandle(0),
       m_currentEntry()
@@ -320,16 +327,16 @@ arch::posix::PosixDirectory::PosixDirectory(String_t dirName)
 arch::posix::PosixDirectory::~PosixDirectory()
 { }
 
-afl::base::Ptr<afl::io::DirectoryEntry>
+afl::base::Ref<afl::io::DirectoryEntry>
 arch::posix::PosixDirectory::getDirectoryEntryByName(String_t name)
 {
-    return new Entry(this, name);
+    return *new Entry(*this, name);
 }
 
-afl::base::Ptr<afl::base::Enumerator<afl::base::Ptr<afl::io::DirectoryEntry> > >
+afl::base::Ref<afl::base::Enumerator<afl::base::Ptr<afl::io::DirectoryEntry> > >
 arch::posix::PosixDirectory::getDirectoryEntries()
 {
-    return new Enum(this);
+    return *new Enum(*this);
 }
 
 afl::base::Ptr<afl::io::Directory>

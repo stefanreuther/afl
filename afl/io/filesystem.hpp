@@ -5,7 +5,7 @@
 #ifndef AFL_AFL_IO_FILESYSTEM_HPP
 #define AFL_AFL_IO_FILESYSTEM_HPP
 
-#include "afl/base/ptr.hpp"
+#include "afl/base/ref.hpp"
 #include "afl/string/string.hpp"
 #include "afl/base/deletable.hpp"
 
@@ -44,7 +44,7 @@ namespace afl { namespace io {
             \param mode Mode
             \return Stream object, never null
             \throw FileProblemException if the file cannot be opened */
-        virtual afl::base::Ptr<Stream> openFile(FileName_t fileName, OpenMode mode) = 0;
+        virtual afl::base::Ref<Stream> openFile(FileName_t fileName, OpenMode mode) = 0;
 
         /** Open a directory given its name.
             Directory names are provided in UTF-8, but otherwise use native syntax.
@@ -52,7 +52,7 @@ namespace afl { namespace io {
             \return Directory object, never null
             \throw FileProblemException if the directory cannot be opened
             (note, however, there's no guarantee that the error is detected upon construction). */
-        virtual afl::base::Ptr<Directory> openDirectory(FileName_t dirName) = 0;
+        virtual afl::base::Ref<Directory> openDirectory(FileName_t dirName) = 0;
 
         /** Open virtual root directory.
             The virtual root directory contains references to actual, physical directories
@@ -61,7 +61,19 @@ namespace afl { namespace io {
             This is intended to allow a platform-neutral enumeration of possible entry points into a file system.
             Entry points could be drive letters, home directories, etc.
             \return Directory object, never null */
-        virtual afl::base::Ptr<Directory> openRootDirectory() = 0;
+        virtual afl::base::Ref<Directory> openRootDirectory() = 0;
+
+        /** Open a file, but don't throw FileProblemException's.
+            This function calls openFile().
+            If there is a FileProblemException, it just returns null.
+            This is for implementing "if (file exists) { read it }" patterns.
+
+            Note that other exceptions (e.g. std::bad_alloc) will still propagate.
+            \param name Name of file
+            \param mode Open mode
+            \return file, null if cannot be opened */
+        afl::base::Ptr<Stream> openFileNT(String_t name, OpenMode mode);
+
 
 
         /*

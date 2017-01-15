@@ -14,6 +14,7 @@
 #include "afl/base/countof.hpp"
 
 using afl::base::Ptr;
+using afl::base::Ref;
 using afl::io::InternalDirectory;
 using afl::io::InternalStream;
 using afl::io::FileSystem;
@@ -26,8 +27,8 @@ void
 TestIoInternalDirectory::testBaseAPI()
 {
     // Create directory
-    Ptr<InternalDirectory> md = InternalDirectory::create("tester");
-    TS_ASSERT(md.get() != 0);
+    Ref<InternalDirectory> md = InternalDirectory::create("tester");
+    TS_ASSERT(&md.get() != 0);
     TS_ASSERT_EQUALS(md->getTitle(), "tester");
     TS_ASSERT_EQUALS(md->getDirectoryName(), "");
 
@@ -37,25 +38,25 @@ TestIoInternalDirectory::testBaseAPI()
     TS_ASSERT(md->getStream("foo").get() == 0);
 
     // Create a file
-    Ptr<InternalStream> ms = new InternalStream();
+    Ref<InternalStream> ms = *new InternalStream();
     md->addStream("foo", ms);
-    TS_ASSERT(ms.get() != 0);
+    TS_ASSERT(&ms.get() != 0);
     TS_ASSERT_EQUALS(ms->getSize(), 0U);
     TS_ASSERT_EQUALS(ms->getPos(), 0U);
-    TS_ASSERT_EQUALS(ms, md->getStream("foo"));
+    TS_ASSERT_EQUALS(ms.asPtr(), md->getStream("foo"));
 
     // Create another file
-    Ptr<InternalStream> ms2 = new InternalStream();
+    Ref<InternalStream> ms2 = *new InternalStream();
     md->addStream("bar", ms2);
-    TS_ASSERT(ms2.get() != 0);
+    TS_ASSERT(&ms2.get() != 0);
     TS_ASSERT_EQUALS(ms2->getSize(), 0U);
     TS_ASSERT_EQUALS(ms2->getPos(), 0U);
-    TS_ASSERT_EQUALS(ms2, md->getStream("bar"));
+    TS_ASSERT_EQUALS(ms2.asPtr(), md->getStream("bar"));
 
     // Rename file
     TS_ASSERT_EQUALS(md->renameStream("foo", "bar"), true);
     TS_ASSERT(md->getStream("foo").get() == 0);
-    TS_ASSERT_EQUALS(md->getStream("bar"), ms);
+    TS_ASSERT_EQUALS(md->getStream("bar"), ms.asPtr());
 
     // Erase file
     TS_ASSERT_EQUALS(md->eraseStream("foo"), false);
@@ -70,7 +71,7 @@ void
 TestIoInternalDirectory::testCreation()
 {
     // Create directory
-    Ptr<Directory> md = InternalDirectory::create("tester");
+    Ref<Directory> md = InternalDirectory::create("tester");
     TS_ASSERT_EQUALS(md->getTitle(), "tester");
 
     // Open fails for nonexistant file
@@ -79,12 +80,12 @@ TestIoInternalDirectory::testCreation()
     TS_ASSERT_EQUALS(md->eraseNT("foo"), false);
     TS_ASSERT_THROWS(md->erase("foo"), afl::except::FileProblemException);
 
-    TS_ASSERT_DIFFERS(md->getDirectoryEntryByName("foo"), Ptr<DirectoryEntry>(0));
+    TS_ASSERT_DIFFERS(md->getDirectoryEntryByName("foo").asPtr(), Ptr<DirectoryEntry>(0));
     TS_ASSERT_THROWS(md->getDirectoryEntryByName("foo")->renameTo("bar"), afl::except::FileProblemException);
 
     // Test creation
-    Ptr<Stream> s = md->openFile("foo", FileSystem::Create);
-    TS_ASSERT(s.get() != 0);
+    Ref<Stream> s = md->openFile("foo", FileSystem::Create);
+    TS_ASSERT(&s.get() != 0);
     TS_ASSERT_EQUALS(s->getPos(), 0U);
     TS_ASSERT_EQUALS(s->getSize(), 0U);
     TS_ASSERT_EQUALS(s->write(afl::string::toBytes("hello")), 5U);
@@ -96,8 +97,8 @@ TestIoInternalDirectory::testCreation()
 
     // Test re-opening / reading
     uint8_t tmp[10];
-    Ptr<Stream> s2 = md->openFile("foo", FileSystem::OpenRead);
-    TS_ASSERT(s2.get() != 0);
+    Ref<Stream> s2 = md->openFile("foo", FileSystem::OpenRead);
+    TS_ASSERT(&s2.get() != 0);
     TS_ASSERT_EQUALS(s2->getPos(), 0U);
     TS_ASSERT_EQUALS(s2->getSize(), 5U);
     TS_ASSERT_EQUALS(s2->read(tmp), 5U);
@@ -105,8 +106,8 @@ TestIoInternalDirectory::testCreation()
     TS_ASSERT_EQUALS(s2->getPos(), 5U);
     TS_ASSERT_EQUALS(s2->getSize(), 5U);
 
-    Ptr<Stream> s3 = md->openFile("foo", FileSystem::OpenWrite);
-    TS_ASSERT(s3.get() != 0);
+    Ref<Stream> s3 = md->openFile("foo", FileSystem::OpenWrite);
+    TS_ASSERT(&s3.get() != 0);
     TS_ASSERT_EQUALS(s3->getPos(), 0U);
     TS_ASSERT_EQUALS(s3->getSize(), 5U);
     TS_ASSERT_EQUALS(s3->read(afl::base::Memory<uint8_t>::unsafeCreate(tmp, 3)), 3U);
@@ -131,7 +132,7 @@ TestIoInternalDirectory::testCreation()
     TS_ASSERT_SAME_DATA(tmp, "me!", 3U);
 
     // Check that creation resets file to zero size
-    Ptr<Stream> s4 = md->openFile("foo", FileSystem::Create);
+    Ref<Stream> s4 = md->openFile("foo", FileSystem::Create);
     TS_ASSERT_EQUALS(s4->getSize(), 0U);
     TS_ASSERT_EQUALS(s3->getSize(), 0U);
     TS_ASSERT_EQUALS(s2->getSize(), 0U);
@@ -144,23 +145,23 @@ void
 TestIoInternalDirectory::testIteration()
 {
     // Create directory
-    Ptr<Directory> md = InternalDirectory::create("tester");
+    Ref<Directory> md = InternalDirectory::create("tester");
     TS_ASSERT_EQUALS(md->getTitle(), "tester");
 
     // Must be initially empty
-    Ptr<afl::base::Enumerator<Ptr<DirectoryEntry> > > e = md->getDirectoryEntries();
+    Ptr<afl::base::Enumerator<Ptr<DirectoryEntry> > > e = md->getDirectoryEntries().asPtr();
     Ptr<DirectoryEntry> result;
     TS_ASSERT(e.get() != 0);
     TS_ASSERT(!e->getNextElement(result));
 
     // Create file with some content
     {
-        Ptr<Stream> s = md->openFile("a", FileSystem::Create);
+        Ref<Stream> s = md->openFile("a", FileSystem::Create);
         TS_ASSERT_EQUALS(s->write(afl::string::toBytes("hallo")), 5U);
     }
 
     // Must now contain one item with correct specs
-    e = md->getDirectoryEntries();
+    e = md->getDirectoryEntries().asPtr();
     TS_ASSERT(e.get() != 0);
     Ptr<DirectoryEntry> entry;
     TS_ASSERT(e->getNextElement(entry));
@@ -173,7 +174,7 @@ TestIoInternalDirectory::testIteration()
     // Entry must be open-able as file
     {
         Ptr<Stream> s;
-        TS_ASSERT_THROWS_NOTHING(s = entry->openFile(FileSystem::OpenRead));
+        TS_ASSERT_THROWS_NOTHING(s = entry->openFile(FileSystem::OpenRead).asPtr());
         TS_ASSERT(s.get() != 0);
         TS_ASSERT_EQUALS(s->getSize(), 5U);
     }
@@ -182,7 +183,7 @@ TestIoInternalDirectory::testIteration()
     TS_ASSERT_THROWS(entry->openDirectory(), afl::except::FileProblemException);
 
     // Entry must be linked to directory
-    TS_ASSERT(entry->openContainingDirectory() == md);
+    TS_ASSERT(&entry->openContainingDirectory().get() == &md.get());
 
     // Directory must not contain more elements
     TS_ASSERT(!e->getNextElement(entry));
@@ -197,13 +198,13 @@ TestIoInternalDirectory::testConcurrency()
     // Perform some iteration; while doing so, delete files.
     for (size_t toDelete = 0; toDelete < countof(names); ++toDelete) {
         // Create test setup
-        Ptr<Directory> md = InternalDirectory::create("tester");
+        Ref<Directory> md = InternalDirectory::create("tester");
         for (size_t i = 0; i < countof(names); ++i) {
             md->openFile(names[i], FileSystem::Create);
         }
 
         // Create iterator
-        Ptr<afl::base::Enumerator<Ptr<DirectoryEntry> > > e = md->getDirectoryEntries();
+        Ref<afl::base::Enumerator<Ptr<DirectoryEntry> > > e = md->getDirectoryEntries();
         Ptr<DirectoryEntry> entry;
         TS_ASSERT(e->getNextElement(entry));
         TS_ASSERT(entry.get() != 0);

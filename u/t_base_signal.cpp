@@ -406,3 +406,44 @@ TestBaseSignal::testNew()
     }
     TS_ASSERT_EQUALS(log, "+hh-");
 }
+
+namespace {
+    class Disconnector {
+     public:
+        Disconnector(afl::base::Signal<void(int)>& sig, int n, int& counter)
+            : m_value(n),
+              m_counter(counter),
+              conn_signal(sig.add(this, &Disconnector::onSignal))
+            { }
+        void onSignal(int n)
+            {
+                ++m_counter;
+                if (n == m_value) {
+                    conn_signal.disconnect();
+                }
+            }
+     private:
+        const int m_value;
+        int& m_counter;
+        afl::base::SignalConnection conn_signal;
+    };
+}
+
+/** Test signals that disconnect themselves. */
+void
+TestBaseSignal::testKillSelf()
+{
+    for (int i = 1; i <= 3; ++i) {
+        int counter = 0;
+        afl::base::Signal<void(int)> testee;
+        Disconnector a(testee, 1, counter);
+        Disconnector b(testee, 2, counter);
+        Disconnector c(testee, 3, counter);
+        testee.raise(i);
+        TS_ASSERT_EQUALS(counter, 3);
+        testee.raise(i);
+        TS_ASSERT_EQUALS(counter, 5);
+        testee.raise(i);
+        TS_ASSERT_EQUALS(counter, 7);
+    }
+}

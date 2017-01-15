@@ -25,7 +25,7 @@ class afl::net::SecureNetworkStack::Listener : public afl::net::Listener, privat
         Makes a new listener.
         \param listener Underlying listener
         \param ctx SecureContext that implements SSL */
-    Listener(afl::base::Ptr<afl::net::Listener> listener, afl::base::Ptr<SecureContext> ctx);
+    Listener(afl::base::Ref<afl::net::Listener> listener, afl::base::Ref<SecureContext> ctx);
 
     // Listener operations:
     virtual afl::base::Ptr<afl::net::Socket> accept(afl::sys::Timeout_t timeout);
@@ -34,8 +34,8 @@ class afl::net::SecureNetworkStack::Listener : public afl::net::Listener, privat
 
  private:
     // Connections
-    const afl::base::Ptr<afl::net::Listener> m_listener;      ///< Underlying listener.
-    const afl::base::Ptr<afl::net::SecureContext> m_ctx;      ///< SecureContext that implements SSL.
+    const afl::base::Ref<afl::net::Listener> m_listener;      ///< Underlying listener.
+    const afl::base::Ref<afl::net::SecureContext> m_ctx;      ///< SecureContext that implements SSL.
 
     // Async:
     std::list<LocalAcceptOperation*> m_pendingAccepts;       ///< All pending encrypted accept operations.
@@ -47,7 +47,7 @@ class afl::net::SecureNetworkStack::Listener : public afl::net::Listener, privat
 };
 
 inline
-afl::net::SecureNetworkStack::Listener::Listener(afl::base::Ptr<afl::net::Listener> listener, afl::base::Ptr<SecureContext> ctx)
+afl::net::SecureNetworkStack::Listener::Listener(afl::base::Ref<afl::net::Listener> listener, afl::base::Ref<SecureContext> ctx)
     : m_listener(listener),
       m_ctx(ctx),
       m_pendingAccepts()
@@ -59,10 +59,13 @@ afl::net::SecureNetworkStack::Listener::accept(afl::sys::Timeout_t timeout)
 {
     // Accept socket on physical layer
     afl::base::Ptr<afl::net::Socket> sock = m_listener->accept(timeout);
-
-    // Wrap in SSL
-    afl::async::Controller ctl;
-    return m_ctx->wrapServer(ctl, sock);
+    if (sock.get() != 0) {
+        // Wrap in SSL
+        afl::async::Controller ctl;
+        return m_ctx->wrapServer(ctl, *sock).asPtr();
+    } else {
+        return sock;
+    }
 }
 
 // Implementation of Listener::acceptAsync
@@ -126,8 +129,8 @@ afl::net::SecureNetworkStack::Listener::notify(afl::async::Operation& op)
     AcceptOperation& userOperation = *localOperation.m_userOperation;
     afl::async::Controller& ctl = *userOperation.getController();
     try {
-        afl::base::Ptr<Socket> result = m_ctx->wrapServer(ctl, localOperation.getResult());
-        userOperation.setResult(result);
+        afl::base::Ref<Socket> result = m_ctx->wrapServer(ctl, *localOperation.getResult());
+        userOperation.setResult(result.asPtr());
         userOperation.getNotifier().notify(userOperation);
     }
     catch (...) {
@@ -148,7 +151,7 @@ afl::net::SecureNetworkStack::Listener::notifyDirect(afl::async::Operation& op)
 
 /*************************** SecureNetworkStack **************************/
 
-afl::net::SecureNetworkStack::SecureNetworkStack(NetworkStack& peer, afl::base::Ptr<SecureContext> ctx)
+afl::net::SecureNetworkStack::SecureNetworkStack(NetworkStack& peer, afl::base::Ref<SecureContext> ctx)
     : NetworkStack(),
       m_peer(peer),
       m_ctx(ctx)
@@ -157,13 +160,13 @@ afl::net::SecureNetworkStack::SecureNetworkStack(NetworkStack& peer, afl::base::
 afl::net::SecureNetworkStack::~SecureNetworkStack()
 { }
 
-afl::base::Ptr<afl::net::Listener>
+afl::base::Ref<afl::net::Listener>
 afl::net::SecureNetworkStack::listen(const Name& name, int backlogSize)
 {
-    return new Listener(m_peer.listen(name, backlogSize), m_ctx);
+    return *new Listener(m_peer.listen(name, backlogSize), m_ctx);
 }
 
-afl::base::Ptr<afl::net::Socket>
+afl::base::Ref<afl::net::Socket>
 afl::net::SecureNetworkStack::connect(const Name& name, afl::sys::Timeout_t timeout)
 {
     afl::async::Controller ctl;

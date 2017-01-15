@@ -68,16 +68,16 @@ afl::io::Stream::copyFrom(Stream& other, FileSize_t size)
     }
 }
 
-afl::base::Ptr<afl::io::FileMapping>
+afl::base::Ref<afl::io::FileMapping>
 afl::io::Stream::createVirtualMapping(FileSize_t limit)
 {
     afl::base::Ptr<FileMapping> mapping = createFileMapping(limit);
     if (mapping.get() == 0) {
-        mapping = new InternalFileMapping(*this, limit);
+        return *new InternalFileMapping(*this, limit);
+    } else {
+        return *mapping;
     }
-    return mapping;
 }
-
 
 bool
 afl::io::Stream::handleData(const String_t& /*name*/, afl::base::ConstBytes_t& data)

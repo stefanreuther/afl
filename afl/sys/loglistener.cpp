@@ -43,17 +43,23 @@ afl::sys::LogListener::write(Level level, const String_t& channel, const String_
 void
 afl::sys::LogListener::write(Level level, const String_t& channel, const String_t& message, const std::exception& e)
 {
+    write(level, channel, formatException(message, e));
+}
+
+String_t
+afl::sys::LogListener::formatException(const String_t& message, const std::exception& e)
+{
     if (const afl::except::FileProblemException* fpe = dynamic_cast<const afl::except::FileProblemException*>(&e)) {
         if (!message.empty()) {
-            write(level, channel, afl::string::Format("%s: %s: %s", fpe->getFileName(), message, e.what()));
+            return afl::string::Format("%s: %s: %s", fpe->getFileName(), message, e.what());
         } else {
-            write(level, channel, afl::string::Format("%s: %s", fpe->getFileName(), e.what()));
+            return afl::string::Format("%s: %s", fpe->getFileName(), e.what());
         }
     } else {
         if (!message.empty()) {
-            write(level, channel, afl::string::Format("%s: %s", message, e.what()));
+            return afl::string::Format("%s: %s", message, e.what());
         } else {
-            write(level, channel, e.what());
+            return e.what();
         }
     }
 }

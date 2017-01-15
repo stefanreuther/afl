@@ -27,7 +27,7 @@ TestNetSocket::testBidi()
     afl::net::Name name("127.0.0.1", uint16_t(std::rand() % 10000 + 20000));
 
     // Listen
-    afl::base::Ptr<afl::net::Listener> listener = ns.listen(name, 1);
+    afl::base::Ref<afl::net::Listener> listener = ns.listen(name, 1);
 
     // Create a listening thread
     class Server : public afl::base::Runnable {
@@ -60,8 +60,8 @@ TestNetSocket::testBidi()
     serverThread.start();
 
     // Connect to the server
-    afl::base::Ptr<afl::net::Socket> socket = ns.connect(name, 5000);
-    TS_ASSERT(socket.get() != 0);
+    afl::base::Ref<afl::net::Socket> socket = ns.connect(name, 5000);
+    TS_ASSERT(&socket.get() != 0);
 
     // Send some data
     static const uint8_t sendData[] = { 1, 2, 3 };
@@ -97,7 +97,7 @@ TestNetSocket::testClose()
     afl::net::Name name("127.0.0.1", uint16_t(std::rand() % 10000 + 20000));
 
     // Listen
-    afl::base::Ptr<afl::net::Listener> listener = ns.listen(name, 1);
+    afl::base::Ref<afl::net::Listener> listener = ns.listen(name, 1);
 
     // Create a listening thread
     class Server : public afl::base::Runnable {
@@ -130,8 +130,8 @@ TestNetSocket::testClose()
     serverThread.start();
 
     // Connect to the server
-    afl::base::Ptr<afl::net::Socket> socket = ns.connect(name, 5000);
-    TS_ASSERT(socket.get() != 0);
+    afl::base::Ref<afl::net::Socket> socket = ns.connect(name, 5000);
+    TS_ASSERT(&socket.get() != 0);
 
     // Send 20 bytes. This will fail.
     static const uint8_t sendData[4096] = {42};

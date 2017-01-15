@@ -84,3 +84,54 @@ TestContainerPtrQueue::testConst()
     TS_ASSERT(q.front() == 0);
     TS_ASSERT(q.extractFront() == 0);
 }
+
+/** Test pushFrontNew/pushBackNew. */
+void
+TestContainerPtrQueue::testPush()
+{
+    afl::container::PtrQueue<int> testee;
+    testee.pushBackNew(new int(1));        // 1
+    testee.pushFrontNew(new int(2));       // 2:1
+    testee.pushBackNew(new int(3));        // 2:1:3
+    testee.pushFrontNew(new int(4));       // 4:2:1:3
+    testee.pushBackNew(new int(5));        // 4:2:1:3:5
+    testee.pushBackNew(new int(6));        // 4:2:1:3:5:6
+    testee.pushFrontNew(new int(7));       // 7:4:2:1:3:5:6
+    testee.pushFrontNew(new int(8));       // 8:7:4:2:1:3:5:6
+
+    TS_ASSERT(testee.front() != 0);
+    TS_ASSERT_EQUALS(*testee.front(), 8);
+    testee.popFront();
+
+    TS_ASSERT(testee.front() != 0);
+    TS_ASSERT_EQUALS(*testee.front(), 7);
+    testee.popFront();
+
+    TS_ASSERT(testee.front() != 0);
+    TS_ASSERT_EQUALS(*testee.front(), 4);
+    testee.popFront();
+
+    TS_ASSERT(testee.front() != 0);
+    TS_ASSERT_EQUALS(*testee.front(), 2);
+    testee.popFront();
+
+    TS_ASSERT(testee.front() != 0);
+    TS_ASSERT_EQUALS(*testee.front(), 1);
+    testee.popFront();
+
+    TS_ASSERT(testee.front() != 0);
+    TS_ASSERT_EQUALS(*testee.front(), 3);
+    testee.popFront();
+
+    TS_ASSERT(testee.front() != 0);
+    TS_ASSERT_EQUALS(*testee.front(), 5);
+    testee.popFront();
+
+    TS_ASSERT(testee.front() != 0);
+    TS_ASSERT_EQUALS(*testee.front(), 6);
+    testee.popFront();
+
+    TS_ASSERT(testee.front() == 0);
+    TS_ASSERT(testee.empty());
+}
+

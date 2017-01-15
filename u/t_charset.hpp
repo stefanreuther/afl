@@ -10,11 +10,14 @@
 class TestCharsetBase64 : public CxxTest::TestSuite {
  public:
     void testIt();
+    void testClone();
+    void testError();
 };
 
 class TestCharsetCharset : public CxxTest::TestSuite {
  public:
     void testIt();
+    void testInterface();
 };
 
 class TestCharsetCharsetFactory : public CxxTest::TestSuite {
@@ -30,6 +33,7 @@ class TestCharsetCodepage : public CxxTest::TestSuite {
 class TestCharsetCodepageCharset : public CxxTest::TestSuite {
  public:
     void testIt();
+    void testClone();
 };
 
 class TestCharsetDefaultCharsetFactory : public CxxTest::TestSuite {
@@ -40,6 +44,7 @@ class TestCharsetDefaultCharsetFactory : public CxxTest::TestSuite {
 class TestCharsetQuotedPrintable : public CxxTest::TestSuite {
  public:
     void testIt();
+    void testClone();
 };
 
 class TestCharsetUnicode : public CxxTest::TestSuite {
@@ -51,6 +56,7 @@ class TestCharsetUnicode : public CxxTest::TestSuite {
 class TestCharsetUrlEncoding : public CxxTest::TestSuite {
  public:
     void testIt();
+    void testClone();
 };
 
 class TestCharsetUtf8 : public CxxTest::TestSuite {
@@ -61,11 +67,17 @@ class TestCharsetUtf8 : public CxxTest::TestSuite {
     void testLength();
     void testSubstr();
     void testPos();
+    void testCharAt();
+    void testIsContinuation();
+    void testAstral();
+    void testZero();
+    void testSurrogate();
 };
 
 class TestCharsetUtf8Charset : public CxxTest::TestSuite {
  public:
     void testIt();
+    void testClone();
 };
 
 class TestCharsetUtf8Reader : public CxxTest::TestSuite {

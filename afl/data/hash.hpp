@@ -5,7 +5,7 @@
 #ifndef AFL_AFL_DATA_HASH_HPP
 #define AFL_AFL_DATA_HASH_HPP
 
-#include "afl/base/ptr.hpp"
+#include "afl/base/ref.hpp"
 #include "afl/base/refcounted.hpp"
 #include "afl/data/namemap.hpp"
 #include "afl/data/segment.hpp"
@@ -24,7 +24,7 @@ namespace afl { namespace data {
             This is a function to make sure all Hash instances are heap-allocated,
             which is required for safe usage in HashValue.
             \return new instance, never null */
-        static afl::base::Ptr<Hash> create();
+        static afl::base::Ref<Hash> create();
 
         /** Constructor.
             Makes a populated mapping.
@@ -33,7 +33,7 @@ namespace afl { namespace data {
             \param keys Keys. Will be modified (emptied).
             \param values Values. Will be modified (emptied), Hash takes ownership of contained values.
             \return new instance, never null */
-        static afl::base::Ptr<Hash> create(NameMap& keys, Segment& values);
+        static afl::base::Ref<Hash> create(NameMap& keys, Segment& values);
 
         /** Destructor. */
         ~Hash();

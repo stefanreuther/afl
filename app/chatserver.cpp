@@ -31,6 +31,7 @@
 using afl::net::Socket;
 using afl::net::Listener;
 using afl::base::Ptr;
+using afl::base::Ref;
 
 namespace {
     /** Read file into a vector.
@@ -44,7 +45,7 @@ namespace {
 
         data.clear();
         FileSystem& fs(FileSystem::getInstance());
-        Ptr<Stream> s = fs.openFile(fileName, FileSystem::OpenRead);
+        Ref<Stream> s = fs.openFile(fileName, FileSystem::OpenRead);
         uint8_t buf[1024];
         while (size_t n = s->read(buf)) {
             data.insert(data.end(), &buf[0], &buf[n]);
@@ -102,14 +103,14 @@ int main(int argc, char** argv)
         // (spStack is used to keep the SecureNetworkStack alive.)
         Ptr<afl::net::NetworkStack> spStack;
         if (argc == 4) {
-            Ptr<afl::net::SecureContext> ctx(afl::net::SecureContext::create());
+            Ref<afl::net::SecureContext> ctx(afl::net::SecureContext::create());
             configureContext(*ctx, argv[2], argv[3]);
             spStack = new afl::net::SecureNetworkStack(*pStack, ctx);
             pStack = spStack.get();
         }
 
         // Set up listener
-        Ptr<Listener> listener = pStack->listen(afl::net::Name::parse(argv[1], "4242"), 10);
+        Ref<Listener> listener = pStack->listen(afl::net::Name::parse(argv[1], "4242"), 10);
 
         // Operate
         std::vector<Ptr<Client> > clients;

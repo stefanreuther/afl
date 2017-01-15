@@ -63,7 +63,7 @@ class afl::io::MultiplexableStream::Child : public afl::io::Stream {
     friend class ControlNode;
 
  public:
-    Child(afl::base::Ptr<ControlNode> controlNode);
+    Child(afl::base::Ref<ControlNode> controlNode);
     virtual ~Child();
 
     virtual size_t read(Bytes_t m);
@@ -74,11 +74,11 @@ class afl::io::MultiplexableStream::Child : public afl::io::Stream {
     virtual FileSize_t getSize();
     virtual uint32_t getCapabilities();
     virtual String_t getName();
-    virtual afl::base::Ptr<Stream> createChild();
+    virtual afl::base::Ref<Stream> createChild();
     virtual afl::base::Ptr<FileMapping> createFileMapping(FileSize_t limit);
 
  private:
-    afl::base::Ptr<ControlNode> m_controlNode;
+    afl::base::Ref<ControlNode> m_controlNode;
     FileSize_t m_posIfInactive;
 
     // Managed by ControlNode:
@@ -167,7 +167,7 @@ afl::io::MultiplexableStream::ControlNode::getParent()
 
 /*********************** MultiplexableStream::Child **********************/
 
-afl::io::MultiplexableStream::Child::Child(afl::base::Ptr<ControlNode> controlNode)
+afl::io::MultiplexableStream::Child::Child(afl::base::Ref<ControlNode> controlNode)
     : Stream(),
       m_controlNode(controlNode),
       m_posIfInactive(0),
@@ -268,10 +268,10 @@ afl::io::MultiplexableStream::Child::getName()
     }
 }
 
-afl::base::Ptr<afl::io::Stream>
+afl::base::Ref<afl::io::Stream>
 afl::io::MultiplexableStream::Child::createChild()
 {
-    return new Child(m_controlNode);
+    return *new Child(m_controlNode);
 }
 
 afl::base::Ptr<afl::io::FileMapping>
@@ -288,7 +288,7 @@ afl::io::MultiplexableStream::Child::createFileMapping(FileSize_t limit)
 /************************** MultiplexableStream **************************/
 
 afl::io::MultiplexableStream::MultiplexableStream()
-    : m_controlNode(new ControlNode(this))
+    : m_controlNode(*new ControlNode(this))
 { }
 
 afl::io::MultiplexableStream::~MultiplexableStream()
@@ -297,8 +297,8 @@ afl::io::MultiplexableStream::~MultiplexableStream()
     m_controlNode->removeParent();
 }
 
-afl::base::Ptr<afl::io::Stream>
+afl::base::Ref<afl::io::Stream>
 afl::io::MultiplexableStream::createChild()
 {
-    return new Child(m_controlNode);
+    return *new Child(m_controlNode);
 }

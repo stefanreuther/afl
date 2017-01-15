@@ -7,6 +7,7 @@
 
 #include "afl/base/deletable.hpp"
 #include "afl/base/ptr.hpp"
+#include "afl/base/ref.hpp"
 #include "afl/string/string.hpp"
 #include "afl/base/refcounted.hpp"
 #include "afl/base/enumerator.hpp"
@@ -33,13 +34,13 @@ namespace afl { namespace io {
             The item need not exist.
             \param name Name of item
             \return directory entry. Never null.
-            \throw FileProblemException if a DirectoryEntry cannot be created */
-        virtual afl::base::Ptr<DirectoryEntry> getDirectoryEntryByName(String_t name) = 0;
+            \throw FileProblemException if a DirectoryEntry cannot be created (only for immutable directories). */
+        virtual afl::base::Ref<DirectoryEntry> getDirectoryEntryByName(String_t name) = 0;
 
         /** Get directory entry enumerator.
             \return enumerator. Never null.
-            \throw FileProblemException if there is a problem creating the enumerator */
-        virtual afl::base::Ptr<afl::base::Enumerator<afl::base::Ptr<DirectoryEntry> > > getDirectoryEntries() = 0;
+            \throw FileProblemException if there is a problem creating the enumerator (e.g. opendir() fails). */
+        virtual afl::base::Ref<afl::base::Enumerator<afl::base::Ptr<DirectoryEntry> > > getDirectoryEntries() = 0;
 
         /** Get parent directory.
             \return parent directory. Can be null if there is no parent. */
@@ -67,7 +68,7 @@ namespace afl { namespace io {
             \param name Name of subdirectory
             \return directory, never null
             \throw FileProblemException if there is a problem */
-        afl::base::Ptr<Directory> openDirectory(String_t name);
+        afl::base::Ref<Directory> openDirectory(String_t name);
 
         /** Open a file.
             This function is short for obtaining a directory entry and opening that.
@@ -75,7 +76,7 @@ namespace afl { namespace io {
             \param mode Open mode
             \return file, never null
             \throw FileProblemException if there is a problem */
-        afl::base::Ptr<Stream> openFile(String_t name, FileSystem::OpenMode mode);
+        afl::base::Ref<Stream> openFile(String_t name, FileSystem::OpenMode mode);
 
         /** Open a file, but don't throw FileProblemException's.
             This function is short for obtaining a directory entry and opening that.

@@ -15,22 +15,22 @@
 #include "arch/posix/posixdirectory.hpp"
 #include "arch/posix/posixroot.hpp"
 
-afl::base::Ptr<afl::io::Stream>
+afl::base::Ref<afl::io::Stream>
 arch::posix::PosixFileSystem::openFile(FileName_t fileName, OpenMode mode)
 {
-    return new PosixStream(fileName, mode);
+    return *new PosixStream(fileName, mode);
 }
 
-afl::base::Ptr<afl::io::Directory>
+afl::base::Ref<afl::io::Directory>
 arch::posix::PosixFileSystem::openDirectory(FileName_t dirName)
 {
-    return new PosixDirectory(dirName);
+    return *new PosixDirectory(dirName);
 }
 
-afl::base::Ptr<afl::io::Directory>
+afl::base::Ref<afl::io::Directory>
 arch::posix::PosixFileSystem::openRootDirectory()
 {
-    return new PosixRoot();
+    return *new PosixRoot();
 }
 
 bool

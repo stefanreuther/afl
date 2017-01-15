@@ -3,6 +3,7 @@
   *  \brief Test for afl::string::Format
   */
 
+#include <sstream>
 #include "afl/string/format.hpp"
 
 #include "u/t_string.hpp"
@@ -241,7 +242,7 @@ TestStringFormat::testIntStr()
     TS_ASSERT_EQUALS(String_t(Format(str) << "000000000001x" << "0004294967297"), "cond = `000000000001x item for 0004294967297 dollars'");
 
     TS_ASSERT_EQUALS(String_t(Format(str) << "000,000,000,1" << ",,,,,,0,,0,,,"), "cond = `000,000,000,1 item for ,,,,,,0,,0,,, dollars'");
-    
+
     // Using String_t:
     TS_ASSERT_EQUALS(String_t(Format(str) << String_t("0") << String_t("0")), "cond = `0 items for 0 dollars each'");
     TS_ASSERT_EQUALS(String_t(Format(str) << String_t("0") << String_t("1")), "cond = `0 items for 1 dollar each'");
@@ -264,3 +265,62 @@ TestStringFormat::testIntStr()
     TS_ASSERT_EQUALS(String_t(Format(str) << one << one), "cond = `1 item for 1 dollar'");
 }
 
+/** Test ability to reorder parameters. */
+void
+TestStringFormat::testReorder()
+{
+    using afl::string::Format;
+
+    TS_ASSERT_EQUALS(String_t(Format("%d-%d-%d",       1, 2, 3)), "1-2-3");
+    TS_ASSERT_EQUALS(String_t(Format("%2$d-%1$d-%0$d", 1, 2, 3)), "3-2-1");
+    TS_ASSERT_EQUALS(String_t(Format("%1$d-%d-%0$d",   1, 2, 3)), "2-3-1");
+
+    TS_ASSERT_EQUALS(String_t(Format("%d-%d-%d")       << 1 << 2 << 3), "1-2-3");
+    TS_ASSERT_EQUALS(String_t(Format("%2$d-%1$d-%0$d") << 1 << 2 << 3), "3-2-1");
+    TS_ASSERT_EQUALS(String_t(Format("%1$d-%d-%0$d")   << 1 << 2 << 3), "2-3-1");
+}
+
+/** Test streaming conversion. */
+void
+TestStringFormat::testStream()
+{
+    using afl::string::Format;
+
+    // Constructor operation
+    {
+        std::stringstream ss;
+        ss << "hi " << Format("a%db", 10) << " ho";
+        TS_ASSERT_EQUALS(ss.str(), "hi a10b ho");
+    }
+
+    // This one has wrong associativity!
+    {
+        std::stringstream ss;
+        ss << "hi " << Format("a%db") << 10 << " ho";
+        TS_ASSERT_EQUALS(ss.str(), "hi a<invalid>b10 ho");
+    }
+
+    // Inserter operation
+    {
+        std::stringstream ss;
+        ss << "hi " << (Format("a%db") << 10) << " ho";
+        TS_ASSERT_EQUALS(ss.str(), "hi a10b ho");
+    }
+}
+
+/** Test some format string specialties. */
+void
+TestStringFormat::testSpecials()
+{
+    using afl::string::Format;
+
+    // Partial placeholder
+    TS_ASSERT_EQUALS(String_t(Format("%")), "");
+    TS_ASSERT_EQUALS(String_t(Format("%10")), "");
+    TS_ASSERT_EQUALS(String_t(Format("%10.")), "");
+    TS_ASSERT_EQUALS(String_t(Format("% ")), "");
+
+    // Percent
+    TS_ASSERT_EQUALS(String_t(Format("%%")), "%");
+    TS_ASSERT_EQUALS(String_t(Format("%5%")), "    %");
+}

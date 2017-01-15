@@ -23,20 +23,20 @@
 /** DirectoryEntry implementation for Win32 root. */
 class arch::win32::Win32Root::Entry : public afl::io::DirectoryEntry {
  public:
-    Entry(afl::base::Ptr<Win32Root> parent, String_t title, String_t path, FileType type, FileFlags_t flags);
+    Entry(afl::base::Ref<Win32Root> parent, String_t title, String_t path, FileType type, FileFlags_t flags);
     ~Entry();
     virtual String_t getTitle();
     virtual String_t getPathName();
-    virtual afl::base::Ptr<afl::io::Stream> openFile(afl::io::FileSystem::OpenMode mode);
-    virtual afl::base::Ptr<afl::io::Directory> openDirectory();
-    virtual afl::base::Ptr<afl::io::Directory> openContainingDirectory();
+    virtual afl::base::Ref<afl::io::Stream> openFile(afl::io::FileSystem::OpenMode mode);
+    virtual afl::base::Ref<afl::io::Directory> openDirectory();
+    virtual afl::base::Ref<afl::io::Directory> openContainingDirectory();
     virtual void updateInfo(uint32_t requested);
     virtual void doRename(String_t newName);
     virtual void doErase();
     virtual void doCreateAsDirectory();
 
  private:
-    afl::base::Ptr<Win32Root> m_parent;
+    afl::base::Ref<Win32Root> m_parent;
     String_t m_title;
     String_t m_path;
     FileType m_type;
@@ -48,7 +48,7 @@ class arch::win32::Win32Root::Entry : public afl::io::DirectoryEntry {
 /** DirectoryEntry enumerator implementation for Win32 root. */
 class arch::win32::Win32Root::Enum : public afl::base::Enumerator<afl::base::Ptr<afl::io::DirectoryEntry> > {
  public:
-    Enum(afl::base::Ptr<Win32Root> dir);
+    Enum(afl::base::Ref<Win32Root> dir);
     virtual ~Enum();
     virtual bool getNextElement(afl::base::Ptr<afl::io::DirectoryEntry>& result);
 
@@ -64,7 +64,7 @@ class arch::win32::Win32Root::Enum : public afl::base::Enumerator<afl::base::Ptr
     String_t m_myFilesPath;
     std::vector<char> m_driveList;
     size_t m_driveListIndex;
-    afl::base::Ptr<Win32Root> m_dir;
+    afl::base::Ref<Win32Root> m_dir;
     afl::base::Ptr<Entry> m_currentEntry;
 
     void next();
@@ -73,7 +73,7 @@ class arch::win32::Win32Root::Enum : public afl::base::Enumerator<afl::base::Ptr
 
 /**************************** Win32Root::Entry ***************************/
 
-arch::win32::Win32Root::Entry::Entry(afl::base::Ptr<Win32Root> parent, String_t title, String_t path, FileType type, FileFlags_t flags)
+arch::win32::Win32Root::Entry::Entry(afl::base::Ref<Win32Root> parent, String_t title, String_t path, FileType type, FileFlags_t flags)
     : m_parent(parent),
       m_title(title),
       m_path(path),
@@ -96,20 +96,21 @@ arch::win32::Win32Root::Entry::getPathName()
     return m_path;
 }
 
-afl::base::Ptr<afl::io::Stream>
+afl::base::Ref<afl::io::Stream>
 arch::win32::Win32Root::Entry::openFile(afl::io::FileSystem::OpenMode /*mode*/)
 {
-    fail();
-    return 0;
+    while (1) {
+        fail();
+    }
 }
 
-afl::base::Ptr<afl::io::Directory>
+afl::base::Ref<afl::io::Directory>
 arch::win32::Win32Root::Entry::openDirectory()
 {
-    return new Win32Directory(m_path);
+    return *new Win32Directory(m_path);
 }
 
-afl::base::Ptr<afl::io::Directory>
+afl::base::Ref<afl::io::Directory>
 arch::win32::Win32Root::Entry::openContainingDirectory()
 {
     return m_parent;
@@ -151,7 +152,7 @@ arch::win32::Win32Root::Entry::fail()
 
 /**************************** Win32Root::Enum ****************************/
 
-arch::win32::Win32Root::Enum::Enum(afl::base::Ptr<arch::win32::Win32Root> dir)
+arch::win32::Win32Root::Enum::Enum(afl::base::Ref<arch::win32::Win32Root> dir)
     : m_state(sDesktop),
       m_desktopPath(getShellFolder(CSIDL_DESKTOPDIRECTORY)),
       m_myFilesPath(getShellFolder(CSIDL_PERSONAL)),
@@ -237,16 +238,16 @@ arch::win32::Win32Root::Win32Root()
 arch::win32::Win32Root::~Win32Root()
 { }
 
-afl::base::Ptr<afl::io::DirectoryEntry>
+afl::base::Ref<afl::io::DirectoryEntry>
 arch::win32::Win32Root::getDirectoryEntryByName(String_t name)
 {
     throw afl::except::FileProblemException(name, afl::string::Messages::cannotAccessFiles());
 }
 
-afl::base::Ptr<afl::base::Enumerator<afl::base::Ptr<afl::io::DirectoryEntry> > >
+afl::base::Ref<afl::base::Enumerator<afl::base::Ptr<afl::io::DirectoryEntry> > >
 arch::win32::Win32Root::getDirectoryEntries()
 {
-    return new Enum(this);
+    return *new Enum(*this);
 }
 
 afl::base::Ptr<afl::io::Directory>

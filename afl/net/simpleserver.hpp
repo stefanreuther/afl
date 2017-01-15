@@ -8,6 +8,7 @@
 #include "afl/base/ptr.hpp"
 #include "afl/base/runnable.hpp"
 #include "afl/base/types.hpp"
+#include "afl/base/ref.hpp"
 
 namespace afl { namespace net {
 
@@ -27,7 +28,7 @@ namespace afl { namespace net {
         /** Constructor.
             \param listener Socket listener. Must not be null.
             \param factory ProtocolHandler factory. Must have sufficient (=infinite) lifetime. */
-        SimpleServer(afl::base::Ptr<Listener> listener, ProtocolHandlerFactory& factory);
+        SimpleServer(afl::base::Ref<Listener> listener, ProtocolHandlerFactory& factory);
 
         /** Destructor. */
         ~SimpleServer();
@@ -37,7 +38,7 @@ namespace afl { namespace net {
 
      private:
         /** Listener. */
-        afl::base::Ptr<Listener> m_listener;
+        afl::base::Ref<Listener> m_listener;
 
         /** ProtocolHandler factory. */
         ProtocolHandlerFactory& m_factory;

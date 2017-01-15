@@ -201,3 +201,149 @@ TestCharsetUtf8::testPos()
     TS_ASSERT_EQUALS(u8.byteToCharPos("a\xC2\x80y", 4), 3U);
     TS_ASSERT_EQUALS(u8.byteToCharPos("a\xC2\x80y", -1), 3U);
 }
+
+/** Test charAt. */
+void
+TestCharsetUtf8::testCharAt()
+{
+    Utf8 u8;
+    TS_ASSERT_EQUALS(u8.charAt("a\xC2\x80y", 0), afl::charset::Unichar_t('a'));
+    TS_ASSERT_EQUALS(u8.charAt("a\xC2\x80y", 1), 0x80U);
+    TS_ASSERT_EQUALS(u8.charAt("a\xC2\x80y", 2), afl::charset::Unichar_t('y'));
+    TS_ASSERT_EQUALS(u8.charAt("a\xC2\x80y", 3), 0U);
+    TS_ASSERT_EQUALS(u8.charAt("a\xC2\x80y", 4), 0U);
+}
+
+/** Test isContinuationByte. */
+void
+TestCharsetUtf8::testIsContinuation()
+{
+    for (int i = 0; i < 256; ++i) {
+        TS_ASSERT_EQUALS(Utf8::isContinuationByte(uint8_t(i)), (i >= 0x80 && i < 0xC0));
+    }
+}
+
+/** Test behaviour with characters from the astral plane. */
+void
+TestCharsetUtf8::testAstral()
+{
+    // Encoder
+    Utf8 u8;
+
+    // By default, Utf8 decodes only the regular Unicode range, and no characters ending in FFFE or FFFF.
+    // Disable error checking for reverse tests.
+    Utf8 u8d(Utf8::AllowNonCharacters);
+    {
+        // 11110_000 10_010000 10_000000 10_000000
+        String_t s;
+        u8.append(s, 0x10000);
+        TS_ASSERT_EQUALS(s, "\xF0\x90\x80\x80");
+        TS_ASSERT_EQUALS(u8d.charAt("\xF0\x90\x80\x80", 0), 0x10000U);
+    }
+    {
+        // 11110_111 10_111111 10_111111 10_111111
+        String_t s;
+        u8.append(s, 0x1FFFFF);
+        TS_ASSERT_EQUALS(s, "\xF7\xBF\xBF\xBF");
+        TS_ASSERT_EQUALS(u8d.charAt("\xF7\xBF\xBF\xBF", 0), 0x1FFFFFU);
+    }
+    {
+        // 111110_00 10_001000 10_000000 10_000000 10_000000
+        String_t s;
+        u8.append(s, 0x200000);
+        TS_ASSERT_EQUALS(s, "\xF8\x88\x80\x80\x80");
+        TS_ASSERT_EQUALS(u8d.charAt("\xF8\x88\x80\x80\x80", 0), 0x200000U);
+    }
+    {
+        // 111110_11 10_111111 10_111111 10_111111 10_111111
+        String_t s;
+        u8.append(s, 0x3FFFFFF);
+        TS_ASSERT_EQUALS(s, "\xFB\xBF\xBF\xBF\xBF");
+        TS_ASSERT_EQUALS(u8d.charAt("\xFB\xBF\xBF\xBF\xBF", 0), 0x3FFFFFFU);
+    }
+    {
+        // 1111110_1 10_110000 10_000000 10_000000 10_000000 10_000000
+        String_t s;
+        u8.append(s, 0x70000000);
+        TS_ASSERT_EQUALS(s, "\xFD\xB0\x80\x80\x80\x80");
+        TS_ASSERT_EQUALS(u8d.charAt("\xFD\xB0\x80\x80\x80\x80", 0), 0x70000000U);
+    }
+    {
+        // 11111110_ 10_000010 10_000000 10_000000 10_000000 10_000000 10_000000
+        String_t s;
+        u8.append(s, 0x80000000);
+        TS_ASSERT_EQUALS(s, "\xFE\x82\x80\x80\x80\x80\x80");
+        TS_ASSERT_EQUALS(u8d.charAt("\xFE\x82\x80\x80\x80\x80\x80", 0), 0x80000000U);
+    }
+}
+
+/** Test zeroes. */
+void
+TestCharsetUtf8::testZero()
+{
+    // Unencoded zero
+    {
+        String_t s;
+        Utf8().append(s, 0);
+        TS_ASSERT_EQUALS(s.size(), 1U);
+        TS_ASSERT_EQUALS(s[0], '\0');
+
+        // Add an additional character to prove we don't run into the out-of-range case
+        Utf8().append(s, 'a');
+        TS_ASSERT_EQUALS(s.size(), 2U);
+        TS_ASSERT_EQUALS(s[1], 'a');
+
+        TS_ASSERT_EQUALS(Utf8().charAt(s, 0), 0U);
+        TS_ASSERT_EQUALS(Utf8().charAt(s, 1), afl::charset::Unichar_t('a'));
+        TS_ASSERT_EQUALS(Utf8().charAt(s, 2), 0U);
+    }
+
+    // Encoded zero
+    {
+        String_t s;
+        Utf8(Utf8::AllowEncodedZero).append(s, 0);
+        TS_ASSERT_EQUALS(s, "\xC0\x80");
+        s += 'a';
+
+        // Default decoder refuses to decode encoded zero
+        TS_ASSERT(afl::charset::isErrorCharacter(Utf8().charAt(s, 0)));
+
+        // Custom decoder
+        Utf8 u8d(Utf8::AllowEncodedZero);
+        TS_ASSERT_EQUALS(u8d.charAt(s, 0), 0U);
+        TS_ASSERT_EQUALS(u8d.charAt(s, 1), afl::charset::Unichar_t('a'));
+        TS_ASSERT_EQUALS(u8d.charAt(s, 2), 0U);
+    }
+}
+
+/** Test surrogates (CESU-8). */
+void
+TestCharsetUtf8::testSurrogate()
+{
+    Utf8 u8s(Utf8::AllowSurrogates);
+
+    {
+        // 1110_1101 10_100000 10_00000
+        // 1110_1101 10_110000 10_00000
+        String_t s;
+        u8s.append(s, 0x10000);
+        TS_ASSERT_EQUALS(s, "\xED\xA0\x80\xED\xB0\x80");
+        TS_ASSERT_EQUALS(u8s.charAt("\xED\xA0\x80\xED\xB0\x80", 0), 0x10000U);
+    }
+    {
+        // 1110_1101 10_100000 10_00000
+        // 1110_1101 10_110000 10_00001
+        String_t s;
+        u8s.append(s, 0x10001);
+        TS_ASSERT_EQUALS(s, "\xED\xA0\x80\xED\xB0\x81");
+        TS_ASSERT_EQUALS(u8s.charAt("\xED\xA0\x80\xED\xB0\x81", 0), 0x10001U);
+    }
+    {
+        // 1110_1101 10_101111 10_11111
+        // 1110_1101 10_111111 10_11111
+        String_t s;
+        u8s.append(s, 0x10FFFF);
+        TS_ASSERT_EQUALS(s, "\xED\xAF\xBF\xED\xBF\xBF");
+        TS_ASSERT_EQUALS(u8s.charAt("\xED\xAF\xBF\xED\xBF\xBF", 0), 0x10FFFFU);
+    }
+}

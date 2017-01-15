@@ -13,8 +13,8 @@ void
 TestDataHash::testIt()
 {
     // Make it
-    afl::base::Ptr<afl::data::Hash> p = afl::data::Hash::create();
-    TS_ASSERT(p.get() != 0);
+    afl::base::Ref<afl::data::Hash> p = afl::data::Hash::create();
+    TS_ASSERT(&p.get() != 0);
     TS_ASSERT(p->getKeys().getNumNames() == 0);
     TS_ASSERT(p->getValues().size() == 0);
 

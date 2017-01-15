@@ -11,7 +11,7 @@ afl::base::Ptr<afl::io::TextWriter>
 afl::sys::Environment::attachTextWriterNT(Channel ch)
 {
     try {
-        return attachTextWriter(ch);
+        return attachTextWriter(ch).asPtr();
     }
     catch (...) {
         return 0;
@@ -23,7 +23,7 @@ afl::base::Ptr<afl::io::TextReader>
 afl::sys::Environment::attachTextReaderNT(Channel ch)
 {
     try {
-        return attachTextReader(ch);
+        return attachTextReader(ch).asPtr();
     }
     catch (...) {
         return 0;
@@ -35,7 +35,7 @@ afl::base::Ptr<afl::io::Stream>
 afl::sys::Environment::attachStreamNT(Channel ch)
 {
     try {
-        return attachStream(ch);
+        return attachStream(ch).asPtr();
     }
     catch (...) {
         return 0;

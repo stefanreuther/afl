@@ -27,6 +27,10 @@ namespace afl { namespace bits {
             \return Unpacked value */
         operator typename Desc::Word_t() const;
 
+        /** Explicit conversion to underlying type.
+            \return Unpacked value */
+        typename Desc::Word_t get() const;
+
         /** Representation. */
         typename Desc::Bytes_t m_bytes;
     };
@@ -44,6 +48,13 @@ afl::bits::Value<Desc>::operator=(typename Desc::Word_t word)
 template<typename Desc>
 inline
 afl::bits::Value<Desc>::operator typename Desc::Word_t() const
+{
+    return Desc::unpack(m_bytes);
+}
+
+template<typename Desc>
+inline typename Desc::Word_t
+afl::bits::Value<Desc>::get() const
 {
     return Desc::unpack(m_bytes);
 }

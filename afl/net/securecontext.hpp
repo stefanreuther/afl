@@ -8,6 +8,7 @@
 #include "afl/base/refcounted.hpp"
 #include "afl/async/controller.hpp"
 #include "afl/base/ptr.hpp"
+#include "afl/base/ref.hpp"
 #include "afl/net/socket.hpp"
 #include "afl/base/memory.hpp"
 
@@ -36,7 +37,7 @@ namespace afl { namespace net {
             \param ctl Controller to perform I/O
             \param peer existing socket
             \return newly-allocated SecureSocket */
-        virtual afl::base::Ptr<SecureSocket> wrapClient(afl::async::Controller& ctl, afl::base::Ptr<Socket> peer) = 0;
+        virtual afl::base::Ref<SecureSocket> wrapClient(afl::async::Controller& ctl, afl::base::Ref<Socket> peer) = 0;
 
         /** Wrap server socket into SecureSocket.
             This will perform the SSL/TLS handshake from the server viewpoint.
@@ -44,7 +45,7 @@ namespace afl { namespace net {
             \param ctl Controller to perform I/O
             \param peer existing socket
             \return newly-allocated SecureSocket */
-        virtual afl::base::Ptr<SecureSocket> wrapServer(afl::async::Controller& ctl, afl::base::Ptr<Socket> peer) = 0;
+        virtual afl::base::Ref<SecureSocket> wrapServer(afl::async::Controller& ctl, afl::base::Ref<Socket> peer) = 0;
 
         virtual void setPrivateKey(afl::base::ConstBytes_t data) = 0;
 
@@ -55,7 +56,7 @@ namespace afl { namespace net {
             configuration-dependant concreate instance of SecureContext.
             \throw afl::except::UnsupportedException if no SSL library is configured
             \return newly-allocated SecureContext */
-        static afl::base::Ptr<SecureContext> create();
+        static afl::base::Ref<SecureContext> create();
     };
 
 } }

@@ -30,7 +30,7 @@ void
 afl::net::redis::Subtree::getKeyNames(afl::data::StringList_t& keyNames)
 {
     const String_t& name = getName();
-    std::auto_ptr<afl::data::Value> val(getHandler().call(Segment().pushBack("KEYS").pushBack(name + "*")));
+    std::auto_ptr<afl::data::Value> val(getHandler().call(Segment().pushBackString("KEYS").pushBackString(name + "*")));
     afl::data::Access a(val);
     for (size_t i = 0, n = a.getArraySize(); i < n; ++i) {
         String_t key = a[i].toString();

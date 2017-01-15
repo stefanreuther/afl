@@ -16,6 +16,7 @@
 int main(int /*argc*/, char** argv)
 {
     using afl::base::Ptr;
+    using afl::base::Ref;
     using afl::io::FileSystem;
     using afl::io::Directory;
     using afl::io::DirectoryEntry;
@@ -27,7 +28,7 @@ int main(int /*argc*/, char** argv)
     /* Open stdout console. */
     afl::base::Ptr<afl::io::TextWriter> out;
     try {
-        out = env.attachTextWriter(Environment::Output);
+        out = env.attachTextWriter(Environment::Output).asPtr();
     }
     catch (afl::except::FileProblemException& fpe) {
         std::cerr << fpe.getFileName() << ": " << fpe.what() << std::endl;
@@ -43,12 +44,12 @@ int main(int /*argc*/, char** argv)
     }
 
     /* Do it */
-    afl::base::Ptr<Environment::CommandLine_t> cmdl = env.getCommandLine();
+    afl::base::Ref<Environment::CommandLine_t> cmdl = env.getCommandLine();
     String_t arg;
     while (cmdl->getNextElement(arg)) {
         try {
-            Ptr<Directory> dir = (arg == "--root") ? FileSystem::getInstance().openRootDirectory() : FileSystem::getInstance().openDirectory(arg);
-            Ptr<afl::base::Enumerator<Ptr<DirectoryEntry> > > e = dir->getDirectoryEntries();
+            Ref<Directory> dir = (arg == "--root") ? FileSystem::getInstance().openRootDirectory() : FileSystem::getInstance().openDirectory(arg);
+            Ref<afl::base::Enumerator<Ptr<DirectoryEntry> > > e = dir->getDirectoryEntries();
             Ptr<DirectoryEntry> entry;
             while (e->getNextElement(entry)) {
                 out->writeLine(entry->getTitle());

@@ -8,6 +8,8 @@
 #include "u/t_io.hpp"
 #include "afl/io/directory.hpp"
 #include "afl/io/directoryentry.hpp"
+#include "afl/except/fileproblemexception.hpp"
+#include "afl/io/nullstream.hpp"
 
 /** Generic tests. */
 void
@@ -198,15 +200,14 @@ TestIoFileSystem::testRoot()
     afl::io::FileSystem& fs = afl::io::FileSystem::getInstance();
 
     // Must be able to open it
-    afl::base::Ptr<afl::io::Directory> root = fs.openRootDirectory();
-    TS_ASSERT(root.get() != 0);
+    afl::base::Ref<afl::io::Directory> root = fs.openRootDirectory();
 
     // Root has no parent
     TS_ASSERT(root->getParentDirectory().get() == 0);
 
     // Enumerate content
-    afl::base::Ptr<afl::base::Enumerator<afl::base::Ptr<afl::io::DirectoryEntry> > > entries = root->getDirectoryEntries();
-    TS_ASSERT(entries.get() != 0);
+    afl::base::Ref<afl::base::Enumerator<afl::base::Ptr<afl::io::DirectoryEntry> > > entries = root->getDirectoryEntries();
+    TS_ASSERT(&entries.get() != 0);
 
     afl::base::Ptr<afl::io::DirectoryEntry> entry;
     size_t n = 0;
@@ -217,4 +218,49 @@ TestIoFileSystem::testRoot()
 
     // Every system has nonzero real roots. If not, the setup is broken and we cannot with good conscience succeed the tests.
     TS_ASSERT(n > 0);
+}
+
+/** Test openFileNT. Also serves as an interface test. */
+void
+TestIoFileSystem::testOpenFileNT()
+{
+    class Tester : public afl::io::FileSystem {
+     public:
+        virtual afl::base::Ref<afl::io::Stream> openFile(FileName_t fileName, OpenMode /*mode*/)
+            {
+                if (fileName == "fpe") {
+                    throw afl::except::FileProblemException(fileName, "boom");
+                } else if (fileName == "ex") {
+                    throw std::runtime_error("err");
+                } else {
+                    return *new afl::io::NullStream();
+                }
+            }
+        virtual afl::base::Ref<afl::io::Directory> openDirectory(FileName_t /*dirName*/)
+            { throw std::runtime_error("no ref"); }
+        virtual afl::base::Ref<afl::io::Directory> openRootDirectory()
+            { throw std::runtime_error("no ref"); }
+        virtual bool isAbsolutePathName(FileName_t /*path*/)
+            { return false; }
+        virtual bool isPathSeparator(char /*c*/)
+            { return false; }
+        virtual FileSystem::FileName_t makePathName(FileName_t /*path*/, FileName_t /*name*/)
+            { return FileName_t(); }
+        virtual FileSystem::FileName_t getCanonicalPathName(FileName_t /*name*/)
+            { return FileName_t(); }
+        virtual FileSystem::FileName_t getAbsolutePathName(FileName_t /*name*/)
+            { return FileName_t(); }
+        virtual FileSystem::FileName_t getFileName(FileName_t /*name*/)
+            { return FileName_t(); }
+        virtual FileSystem::FileName_t getDirectoryName(FileName_t /*name*/)
+            { return FileName_t(); }
+        virtual FileSystem::FileName_t getWorkingDirectoryName()
+            { return FileName_t(); }
+    };
+    Tester t;
+
+    // Test openFileNT
+    TS_ASSERT(t.openFileNT("fpe", Tester::OpenRead).get() == 0);
+    TS_ASSERT(t.openFileNT("other", Tester::OpenRead).get() != 0);
+    TS_ASSERT_THROWS(t.openFileNT("ex", Tester::OpenRead), std::runtime_error);
 }

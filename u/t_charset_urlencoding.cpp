@@ -3,6 +3,7 @@
   *  \brief Test for afl::charset::UrlEncoding
   */
 
+#include <memory>
 #include "afl/charset/urlencoding.hpp"
 
 #include "u/t_charset.hpp"
@@ -58,3 +59,14 @@ TestCharsetUrlEncoding::testIt()
     TS_ASSERT_EQUALS(ue.decode(afl::string::toMemory("%%33")), "%%33");
     TS_ASSERT_EQUALS(ue.decode(afl::string::toMemory("%%%%33")), "%%%3");  // fourth "=" starts a character
 }
+
+/** Test clone. */
+void
+TestCharsetUrlEncoding::testClone()
+{
+    afl::charset::UrlEncoding testee;
+    std::auto_ptr<afl::charset::Charset> result(testee.clone());
+    TS_ASSERT(result.get() != 0);
+    TS_ASSERT(dynamic_cast<afl::charset::UrlEncoding*>(result.get()) != 0);
+}
+

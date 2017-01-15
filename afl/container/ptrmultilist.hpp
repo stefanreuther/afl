@@ -35,6 +35,9 @@ namespace afl { namespace container {
             iterator(PtrMultiListBase::iterator it)
                 : m_it(it)
                 { }
+            iterator()
+                : m_it()
+                { }
             T* operator*() const
                 { return static_cast<T*>(m_it.get()); }
             iterator& operator++()
@@ -82,7 +85,7 @@ namespace afl { namespace container {
             { m_data.pushFrontNew(t); }
 
         /** Remove and delete first element. */
-        void pop_front()
+        void popFront()
             { m_data.erase(m_data.begin()); }
 
         /** Erase an element. */
@@ -93,7 +96,7 @@ namespace afl { namespace container {
             \param it element is inserted before this item
             \param p element
             \return iterator pointing to newly-inserted element */
-        iterator insert(const iterator& it, T* p)
+        iterator insertNew(const iterator& it, T* p)
             { return m_data.insert(it.m_it, p); }
 
         /** Swap elements. Both iterators must point at undeleted elements. */
@@ -192,7 +195,7 @@ afl::container::PtrMultiList<T>::merge(PtrMultiList& other, Pred p)
         while (i != e && p(*i, elem)) {
             ++i;
         }
-        insert(i, elem);
+        insertNew(i, elem);
     }
 }
 

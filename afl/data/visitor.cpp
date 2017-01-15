@@ -7,7 +7,7 @@
 #include "afl/data/value.hpp"
 
 void
-afl::data::Visitor::visit(Value* value)
+afl::data::Visitor::visit(const Value* value)
 {
     if (value != 0) {
         value->visit(*this);

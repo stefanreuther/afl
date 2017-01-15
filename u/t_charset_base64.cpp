@@ -3,6 +3,7 @@
   *  \brief Test for afl::charset::Base64
   */
 
+#include <memory>
 #include "afl/charset/base64.hpp"
 
 #include "u/t_charset.hpp"
@@ -63,4 +64,27 @@ TestCharsetBase64::testIt()
         TS_ASSERT_EQUALS(decoded.size(), sizeof(c));
         TS_ASSERT_SAME_DATA(decoded.data(), c, sizeof(c));
     }
+}
+
+/** Test clone. */
+void
+TestCharsetBase64::testClone()
+{
+    afl::charset::Base64 testee;
+    std::auto_ptr<afl::charset::Charset> result(testee.clone());
+    TS_ASSERT(result.get() != 0);
+    TS_ASSERT(dynamic_cast<afl::charset::Base64*>(result.get()) != 0);
+}
+
+/** Test fallback on error. */
+void
+TestCharsetBase64::testError()
+{
+    afl::charset::Base64 b64;
+
+    TS_ASSERT_EQUALS(b64.decode(afl::string::toMemory("YQ")), "a");
+    TS_ASSERT_EQUALS(b64.decode(afl::string::toMemory("YQA")),  String_t("a\0",   2));  // correct
+    TS_ASSERT_EQUALS(b64.decode(afl::string::toMemory("YQAA")), String_t("a\0\0", 3));  // correct
+    TS_ASSERT_EQUALS(b64.decode(afl::string::toMemory("YQ$")),  String_t("a\0",   2));  // incorrect
+    TS_ASSERT_EQUALS(b64.decode(afl::string::toMemory("YQ$$")), String_t("a\0\0", 3));  // incorrect
 }

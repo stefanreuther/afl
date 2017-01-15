@@ -17,7 +17,7 @@ afl::net::redis::SetKey::SetKey(CommandHandler& ch, const String_t& name)
 int32_t
 afl::net::redis::SetKey::size() const
 {
-    return getHandler().callInt(Segment().pushBack("SCARD").pushBack(getName()));
+    return getHandler().callInt(Segment().pushBackString("SCARD").pushBackString(getName()));
 }
 
 // Check emptiness (SCARD).

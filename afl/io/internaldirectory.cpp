@@ -11,31 +11,31 @@
 
 class afl::io::InternalDirectory::Entry : public afl::io::DirectoryEntry {
  public:
-    Entry(afl::base::Ptr<InternalDirectory> parent, const String_t& name);
+    Entry(afl::base::Ref<InternalDirectory> parent, const String_t& name);
     virtual String_t getTitle();
     virtual String_t getPathName();
-    virtual afl::base::Ptr<afl::io::Stream> openFile(afl::io::FileSystem::OpenMode mode);
-    virtual afl::base::Ptr<afl::io::Directory> openDirectory();
-    virtual afl::base::Ptr<afl::io::Directory> openContainingDirectory();
+    virtual afl::base::Ref<afl::io::Stream> openFile(afl::io::FileSystem::OpenMode mode);
+    virtual afl::base::Ref<afl::io::Directory> openDirectory();
+    virtual afl::base::Ref<afl::io::Directory> openContainingDirectory();
     virtual void updateInfo(uint32_t requested);
     virtual void doRename(String_t newName);
     virtual void doErase();
     virtual void doCreateAsDirectory();
 
  private:
-    afl::base::Ptr<InternalDirectory> m_parent;
+    afl::base::Ref<InternalDirectory> m_parent;
     String_t m_name;
 };
 
 
 class afl::io::InternalDirectory::Enum : public afl::base::Enumerator<afl::base::Ptr<afl::io::DirectoryEntry> > {
  public:
-    Enum(afl::base::Ptr<InternalDirectory> dir);
+    Enum(afl::base::Ref<InternalDirectory> dir);
     virtual ~Enum();
     virtual bool getNextElement(afl::base::Ptr<afl::io::DirectoryEntry>& result);
 
  private:
-    afl::base::Ptr<InternalDirectory> m_parent;
+    afl::base::Ref<InternalDirectory> m_parent;
     afl::base::Ptr<DirectoryEntry> m_currentEntry;
     InternalDirectory::NodeList_t::iterator m_iter;
 
@@ -46,7 +46,7 @@ class afl::io::InternalDirectory::Enum : public afl::base::Enumerator<afl::base:
 /******************* afl::io::InternalDirectory::Entry *******************/
 
 inline
-afl::io::InternalDirectory::Entry::Entry(afl::base::Ptr<InternalDirectory> parent, const String_t& name)
+afl::io::InternalDirectory::Entry::Entry(afl::base::Ref<InternalDirectory> parent, const String_t& name)
     : m_parent(parent),
       m_name(name)
 { }
@@ -62,7 +62,7 @@ afl::io::InternalDirectory::Entry::getPathName()
     return String_t();
 }
 
-afl::base::Ptr<afl::io::Stream>
+afl::base::Ref<afl::io::Stream>
 afl::io::InternalDirectory::Entry::openFile(afl::io::FileSystem::OpenMode mode)
 {
     InternalDirectory::NodeList_t::iterator it = m_parent->findName(m_name);
@@ -75,15 +75,15 @@ afl::io::InternalDirectory::Entry::openFile(afl::io::FileSystem::OpenMode mode)
         if (it == end) {
             throw afl::except::FileProblemException(m_name, afl::string::Messages::fileNotFound());
         }
-        result = (*it)->m_stream;
+        result = (*it)->m_stream.asPtr();
         break;
 
      case FileSystem::Create:
         result = new afl::io::InternalStream();
         if (it != end) {
-            (*it)->m_stream = result;
+            (*it)->m_stream.reset(*result);
         } else {
-            m_parent->m_content.pushBackNew(new Node(m_name, result));
+            m_parent->m_content.pushBackNew(new Node(m_name, *result));
         }
         break;
 
@@ -92,7 +92,7 @@ afl::io::InternalDirectory::Entry::openFile(afl::io::FileSystem::OpenMode mode)
             throw afl::except::FileProblemException(m_name, afl::string::Messages::fileExists());
         }
         result = new afl::io::InternalStream();
-        m_parent->m_content.pushBackNew(new Node(m_name, result));
+        m_parent->m_content.pushBackNew(new Node(m_name, *result));
         break;
     }
 
@@ -100,17 +100,17 @@ afl::io::InternalDirectory::Entry::openFile(afl::io::FileSystem::OpenMode mode)
     if (result.get() != 0) {
         return result->createChild();
     } else {
-        return 0;
+        throw afl::except::FileProblemException(m_name, afl::string::Messages::fileNotFound());
     }
 }
 
-afl::base::Ptr<afl::io::Directory>
+afl::base::Ref<afl::io::Directory>
 afl::io::InternalDirectory::Entry::openDirectory()
 {
     throw afl::except::FileProblemException(m_name, afl::string::Messages::cannotAccessDirectories());
 }
 
-afl::base::Ptr<afl::io::Directory>
+afl::base::Ref<afl::io::Directory>
 afl::io::InternalDirectory::Entry::openContainingDirectory()
 {
     return m_parent;
@@ -153,7 +153,7 @@ afl::io::InternalDirectory::Entry::doCreateAsDirectory()
 
 /******************** afl::io::InternalDirectory::Enum *******************/
 
-afl::io::InternalDirectory::Enum::Enum(afl::base::Ptr<InternalDirectory> dir)
+afl::io::InternalDirectory::Enum::Enum(afl::base::Ref<InternalDirectory> dir)
     : m_parent(dir),
       m_currentEntry(),
       m_iter(dir->m_content.begin())
@@ -199,7 +199,7 @@ afl::io::InternalDirectory::Enum::next()
 /******************** afl::io::InternalDirectory::Node *******************/
 
 inline
-afl::io::InternalDirectory::Node::Node(String_t name, afl::base::Ptr<Stream> stream)
+afl::io::InternalDirectory::Node::Node(String_t name, afl::base::Ref<Stream> stream)
     : m_name(name),
       m_stream(stream)
 { }
@@ -217,22 +217,22 @@ afl::io::InternalDirectory::InternalDirectory(String_t name)
 afl::io::InternalDirectory::~InternalDirectory()
 { }
 
-afl::base::Ptr<afl::io::InternalDirectory>
+afl::base::Ref<afl::io::InternalDirectory>
 afl::io::InternalDirectory::create(String_t name)
 {
-    return new InternalDirectory(name);
+    return *new InternalDirectory(name);
 }
 
-afl::base::Ptr<afl::io::DirectoryEntry>
+afl::base::Ref<afl::io::DirectoryEntry>
 afl::io::InternalDirectory::getDirectoryEntryByName(String_t name)
 {
-    return new Entry(this, name);
+    return *new Entry(*this, name);
 }
 
-afl::base::Ptr<afl::base::Enumerator<afl::base::Ptr<afl::io::DirectoryEntry> > >
+afl::base::Ref<afl::base::Enumerator<afl::base::Ptr<afl::io::DirectoryEntry> > >
 afl::io::InternalDirectory::getDirectoryEntries()
 {
-    return new Enum(this);
+    return *new Enum(*this);
 }
 
 afl::base::Ptr<afl::io::Directory>
@@ -254,11 +254,11 @@ afl::io::InternalDirectory::getTitle()
 }
 
 void
-afl::io::InternalDirectory::addStream(String_t name, afl::base::Ptr<Stream> stream)
+afl::io::InternalDirectory::addStream(String_t name, afl::base::Ref<Stream> stream)
 {
     NodeList_t::iterator p = findName(name);
     if (p != m_content.end()) {
-        (*p)->m_stream = stream;
+        (*p)->m_stream.reset(*stream);
     } else {
         m_content.pushBackNew(new Node(name, stream));
     }
@@ -269,7 +269,7 @@ afl::io::InternalDirectory::getStream(String_t name)
 {
     NodeList_t::iterator p = findName(name);
     if (p != m_content.end()) {
-        return (*p)->m_stream;
+        return (*p)->m_stream.asPtr();
     } else {
         return 0;
     }

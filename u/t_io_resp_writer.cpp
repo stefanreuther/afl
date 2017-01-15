@@ -46,7 +46,7 @@ TestIoRespWriter::testSimple()
         TS_ASSERT_EQUALS(formatToString(&iv), "$3\r\n-99\r\n");
     }
     {
-        afl::base::Ptr<afl::data::Hash> hash(afl::data::Hash::create());
+        afl::base::Ref<afl::data::Hash> hash(afl::data::Hash::create());
         hash->setNew("a", new afl::data::IntegerValue(99));
         hash->setNew("b", new afl::data::BooleanValue(true));
         afl::data::HashValue hv(hash);
@@ -62,7 +62,7 @@ TestIoRespWriter::testSimple()
                          "1\r\n");
     }
     {
-        afl::base::Ptr<afl::data::Vector> vec(afl::data::Vector::create());
+        afl::base::Ref<afl::data::Vector> vec(afl::data::Vector::create());
         vec->pushBackNew(new afl::data::IntegerValue(99));
         vec->pushBackNew(new afl::data::BooleanValue(true));
         vec->pushBackNew(0);

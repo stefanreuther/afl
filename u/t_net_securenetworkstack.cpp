@@ -23,6 +23,7 @@
 namespace {
     using afl::net::SecureContext;
     using afl::base::Ptr;
+    using afl::base::Ref;
     using afl::net::Name;
     using afl::net::Socket;
 
@@ -91,9 +92,9 @@ TestNetSecureNetworkStack::testConnect()
         bool ok = false;
         try {
             Name name("localhost", "26");     // 26 is unassigned, we assume nothing runs there
-            Ptr<afl::net::Socket> sock = ns.connect(name, 1000);
-            if (sock.get() == 0) {
-                // Failed with timeout, is ok
+            Ref<afl::net::Socket> sock = ns.connect(name, 1000);
+            if (&sock.get() != 0) {
+                // If it returns, it must be nonzero
                 ok = true;
             }
         }
@@ -117,7 +118,7 @@ TestNetSecureNetworkStack::testTransfer()
 {
     try {
         // Create and configure context
-        Ptr<SecureContext> serverContext = SecureContext::create();
+        Ref<SecureContext> serverContext = SecureContext::create();
         serverContext->setCertificate(afl::string::toBytes(CERTIFICATE));
         serverContext->setPrivateKey(afl::string::toBytes(PRIVATE_KEY));
 
@@ -126,7 +127,7 @@ TestNetSecureNetworkStack::testTransfer()
 
         // Create network stack and listen
         afl::net::SecureNetworkStack sns(afl::net::NetworkStack::getInstance(), serverContext);
-        Ptr<afl::net::Listener> listener(sns.listen(name, 10));
+        Ref<afl::net::Listener> listener(sns.listen(name, 10));
 
         // A thread to do the connecting
         class ClientRunnable : public afl::base::Runnable {
@@ -140,8 +141,8 @@ TestNetSecureNetworkStack::testTransfer()
                     afl::net::SecureNetworkStack sns(afl::net::NetworkStack::getInstance());
 
                     // Connect
-                    Ptr<Socket> sock(sns.connect(m_name));
-                    TS_ASSERT(sock.get());
+                    Ref<Socket> sock(sns.connect(m_name));
+                    TS_ASSERT(&sock.get());
 
                     // Send data
                     static const uint8_t data[] = { 1, 2 };

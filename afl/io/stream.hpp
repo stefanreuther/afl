@@ -10,6 +10,7 @@
 #include "afl/base/types.hpp"
 #include "afl/string/string.hpp"
 #include "afl/base/ptr.hpp"
+#include "afl/base/ref.hpp"
 #include "afl/io/datasink.hpp"
 
 namespace afl { namespace io {
@@ -101,7 +102,7 @@ namespace afl { namespace io {
               Instead, create a child stream for yourself.
             - the master stream must still be kept open until the last child has stopped using it.
               The behaviour is undefined if you close (=delete) it too early. */
-        virtual afl::base::Ptr<Stream> createChild() = 0;
+        virtual afl::base::Ref<Stream> createChild() = 0;
 
         /** Create a file mapping.
             The file mapping consists of all bytes from the current file position (getPos()) and includes up to \c limit bytes.
@@ -162,7 +163,7 @@ namespace afl { namespace io {
             \param stream Input stream. Object needs to be valid for the duration of this call, but no longer.
             \param limit Size limit. Map at most this many bytes.
             \return New file mapping, never null */
-        afl::base::Ptr<FileMapping> createVirtualMapping(FileSize_t limit = FileSize_t(-1));
+        afl::base::Ref<FileMapping> createVirtualMapping(FileSize_t limit = FileSize_t(-1));
 
 
         // DataSink:

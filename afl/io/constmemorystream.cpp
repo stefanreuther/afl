@@ -67,10 +67,10 @@ afl::io::ConstMemoryStream::getName()
     return "<memory>";
 }
 
-afl::base::Ptr<afl::io::Stream>
+afl::base::Ref<afl::io::Stream>
 afl::io::ConstMemoryStream::createChild()
 {
-    return new ConstMemoryStream(m_mem);
+    return *new ConstMemoryStream(m_mem);
 }
 
 afl::base::Ptr<afl::io::FileMapping>

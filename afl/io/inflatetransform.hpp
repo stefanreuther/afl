@@ -22,7 +22,8 @@ namespace afl { namespace io {
         /** Personality (stream type). */
         enum Personality {
             Gzip,               ///< Gzip file (with header).
-            Raw                 ///< Just a deflate stream.
+            Raw,                ///< Just a deflate stream.
+            Zlib
         };
 
         /** Constructor.

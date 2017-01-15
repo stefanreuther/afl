@@ -27,8 +27,8 @@ TestNetListener::testListen()
     afl::net::Name name("localhost", uint16_t(std::rand() % 10000 + 20000));
 
     // Create a listener
-    afl::base::Ptr<afl::net::Listener> listener = ns.listen(name, 10);
-    TS_ASSERT(listener.get() != 0);
+    afl::base::Ref<afl::net::Listener> listener = ns.listen(name, 10);
+    TS_ASSERT(&listener.get() != 0);
 
     // Accept a connection, with timeout
     afl::base::Ptr<afl::net::Socket> sock = listener->accept(1000);
@@ -51,7 +51,7 @@ TestNetListener::testAsync()
         void run()
             {
                 // Prepare network
-                afl::base::Ptr<afl::net::Listener> listener
+                afl::base::Ref<afl::net::Listener> listener
                     (afl::net::NetworkStack::getInstance().listen(afl::net::Name("localhost", m_portNr), 10));
 
                 // Start operations
@@ -92,8 +92,8 @@ TestNetListener::testAsync()
     TS_ASSERT(helper.m_out.receive(ctl, recvOp, 1000));
 
     // Connect to network
-    afl::base::Ptr<afl::net::Socket> sock(afl::net::NetworkStack::getInstance().connect(afl::net::Name("localhost", helper.m_portNr), 1000));
-    TS_ASSERT(sock.get() != 0);
+    afl::base::Ref<afl::net::Socket> sock(afl::net::NetworkStack::getInstance().connect(afl::net::Name("localhost", helper.m_portNr), 1000));
+    TS_ASSERT(&sock.get() != 0);
 
     // Finish
     helperThread.join();

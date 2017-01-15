@@ -55,6 +55,12 @@ namespace afl { namespace sys {
             If you call this, call it after getNext(), before getParameter().
             \return flags */
         virtual Flags_t getFlags() = 0;
+
+        /** Get a required parameter.
+            If the parameter is not specified, throws a afl::except::CommandLineException.
+            This is a convenience wrapper around getParameter().
+            \param text Name of option as produced by getNext() */
+        String_t getRequiredParameter(const String_t& text);
     };
 
 } }

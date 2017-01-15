@@ -347,6 +347,38 @@ afl::net::redis::InternalDatabase::call(const Segment_t& command)
         } else {
             return factory.createNull();
         }
+    } else if (verb == "GETRANGE") {
+        // GETRANGE key first last
+        int32_t beg = 0, end = 0;
+        checkArgumentCount(v, 3);
+        v.eat(keyArg);
+        v.eat(beg);
+        v.eat(end);
+
+        if (String* sk = get<String>(keyArg)) {
+            // This implementation of the range limitation means that
+            // "GETRANGE key -$bignum -$bignum" will truncate both locations to 0 and thus return the first character of the value.
+            if (beg < 0) {
+                beg += int32_t(sk->m_string.size());
+            }
+            if (end < 0) {
+                end += int32_t(sk->m_string.size());
+            }
+            if (beg < 0) {
+                beg = 0;
+            }
+            if (end < 0) {
+                end = 0;
+            }
+            ++end;
+            if (beg >= end || beg >= int32_t(sk->m_string.size())) {
+                return factory.createString(String_t());
+            } else {
+                return factory.createString(sk->m_string.substr(beg, end-beg));
+            }
+        } else {
+            return factory.createNull();
+        }
     } else if (verb == "GETSET") {
         // GETSET key value
         checkArgumentCount(v, 2);
@@ -437,7 +469,7 @@ afl::net::redis::InternalDatabase::call(const Segment_t& command)
         Segment_t result;
         if (Hash* hk = get<Hash>(keyArg)) {
             for (std::map<String_t, String_t>::const_iterator it = hk->m_hash.begin(), e = hk->m_hash.end(); it != e; ++it) {
-                result.pushBack(it->first);
+                result.pushBackString(it->first);
             }
         }
         return factory.createVector(result);
@@ -495,7 +527,7 @@ afl::net::redis::InternalDatabase::call(const Segment_t& command)
         Segment_t result;
         for (Data_t::iterator it = m_data.begin(), e = m_data.end(); it != e; ++it) {
             if (matchKey(keyArg, it->first)) {
-                result.pushBack(it->first);
+                result.pushBackString(it->first);
             }
         }
         return factory.createVector(result);
@@ -571,7 +603,7 @@ afl::net::redis::InternalDatabase::call(const Segment_t& command)
             size_t i = lk->convertIndex(beg);
             size_t j = lk->convertIndex(end);
             while (i <= j && lk->getByIndex(i, stringArg)) {
-                result.pushBack(stringArg);
+                result.pushBackString(stringArg);
                 ++i;
             }
         }
@@ -780,7 +812,7 @@ afl::net::redis::InternalDatabase::call(const Segment_t& command)
 
         Segment_t result;
         for (std::set<String_t>::iterator it = set.begin(), e = set.end(); it != e; ++it) {
-            result.pushBack(*it);
+            result.pushBackString(*it);
         }
         return factory.createVector(result);
     } else if (verb == "SDIFFSTORE") {
@@ -827,7 +859,7 @@ afl::net::redis::InternalDatabase::call(const Segment_t& command)
 
         Segment_t result;
         for (std::set<String_t>::iterator it = set.begin(), e = set.end(); it != e; ++it) {
-            result.pushBack(*it);
+            result.pushBackString(*it);
         }
         return factory.createVector(result);
     } else if (verb == "SINTERSTORE") {
@@ -861,7 +893,7 @@ afl::net::redis::InternalDatabase::call(const Segment_t& command)
         Segment_t result;
         if (Set* sk = get<Set>(keyArg)) {
             for (std::set<String_t>::iterator it = sk->m_set.begin(), e = sk->m_set.end(); it != e; ++it) {
-                result.pushBack(*it);
+                result.pushBackString(*it);
             }
         }
         return factory.createVector(result);
@@ -945,7 +977,7 @@ afl::net::redis::InternalDatabase::call(const Segment_t& command)
 
         Segment_t result;
         for (std::set<String_t>::iterator it = set.begin(), e = set.end(); it != e; ++it) {
-            result.pushBack(*it);
+            result.pushBackString(*it);
         }
         return factory.createVector(result);
     } else if (verb == "SUNIONSTORE") {
@@ -1149,7 +1181,7 @@ afl::net::redis::InternalDatabase::executeSortOperation(Sortable* key, Segment_t
             for (std::vector<String_t>::const_iterator it = get.begin(), e = get.end(); it != e; ++it) {
                 String_t tmp;
                 if (getSortValue(originValues[i], *it, tmp)) {
-                    out.pushBack(tmp);
+                    out.pushBackString(tmp);
                 } else {
                     out.pushBackNew(0);
                 }

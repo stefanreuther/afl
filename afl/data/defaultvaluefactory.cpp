@@ -49,7 +49,7 @@ afl::data::Value*
 afl::data::DefaultValueFactory::createHash(NameMap& keys, Segment& values)
 {
     // Create hash
-    afl::base::Ptr<Hash> pHash(Hash::create(keys, values));
+    afl::base::Ref<Hash> pHash(Hash::create(keys, values));
 
     // Create object
     return new HashValue(pHash);
@@ -59,7 +59,7 @@ afl::data::Value*
 afl::data::DefaultValueFactory::createVector(Segment& values)
 {
     // Create vector
-    afl::base::Ptr<Vector> pVector(Vector::create(values));
+    afl::base::Ref<Vector> pVector(Vector::create(values));
 
     // Create object
     return new VectorValue(pVector);

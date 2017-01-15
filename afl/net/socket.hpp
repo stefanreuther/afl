@@ -7,6 +7,7 @@
 
 #include "afl/sys/types.hpp"
 #include "afl/async/communicationobject.hpp"
+#include "afl/base/refcounted.hpp"
 
 namespace afl { namespace net {
 
@@ -18,7 +19,7 @@ namespace afl { namespace net {
 
         send/receive are allowed to do partial send/receive, you must check the return Operation.
         For full send/receives, use CommunicationStream::fullRead/fullWrite with the socket. */
-    class Socket : public afl::async::CommunicationObject {
+    class Socket : public afl::async::CommunicationObject, public afl::base::RefCounted {
      public:
         /** Close sender end.
             This signals the receiving end of the socket connection an end-of-file condition. */

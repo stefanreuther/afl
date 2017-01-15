@@ -26,10 +26,10 @@ int32_t
 afl::net::redis::IntegerField::operator+=(int32_t incr)
 {
     return getHash().getHandler().callInt(Segment()
-                                          .pushBack("HINCRBY")
-                                          .pushBack(getHash().getName())
-                                          .pushBack(getName())
-                                          .pushBack(incr));
+                                          .pushBackString("HINCRBY")
+                                          .pushBackString(getHash().getName())
+                                          .pushBackString(getName())
+                                          .pushBackInteger(incr));
 }
 
 // Increment by one (HINCRBY).
@@ -51,9 +51,10 @@ bool
 afl::net::redis::IntegerField::set(int32_t value)
 {
     return getHash().getHandler().callInt(Segment()
-                                          .pushBack("HSET")
-                                          .pushBack(getHash().getName())
-                                          .pushBack(value));
+                                          .pushBackString("HSET")
+                                          .pushBackString(getHash().getName())
+                                          .pushBackString(getName())
+                                          .pushBackInteger(value));
 }
 
 // Get current value (HGET).
@@ -61,7 +62,7 @@ int32_t
 afl::net::redis::IntegerField::get() const
 {
     return getHash().getHandler().callInt(Segment()
-                                          .pushBack("HGET")
-                                          .pushBack(getHash().getName())
-                                          .pushBack(getName()));
+                                          .pushBackString("HGET")
+                                          .pushBackString(getHash().getName())
+                                          .pushBackString(getName()));
 }

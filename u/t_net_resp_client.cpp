@@ -10,7 +10,6 @@
 #include "u/t_net_resp.hpp"
 #include "afl/async/communicationstream.hpp"
 #include "afl/async/controller.hpp"
-#include "afl/base/ptr.hpp"
 #include "afl/base/runnable.hpp"
 #include "afl/net/listener.hpp"
 #include "afl/net/name.hpp"
@@ -20,15 +19,16 @@
 #include "afl/sys/thread.hpp"
 #include "afl/data/integervalue.hpp"
 #include "afl/except/remoteerrorexception.hpp"
+#include "afl/base/ref.hpp"
 
 /** Simple test. */
 void
 TestNetRespClient::testIt()
 {
-    using afl::base::Ptr;
+    using afl::base::Ref;
     class Tester : public afl::base::Runnable {
      public:
-        Tester(Ptr<afl::net::Listener> listener)
+        Tester(Ref<afl::net::Listener> listener)
             : m_listener(listener),
               m_in(),
               m_out(),
@@ -68,7 +68,7 @@ TestNetRespClient::testIt()
             }
 
      private:
-        Ptr<afl::net::Listener> m_listener;
+        Ref<afl::net::Listener> m_listener;
         String_t m_in;
         String_t m_out;
         afl::sys::Semaphore m_wake;
@@ -91,7 +91,7 @@ TestNetRespClient::testIt()
     std::auto_ptr<afl::data::Value> result;
     for (int i = 0; i < 10; ++i) {
         testRunnable.setData("*2\r\n$5\r\nHello\r\n$5\r\nWorld\r\n", ":17\r\n");
-        result.reset(client.call(afl::data::Segment().pushBack("Hello").pushBack("World")));
+        result.reset(client.call(afl::data::Segment().pushBackString("Hello").pushBackString("World")));
         TS_ASSERT(result.get() != 0);
         TS_ASSERT(dynamic_cast<afl::data::IntegerValue*>(result.get()) != 0);
         TS_ASSERT_EQUALS(dynamic_cast<afl::data::IntegerValue*>(result.get())->getValue(), 17);
@@ -99,7 +99,7 @@ TestNetRespClient::testIt()
 
     // Test that integers are transmitted as strings
     testRunnable.setData("*2\r\n$3\r\nADD\r\n$2\r\n42\r\n", "$-1\r\n");
-    result.reset(client.call(afl::data::Segment().pushBack("ADD").pushBack(42)));
+    result.reset(client.call(afl::data::Segment().pushBackString("ADD").pushBackInteger(42)));
     TS_ASSERT(result.get() == 0);
 
     // Test error

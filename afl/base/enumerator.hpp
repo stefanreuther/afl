@@ -6,6 +6,7 @@
 #define AFL_AFL_BASE_ENUMERATOR_HPP
 
 #include "afl/base/deletable.hpp"
+#include "afl/base/refcounted.hpp"
 
 namespace afl { namespace base {
 
@@ -14,7 +15,7 @@ namespace afl { namespace base {
         provides late binding and does not require the iterator to be
         copyable. */
     template<typename T>
-    class Enumerator : public Deletable {
+    class Enumerator : public Deletable, public RefCounted {
      public:
         /** Virtual destructor. */
         virtual ~Enumerator();

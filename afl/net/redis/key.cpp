@@ -22,21 +22,21 @@ afl::net::redis::Key::~Key()
 bool
 afl::net::redis::Key::exists() const
 {
-    return m_ch.callInt(Segment().pushBack("EXISTS").pushBack(m_name)) != 0;
+    return m_ch.callInt(Segment().pushBackString("EXISTS").pushBackString(m_name)) != 0;
 }
 
 // Remove this key from the database (DEL).
 void
 afl::net::redis::Key::remove()
 {
-    m_ch.callVoid(Segment().pushBack("DEL").pushBack(m_name));
+    m_ch.callVoid(Segment().pushBackString("DEL").pushBackString(m_name));
 }
 
 // Rename this key (RENAME).
 void
 afl::net::redis::Key::renameTo(String_t newName)
 {
-    m_ch.callVoid(Segment().pushBack("RENAME").pushBack(m_name).pushBack(newName));
+    m_ch.callVoid(Segment().pushBackString("RENAME").pushBackString(m_name).pushBackString(newName));
     m_name = newName;
 }
 
@@ -44,7 +44,7 @@ afl::net::redis::Key::renameTo(String_t newName)
 bool
 afl::net::redis::Key::renameToUnique(String_t newName)
 {
-    const bool result = m_ch.callInt(Segment().pushBack("RENAMENX").pushBack(m_name).pushBack(newName));
+    const bool result = m_ch.callInt(Segment().pushBackString("RENAMENX").pushBackString(m_name).pushBackString(newName));
     if (result) {
         m_name = newName;
     }
@@ -55,7 +55,7 @@ afl::net::redis::Key::renameToUnique(String_t newName)
 afl::net::redis::Key::Type
 afl::net::redis::Key::getType() const
 {
-    const String_t result = m_ch.callString(Segment().pushBack("TYPE").pushBack(m_name));
+    const String_t result = m_ch.callString(Segment().pushBackString("TYPE").pushBackString(m_name));
     if (result == "none") {
         return None;
     } else if (result == "string") {

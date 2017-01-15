@@ -35,7 +35,11 @@ namespace afl { namespace bits {
     rotateLeft16(uint16_t a, int c)
     {
         c &= 15;
-        return static_cast<uint16_t>((a << c) | (a >> (16-c)));
+        if (c != 0) {
+            return static_cast<uint16_t>((a << c) | (a >> (16-c)));
+        } else {
+            return a;
+        }
     }
 
     /** Right-rotate a 16-bit integer.
@@ -54,7 +58,11 @@ namespace afl { namespace bits {
     rotateLeft32(uint32_t a, int c)
     {
         c &= 31;
-        return (a << c) | (a >> (32-c));
+        if (c != 0) {
+            return (a << c) | (a >> (32-c));
+        } else {
+            return a;
+        }
     }
 
     /** Right-rotate a 32-bit integer.
@@ -64,7 +72,11 @@ namespace afl { namespace bits {
     rotateRight32(uint32_t a, int c)
     {
         c &= 31;
-        return (a << (32-c)) | (a >> c);
+        if (c != 0) {
+            return (a << (32-c)) | (a >> c);
+        } else {
+            return a;
+        }
     }
 
     /** Left-rotate a 64-bit integer.
@@ -74,7 +86,11 @@ namespace afl { namespace bits {
     rotateLeft64(uint64_t a, int c)
     {
         c &= 63;
-        return (a << c) | (a >> (64-c));
+        if (c != 0) {
+            return (a << c) | (a >> (64-c));
+        } else {
+            return a;
+        }
     }
 
     /** Right-rotate a 64-bit integer.
@@ -84,7 +100,11 @@ namespace afl { namespace bits {
     rotateRight64(uint64_t a, int c)
     {
         c &= 63;
-        return (a << (64-c)) | (a >> c);
+        if (c != 0) {
+            return (a << (64-c)) | (a >> c);
+        } else {
+            return a;
+        }
     }
 
 } }

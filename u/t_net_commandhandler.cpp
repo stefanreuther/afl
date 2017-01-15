@@ -28,14 +28,14 @@ TestNetCommandHandler::testIt()
 
     // Test it
     using afl::data::Segment;
-    TS_ASSERT_EQUALS(t.callInt(Segment().pushBack(42)), 42);
-    TS_ASSERT_EQUALS(t.callString(Segment().pushBack(42)), "42");
+    TS_ASSERT_EQUALS(t.callInt(Segment().pushBackInteger(42)), 42);
+    TS_ASSERT_EQUALS(t.callString(Segment().pushBackInteger(42)), "42");
 
-    TS_ASSERT_EQUALS(t.callInt(Segment().pushBack("42")), 42);
-    TS_ASSERT_EQUALS(t.callString(Segment().pushBack("42")), "42");
+    TS_ASSERT_EQUALS(t.callInt(Segment().pushBackString("42")), 42);
+    TS_ASSERT_EQUALS(t.callString(Segment().pushBackString("42")), "42");
 
-    TS_ASSERT_THROWS(t.callInt(Segment().pushBack("xy")), afl::except::InvalidDataException);
-    TS_ASSERT_EQUALS(t.callString(Segment().pushBack("xy")), "xy");
+    TS_ASSERT_THROWS(t.callInt(Segment().pushBackString("xy")), afl::except::InvalidDataException);
+    TS_ASSERT_EQUALS(t.callString(Segment().pushBackString("xy")), "xy");
 
     // g++-3.4.2 does not eat this if it reads callInt(Segment()) because it attempty to copy the segment?
     Segment empty;

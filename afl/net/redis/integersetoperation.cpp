@@ -14,14 +14,14 @@ afl::net::redis::IntegerSetOperation::IntegerSetOperation(const char op[], const
     : m_ch(a.getHandler()),
       m_request(new afl::data::Segment())
 {
-    m_request->pushBack(op).pushBack(a.getName()).pushBack(b.getName());
+    m_request->pushBackString(op).pushBackString(a.getName()).pushBackString(b.getName());
 }
 
 // Add additional set.
 afl::net::redis::IntegerSetOperation&
 afl::net::redis::IntegerSetOperation::andAlso(IntegerSetKey x)
 {
-    m_request->pushBack(x.getName());
+    m_request->pushBackString(x.getName());
     return *this;
 }
 

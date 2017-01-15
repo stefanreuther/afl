@@ -3,16 +3,13 @@
   *  \brief Class afl::data::HashValue
   */
 
-#include <cassert>
 #include "afl/data/hashvalue.hpp"
 #include "afl/data/visitor.hpp"
 
-afl::data::HashValue::HashValue(afl::base::Ptr<Hash> pHash)
+afl::data::HashValue::HashValue(afl::base::Ref<Hash> pHash)
     : Value(),
       m_pHash(pHash)
-{
-    assert(m_pHash.get() != 0);
-}
+{ }
 
 afl::data::HashValue::~HashValue()
 { }

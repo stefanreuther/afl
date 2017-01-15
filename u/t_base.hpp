@@ -7,6 +7,11 @@
 
 #include <cxxtest/TestSuite.h>
 
+class TestBaseBaseWeakLink : public CxxTest::TestSuite {
+ public:
+    void testIt();
+};
+
 class TestBaseClonable : public CxxTest::TestSuite {
  public:
     void testIt();
@@ -85,6 +90,12 @@ class TestBaseMemory : public CxxTest::TestSuite {
     void testSplit();
     void testObject();
     void testFind();
+    void testNothing();
+};
+
+class TestBaseObservable : public CxxTest::TestSuite {
+ public:
+    void testIt();
 };
 
 class TestBaseOptional : public CxxTest::TestSuite {
@@ -101,6 +112,13 @@ class TestBasePtr : public CxxTest::TestSuite {
     void testObj();
     void testRefCountedObj();
     void testDerivation();
+};
+
+class TestBaseRef : public CxxTest::TestSuite {
+ public:
+    void testObj();
+    void testDerived();
+    void testPtr();
 };
 
 class TestBaseRefCounted : public CxxTest::TestSuite {
@@ -127,6 +145,7 @@ class TestBaseSignal : public CxxTest::TestSuite {
     void testResult();
     void testResult2();
     void testNew();
+    void testKillSelf();
 };
 
 class TestBaseSignalConnection : public CxxTest::TestSuite {
@@ -154,6 +173,17 @@ class TestBaseTypes : public CxxTest::TestSuite {
 };
 
 class TestBaseUncopyable : public CxxTest::TestSuite {
+ public:
+    void testIt();
+};
+
+class TestBaseWeakLink : public CxxTest::TestSuite {
+ public:
+    void testIt();
+    void testAssignment();
+};
+
+class TestBaseWeakTarget : public CxxTest::TestSuite {
  public:
     void testIt();
 };

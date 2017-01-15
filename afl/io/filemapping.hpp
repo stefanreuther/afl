@@ -7,6 +7,7 @@
 
 #include "afl/base/memory.hpp"
 #include "afl/base/deletable.hpp"
+#include "afl/base/refcounted.hpp"
 
 namespace afl { namespace io {
 
@@ -30,7 +31,7 @@ namespace afl { namespace io {
         There are no restrictions about sizes and positions;
         if unaligned mappings are attempted, those are enlarged to match page borders.
         It is unspecified, whether (and when) modifications to the underlying file show up in the mapping. */
-    class FileMapping : afl::base::Deletable {
+    class FileMapping : public afl::base::Deletable, public afl::base::RefCounted {
      public:
         /** Get content of file mapping.
             \return Memory descriptor, describing content of the mapped file */

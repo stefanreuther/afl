@@ -17,21 +17,21 @@ afl::io::NullFileSystem::~NullFileSystem()
 { }
 
 // Open a file given its name.
-afl::base::Ptr<afl::io::Stream>
+afl::base::Ref<afl::io::Stream>
 afl::io::NullFileSystem::openFile(FileName_t fileName, OpenMode /*mode*/)
 {
     throw afl::except::FileProblemException(fileName, afl::string::Messages::fileNotFound());
 }
 
 // Open a directory given its name.
-afl::base::Ptr<afl::io::Directory>
+afl::base::Ref<afl::io::Directory>
 afl::io::NullFileSystem::openDirectory(FileName_t dirName)
 {
     throw afl::except::FileProblemException(dirName, afl::string::Messages::fileNotFound());
 }
 
 // Open virtual root directory.
-afl::base::Ptr<afl::io::Directory>
+afl::base::Ref<afl::io::Directory>
 afl::io::NullFileSystem::openRootDirectory()
 {
     throw afl::except::FileProblemException("/", afl::string::Messages::fileNotFound());

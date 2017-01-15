@@ -19,56 +19,56 @@ afl::net::redis::IntegerSetKey::IntegerSetKey(CommandHandler& ch, const String_t
 bool
 afl::net::redis::IntegerSetKey::add(int32_t value)
 {
-    return getHandler().callInt(Segment().pushBack("SADD").pushBack(getName()).pushBack(value));
+    return getHandler().callInt(Segment().pushBackString("SADD").pushBackString(getName()).pushBackInteger(value));
 }
 
 // Remove a value from the set (SREM).
 bool
 afl::net::redis::IntegerSetKey::remove(int32_t value)
 {
-    return getHandler().callInt(Segment().pushBack("SREM").pushBack(getName()).pushBack(value));
+    return getHandler().callInt(Segment().pushBackString("SREM").pushBackString(getName()).pushBackInteger(value));
 }
 
 // Extract a random value (SPOP).
 int32_t
 afl::net::redis::IntegerSetKey::extractRandom()
 {
-    return getHandler().callInt(Segment().pushBack("SPOP").pushBack(getName()));
+    return getHandler().callInt(Segment().pushBackString("SPOP").pushBackString(getName()));
 }
 
 // Get a random value (SRANDMEMBER).
 int32_t
 afl::net::redis::IntegerSetKey::getRandom() const
 {
-    return getHandler().callInt(Segment().pushBack("SRANDMEMBER").pushBack(getName()));
+    return getHandler().callInt(Segment().pushBackString("SRANDMEMBER").pushBackString(getName()));
 }
 
 // Move a value into another set (SMOVE).
 bool
 afl::net::redis::IntegerSetKey::moveTo(int32_t value, const IntegerSetKey& other)
 {
-    return getHandler().callInt(Segment().pushBack("SMOVE").pushBack(getName()).pushBack(other.getName()).pushBack(value));
+    return getHandler().callInt(Segment().pushBackString("SMOVE").pushBackString(getName()).pushBackString(other.getName()).pushBackInteger(value));
 }
 
 // Check whether set contains an element (SISMEMBER).
 bool
 afl::net::redis::IntegerSetKey::contains(int32_t value) const
 {
-    return getHandler().callInt(Segment().pushBack("SISMEMBER").pushBack(getName()).pushBack(value));
+    return getHandler().callInt(Segment().pushBackString("SISMEMBER").pushBackString(getName()).pushBackInteger(value));
 }
 
 // Copy whole set (SINTERSTORE).
 void
 afl::net::redis::IntegerSetKey::copyTo(const IntegerSetKey& other)
 {
-    getHandler().callVoid(Segment().pushBack("SINTERSTORE").pushBack(other.getName()).pushBack(getName()));
+    getHandler().callVoid(Segment().pushBackString("SINTERSTORE").pushBackString(other.getName()).pushBackString(getName()));
 }
 
 // Get all elements (SMEMBERS).
 void
 afl::net::redis::IntegerSetKey::getAll(afl::data::IntegerList_t& list) const
 {
-    std::auto_ptr<afl::data::Value> val(getHandler().call(Segment().pushBack("SMEMBERS").pushBack(getName())));
+    std::auto_ptr<afl::data::Value> val(getHandler().call(Segment().pushBackString("SMEMBERS").pushBackString(getName())));
     afl::data::Access(val).toIntegerList(list);
 }
 

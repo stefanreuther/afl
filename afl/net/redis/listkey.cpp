@@ -17,7 +17,7 @@ afl::net::redis::ListKey::ListKey(CommandHandler& ch, String_t name)
 int32_t
 afl::net::redis::ListKey::size() const
 {
-    return getHandler().callInt(Segment().pushBack("LLEN").pushBack(getName()));
+    return getHandler().callInt(Segment().pushBackString("LLEN").pushBackString(getName()));
 }
 
 // Check emptiness (LLEN).
@@ -31,7 +31,7 @@ afl::net::redis::ListKey::empty() const
 void
 afl::net::redis::ListKey::trimToRange(int32_t start, int32_t end)
 {
-    getHandler().callVoid(Segment().pushBack("LTRIM").pushBack(getName()).pushBack(start).pushBack(end));
+    getHandler().callVoid(Segment().pushBackString("LTRIM").pushBackString(getName()).pushBackInteger(start).pushBackInteger(end));
 }
 
 // Sort operation (SORT).

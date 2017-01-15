@@ -8,7 +8,7 @@
 #include <memory>
 #include "afl/async/receiveoperation.hpp"
 #include "afl/async/sendoperation.hpp"
-#include "afl/base/ptr.hpp"
+#include "afl/base/ref.hpp"
 #include "afl/net/name.hpp"
 #include "afl/net/socket.hpp"
 #include "afl/io/datasink.hpp"
@@ -47,7 +47,7 @@ namespace afl { namespace net { namespace http {
             \param name Network name of other end
             \param scheme URL scheme (protocol)
             \param socket Connected socket */
-        ClientConnection(const Name& name, const String_t& scheme, afl::base::Ptr<Socket> socket);
+        ClientConnection(const Name& name, const String_t& scheme, afl::base::Ref<Socket> socket);
 
         /** Destructor. */
         ~ClientConnection();
@@ -95,7 +95,7 @@ namespace afl { namespace net { namespace http {
         // Connection data
         const Name m_name;
         const String_t m_scheme;
-        const afl::base::Ptr<Socket> m_socket;
+        const afl::base::Ref<Socket> m_socket;
 
         // Current request
         std::auto_ptr<ClientRequest> m_request;

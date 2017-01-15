@@ -13,12 +13,12 @@
 
 class afl::io::MultiDirectory::Enum : public afl::base::Enumerator<afl::base::Ptr<afl::io::DirectoryEntry> > {
  public:
-    Enum(afl::base::Ptr<MultiDirectory> dir);
+    Enum(afl::base::Ref<MultiDirectory> dir);
     virtual ~Enum();
     virtual bool getNextElement(afl::base::Ptr<afl::io::DirectoryEntry>& result);
 
  private:
-    afl::base::Ptr<MultiDirectory> m_parent;
+    afl::base::Ref<MultiDirectory> m_parent;
 
     std::set<String_t> m_seenFileNames;
 
@@ -30,7 +30,7 @@ class afl::io::MultiDirectory::Enum : public afl::base::Enumerator<afl::base::Pt
 };
 
 inline
-afl::io::MultiDirectory::Enum::Enum(afl::base::Ptr<MultiDirectory> dir)
+afl::io::MultiDirectory::Enum::Enum(afl::base::Ref<MultiDirectory> dir)
     : m_parent(dir),
       m_seenFileNames(),
       m_currentEntry(),
@@ -70,7 +70,7 @@ afl::io::MultiDirectory::Enum::next()
             }
         } else if (m_currentIndex < m_parent->m_directories.size()) {
             // Start iterating a directory
-            m_currentIterator = m_parent->m_directories[m_currentIndex++]->getDirectoryEntries();
+            m_currentIterator = m_parent->m_directories[m_currentIndex++]->getDirectoryEntries().asPtr();
         } else {
             // No more directories.
             m_currentEntry = 0;
@@ -83,10 +83,10 @@ afl::io::MultiDirectory::Enum::next()
 
 /***************************** MultiDirectory ****************************/
 
-afl::base::Ptr<afl::io::MultiDirectory>
+afl::base::Ref<afl::io::MultiDirectory>
 afl::io::MultiDirectory::create()
 {
-    return new MultiDirectory();
+    return *new MultiDirectory();
 }
 
 inline
@@ -99,12 +99,12 @@ afl::io::MultiDirectory::~MultiDirectory()
 { }
 
 // Directory:
-afl::base::Ptr<afl::io::DirectoryEntry>
+afl::base::Ref<afl::io::DirectoryEntry>
 afl::io::MultiDirectory::getDirectoryEntryByName(String_t name)
 {
     for (Vector_t::const_iterator i = m_directories.begin(), e = m_directories.end(); i != e; ++i) {
         try {
-            afl::base::Ptr<DirectoryEntry> entry = (*i)->getDirectoryEntryByName(name);
+            afl::base::Ref<DirectoryEntry> entry = (*i)->getDirectoryEntryByName(name);
             if (entry->getFileType() != DirectoryEntry::tUnknown) {
                 return entry;
             }
@@ -114,10 +114,10 @@ afl::io::MultiDirectory::getDirectoryEntryByName(String_t name)
     throw afl::except::FileProblemException(name, afl::string::Messages::cannotAccessFiles());
 }
 
-afl::base::Ptr<afl::base::Enumerator<afl::base::Ptr<afl::io::DirectoryEntry> > >
+afl::base::Ref<afl::base::Enumerator<afl::base::Ptr<afl::io::DirectoryEntry> > >
 afl::io::MultiDirectory::getDirectoryEntries()
 {
-    return new Enum(this);
+    return *new Enum(*this);
 }
 
 afl::base::Ptr<afl::io::Directory>
@@ -149,7 +149,7 @@ afl::io::MultiDirectory::getTitle()
 
 // MultiDirectory:
 void
-afl::io::MultiDirectory::addDirectory(afl::base::Ptr<Directory> dir)
+afl::io::MultiDirectory::addDirectory(afl::base::Ref<Directory> dir)
 {
-    m_directories.push_back(dir);
+    m_directories.push_back(dir.asPtr());
 }

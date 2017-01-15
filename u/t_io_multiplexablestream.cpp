@@ -29,10 +29,10 @@ TestIoMultiplexableStream::testAccess()
         ms.setPos(2);
 
         // Create children
-        afl::base::Ptr<afl::io::Stream> one = ms.createChild();
-        afl::base::Ptr<afl::io::Stream> two = ms.createChild();
-        TS_ASSERT(one.get() != 0);
-        TS_ASSERT(two.get() != 0);
+        afl::base::Ref<afl::io::Stream> one = ms.createChild();
+        afl::base::Ref<afl::io::Stream> two = ms.createChild();
+        TS_ASSERT(&one.get() != 0);
+        TS_ASSERT(&two.get() != 0);
 
         TS_ASSERT_EQUALS(one->getSize(), 5U);
         TS_ASSERT_EQUALS(two->getSize(), 5U);
@@ -73,10 +73,10 @@ TestIoMultiplexableStream::testLife()
                 static uint8_t data[] = { 1,2,3,4,5 };
                 afl::io::MemoryStream ms(data);
                 afl::base::Ptr<afl::io::Stream> children[COUNT] = {
-                    ms.createChild(),
-                    ms.createChild(),
-                    ms.createChild(),
-                    ms.createChild()
+                    ms.createChild().asPtr(),
+                    ms.createChild().asPtr(),
+                    ms.createChild().asPtr(),
+                    ms.createChild().asPtr()
                 };
 
                 // Access and thus activate one

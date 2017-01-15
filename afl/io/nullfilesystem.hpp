@@ -25,9 +25,9 @@ namespace afl { namespace io {
         ~NullFileSystem();
 
         // FileSystem:
-        virtual afl::base::Ptr<Stream> openFile(FileName_t fileName, OpenMode mode);
-        virtual afl::base::Ptr<Directory> openDirectory(FileName_t dirName);
-        virtual afl::base::Ptr<Directory> openRootDirectory();
+        virtual afl::base::Ref<Stream> openFile(FileName_t fileName, OpenMode mode);
+        virtual afl::base::Ref<Directory> openDirectory(FileName_t dirName);
+        virtual afl::base::Ref<Directory> openRootDirectory();
         virtual bool isAbsolutePathName(FileName_t path);
         virtual bool isPathSeparator(char c);
         virtual FileName_t makePathName(FileName_t path, FileName_t name);

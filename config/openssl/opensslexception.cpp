@@ -11,12 +11,12 @@
 
 config::openssl::OpenSSLException::OpenSSLException(long err)
     : std::runtime_error(ERR_reason_error_string(err) != 0
-                         ? afl::string::Format("%s, code: 0x%08X, in %s::%s",
-                                               ERR_reason_error_string(err),
-                                               err,
-                                               ERR_lib_error_string(err),
-                                               ERR_func_error_string(err))
-                         : afl::string::Format("OpenSSL error 0x%08X", err))
+                         ? String_t(afl::string::Format("%s, code: 0x%08X, in %s::%s",
+                                                        ERR_reason_error_string(err),
+                                                        err,
+                                                        ERR_lib_error_string(err),
+                                                        ERR_func_error_string(err)))
+                         : String_t(afl::string::Format("OpenSSL error 0x%08X", err)))
 { }
 
 config::openssl::OpenSSLException::~OpenSSLException() throw()

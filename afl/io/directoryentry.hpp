@@ -123,7 +123,7 @@ namespace afl { namespace io {
             This is the title to be shown to users.
             For actual disk files or directories, it should be the basename of the file or directory.
             For virtual files, it is the user-friendly name.
-            \return Title, UTF-8 encoded */
+            \return Title, UTF-8 encoded; should not be empty */
         virtual String_t getTitle() = 0;
 
         /** Get path name of this directory.
@@ -137,16 +137,16 @@ namespace afl { namespace io {
             \param mode Open mode
             \return Stream, never null
             \throw FileProblemException if there is a problem */
-        virtual afl::base::Ptr<Stream> openFile(FileSystem::OpenMode mode) = 0;
+        virtual afl::base::Ref<Stream> openFile(FileSystem::OpenMode mode) = 0;
 
         /** Open this entry as a directory.
             \return Directory, never null
             \throw FileProblemException if there is a problem */
-        virtual afl::base::Ptr<Directory> openDirectory() = 0;
+        virtual afl::base::Ref<Directory> openDirectory() = 0;
 
         /** Open this entry's parent.
             \return Directory, never null. */
-        virtual afl::base::Ptr<Directory> openContainingDirectory() = 0;
+        virtual afl::base::Ref<Directory> openContainingDirectory() = 0;
 
      protected:
         static const uint32_t InfoType = 1;
@@ -163,8 +163,12 @@ namespace afl { namespace io {
             It can also provide less information than required, causing the user request to return a default.
 
             \param requested Bitfield of required information.
-            This function must provide at least the required information.
-            If that information is not provided, we assume it does not exist and return defaults. */
+            This function must provide at least the required information; it can provide more.
+            If the requested information is not provided, we assume it does not exist and return defaults.
+
+            This function should not generate exceptions if the referenced file does not exist;
+            nonexistant files shall report a file type of tUnknown.
+            Serious errors may be converted into exceptions (e.g. unable to allocate memory). */
         virtual void updateInfo(uint32_t requested) = 0;
 
         /** Rename, implementation.

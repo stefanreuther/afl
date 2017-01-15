@@ -15,6 +15,8 @@ namespace afl { namespace base {
         afl::sys::AtomicInteger* getReferenceCount(afl::base::RefCounted*);
     }
 
+    template<typename T> class Ref;
+
     /** Reference-counted pointer.
         This pointer supports all operations which a dumb pointer-to-a-single-object would support.
         It tracks the number of active pointers to one object;
@@ -41,6 +43,7 @@ namespace afl { namespace base {
     template<typename T>
     class Ptr {
         template<typename U> friend class Ptr;
+        friend class Ref<T>;
 
      public:
         /** Construct null pointer. */

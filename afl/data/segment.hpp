@@ -107,17 +107,17 @@ namespace afl { namespace data {
         /** Push integer.
             \param value Value to push
             \return *this */
-        Segment& pushBack(int32_t value);
+        Segment& pushBackInteger(int32_t value);
 
         /** Push string.
             \param value Value to push
             \return *this */
-        Segment& pushBack(const String_t& value);
+        Segment& pushBackString(const String_t& value);
 
         /** Push string.
             \param value Value to push
             \return *this */
-        Segment& pushBack(const char* value);
+        Segment& pushBackString(const char* value);
 
         /** Push content of array.
             \param T type of elements; one of Segment, IntegerList_t, StringList_t.
@@ -165,6 +165,19 @@ namespace afl { namespace data {
         void transferLastTo(Offset_t count, Segment& other);
 
      private:
+        /*
+         *  Generic pushBack function for use by pushBackElements.
+         *  These are not part of the public interface because this overload has a nasty ambiguity
+         *  for pushBackT(0) (could be int32_t zero or Value*) which is not desirable.
+         *  The public interface requires explicit specification of the type.
+         */
+        void pushBackT(int32_t i)
+            { pushBackInteger(i); }
+        void pushBackT(const String_t& s)
+            { pushBackString(s); }
+        void pushBackT(Value* p)
+            { pushBack(p); }
+
         void makeIndexAccessible(Index_t index);
 
         afl::container::PtrVector<Value> m_content;
@@ -177,7 +190,7 @@ afl::data::Segment&
 afl::data::Segment::pushBackElements(const T& array)
 {
     for (size_t i = 0, n = array.size(); i < n; ++i) {
-        pushBack(array[i]);
+        pushBackT(array[i]);
     }
     return *this;
 }

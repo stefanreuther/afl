@@ -156,3 +156,35 @@ TestSysTime::testCurrent()
     TS_ASSERT(pt.m_millisecond < 1000);
     TS_ASSERT(pt.m_weekday < 7);
 }
+
+/** Test toString. */
+void
+TestSysTime::testToString()
+{
+    // Sun Jul 31 23:20:42 CEST 2016
+    afl::sys::Time t = afl::sys::Time::fromUnixTime(1470000042);
+
+    // Fetch times.
+    String_t univFull = t.toString(afl::sys::Time::UniversalTime, afl::sys::Time::FullFormat);
+    String_t univDate = t.toString(afl::sys::Time::UniversalTime, afl::sys::Time::DateFormat);
+    String_t univTime = t.toString(afl::sys::Time::UniversalTime, afl::sys::Time::TimeFormat);
+
+    // Validate.
+    // These are locale and operating-system dependant.
+    // However, we're pretty sure that dates contain "16", and times contain "42" (=seconds).
+    TSM_ASSERT(univFull, univFull.find("16") != String_t::npos);
+    TSM_ASSERT(univDate, univDate.find("16") != String_t::npos);
+    TSM_ASSERT(univFull, univFull.find("42") != String_t::npos);
+    TSM_ASSERT(univTime, univTime.find("42") != String_t::npos);
+
+    // Same thing with local time
+    String_t localFull = t.toString(afl::sys::Time::LocalTime, afl::sys::Time::FullFormat);
+    String_t localDate = t.toString(afl::sys::Time::LocalTime, afl::sys::Time::DateFormat);
+    String_t localTime = t.toString(afl::sys::Time::LocalTime, afl::sys::Time::TimeFormat);
+
+    TSM_ASSERT(localFull, localFull.find("16") != String_t::npos);
+    TSM_ASSERT(localDate, localDate.find("16") != String_t::npos);
+    TSM_ASSERT(localFull, localFull.find("42") != String_t::npos);
+    TSM_ASSERT(localTime, localTime.find("42") != String_t::npos);
+}
+

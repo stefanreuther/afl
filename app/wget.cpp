@@ -126,8 +126,7 @@ int main(int /*argc*/, char** argv)
     // Load cookies
     http::CookieJar jar;
     try {
-        afl::base::Ptr<afl::io::Stream> f = afl::io::FileSystem::getInstance().openFile("cookies.txt",
-                                                                                        afl::io::FileSystem::OpenRead);
+        afl::base::Ref<afl::io::Stream> f = afl::io::FileSystem::getInstance().openFile("cookies.txt", afl::io::FileSystem::OpenRead);
         jar.loadCookies(*f);
     }
     catch (...) { }
@@ -164,8 +163,7 @@ int main(int /*argc*/, char** argv)
 
     // Save cookies
     try {
-        afl::base::Ptr<afl::io::Stream> f = afl::io::FileSystem::getInstance().openFile("cookies.txt",
-                                                                                        afl::io::FileSystem::Create);
+        afl::base::Ref<afl::io::Stream> f = afl::io::FileSystem::getInstance().openFile("cookies.txt", afl::io::FileSystem::Create);
         jar.saveCookies(*f);
     }
     catch (...) {

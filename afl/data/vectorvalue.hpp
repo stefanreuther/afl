@@ -17,26 +17,26 @@ namespace afl { namespace data {
      public:
         /** Constructor.
             \param pVector Vector object. Must not be null. */
-        VectorValue(afl::base::Ptr<Vector> pVector);
+        VectorValue(afl::base::Ref<Vector> pVector);
 
         /** Destructor. */
         ~VectorValue();
 
         /** Get contained vector object.
             \return Pointer to vector object */
-        const afl::base::Ptr<Vector>& getValue() const;
+        const afl::base::Ref<Vector>& getValue() const;
 
         virtual void visit(Visitor& visitor) const;
 
         virtual VectorValue* clone() const;
 
      private:
-        afl::base::Ptr<Vector> m_pVector;
+        afl::base::Ref<Vector> m_pVector;
     };
 
 } }
 
-inline const afl::base::Ptr<afl::data::Vector>&
+inline const afl::base::Ref<afl::data::Vector>&
 afl::data::VectorValue::getValue() const
 {
     return m_pVector;

@@ -90,7 +90,7 @@ TestDataDefaultValueFactory::testHash()
     TS_ASSERT(v.get() != 0);
     TS_ASSERT(dynamic_cast<afl::data::HashValue*>(v.get()) != 0);
 
-    afl::base::Ptr<afl::data::Hash> hv(dynamic_cast<afl::data::HashValue*>(v.get())->getValue());
+    afl::base::Ref<afl::data::Hash> hv(dynamic_cast<afl::data::HashValue*>(v.get())->getValue());
     TS_ASSERT(dynamic_cast<afl::data::IntegerValue*>(hv->get("a")) != 0)
     TS_ASSERT(dynamic_cast<afl::data::StringValue*>(hv->get("b")) != 0)
 }
@@ -113,7 +113,7 @@ TestDataDefaultValueFactory::testVector()
     TS_ASSERT(v.get() != 0);
     TS_ASSERT(dynamic_cast<afl::data::VectorValue*>(v.get()) != 0);
 
-    afl::base::Ptr<afl::data::Vector> vv(dynamic_cast<afl::data::VectorValue*>(v.get())->getValue());
+    afl::base::Ref<afl::data::Vector> vv(dynamic_cast<afl::data::VectorValue*>(v.get())->getValue());
     TS_ASSERT(dynamic_cast<afl::data::IntegerValue*>(vv->get(0)) != 0)
     TS_ASSERT(dynamic_cast<afl::data::StringValue*>(vv->get(1)) != 0)
 }

@@ -11,11 +11,12 @@ namespace afl { namespace base {
 
     /** Reference-counted object base class.
         Deriving from this class adds a reference counter to the object.
-        This optimizes operation when the object is used with Ptr<>,
-        and could also be usable otherwise.
+        This allows the derived class to be used with Ref<>,
+        and optimizes operation when the object is used with Ptr<>.
 
         RefCounted does not add a virtual destructor to the class,
-        and is therefore not intended to be used with <tt>delete</tt>. */
+        and is therefore not intended to be used with <tt>delete</tt>.
+        Always delete the derived object type. */
     class RefCounted {
      public:
         /** Access reference counter.

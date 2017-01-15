@@ -112,8 +112,8 @@ TestDataSegment::testPush()
 {
     // Initialize
     afl::data::Segment seg;
-    seg.pushBack("hi");
-    seg.pushBack(17);
+    seg.pushBackString("hi");
+    seg.pushBackInteger(17);
 
     // Check
     TS_ASSERT_EQUALS(seg.size(), 2U);
@@ -151,8 +151,8 @@ TestDataSegment::testInsert()
 {
     // Initialize
     afl::data::Segment seg;
-    seg.pushBack("hi");
-    seg.pushBack(17);
+    seg.pushBackString("hi");
+    seg.pushBackInteger(17);
 
     // Insert: "hi",3,17
     seg.insertNew(1, new afl::data::IntegerValue(3));

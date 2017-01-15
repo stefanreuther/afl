@@ -18,11 +18,11 @@ TestNetNetworkStack::testConnect()
     bool ok = false;
     try {
         afl::net::Name name("localhost", "26");     // 26 is unassigned, we assume nothing runs there
-        afl::base::Ptr<afl::net::Socket> sock = ns.connect(name, 1000);
-        if (sock.get() == 0) {
-            // Failed with timeout, is ok
-            ok = true;
-        }
+        afl::base::Ptr<afl::net::Socket> sock = ns.connect(name, 1000).asPtr();
+
+        // If it returns, it must be nonzero (but failed test...)
+        TS_ASSERT(sock.get() != 0);
+        ok = true;
     }
     catch (afl::except::FileProblemException&) {
         // Failed with error, is also ok

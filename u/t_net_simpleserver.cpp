@@ -88,14 +88,14 @@ TestNetSimpleServer::testIt()
     // Perform one stupid connection with no data transfer
     {
         afl::base::Ptr<afl::net::Socket> socket;
-        TS_ASSERT_THROWS_NOTHING(socket = stack.connect(name, 500));
+        TS_ASSERT_THROWS_NOTHING(socket = stack.connect(name, 500).asPtr());
         TS_ASSERT(socket.get() != 0);
     }
 
     // Perform another connection
     {
         afl::base::Ptr<afl::net::Socket> socket;
-        TS_ASSERT_THROWS_NOTHING(socket = stack.connect(name, 500));
+        TS_ASSERT_THROWS_NOTHING(socket = stack.connect(name, 500).asPtr());
         TS_ASSERT(socket.get() != 0);
 
         // Async boilerplate

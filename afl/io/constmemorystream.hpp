@@ -31,7 +31,7 @@ namespace afl { namespace io {
         virtual FileSize_t getSize();
         virtual uint32_t getCapabilities();
         virtual String_t getName();
-        virtual afl::base::Ptr<Stream> createChild();
+        virtual afl::base::Ref<Stream> createChild();
         virtual afl::base::Ptr<FileMapping> createFileMapping(FileSize_t limit);
 
      private:

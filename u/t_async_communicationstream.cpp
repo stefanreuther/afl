@@ -105,7 +105,7 @@ TestAsyncCommunicationStream::testSocket()
     // Server half, this time with sockets
     class Server : public afl::base::Runnable {
      public:
-        Server(afl::base::Ptr<afl::net::Listener> pListener)
+        Server(afl::base::Ref<afl::net::Listener> pListener)
             : m_pListener(pListener)
             { }
         void run()
@@ -114,7 +114,7 @@ TestAsyncCommunicationStream::testSocket()
                 testWriter(socket);
             }
      private:
-        afl::base::Ptr<afl::net::Listener> m_pListener;
+        afl::base::Ref<afl::net::Listener> m_pListener;
     };
 
     // Build a network name with a random port number
@@ -122,7 +122,7 @@ TestAsyncCommunicationStream::testSocket()
 
     // Setup network
     afl::net::NetworkStack& ns = afl::net::NetworkStack::getInstance();
-    afl::base::Ptr<afl::net::Listener> listener = ns.listen(name, 1);
+    afl::base::Ref<afl::net::Listener> listener = ns.listen(name, 1);
 
     // Setup background thread
     Server server(listener);
@@ -130,9 +130,9 @@ TestAsyncCommunicationStream::testSocket()
     t.start();
 
     // Connect and operate
-    afl::base::Ptr<afl::net::Socket> socket = ns.connect(name, 5000);
-    TS_ASSERT(socket.get() != 0);
-    testReader(socket);
+    afl::base::Ref<afl::net::Socket> socket = ns.connect(name, 5000);
+    TS_ASSERT(&socket.get() != 0);
+    testReader(socket.asPtr());
 
     // Close
     t.join();

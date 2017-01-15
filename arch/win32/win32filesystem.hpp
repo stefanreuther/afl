@@ -14,9 +14,9 @@ namespace arch { namespace win32 {
         using ANSI or Unicode calls (Win95 vs. WinNT). */
     class Win32FileSystem : public afl::io::FileSystem {
      public:
-        virtual afl::base::Ptr<afl::io::Stream> openFile(FileName_t fileName, OpenMode mode);
-        virtual afl::base::Ptr<afl::io::Directory> openDirectory(FileName_t dirName);
-        virtual afl::base::Ptr<afl::io::Directory> openRootDirectory();
+        virtual afl::base::Ref<afl::io::Stream> openFile(FileName_t fileName, OpenMode mode);
+        virtual afl::base::Ref<afl::io::Directory> openDirectory(FileName_t dirName);
+        virtual afl::base::Ref<afl::io::Directory> openRootDirectory();
 
         /* File Name Operations */
         virtual bool isAbsolutePathName(FileName_t path);

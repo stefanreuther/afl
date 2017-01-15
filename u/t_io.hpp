@@ -6,6 +6,7 @@
 #define AFL_U_T_IO_HPP
 
 #include <cxxtest/TestSuite.h>
+#include "afl/io/stream.hpp"
 
 class TestIoBufferedSink : public CxxTest::TestSuite {
  public:
@@ -28,9 +29,22 @@ class TestIoDataSink : public CxxTest::TestSuite {
     void testIt();
 };
 
+class TestIoDeflateTransform : public CxxTest::TestSuite {
+ public:
+    void testGzip();
+    void testRaw();
+    void testZlib();
+};
+
 class TestIoDirectory : public CxxTest::TestSuite {
  public:
+    void setUp();
+    void tearDown();
+
+    void testInterface();
     void testIt();
+    void testCreationAndDeletion();
+    void testDirectoryAccess();
 };
 
 class TestIoDirectoryEntry : public CxxTest::TestSuite {
@@ -49,6 +63,7 @@ class TestIoFileSystem : public CxxTest::TestSuite {
     void testPosix();
     void testWin32();
     void testRoot();
+    void testOpenFileNT();
 };
 
 class TestIoInflateDataSink : public CxxTest::TestSuite {
@@ -95,7 +110,17 @@ class TestIoLimitedDataSink : public CxxTest::TestSuite {
     void testIt();
 };
 
+class TestIoLimitedStream : public CxxTest::TestSuite {
+ public:
+    void testFull();
+};
+
 class TestIoMemoryStream : public CxxTest::TestSuite {
+ public:
+    void testIt();
+};
+
+class TestIoMsExpandTransform : public CxxTest::TestSuite {
  public:
     void testIt();
 };
@@ -173,6 +198,12 @@ class TestIoTransformDataSink : public CxxTest::TestSuite {
     void testNull();
     void testSimple();
     void testLarge();
+};
+
+class TestIoTransformReaderStream : public CxxTest::TestSuite {
+ public:
+    void testIt();
+    void testExtra();
 };
 
 #endif

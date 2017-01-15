@@ -46,7 +46,7 @@ StringSegment::StringSegment(const char* str)
             n = std::strlen(str);
         }
         if (n != 0) {
-            pushBack(String_t(str, n));
+            pushBackString(String_t(str, n));
         }
         str += n;
     }
@@ -126,7 +126,8 @@ TestNetRedisInternalDatabase::testKey()
     - MSET
     - SET
     - SETNX
-    - STRLEN */
+    - STRLEN
+    - GETRANGE */
 void
 TestNetRedisInternalDatabase::testString()
 {
@@ -167,7 +168,7 @@ TestNetRedisInternalDatabase::testString()
     TS_ASSERT_EQUALS(db.callString(StringSegment("type h").self()), "string");
 
     // Setting empty keeps it
-    db.callVoid(StringSegment("set b").self().pushBack(""));
+    db.callVoid(StringSegment("set b").self().pushBackString(""));
     TS_ASSERT_EQUALS(db.callInt(StringSegment("exists b").self()), 1);
 
     // Multi-set
@@ -175,6 +176,19 @@ TestNetRedisInternalDatabase::testString()
     TS_ASSERT_EQUALS(db.callString(StringSegment("get ka").self()), "va");
     TS_ASSERT_EQUALS(db.callString(StringSegment("get kb").self()), "vb");
     TS_ASSERT_EQUALS(db.callString(StringSegment("get kc").self()), "vc");
+
+    // Getrange
+    db.callVoid(StringSegment("set k abcdefg").self());
+    TS_ASSERT_EQUALS(db.callString(StringSegment("getrange k 0 0").self()), "a");
+    TS_ASSERT_EQUALS(db.callString(StringSegment("getrange k 0 3").self()), "abcd");
+    TS_ASSERT_EQUALS(db.callString(StringSegment("getrange k 3 3").self()), "d");
+    TS_ASSERT_EQUALS(db.callString(StringSegment("getrange k -3 -3").self()), "e");
+    TS_ASSERT_EQUALS(db.callString(StringSegment("getrange k 0 -3").self()), "abcde");
+    TS_ASSERT_EQUALS(db.callString(StringSegment("getrange k -3 6").self()), "efg");
+    TS_ASSERT_EQUALS(db.callString(StringSegment("getrange k -100 -200").self()), "a");
+    TS_ASSERT_EQUALS(db.callString(StringSegment("getrange k 100 200").self()), "");
+    TS_ASSERT_EQUALS(db.callString(StringSegment("getrange k 3 0").self()), "");
+    TS_ASSERT_EQUALS(db.callString(StringSegment("getrange k 3 2").self()), "");
 }
 
 /** Test integer operations.
@@ -191,39 +205,39 @@ TestNetRedisInternalDatabase::testInt()
     InternalDatabase db;
 
     // Get/set with integers (verifies that infrastructure converts correctly)
-    db.callVoid(StringSegment("set i").self().pushBack(12));
+    db.callVoid(StringSegment("set i").self().pushBackInteger(12));
     TS_ASSERT_EQUALS(db.callInt(StringSegment("get i").self()), 12);
 
     // Arithmetic
-    TS_ASSERT_EQUALS(db.callInt(StringSegment("incr i").self()),                 13);
-    TS_ASSERT_EQUALS(db.callInt(StringSegment("incrby i 5").self()),             18);
-    TS_ASSERT_EQUALS(db.callInt(StringSegment("incrby i").self().pushBack(99)), 117);
-    TS_ASSERT_EQUALS(db.callInt(StringSegment("incrby i -17").self()),          100);
-    TS_ASSERT_EQUALS(db.callInt(StringSegment("incrby i +1").self()),           101);
+    TS_ASSERT_EQUALS(db.callInt(StringSegment("incr i").self()),                        13);
+    TS_ASSERT_EQUALS(db.callInt(StringSegment("incrby i 5").self()),                    18);
+    TS_ASSERT_EQUALS(db.callInt(StringSegment("incrby i").self().pushBackInteger(99)), 117);
+    TS_ASSERT_EQUALS(db.callInt(StringSegment("incrby i -17").self()),                 100);
+    TS_ASSERT_EQUALS(db.callInt(StringSegment("incrby i +1").self()),                  101);
 
-    TS_ASSERT_EQUALS(db.callInt(StringSegment("decr i").self()),                100);
-    TS_ASSERT_EQUALS(db.callInt(StringSegment("decrby i 5").self()),             95);
-    TS_ASSERT_EQUALS(db.callInt(StringSegment("decrby i").self().pushBack(99)),  -4);
-    TS_ASSERT_EQUALS(db.callInt(StringSegment("decrby i -17").self()),           13);
-    TS_ASSERT_EQUALS(db.callInt(StringSegment("decrby i +1").self()),            12);
+    TS_ASSERT_EQUALS(db.callInt(StringSegment("decr i").self()),                       100);
+    TS_ASSERT_EQUALS(db.callInt(StringSegment("decrby i 5").self()),                    95);
+    TS_ASSERT_EQUALS(db.callInt(StringSegment("decrby i").self().pushBackInteger(99)),  -4);
+    TS_ASSERT_EQUALS(db.callInt(StringSegment("decrby i -17").self()),                  13);
+    TS_ASSERT_EQUALS(db.callInt(StringSegment("decrby i +1").self()),                   12);
 
     // Create empty
-    TS_ASSERT_EQUALS(db.callInt(StringSegment("incr e1").self()),                 1);
-    TS_ASSERT_EQUALS(db.callInt(StringSegment("incrby e2").self().pushBack(9)),   9);
-    TS_ASSERT_EQUALS(db.callInt(StringSegment("decr e3").self()),                -1);
-    TS_ASSERT_EQUALS(db.callInt(StringSegment("decrby e4").self().pushBack(9)),  -9);
+    TS_ASSERT_EQUALS(db.callInt(StringSegment("incr e1").self()),                        1);
+    TS_ASSERT_EQUALS(db.callInt(StringSegment("incrby e2").self().pushBackInteger(9)),   9);
+    TS_ASSERT_EQUALS(db.callInt(StringSegment("decr e3").self()),                       -1);
+    TS_ASSERT_EQUALS(db.callInt(StringSegment("decrby e4").self().pushBackInteger(9)),  -9);
 
     // Wrong type or format
     db.callVoid(StringSegment("set i x").self());
     db.callVoid(StringSegment("hset h k v").self());
-    TS_ASSERT_THROWS(db.callVoid(StringSegment("incr i").self()),               std::exception);
-    TS_ASSERT_THROWS(db.callVoid(StringSegment("incrby i").self().pushBack(9)), std::exception);
-    TS_ASSERT_THROWS(db.callVoid(StringSegment("decr i").self()),               std::exception);
-    TS_ASSERT_THROWS(db.callVoid(StringSegment("decrby i").self().pushBack(9)), std::exception);
-    TS_ASSERT_THROWS(db.callVoid(StringSegment("incr h").self()),               std::exception);
-    TS_ASSERT_THROWS(db.callVoid(StringSegment("incrby h").self().pushBack(9)), std::exception);
-    TS_ASSERT_THROWS(db.callVoid(StringSegment("decr h").self()),               std::exception);
-    TS_ASSERT_THROWS(db.callVoid(StringSegment("decrby h").self().pushBack(9)), std::exception);
+    TS_ASSERT_THROWS(db.callVoid(StringSegment("incr i").self()),                      std::exception);
+    TS_ASSERT_THROWS(db.callVoid(StringSegment("incrby i").self().pushBackInteger(9)), std::exception);
+    TS_ASSERT_THROWS(db.callVoid(StringSegment("decr i").self()),                      std::exception);
+    TS_ASSERT_THROWS(db.callVoid(StringSegment("decrby i").self().pushBackInteger(9)), std::exception);
+    TS_ASSERT_THROWS(db.callVoid(StringSegment("incr h").self()),                      std::exception);
+    TS_ASSERT_THROWS(db.callVoid(StringSegment("incrby h").self().pushBackInteger(9)), std::exception);
+    TS_ASSERT_THROWS(db.callVoid(StringSegment("decr h").self()),                      std::exception);
+    TS_ASSERT_THROWS(db.callVoid(StringSegment("decrby h").self().pushBackInteger(9)), std::exception);
 }
 
 /** Test hash operations.
@@ -264,7 +278,7 @@ TestNetRedisInternalDatabase::testHash()
     TS_ASSERT_EQUALS(Access(result).getArraySize(), 2U);
 
     // Arithmetic
-    TS_ASSERT_EQUALS(db.callInt(StringSegment("hincrby k f2").self().pushBack(3)), 5);
+    TS_ASSERT_EQUALS(db.callInt(StringSegment("hincrby k f2").self().pushBackInteger(3)), 5);
     TS_ASSERT_EQUALS(db.callInt(StringSegment("hincrby k f2 2").self()), 7);
     TS_ASSERT_EQUALS(db.callInt(StringSegment("hincrby k f2 -10").self()), -3);
 
@@ -334,8 +348,8 @@ TestNetRedisInternalDatabase::testList()
     TS_ASSERT_EQUALS(Access(result)[2].toString(), "3");
     TS_ASSERT_EQUALS(Access(result)[3].toString(), "4");
 
-    TS_ASSERT_EQUALS(db.callInt(StringSegment("lindex right").self().pushBack(1)), 2);
-    TS_ASSERT_EQUALS(db.callInt(StringSegment("lindex right").self().pushBack(-1)), 4);
+    TS_ASSERT_EQUALS(db.callInt(StringSegment("lindex right").self().pushBackInteger(1)), 2);
+    TS_ASSERT_EQUALS(db.callInt(StringSegment("lindex right").self().pushBackInteger(-1)), 4);
 
     // Modification: cannot modify nonexistant
     TS_ASSERT_THROWS(db.callVoid(StringSegment("lset nx 0 a").self()), std::exception);
@@ -343,7 +357,7 @@ TestNetRedisInternalDatabase::testList()
     // Modification: update left
     //   left=[four,three,two,one]
     TS_ASSERT_THROWS_NOTHING(db.callVoid(StringSegment("lset left 1 three").self()));
-    TS_ASSERT_THROWS_NOTHING(db.callVoid(StringSegment("lset left").self().pushBack(-4).pushBack("four")));
+    TS_ASSERT_THROWS_NOTHING(db.callVoid(StringSegment("lset left").self().pushBackInteger(-4).pushBackString("four")));
 
     result.reset(db.call(StringSegment("lrange left 0 -1").self()));
     TS_ASSERT_EQUALS(Access(result).getArraySize(), 4U);
@@ -353,10 +367,10 @@ TestNetRedisInternalDatabase::testList()
     TS_ASSERT_EQUALS(Access(result)[3].toString(), "one");
 
     // More ranges
-    result.reset(db.call(StringSegment("lrange left").self().pushBack(3).pushBack(2)));
+    result.reset(db.call(StringSegment("lrange left").self().pushBackInteger(3).pushBackInteger(2)));
     TS_ASSERT_EQUALS(Access(result).getArraySize(), 0U);
 
-    result.reset(db.call(StringSegment("lrange left").self().pushBack(2).pushBack(2)));
+    result.reset(db.call(StringSegment("lrange left").self().pushBackInteger(2).pushBackInteger(2)));
     TS_ASSERT_EQUALS(Access(result).getArraySize(), 1U);
     TS_ASSERT_EQUALS(Access(result)[0].toString(), "two");
 
@@ -364,11 +378,11 @@ TestNetRedisInternalDatabase::testList()
     TS_ASSERT_EQUALS(Access(result).getArraySize(), 1U);
     TS_ASSERT_EQUALS(Access(result)[0].toString(), "two");
 
-    result.reset(db.call(StringSegment("lrange left").self().pushBack(2).pushBack(-2)));
+    result.reset(db.call(StringSegment("lrange left").self().pushBackInteger(2).pushBackInteger(-2)));
     TS_ASSERT_EQUALS(Access(result).getArraySize(), 1U);
     TS_ASSERT_EQUALS(Access(result)[0].toString(), "two");
 
-    result.reset(db.call(StringSegment("lrange left").self().pushBack(3).pushBack(-3)));
+    result.reset(db.call(StringSegment("lrange left").self().pushBackInteger(3).pushBackInteger(-3)));
     TS_ASSERT_EQUALS(Access(result).getArraySize(), 0U);
 
     // Transfer: move one element
@@ -426,7 +440,7 @@ TestNetRedisInternalDatabase::testList()
 
     // Trim. At this point, right=[one,1,2,3,4].
     //   right=[1,2,3]
-    db.callVoid(StringSegment("ltrim right").self().pushBack(1).pushBack(-2));
+    db.callVoid(StringSegment("ltrim right").self().pushBackInteger(1).pushBackInteger(-2));
     TS_ASSERT_EQUALS(db.callInt(StringSegment("llen right").self()), 3);
 
     result.reset(db.call(StringSegment("lrange right 0 -1").self()));
@@ -453,11 +467,11 @@ TestNetRedisInternalDatabase::testSet()
 
     // Create a set
     //   [1,2,3,4]
-    TS_ASSERT_EQUALS(db.callInt(StringSegment("sadd s").self().pushBack(1)), 1);
-    TS_ASSERT_EQUALS(db.callInt(StringSegment("sadd s").self().pushBack(2)), 1);
-    TS_ASSERT_EQUALS(db.callInt(StringSegment("sadd s").self().pushBack(3)), 1);
-    TS_ASSERT_EQUALS(db.callInt(StringSegment("sadd s").self().pushBack(4)), 1);
-    TS_ASSERT_EQUALS(db.callInt(StringSegment("sadd s").self().pushBack(4)), 0);
+    TS_ASSERT_EQUALS(db.callInt(StringSegment("sadd s").self().pushBackInteger(1)), 1);
+    TS_ASSERT_EQUALS(db.callInt(StringSegment("sadd s").self().pushBackInteger(2)), 1);
+    TS_ASSERT_EQUALS(db.callInt(StringSegment("sadd s").self().pushBackInteger(3)), 1);
+    TS_ASSERT_EQUALS(db.callInt(StringSegment("sadd s").self().pushBackInteger(4)), 1);
+    TS_ASSERT_EQUALS(db.callInt(StringSegment("sadd s").self().pushBackInteger(4)), 0);
 
     // Verify
     TS_ASSERT_EQUALS(db.callInt(StringSegment("scard s").self()), 4);
@@ -471,8 +485,8 @@ TestNetRedisInternalDatabase::testSet()
 
     // Remove one
     //   [1,2,4]
-    TS_ASSERT_EQUALS(db.callInt(StringSegment("srem s").self().pushBack(3)), 1);
-    TS_ASSERT_EQUALS(db.callInt(StringSegment("srem s").self().pushBack(3)), 0);
+    TS_ASSERT_EQUALS(db.callInt(StringSegment("srem s").self().pushBackInteger(3)), 1);
+    TS_ASSERT_EQUALS(db.callInt(StringSegment("srem s").self().pushBackInteger(3)), 0);
     result.reset(db.call(StringSegment("smembers s").self()));
     TS_ASSERT_EQUALS(Access(result).getArraySize(), 3U);
     TS_ASSERT_EQUALS(computeBits(result), (1<<1)|(1<<2)|(1<<4));
@@ -480,9 +494,9 @@ TestNetRedisInternalDatabase::testSet()
     // Move
     //   s=[1,4]
     //   t=[2]
-    TS_ASSERT_EQUALS(db.callInt(StringSegment("smove s t").self().pushBack(2)), 1);
-    TS_ASSERT_EQUALS(db.callInt(StringSegment("smove s t").self().pushBack(2)), 0);
-    TS_ASSERT_EQUALS(db.callInt(StringSegment("smove z t").self().pushBack(2)), 0);
+    TS_ASSERT_EQUALS(db.callInt(StringSegment("smove s t").self().pushBackInteger(2)), 1);
+    TS_ASSERT_EQUALS(db.callInt(StringSegment("smove s t").self().pushBackInteger(2)), 0);
+    TS_ASSERT_EQUALS(db.callInt(StringSegment("smove z t").self().pushBackInteger(2)), 0);
 
     result.reset(db.call(StringSegment("smembers s").self()));
     TS_ASSERT_EQUALS(Access(result).getArraySize(), 2U);
@@ -538,9 +552,9 @@ TestNetRedisInternalDatabase::testSetOps()
     //   a=[1,2,3,4]
     //   b=[  2,  4,5,6]
     //   c=[        5]
-    TS_ASSERT_EQUALS(db.callInt(StringSegment("sadd a").self().pushBack(1).pushBack(2).pushBack(3).pushBack(4)), 4);
-    TS_ASSERT_EQUALS(db.callInt(StringSegment("sadd b").self().pushBack(2).pushBack(4).pushBack(5).pushBack(6)), 4);
-    TS_ASSERT_EQUALS(db.callInt(StringSegment("sadd c").self().pushBack(5)),                                     1);
+    TS_ASSERT_EQUALS(db.callInt(StringSegment("sadd a").self().pushBackInteger(1).pushBackInteger(2).pushBackInteger(3).pushBackInteger(4)), 4);
+    TS_ASSERT_EQUALS(db.callInt(StringSegment("sadd b").self().pushBackInteger(2).pushBackInteger(4).pushBackInteger(5).pushBackInteger(6)), 4);
+    TS_ASSERT_EQUALS(db.callInt(StringSegment("sadd c").self().pushBackInteger(5)),                                                          1);
 
     // Set operations
     //   a-b = [1,3]
@@ -593,7 +607,7 @@ TestNetRedisInternalDatabase::testSortList()
     std::auto_ptr<Value> result;
 
     // Make a list [3,2,1,8,9,10,5]
-    TS_ASSERT_EQUALS(db.callInt(StringSegment("rpush a").self().pushBack(3).pushBack(2).pushBack(1).pushBack(8).pushBack(9).pushBack(10).pushBack(5)), 7);
+    TS_ASSERT_EQUALS(db.callInt(StringSegment("rpush a").self().pushBackInteger(3).pushBackInteger(2).pushBackInteger(1).pushBackInteger(8).pushBackInteger(9).pushBackInteger(10).pushBackInteger(5)), 7);
 
     // Sort normally: [1,2,3,5,8,9,10]
     result.reset(db.call(StringSegment("sort a").self()));
@@ -639,7 +653,7 @@ TestNetRedisInternalDatabase::testSortList()
 
     // Sort with store
     db.callVoid(StringSegment("sort a store a").self());
-    result.reset(db.call(StringSegment("lrange a").self().pushBack(0).pushBack(-1)));
+    result.reset(db.call(StringSegment("lrange a").self().pushBackInteger(0).pushBackInteger(-1)));
     TS_ASSERT_EQUALS(Access(result).getArraySize(), 7U);
     TS_ASSERT_EQUALS(Access(result)[0].toInteger(), 1);
     TS_ASSERT_EQUALS(Access(result)[1].toInteger(), 2);
@@ -659,7 +673,7 @@ TestNetRedisInternalDatabase::testSortSet()
     std::auto_ptr<Value> result;
 
     // Make a set [3,2,1,8,9,10,5]
-    TS_ASSERT_EQUALS(db.callInt(StringSegment("sadd a").self().pushBack(3).pushBack(2).pushBack(1).pushBack(8).pushBack(9).pushBack(10).pushBack(5)), 7);
+    TS_ASSERT_EQUALS(db.callInt(StringSegment("sadd a").self().pushBackInteger(3).pushBackInteger(2).pushBackInteger(1).pushBackInteger(8).pushBackInteger(9).pushBackInteger(10).pushBackInteger(5)), 7);
 
     // Sort normally: [1,2,3,5,8,9,10]
     result.reset(db.call(StringSegment("sort a").self()));
@@ -675,7 +689,7 @@ TestNetRedisInternalDatabase::testSortSet()
     // Sort with store. This will turn the set into a list
     TS_ASSERT_EQUALS(db.callString(StringSegment("type a").self()), "set");
     db.callVoid(StringSegment("sort a store a").self());
-    result.reset(db.call(StringSegment("lrange a").self().pushBack(0).pushBack(-1)));
+    result.reset(db.call(StringSegment("lrange a").self().pushBackInteger(0).pushBackInteger(-1)));
     TS_ASSERT_EQUALS(Access(result).getArraySize(), 7U);
     TS_ASSERT_EQUALS(Access(result)[0].toInteger(), 1);
     TS_ASSERT_EQUALS(Access(result)[1].toInteger(), 2);
@@ -696,7 +710,7 @@ TestNetRedisInternalDatabase::testSortExt()
     std::auto_ptr<Value> result;
 
     // Make a list
-    db.callVoid(StringSegment("rpush a").self().pushBack(3).pushBack(1).pushBack(2));
+    db.callVoid(StringSegment("rpush a").self().pushBackInteger(3).pushBackInteger(1).pushBackInteger(2));
 
     // Make some keys
     db.callVoid(StringSegment("set k:1 one").self());
@@ -751,7 +765,7 @@ TestNetRedisInternalDatabase::testSortExt()
 
     // Sort normally, get two external keys, and store them in a list
     db.callVoid(StringSegment("sort a get k:* get h:*->f alpha store z").self());
-    result.reset(db.call(StringSegment("lrange z").self().pushBack(0).pushBack(-1)));
+    result.reset(db.call(StringSegment("lrange z").self().pushBackInteger(0).pushBackInteger(-1)));
     TS_ASSERT_EQUALS(Access(result).getArraySize(), 6U);
     TS_ASSERT_EQUALS(Access(result)[0].toString(), "one");
     TS_ASSERT_EQUALS(Access(result)[1].toString(), "un");
@@ -773,7 +787,7 @@ TestNetRedisInternalDatabase::testSortExt()
 
     // Same thing with store. Null values turn into empty strings here.
     db.callVoid(StringSegment("sort a get k:* get h:*->f alpha store z").self());
-    result.reset(db.call(StringSegment("lrange z").self().pushBack(0).pushBack(-1)));
+    result.reset(db.call(StringSegment("lrange z").self().pushBackInteger(0).pushBackInteger(-1)));
     TS_ASSERT_EQUALS(Access(result).getArraySize(), 6U);
     TS_ASSERT_EQUALS(Access(result)[0].toString(), "one");
     TS_ASSERT_EQUALS(Access(result)[1].toString(), "un");

@@ -20,6 +20,7 @@
 #include "afl/data/vectorvalue.hpp"
 #include "afl/data/hash.hpp"
 #include "afl/data/hashvalue.hpp"
+#include "afl/except/filetooshortexception.hpp"
 
 using afl::io::json::Parser;
 using afl::data::DefaultValueFactory;
@@ -91,9 +92,15 @@ TestIoJsonParser::testString()
     }
     // Single-quote escape (nonstandard)
     {
-        std::auto_ptr<afl::data::Value> result(parseString("  \"\'x'\""));
+        std::auto_ptr<afl::data::Value> result(parseString("  \"\\'x\\'\""));
         TS_ASSERT(dynamic_cast<afl::data::StringValue*>(result.get()) != 0);
         TS_ASSERT(dynamic_cast<afl::data::StringValue*>(result.get())->getValue() == "'x'");
+    }
+    // Slash
+    {
+        std::auto_ptr<afl::data::Value> result(parseString("  \"<\\/script>\""));
+        TS_ASSERT(dynamic_cast<afl::data::StringValue*>(result.get()) != 0);
+        TS_ASSERT(dynamic_cast<afl::data::StringValue*>(result.get())->getValue() == "</script>");
     }
     // Unicode
     {
@@ -215,8 +222,8 @@ TestIoJsonParser::testHash()
     {
         std::auto_ptr<afl::data::Value> result(parseString("{}"));
         TS_ASSERT(dynamic_cast<afl::data::HashValue*>(result.get()) != 0);
-        afl::base::Ptr<afl::data::Hash> hash(dynamic_cast<afl::data::HashValue*>(result.get())->getValue());
-        TS_ASSERT(hash.get() != 0);
+        afl::base::Ref<afl::data::Hash> hash(dynamic_cast<afl::data::HashValue*>(result.get())->getValue());
+        TS_ASSERT(&hash.get() != 0);
         TS_ASSERT_EQUALS(hash->getKeys().getNumNames(), 0U);
     }
 
@@ -224,8 +231,8 @@ TestIoJsonParser::testHash()
     {
         std::auto_ptr<afl::data::Value> result(parseString("{\"a\":1,\"b\":2}"));
         TS_ASSERT(dynamic_cast<afl::data::HashValue*>(result.get()) != 0);
-        afl::base::Ptr<afl::data::Hash> hash(dynamic_cast<afl::data::HashValue*>(result.get())->getValue());
-        TS_ASSERT(hash.get() != 0);
+        afl::base::Ref<afl::data::Hash> hash(dynamic_cast<afl::data::HashValue*>(result.get())->getValue());
+        TS_ASSERT(&hash.get() != 0);
         TS_ASSERT(dynamic_cast<afl::data::IntegerValue*>(hash->get("a")) != 0);
         TS_ASSERT_EQUALS(dynamic_cast<afl::data::IntegerValue*>(hash->get("a"))->getValue(), 1);
         TS_ASSERT(dynamic_cast<afl::data::IntegerValue*>(hash->get("b")) != 0);
@@ -236,8 +243,8 @@ TestIoJsonParser::testHash()
     {
         std::auto_ptr<afl::data::Value> result(parseString(" { \"a\" : 1 , \"b\" : 2 } "));
         TS_ASSERT(dynamic_cast<afl::data::HashValue*>(result.get()) != 0);
-        afl::base::Ptr<afl::data::Hash> hash(dynamic_cast<afl::data::HashValue*>(result.get())->getValue());
-        TS_ASSERT(hash.get() != 0);
+        afl::base::Ref<afl::data::Hash> hash(dynamic_cast<afl::data::HashValue*>(result.get())->getValue());
+        TS_ASSERT(&hash.get() != 0);
         TS_ASSERT(dynamic_cast<afl::data::IntegerValue*>(hash->get("a")) != 0);
         TS_ASSERT_EQUALS(dynamic_cast<afl::data::IntegerValue*>(hash->get("a"))->getValue(), 1);
         TS_ASSERT(dynamic_cast<afl::data::IntegerValue*>(hash->get("b")) != 0);
@@ -248,8 +255,8 @@ TestIoJsonParser::testHash()
     {
         std::auto_ptr<afl::data::Value> result(parseString("{\"a\":{},\"b\":[]}"));
         TS_ASSERT(dynamic_cast<afl::data::HashValue*>(result.get()) != 0);
-        afl::base::Ptr<afl::data::Hash> hash(dynamic_cast<afl::data::HashValue*>(result.get())->getValue());
-        TS_ASSERT(hash.get() != 0);
+        afl::base::Ref<afl::data::Hash> hash(dynamic_cast<afl::data::HashValue*>(result.get())->getValue());
+        TS_ASSERT(&hash.get() != 0);
         TS_ASSERT(dynamic_cast<afl::data::HashValue*>(hash->get("a")) != 0);
         TS_ASSERT(dynamic_cast<afl::data::VectorValue*>(hash->get("b")) != 0);
     }
@@ -288,8 +295,8 @@ TestIoJsonParser::testVector()
     {
         std::auto_ptr<afl::data::Value> result(parseString("[]"));
         TS_ASSERT(dynamic_cast<afl::data::VectorValue*>(result.get()) != 0);
-        afl::base::Ptr<afl::data::Vector> vec(dynamic_cast<afl::data::VectorValue*>(result.get())->getValue());
-        TS_ASSERT(vec.get() != 0);
+        afl::base::Ref<afl::data::Vector> vec(dynamic_cast<afl::data::VectorValue*>(result.get())->getValue());
+        TS_ASSERT(&vec.get() != 0);
         TS_ASSERT_EQUALS(vec->size(), 0U);
     }
 
@@ -297,8 +304,8 @@ TestIoJsonParser::testVector()
     {
         std::auto_ptr<afl::data::Value> result(parseString("[1,2,3]"));
         TS_ASSERT(dynamic_cast<afl::data::VectorValue*>(result.get()) != 0);
-        afl::base::Ptr<afl::data::Vector> vec(dynamic_cast<afl::data::VectorValue*>(result.get())->getValue());
-        TS_ASSERT(vec.get() != 0);
+        afl::base::Ref<afl::data::Vector> vec(dynamic_cast<afl::data::VectorValue*>(result.get())->getValue());
+        TS_ASSERT(&vec.get() != 0);
         TS_ASSERT_EQUALS(vec->size(), 3U);
         TS_ASSERT(dynamic_cast<afl::data::IntegerValue*>(vec->get(0)) != 0);
         TS_ASSERT_EQUALS(dynamic_cast<afl::data::IntegerValue*>(vec->get(0))->getValue(), 1);
@@ -312,8 +319,8 @@ TestIoJsonParser::testVector()
     {
         std::auto_ptr<afl::data::Value> result(parseString(" [ 1 , 2 , 3 ] "));
         TS_ASSERT(dynamic_cast<afl::data::VectorValue*>(result.get()) != 0);
-        afl::base::Ptr<afl::data::Vector> vec(dynamic_cast<afl::data::VectorValue*>(result.get())->getValue());
-        TS_ASSERT(vec.get() != 0);
+        afl::base::Ref<afl::data::Vector> vec(dynamic_cast<afl::data::VectorValue*>(result.get())->getValue());
+        TS_ASSERT(&vec.get() != 0);
         TS_ASSERT_EQUALS(vec->size(), 3U);
         TS_ASSERT(dynamic_cast<afl::data::IntegerValue*>(vec->get(0)) != 0);
         TS_ASSERT_EQUALS(dynamic_cast<afl::data::IntegerValue*>(vec->get(0))->getValue(), 1);
@@ -327,8 +334,8 @@ TestIoJsonParser::testVector()
     {
         std::auto_ptr<afl::data::Value> result(parseString("[{},[]]"));
         TS_ASSERT(dynamic_cast<afl::data::VectorValue*>(result.get()) != 0);
-        afl::base::Ptr<afl::data::Vector> vec(dynamic_cast<afl::data::VectorValue*>(result.get())->getValue());
-        TS_ASSERT(vec.get() != 0);
+        afl::base::Ref<afl::data::Vector> vec(dynamic_cast<afl::data::VectorValue*>(result.get())->getValue());
+        TS_ASSERT(&vec.get() != 0);
         TS_ASSERT_EQUALS(vec->size(), 2U);
         TS_ASSERT(dynamic_cast<afl::data::HashValue*>(vec->get(0)) != 0);
         TS_ASSERT(dynamic_cast<afl::data::VectorValue*>(vec->get(1)) != 0);
@@ -340,4 +347,36 @@ TestIoJsonParser::testVector()
     TS_ASSERT_THROWS(parseString("[1,2"), afl::except::FileFormatException);
     TS_ASSERT_THROWS(parseString("[1,,2]"), afl::except::FileFormatException);
     TS_ASSERT_THROWS(parseString("[1,,2["), afl::except::FileFormatException);
+}
+
+/** Test errors (coverage). */
+void
+TestIoJsonParser::testErrors()
+{
+    // Nothing in buffer
+    TS_ASSERT_THROWS(parseString(""), afl::except::FileTooShortException);
+    TS_ASSERT_THROWS(parseString("       "), afl::except::FileTooShortException);
+    TS_ASSERT_THROWS(parseString("  \r\n\t     "), afl::except::FileTooShortException);
+
+    // Invalid literal
+    TS_ASSERT_THROWS(parseString("TRUE"), afl::except::FileFormatException);
+    TS_ASSERT_THROWS(parseString("&x"), afl::except::FileFormatException);
+    TS_ASSERT_THROWS(parseString("<foo>"), afl::except::FileFormatException);
+    TS_ASSERT_THROWS(parseString("'a'"), afl::except::FileFormatException);
+
+    // EOF while expecting single character
+    TS_ASSERT_THROWS(parseString("{"), afl::except::FileTooShortException);
+    TS_ASSERT_THROWS(parseString("{\"foo\""), afl::except::FileTooShortException);
+    TS_ASSERT_THROWS(parseString("{\"foo\":1,"), afl::except::FileTooShortException);
+
+    // Expecting different characters
+    TS_ASSERT_THROWS(parseString("[1"), afl::except::FileTooShortException);
+    TS_ASSERT_THROWS(parseString("[1:"), afl::except::FileFormatException);
+    TS_ASSERT_THROWS(parseString("{\"foo\":2"), afl::except::FileTooShortException);
+    TS_ASSERT_THROWS(parseString("{\"foo\":2:"), afl::except::FileFormatException);
+
+    // Bad unicode escape
+    TS_ASSERT_THROWS(parseString("\"\\ufooo"), afl::except::FileFormatException);
+    TS_ASSERT_THROWS(parseString("\"\\uf"), afl::except::FileTooShortException);
+    TS_ASSERT_THROWS(parseString("\"\\u0x10"), afl::except::FileFormatException);
 }

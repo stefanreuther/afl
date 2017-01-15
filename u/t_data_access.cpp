@@ -86,7 +86,7 @@ void
 TestDataAccess::testVector()
 {
     // Make a vector
-    afl::base::Ptr<afl::data::Vector> vec(afl::data::Vector::create());
+    afl::base::Ref<afl::data::Vector> vec(afl::data::Vector::create());
     vec->pushBackNew(new afl::data::IntegerValue(1));
     vec->pushBackNew(0);
     vec->pushBackNew(new afl::data::IntegerValue(42));
@@ -135,7 +135,7 @@ void
 TestDataAccess::testHash()
 {
     // Make a hash
-    afl::base::Ptr<afl::data::Hash> hash(afl::data::Hash::create());
+    afl::base::Ref<afl::data::Hash> hash(afl::data::Hash::create());
     hash->setNew("1", new afl::data::IntegerValue(1));
     hash->setNew("xyz", new afl::data::IntegerValue(42));
     hash->setNew("01", new afl::data::StringValue("77"));
@@ -188,7 +188,7 @@ TestDataAccess::testList()
     using afl::data::Access;
 
     // Make a vector
-    afl::base::Ptr<afl::data::Vector> vec(afl::data::Vector::create());
+    afl::base::Ref<afl::data::Vector> vec(afl::data::Vector::create());
     vec->pushBackNew(new afl::data::IntegerValue(1));
     vec->pushBackNew(0);
     vec->pushBackNew(new afl::data::IntegerValue(42));

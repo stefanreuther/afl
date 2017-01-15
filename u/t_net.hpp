@@ -96,6 +96,12 @@ class TestNetSecureSocket : public CxxTest::TestSuite {
     void testIt();
 };
 
+class TestNetServer : public CxxTest::TestSuite {
+ public:
+    void testIt();
+    void testStop();
+};
+
 class TestNetSimpleServer : public CxxTest::TestSuite {
  public:
     void testIt();

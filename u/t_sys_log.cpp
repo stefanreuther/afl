@@ -80,5 +80,14 @@ TestSysLog::testLifetime()
         b.reset();
         a->write(afl::sys::Log::Warn, "channel", "message");
     }
+    {
+        std::auto_ptr<Log> a(new Log());
+        std::auto_ptr<Log> b(new Log());
+        a->addListener(*b);
+        a->write(afl::sys::Log::Warn, "channel", "message");
+        b->write(afl::sys::Log::Warn, "channel", "message");
+        a->removeListener(*b);
+        a->write(afl::sys::Log::Warn, "channel", "message");
+    }
 }
 

@@ -19,6 +19,7 @@ class TestExcept : public CxxTest::TestSuite {
     void testUnsupportedException();
     void testSystemException();
     void testRemoteErrorException();
+    void testCommandLineException();
 };
 
 class TestExceptAssertionFailedException : public CxxTest::TestSuite {

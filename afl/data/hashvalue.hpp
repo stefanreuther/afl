@@ -17,26 +17,26 @@ namespace afl { namespace data {
      public:
         /** Constructor.
             \param pHash Hash object. Must not be null. */
-        HashValue(afl::base::Ptr<Hash> pHash);
+        HashValue(afl::base::Ref<Hash> pHash);
 
         /** Destructor. */
         ~HashValue();
 
         /** Get contained hash object.
             \return Pointer to hash object */
-        const afl::base::Ptr<Hash>& getValue() const;
+        const afl::base::Ref<Hash>& getValue() const;
 
         virtual void visit(Visitor& visitor) const;
 
         virtual HashValue* clone() const;
 
      private:
-        afl::base::Ptr<Hash> m_pHash;
+        afl::base::Ref<Hash> m_pHash;
     };
 
 } }
 
-inline const afl::base::Ptr<afl::data::Hash>&
+inline const afl::base::Ref<afl::data::Hash>&
 afl::data::HashValue::getValue() const
 {
     return m_pHash;

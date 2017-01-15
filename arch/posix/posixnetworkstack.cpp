@@ -389,7 +389,7 @@ arch::posix::PosixNetworkStack::Socket::getPeerName()
 
 /*************************** PosixNetworkStack ***************************/
 
-afl::base::Ptr<afl::net::Listener>
+afl::base::Ref<afl::net::Listener>
 arch::posix::PosixNetworkStack::listen(const afl::net::Name& name, int backlogSize)
 {
     // Create listener socket
@@ -398,14 +398,14 @@ arch::posix::PosixNetworkStack::listen(const afl::net::Name& name, int backlogSi
 
     // Make socket non-blocking
     ::fcntl(fd, F_SETFL, O_NONBLOCK);
-    return new Listener(fd, name.toString());
+    return *new Listener(fd, name.toString());
 }
 
-afl::base::Ptr<afl::net::Socket>
+afl::base::Ref<afl::net::Socket>
 arch::posix::PosixNetworkStack::connect(const afl::net::Name& name, afl::sys::Timeout_t timeout)
 {
     int fd = Connect(timeout).toName(name);
-    return new Socket(fd, name.toString());
+    return *new Socket(fd, name.toString());
 }
 #else
 int g_variableToMakePosixNetworkStackObjectFileNotEmpty;

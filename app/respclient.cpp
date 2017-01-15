@@ -18,8 +18,7 @@
 int main(int /*argc*/, char** argv)
 {
     // Fetch command line
-    afl::base::Ptr<afl::sys::Environment::CommandLine_t> cmdl =
-        afl::sys::Environment::getInstance(argv).getCommandLine();
+    afl::base::Ref<afl::sys::Environment::CommandLine_t> cmdl = afl::sys::Environment::getInstance(argv).getCommandLine();
 
     // First element is network address
     String_t str;
@@ -32,7 +31,7 @@ int main(int /*argc*/, char** argv)
     // Following elements are command
     afl::data::Segment cmd;
     while (cmdl->getNextElement(str)) {
-        cmd.pushBack(str);
+        cmd.pushBackString(str);
     }
     if (cmd.size() == 0) {
         std::cout << "Missing command.\n";

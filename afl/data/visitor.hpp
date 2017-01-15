@@ -76,7 +76,7 @@ namespace afl { namespace data {
             when given a null value, calls visitNull(),
             This is the main entry point.
             \param value Value to examine */
-        void visit(Value* value);
+        void visit(const Value* value);
     };
 
 } }

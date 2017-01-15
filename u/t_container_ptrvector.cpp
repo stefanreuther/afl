@@ -210,3 +210,45 @@ TestContainerPtrVector::testSort4()
     TS_ASSERT_EQUALS(*v[1], 5);
     TS_ASSERT_EQUALS(v[2], (int*) 0);
 }
+
+/** Test resize(). */
+void
+TestContainerPtrVector::testResize()
+{
+    // Blank vector
+    afl::container::PtrVector<Obj> pv;
+    TS_ASSERT(pv.empty());
+    TS_ASSERT_EQUALS(pv.size(), 0U);
+    TS_ASSERT_EQUALS(Obj::live, 0);
+
+    // Append three elements
+    pv.pushBackNew(new Obj(10));
+    pv.pushBackNew(new Obj(11));
+    pv.pushBackNew(new Obj(12));
+    TS_ASSERT(!pv.empty());
+    TS_ASSERT_EQUALS(pv.size(), 3U);
+    TS_ASSERT_EQUALS(Obj::live, 3);
+
+    // Resize to drop
+    pv.resize(2);
+    TS_ASSERT(!pv.empty());
+    TS_ASSERT_EQUALS(pv.size(), 2U);
+    TS_ASSERT_EQUALS(Obj::live, 2);
+    TS_ASSERT_EQUALS(pv[0]->n, 10);
+    TS_ASSERT_EQUALS(pv[1]->n, 11);
+
+    // Resize to extend
+    pv.resize(4);
+    TS_ASSERT(!pv.empty());
+    TS_ASSERT_EQUALS(pv.size(), 4U);
+    TS_ASSERT_EQUALS(Obj::live, 2);
+    TS_ASSERT_EQUALS(pv[0]->n, 10);
+    TS_ASSERT_EQUALS(pv[1]->n, 11);
+    TS_ASSERT(pv[2] == 0);
+    TS_ASSERT(pv[3] == 0);
+
+    // Clear
+    pv.resize(0);
+    TS_ASSERT(pv.empty());
+    TS_ASSERT_EQUALS(Obj::live, 0);
+}

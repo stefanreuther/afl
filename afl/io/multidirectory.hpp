@@ -25,12 +25,12 @@ namespace afl { namespace io {
         /** Create a directory.
             Use this function to create instances.
             \return New instance */
-        static afl::base::Ptr<MultiDirectory> create();
+        static afl::base::Ref<MultiDirectory> create();
 
         // Directory:
         virtual ~MultiDirectory();
-        virtual afl::base::Ptr<DirectoryEntry> getDirectoryEntryByName(String_t name);
-        virtual afl::base::Ptr<afl::base::Enumerator<afl::base::Ptr<DirectoryEntry> > > getDirectoryEntries();
+        virtual afl::base::Ref<DirectoryEntry> getDirectoryEntryByName(String_t name);
+        virtual afl::base::Ref<afl::base::Enumerator<afl::base::Ptr<DirectoryEntry> > > getDirectoryEntries();
         virtual afl::base::Ptr<Directory> getParentDirectory();
         virtual String_t getDirectoryName();
         virtual String_t getTitle();
@@ -40,7 +40,7 @@ namespace afl { namespace io {
         /** Add new directory.
             Entries will be looked up in this directory if they are not found in the previous ones.
             \param dir New directory */
-        void addDirectory(afl::base::Ptr<Directory> dir);
+        void addDirectory(afl::base::Ref<Directory> dir);
 
      private:
         MultiDirectory();

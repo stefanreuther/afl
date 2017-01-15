@@ -5,7 +5,7 @@
 #include "afl/sys/longcommandlineparser.hpp"
 
 
-afl::sys::LongCommandLineParser::LongCommandLineParser(afl::base::Ptr<Environment::CommandLine_t> commandLine)
+afl::sys::LongCommandLineParser::LongCommandLineParser(afl::base::Ref<Environment::CommandLine_t> commandLine)
     : m_commandLine(commandLine),
       m_state(Idle),
       m_currentValue()

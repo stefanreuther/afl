@@ -78,7 +78,7 @@ afl::async::CommunicationStream::getName()
     return m_pObj->getName();
 }
 
-afl::base::Ptr<afl::io::Stream>
+afl::base::Ref<afl::io::Stream>
 afl::async::CommunicationStream::createChild()
 {
     throw std::runtime_error(afl::string::Messages::invalidOperation());

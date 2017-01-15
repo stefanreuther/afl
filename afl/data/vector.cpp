@@ -13,16 +13,16 @@ afl::data::Vector::Vector()
 afl::data::Vector::~Vector()
 { }
 
-afl::base::Ptr<afl::data::Vector>
+afl::base::Ref<afl::data::Vector>
 afl::data::Vector::create()
 {
-    return new Vector();
+    return *new Vector();
 }
 
-afl::base::Ptr<afl::data::Vector>
+afl::base::Ref<afl::data::Vector>
 afl::data::Vector::create(Segment& values)
 {
-    afl::base::Ptr<afl::data::Vector> vec = new Vector();
+    afl::base::Ref<afl::data::Vector> vec = *new Vector();
     vec->m_values.swap(values);
     return vec;
 }

@@ -24,9 +24,9 @@ bool
 afl::net::redis::Field::exists() const
 {
     return getHash().getHandler().callInt(Segment()
-                                          .pushBack("HEXISTS")
-                                          .pushBack(getHash().getName())
-                                          .pushBack(getName()));
+                                          .pushBackString("HEXISTS")
+                                          .pushBackString(getHash().getName())
+                                          .pushBackString(getName()));
 }
 
 // Remove this field from the hash (HDEL).
@@ -34,9 +34,9 @@ bool
 afl::net::redis::Field::remove()
 {
     return getHash().getHandler().callInt(Segment()
-                                          .pushBack("HDEL")
-                                          .pushBack(getHash().getName())
-                                          .pushBack(getName()));
+                                          .pushBackString("HDEL")
+                                          .pushBackString(getHash().getName())
+                                          .pushBackString(getName()));
 }
 
 // Get name of this field.

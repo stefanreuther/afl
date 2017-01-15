@@ -10,13 +10,13 @@
 afl::io::Directory::~Directory()
 { }
 
-afl::base::Ptr<afl::io::Directory>
+afl::base::Ref<afl::io::Directory>
 afl::io::Directory::openDirectory(String_t name)
 {
     return getDirectoryEntryByName(name)->openDirectory();
 }
 
-afl::base::Ptr<afl::io::Stream>
+afl::base::Ref<afl::io::Stream>
 afl::io::Directory::openFile(String_t name, FileSystem::OpenMode mode)
 {
     return getDirectoryEntryByName(name)->openFile(mode);
@@ -26,7 +26,7 @@ afl::base::Ptr<afl::io::Stream>
 afl::io::Directory::openFileNT(String_t name, FileSystem::OpenMode mode)
 {
     try {
-        return openFile(name, mode);
+        return openFile(name, mode).asPtr();
     }
     catch (afl::except::FileProblemException& e) {
         return 0;

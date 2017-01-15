@@ -3,6 +3,7 @@
   *  \brief Test for afl::checksums::Adler32
   */
 
+#include <memory>
 #include "afl/checksums/adler32.hpp"
 
 #include "u/t_checksums.hpp"
@@ -22,7 +23,7 @@ TestChecksumsAdler32::testIt()
     TS_ASSERT_EQUALS(t.add(Memory_t(), 9999999), 9999999U);
 
     // "Wikipedia" (example from precisely there)
-    uint8_t wikipedia[9] = { 'W', 'i', 'k', 'i', 'p', 'e', 'd', 'i', 'a' };
+    static const uint8_t wikipedia[9] = { 'W', 'i', 'k', 'i', 'p', 'e', 'd', 'i', 'a' };
     TS_ASSERT_EQUALS(t.add(Memory_t(wikipedia), 1), 0x11E60398U);
 
     // Verify associativity. Since we know that the implementation has a
@@ -39,4 +40,22 @@ TestChecksumsAdler32::testIt()
 
         TS_ASSERT_EQUALS(t.add(wholeBlock, 1), t.add(secondHalf, t.add(firstHalf, 1)));
     }
+}
+
+/** Test using the interface. */
+void
+TestChecksumsAdler32::testInterface()
+{
+    typedef afl::checksums::Checksum::Memory_t Memory_t;
+    std::auto_ptr<afl::checksums::Checksum> t(new afl::checksums::Adler32());
+
+    // Check empty
+    TS_ASSERT_EQUALS(t->add(Memory_t(), 9999), 9999U);
+
+    // "Wikipedia"
+    static const uint8_t wikipedia[9] = { 'W', 'i', 'k', 'i', 'p', 'e', 'd', 'i', 'a' };
+    TS_ASSERT_EQUALS(t->add(wikipedia, 1), 0x11E60398U);
+
+    // Inquiry
+    TS_ASSERT_EQUALS(t->bits(), 32U);
 }

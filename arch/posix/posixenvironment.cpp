@@ -15,6 +15,7 @@
 #include "arch/posix/posixstream.hpp"
 #include "afl/io/bufferedstream.hpp"
 #include "afl/string/messages.hpp"
+#include "afl/except/unsupportedexception.hpp"
 
 namespace {
     /* CommandLine implementation for POSIX */
@@ -47,22 +48,13 @@ namespace {
 
 
     
-    template<typename T>
-    T checkNull(T t)
-    {
-        if (t.get() == 0) {
-            throw std::runtime_error(afl::string::Messages::unknownError());
-        }
-        return t;
-    }
-
     /* Console implementation for POSIX.
        This is a stripped-down version of TextFile, with BOM-snooping removed and charset conversion hardcoded to convertExternalToUtf8.
        It must also keep the stream alive (Ptr<>). */
     class Console : public afl::io::TextReader, public afl::io::TextWriter {
      public:
-        Console(afl::base::Ptr<afl::io::Stream> s)
-            : m_stream(checkNull(s)),
+        Console(afl::base::Ref<afl::io::Stream> s)
+            : m_stream(s),
               m_buffer(*s)
             { }
         ~Console()
@@ -127,7 +119,7 @@ namespace {
             }
 
      private:
-        afl::base::Ptr<afl::io::Stream> m_stream;
+        afl::base::Ref<afl::io::Stream> m_stream;
         afl::io::BufferedStream m_buffer;
     };
 }
@@ -137,15 +129,22 @@ arch::posix::PosixEnvironment::PosixEnvironment(const char*const* argv)
 { }
 
 /* Get command line */
-afl::base::Ptr<afl::sys::Environment::CommandLine_t>
+afl::base::Ref<afl::sys::Environment::CommandLine_t>
 arch::posix::PosixEnvironment::getCommandLine()
 {
     const char*const* argv = m_argv;
-    afl::base::Ptr<CommandLine> cmdl = new CommandLine();
+    afl::base::Ref<CommandLine> cmdl = *new CommandLine();
     while (const char* p = *++argv) {
         cmdl->add(convertExternalToUtf8(afl::string::toMemory(p)));
     }
     return cmdl;
+}
+
+/* Get invocation name */
+String_t
+arch::posix::PosixEnvironment::getInvocationName()
+{
+    return convertExternalToUtf8(afl::string::toMemory(m_argv[0]));
 }
 
 /* Get environment variable */
@@ -280,30 +279,30 @@ arch::posix::PosixEnvironment::getInstallationDirectoryName()
     }
 }
 
-afl::base::Ptr<afl::io::TextWriter>
+afl::base::Ref<afl::io::TextWriter>
 arch::posix::PosixEnvironment::attachTextWriter(Channel ch)
 {
-    return new Console(attachStream(ch));
+    return *new Console(attachStream(ch));
 }
 
-afl::base::Ptr<afl::io::TextReader>
+afl::base::Ref<afl::io::TextReader>
 arch::posix::PosixEnvironment::attachTextReader(Channel ch)
 {
-    return new Console(attachStream(ch));
+    return *new Console(attachStream(ch));
 }
 
-afl::base::Ptr<afl::io::Stream>
+afl::base::Ref<afl::io::Stream>
 arch::posix::PosixEnvironment::attachStream(Channel ch)
 {
     switch (ch) {
      case Input:
-        return new PosixStream("<stdin>", 0);
+        return *new PosixStream("<stdin>", 0);
      case Output:
-        return new PosixStream("<stdout>", 1);
+        return *new PosixStream("<stdout>", 1);
      case Error:
-        return new PosixStream("<stderr>", 2);
+        return *new PosixStream("<stderr>", 2);
     }
-    return 0;
+    throw afl::except::UnsupportedException("<attachStream>");
 }
 
 #else

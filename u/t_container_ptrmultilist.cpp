@@ -124,7 +124,7 @@ TestContainerPtrMultiList::testTyped()
 
         // Insert one element to test insert()
         {
-            ml.insert(ml.begin(), new Obj(9));
+            ml.insertNew(ml.begin(), new Obj(9));
             TS_ASSERT_EQUALS(Obj::live, 2);
             TS_ASSERT_EQUALS(ml.size(), 2U);
             TS_ASSERT_EQUALS(ml.front()->n, 9);
@@ -237,4 +237,90 @@ TestContainerPtrMultiList::testTypedSort()
         ++p;
     }
     TS_ASSERT(p == ml.end());
+}
+
+/** Test removal of elements. */
+void
+TestContainerPtrMultiList::testRemove()
+{
+    {
+        // Remove element from empty list. Must not crash.
+        afl::container::PtrMultiList<int> testee;
+        testee.popFront();
+        testee.popFront();
+        testee.popFront();
+        TS_ASSERT(testee.extractFront() == 0);
+        TS_ASSERT(testee.extractFront() == 0);
+        TS_ASSERT(testee.extractFront() == 0);
+    }
+
+    {
+        // Add single element, point iterator at it, remove.
+        afl::container::PtrMultiList<int> testee;
+        testee.pushBackNew(new int(42));
+        afl::container::PtrMultiList<int>::iterator it = testee.begin();
+        TS_ASSERT(*it != 0);
+        TS_ASSERT_EQUALS(**it, 42);
+
+        testee.popFront();
+        TS_ASSERT(*it == 0);
+        TS_ASSERT(testee.extractFront() == 0);
+    }
+
+    {
+        // Iterator that lives longer than the list
+        afl::container::PtrMultiList<int>::iterator it;
+        {
+            afl::container::PtrMultiList<int> testee;
+            testee.pushBackNew(new int(42));
+            it = testee.begin();
+            TS_ASSERT(*it != 0);
+            TS_ASSERT_EQUALS(**it, 42);
+        }
+        TS_ASSERT(*it == 0);
+    }
+}
+
+/** Test insert method. */
+void
+TestContainerPtrMultiList::testInsert()
+{
+    afl::container::PtrMultiList<int> testee;
+    testee.insertNew(testee.begin(), new int(10));       // [10]
+    testee.insertNew(testee.end(), new int(15));         // [10,15]
+    testee.insertNew(testee.begin(), new int(5));        // [5,10,15]
+    testee.insertNew(++testee.begin(), new int(7));      // [5,7,10,15]
+    testee.insertNew(testee.end(), new int(17));         // [5,7,10,15,17]
+
+    // Iterate
+    // Default-construct the iterator and assign it, to test that.
+    afl::container::PtrMultiList<int>::iterator it;
+
+    it = testee.begin();
+    TS_ASSERT(it != testee.end());
+    TS_ASSERT(*it != 0);
+    TS_ASSERT_EQUALS(**it, 5);
+
+    ++it;
+    TS_ASSERT(it != testee.end());
+    TS_ASSERT(*it != 0);
+    TS_ASSERT_EQUALS(**it, 7);
+
+    ++it;
+    TS_ASSERT(it != testee.end());
+    TS_ASSERT(*it != 0);
+    TS_ASSERT_EQUALS(**it, 10);
+
+    it++;   // post-increment for a change...
+    TS_ASSERT(it != testee.end());
+    TS_ASSERT(*it != 0);
+    TS_ASSERT_EQUALS(**it, 15);
+
+    ++it;
+    TS_ASSERT(it != testee.end());
+    TS_ASSERT(*it != 0);
+    TS_ASSERT_EQUALS(**it, 17);
+
+    ++it;
+    TS_ASSERT(it == testee.end());
 }

@@ -14,7 +14,7 @@ int main(int, char** argv)
               << "PATH environment: " << env.getEnvironmentVariable("PATH") << "\n"
               << "Command line:\n";
 
-    afl::base::Ptr<afl::sys::Environment::CommandLine_t> cmdl = env.getCommandLine();
+    afl::base::Ref<afl::sys::Environment::CommandLine_t> cmdl = env.getCommandLine();
     String_t s;
     while (cmdl->getNextElement(s)) {
         std::cout << "\t" << s << " (" << s.size() << "b)\n";

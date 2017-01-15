@@ -39,7 +39,7 @@ namespace {
 }
 
 
-afl::net::http::ClientConnection::ClientConnection(const Name& name, const String_t& scheme, afl::base::Ptr<Socket> socket)
+afl::net::http::ClientConnection::ClientConnection(const Name& name, const String_t& scheme, afl::base::Ref<Socket> socket)
     : m_name(name),
       m_scheme(scheme),
       m_socket(socket),

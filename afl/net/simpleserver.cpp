@@ -26,7 +26,7 @@ namespace {
     }
 }
 
-afl::net::SimpleServer::SimpleServer(afl::base::Ptr<Listener> listener, ProtocolHandlerFactory& factory)
+afl::net::SimpleServer::SimpleServer(afl::base::Ref<Listener> listener, ProtocolHandlerFactory& factory)
     : afl::base::Runnable(),
       m_listener(listener),
       m_factory(factory)

@@ -74,6 +74,12 @@ namespace afl { namespace sys {
             \param msg Log message */
         virtual void handleMessage(const Message& msg) = 0;
 
+        /** Format an exception message.
+            Concatenates the message (if nonempty), a possible file name from the exception, and the exception's code into one message.
+            \param message log message (text)
+            \param e exception object. Should have been caught by reference to be able to access its original dynamic type. */
+        static String_t formatException(const String_t& message, const std::exception& e);
+
      private:
         friend class Log;
         std::vector<Log*> m_parents;

@@ -73,7 +73,7 @@ afl::net::http::DefaultConnectionProvider::run()
             } else {
                 try {
                     // Try connecting...
-                    afl::base::Ptr<afl::net::Socket> socket = m_networkStack.connect(name, CONNECTION_TIMEOUT);
+                    afl::base::Ref<afl::net::Socket> socket = m_networkStack.connect(name, CONNECTION_TIMEOUT);
                     m_client.addNewConnection(new ClientConnection(name, scheme, socket));
                 }
                 catch (std::exception& e) {

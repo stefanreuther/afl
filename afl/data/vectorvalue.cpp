@@ -3,16 +3,13 @@
   *  \brief Class afl::data::VectorValue
   */
 
-#include <cassert>
 #include "afl/data/vectorvalue.hpp"
 #include "afl/data/visitor.hpp"
 
-afl::data::VectorValue::VectorValue(afl::base::Ptr<Vector> pVector)
+afl::data::VectorValue::VectorValue(afl::base::Ref<Vector> pVector)
     : Value(),
       m_pVector(pVector)
-{
-    assert(m_pVector.get() != 0);
-}
+{ }
 
 afl::data::VectorValue::~VectorValue()
 { }

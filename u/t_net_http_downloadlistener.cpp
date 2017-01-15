@@ -7,9 +7,21 @@
 
 #include "u/t_net_http.hpp"
 
-/** Simple test. */
+/** Interface test. */
 void
 TestNetHttpDownloadListener::testIt()
 {
-    /* This is an interface. We only test whether it builds. */
+    class Tester : public afl::net::http::DownloadListener {
+     public:
+        virtual void handleResponseHeader(afl::net::http::ClientResponse& /*resp*/)
+            { }
+        virtual void handleResponseData(afl::io::Stream::FileSize_t /*ofs*/, afl::base::ConstBytes_t /*data*/)
+            { }
+        virtual void handleFailure(afl::net::http::ClientRequest::FailureReason /*reason*/, const String_t& /*message*/)
+            { }
+        virtual void handleSuccess()
+            { }
+    };
+    Tester t;
 }
+

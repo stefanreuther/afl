@@ -6,7 +6,7 @@
 #define AFL_AFL_DATA_VECTOR_HPP
 
 #include "afl/base/refcounted.hpp"
-#include "afl/base/ptr.hpp"
+#include "afl/base/ref.hpp"
 #include "afl/data/segment.hpp"
 
 namespace afl { namespace data {
@@ -22,14 +22,14 @@ namespace afl { namespace data {
             Makes an empty vector.
             This is a function to make sure all Vector instances are heap-allocated,
             which is required for safe usage in VectorValue. */
-        static afl::base::Ptr<Vector> create();
+        static afl::base::Ref<Vector> create();
 
         /** Constructor.
             Makes a populated vector.
             This is a function to make sure all Vector instances are heap-allocated,
             which is required for safe usage in VectorValue.
             \param values Initial values. Will be modified (emptied), Vector takes ownership of contained values. */
-        static afl::base::Ptr<Vector> create(Segment& values);
+        static afl::base::Ref<Vector> create(Segment& values);
 
         ~Vector();
 

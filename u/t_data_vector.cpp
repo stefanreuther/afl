@@ -13,8 +13,8 @@ void
 TestDataVector::testIt()
 {
     // Make it
-    afl::base::Ptr<afl::data::Vector> p = afl::data::Vector::create();
-    TS_ASSERT(p.get() != 0);
+    afl::base::Ref<afl::data::Vector> p = afl::data::Vector::create();
+    TS_ASSERT(&p.get() != 0);
     TS_ASSERT_EQUALS(p->size(), 0U);
     TS_ASSERT_EQUALS(p->getValues().size(), 0U);
 

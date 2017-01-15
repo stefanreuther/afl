@@ -30,14 +30,14 @@ namespace afl { namespace io {
             Use this function to create instances.
             \param name Name of instance (for reporting in getTitle()).
             \return New instance */
-        static afl::base::Ptr<InternalDirectory> create(String_t name);
+        static afl::base::Ref<InternalDirectory> create(String_t name);
 
         /*
          *  Directory:
          */
         virtual ~InternalDirectory();
-        virtual afl::base::Ptr<DirectoryEntry> getDirectoryEntryByName(String_t name);
-        virtual afl::base::Ptr<afl::base::Enumerator<afl::base::Ptr<DirectoryEntry> > > getDirectoryEntries();
+        virtual afl::base::Ref<DirectoryEntry> getDirectoryEntryByName(String_t name);
+        virtual afl::base::Ref<afl::base::Enumerator<afl::base::Ptr<DirectoryEntry> > > getDirectoryEntries();
         virtual afl::base::Ptr<Directory> getParentDirectory();
         virtual String_t getDirectoryName();
         virtual String_t getTitle();
@@ -50,7 +50,7 @@ namespace afl { namespace io {
             If one with the given name already exists, it is replaced.
             \param name Name of stream (virtual file)
             \param stream Stream object */
-        void addStream(String_t name, afl::base::Ptr<Stream> stream);
+        void addStream(String_t name, afl::base::Ref<Stream> stream);
 
         /** Get stream (virtual file).
             This is a possibly more convenient interface than the regular Directory interface.
@@ -82,9 +82,9 @@ namespace afl { namespace io {
 
         struct Node {
             String_t m_name;
-            afl::base::Ptr<Stream> m_stream;
+            afl::base::Ref<Stream> m_stream;
 
-            Node(String_t name, afl::base::Ptr<Stream> stream);
+            Node(String_t name, afl::base::Ref<Stream> stream);
         };
         typedef afl::container::PtrMultiList<Node> NodeList_t;
 

@@ -4,14 +4,34 @@
 #
 
 ##
-##  Configuration (FIXME)
+##  Configuration
 ##
+
+# Path to cxxtest
 CXXTESTDIR = $(CONFIG_AFL_CXXTESTDIR)
+
+# Path to perl executable
 PERL = $(CONFIG_AFL_PERL)
+
+# C++ compiler and flags
 CXX = $(CONFIG_AFL_CXX)
 CXXFLAGS = $(CONFIG_AFL_CXXFLAGS) -I.
+
+# Libraries and linker flags
 LIBS = $(CONFIG_AFL_LIBS)
 LDFLAGS = $(CONFIG_AFL_LDFLAGS)
+
+# Additional dependencies that trigger a relink
+LIBDEPEND = $(CONFIG_AFL_LIBDEPEND)
+
+# Librarian
+AR = $(CONFIG_AFL_AR)
+
+# "rm" tool
+RM = rm
+
+# A program to execute a compiled program. Empty for native execution, but could be something like a simulator.
+RUN = $(CONFIG_AFL_RUN)
 
 include config.mk
 
@@ -28,7 +48,20 @@ PROJ_AUTO += afl:afl/*pp testsuite:u/*pp
 ##  Main Library
 ##
 TARGETS += afl
-FILES_afl = afl/io/nullfilesystem.cpp afl/io/nullfilesystem.hpp \
+FILES_afl = afl/net/server.cpp afl/net/server.hpp \
+    afl/sys/commandlineparser.cpp afl/except/commandlineexception.cpp \
+    afl/except/commandlineexception.hpp afl/base/observable.hpp \
+    arch/posix/posixdialog.cpp arch/posix/posixdialog.hpp \
+    arch/win32/win32dialog.cpp arch/win32/win32dialog.hpp arch/dialog.hpp \
+    afl/sys/dialog.cpp afl/sys/dialog.hpp afl/base/baseweaklink.cpp \
+    afl/base/baseweaklink.hpp afl/base/weaktarget.cpp \
+    afl/base/weaktarget.hpp afl/base/weaklink.hpp \
+    afl/io/transformreaderstream.cpp afl/io/transformreaderstream.hpp \
+    afl/io/deflatetransform.cpp afl/io/deflatetransform.hpp \
+    afl/io/archive/zipreader.cpp afl/io/archive/zipreader.hpp \
+    afl/io/limitedstream.cpp afl/io/limitedstream.hpp afl/base/ref.hpp \
+    afl/io/msexpandtransform.cpp afl/io/msexpandtransform.hpp \
+    afl/io/nullfilesystem.cpp afl/io/nullfilesystem.hpp \
     afl/string/posixfilenames.hpp afl/string/posixfilenames.cpp \
     afl/net/parameterencoder.cpp afl/net/parameterencoder.hpp \
     afl/charset/unicode.cpp afl/io/nulltextwriter.cpp \
@@ -250,6 +283,11 @@ FILES_date = app/date.cpp
 TYPE_date = app
 DEPEND_date = afl
 
+TARGETS += dialog
+FILES_dialog = app/dialog.cpp
+TYPE_dialog = app
+DEPEND_dialog = afl
+
 TARGETS += ls
 FILES_ls = app/ls.cpp
 TYPE_ls = app
@@ -290,11 +328,27 @@ FILES_env = app/env.cpp
 TYPE_env = app
 DEPEND_env = afl
 
+TARGETS += unzip
+FILES_unzip = app/unzip.cpp
+TYPE_unzip = app
+DEPEND_unzip = afl
+
 ##
 ##  Testsuite
 ##
 TARGETS += testsuite
-FILES_testsuite = u/t_io_nullfilesystem.cpp u/t_string_posixfilenames.cpp \
+FILES_testsuite = u/t_net_server.cpp u/t_base_observable.cpp \
+    u/t_sys_dialog.cpp u/t_base_weaklink.cpp u/t_base_baseweaklink.cpp \
+    u/t_base_weaktarget.cpp u/t_io_transformreaderstream.cpp \
+    u/t_io_json_parser_testsuite.cpp u/t_io_deflatetransform.cpp \
+    u/t_io_archive_zipreader.cpp u/t_io_archive.hpp u/t_io_limitedstream.cpp \
+    u/t_base_ref.cpp u/t_net_http_errorresponse.cpp \
+    u/t_io_msexpandtransform.cpp u/t_net_redis_sortoperation.cpp \
+    u/t_net_redis_stringsetkey.cpp u/t_net_redis_integersetkey.cpp \
+    u/t_net_redis_subtree.cpp u/t_net_redis_key.cpp \
+    u/t_net_redis_stringkey.cpp u/mock/commandhandlermock.cpp \
+    u/mock/commandhandlermock.hpp u/t_net_redis_integerkey.cpp \
+    u/t_io_nullfilesystem.cpp u/t_string_posixfilenames.cpp \
     u/t_net_http_client.cpp u/t_net_parameterencoder.cpp \
     u/t_io_nulltextwriter.cpp u/t_io_textreader.cpp u/t_io_textwriter.cpp \
     u/t_except_assertionfailedexception.cpp \
@@ -397,7 +451,8 @@ DEPEND_testsuite = afl
 HEADERS_testsuite = u/t_*.hpp
 
 test: $(OUTPUT_testsuite)
-	./testsuite
+	@echo "        Running testsuite..."
+	@$(RUN) ./$(OUTPUT_testsuite)
 
 testsuite.cpp: $(HEADERS_testsuite)
 	@echo "        Generating test driver..."

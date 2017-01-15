@@ -15,12 +15,12 @@ void
 TestDataSegmentView::testEat()
 {
     afl::data::Segment seg;
-    seg.pushBack(12);
-    seg.pushBack("foo");
+    seg.pushBackInteger(12);
+    seg.pushBackString("foo");
     seg.pushBackNew(0);
-    seg.pushBack(42);
-    seg.pushBack("hello");
-    seg.pushBack("bye");
+    seg.pushBackInteger(42);
+    seg.pushBackString("hello");
+    seg.pushBackString("bye");
 
     // First constructor
     {
@@ -69,12 +69,12 @@ void
 TestDataSegmentView::testTypes()
 {
     afl::data::Segment seg;
-    seg.pushBack(12);
-    seg.pushBack("foo");
+    seg.pushBackInteger(12);
+    seg.pushBackString("foo");
     seg.pushBackNew(0);
-    seg.pushBack(42);
-    seg.pushBack("hello");
-    seg.pushBack(99);
+    seg.pushBackInteger(42);
+    seg.pushBackString("hello");
+    seg.pushBackInteger(99);
 
     int32_t iv;
     String_t sv;

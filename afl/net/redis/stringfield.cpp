@@ -18,10 +18,10 @@ bool
 afl::net::redis::StringField::set(String_t value)
 {
     return getHash().getHandler().callInt(Segment()
-                                          .pushBack("HSET")
-                                          .pushBack(getHash().getName())
-                                          .pushBack(getName())
-                                          .pushBack(value));
+                                          .pushBackString("HSET")
+                                          .pushBackString(getHash().getName())
+                                          .pushBackString(getName())
+                                          .pushBackString(value));
 }
 
 // Get current value (HGET).
@@ -29,7 +29,7 @@ String_t
 afl::net::redis::StringField::get() const
 {
     return getHash().getHandler().callString(Segment()
-                                             .pushBack("HGET")
-                                             .pushBack(getHash().getName())
-                                             .pushBack(getName()));
+                                             .pushBackString("HGET")
+                                             .pushBackString(getHash().getName())
+                                             .pushBackString(getName()));
 }

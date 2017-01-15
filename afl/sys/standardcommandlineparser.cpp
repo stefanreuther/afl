@@ -5,7 +5,7 @@
 
 #include "afl/sys/standardcommandlineparser.hpp"
 
-afl::sys::StandardCommandLineParser::StandardCommandLineParser(afl::base::Ptr<Environment::CommandLine_t> commandLine)
+afl::sys::StandardCommandLineParser::StandardCommandLineParser(afl::base::Ref<Environment::CommandLine_t> commandLine)
     : m_commandLine(commandLine),
       m_state(Idle),
       m_currentValue(),

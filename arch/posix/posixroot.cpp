@@ -25,20 +25,20 @@ namespace {
 /** DirectoryEntry implementation for POSIX root. */
 class arch::posix::PosixRoot::Entry : public afl::io::DirectoryEntry {
  public:
-    Entry(afl::base::Ptr<PosixRoot> parent, RootEntry which);
+    Entry(afl::base::Ref<PosixRoot> parent, RootEntry which);
     ~Entry();
     virtual String_t getTitle();
     virtual String_t getPathName();
-    virtual afl::base::Ptr<afl::io::Stream> openFile(afl::io::FileSystem::OpenMode mode);
-    virtual afl::base::Ptr<afl::io::Directory> openDirectory();
-    virtual afl::base::Ptr<afl::io::Directory> openContainingDirectory();
+    virtual afl::base::Ref<afl::io::Stream> openFile(afl::io::FileSystem::OpenMode mode);
+    virtual afl::base::Ref<afl::io::Directory> openDirectory();
+    virtual afl::base::Ref<afl::io::Directory> openContainingDirectory();
     virtual void updateInfo(uint32_t requested);
     virtual void doRename(String_t newName);
     virtual void doErase();
     virtual void doCreateAsDirectory();
 
  private:
-    afl::base::Ptr<PosixRoot> m_parent;
+    afl::base::Ref<PosixRoot> m_parent;
     RootEntry m_which;
     void fail();
 };
@@ -46,19 +46,19 @@ class arch::posix::PosixRoot::Entry : public afl::io::DirectoryEntry {
 /** DirectoryEntry enumerator implementation for POSIX root. */
 class arch::posix::PosixRoot::Enum : public afl::base::Enumerator<afl::base::Ptr<afl::io::DirectoryEntry> > {
  public:
-    Enum(afl::base::Ptr<PosixRoot> dir);
+    Enum(afl::base::Ref<PosixRoot> dir);
     virtual ~Enum();
     virtual bool getNextElement(afl::base::Ptr<afl::io::DirectoryEntry>& result);
 
  private:
     RootEntry m_pos;
-    afl::base::Ptr<PosixRoot> m_dir;
+    afl::base::Ref<PosixRoot> m_dir;
 };
 
 
 /**************************** PosixRoot::Entry ***************************/
 
-arch::posix::PosixRoot::Entry::Entry(afl::base::Ptr<PosixRoot> parent, RootEntry which)
+arch::posix::PosixRoot::Entry::Entry(afl::base::Ref<PosixRoot> parent, RootEntry which)
     : m_parent(parent),
       m_which(which)
 { }
@@ -87,20 +87,21 @@ arch::posix::PosixRoot::Entry::getPathName()
     return getLinkText();
 }
 
-afl::base::Ptr<afl::io::Stream>
+afl::base::Ref<afl::io::Stream>
 arch::posix::PosixRoot::Entry::openFile(afl::io::FileSystem::OpenMode /*mode*/)
 {
-    fail();
-    return 0;
+    while (1) {
+        fail();
+    }
 }
 
-afl::base::Ptr<afl::io::Directory>
+afl::base::Ref<afl::io::Directory>
 arch::posix::PosixRoot::Entry::openDirectory()
 {
-    return new PosixDirectory(getLinkText());
+    return *new PosixDirectory(getLinkText());
 }
 
-afl::base::Ptr<afl::io::Directory>
+afl::base::Ref<afl::io::Directory>
 arch::posix::PosixRoot::Entry::openContainingDirectory()
 {
     return m_parent;
@@ -161,7 +162,7 @@ arch::posix::PosixRoot::Entry::fail()
 
 /**************************** PosixRoot::Enum ****************************/
 
-arch::posix::PosixRoot::Enum::Enum(afl::base::Ptr<arch::posix::PosixRoot> dir)
+arch::posix::PosixRoot::Enum::Enum(afl::base::Ref<arch::posix::PosixRoot> dir)
     : m_pos(FileSystemRoot),
       m_dir(dir)
 { }
@@ -190,16 +191,16 @@ arch::posix::PosixRoot::PosixRoot()
 arch::posix::PosixRoot::~PosixRoot()
 { }
 
-afl::base::Ptr<afl::io::DirectoryEntry>
+afl::base::Ref<afl::io::DirectoryEntry>
 arch::posix::PosixRoot::getDirectoryEntryByName(String_t name)
 {
     throw afl::except::FileProblemException(name, afl::string::Messages::cannotAccessFiles());
 }
 
-afl::base::Ptr<afl::base::Enumerator<afl::base::Ptr<afl::io::DirectoryEntry> > >
+afl::base::Ref<afl::base::Enumerator<afl::base::Ptr<afl::io::DirectoryEntry> > >
 arch::posix::PosixRoot::getDirectoryEntries()
 {
-    return new Enum(this);
+    return *new Enum(*this);
 }
 
 afl::base::Ptr<afl::io::Directory>

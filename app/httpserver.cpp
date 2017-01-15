@@ -60,7 +60,7 @@ namespace {
     class MyResponse : public afl::net::http::Response {
      public:
         // Constructor.
-        MyResponse(afl::base::Ptr<afl::io::Stream> stream,
+        MyResponse(afl::base::Ref<afl::io::Stream> stream,
                    String_t mimeType,
                    std::auto_ptr<afl::net::http::Request> request)
             : m_wantHeader(request->isResponseHeaderRequested()),
@@ -123,7 +123,7 @@ namespace {
         bool m_wantBody;
         uint8_t m_bodyBuffer[4096];
 
-        afl::base::Ptr<afl::io::Stream> m_stream;
+        afl::base::Ref<afl::io::Stream> m_stream;
         afl::io::Stream::FileSize_t m_bodySize;
     };
 
@@ -192,8 +192,7 @@ namespace {
 int main(int /*argc*/, char** argv)
 {
     // Fetch command line
-    afl::base::Ptr<afl::sys::Environment::CommandLine_t> cmdl =
-        afl::sys::Environment::getInstance(argv).getCommandLine();
+    afl::base::Ref<afl::sys::Environment::CommandLine_t> cmdl = afl::sys::Environment::getInstance(argv).getCommandLine();
 
     // First element is network address
     String_t str;

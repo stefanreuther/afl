@@ -33,6 +33,7 @@ namespace afl { namespace async {
         /** Constructor.
             \param ctl Controller to associate with this instance
             \param obj Asynchronous communication object to use */
+        // FIXME: Ref
         CommunicationStream(Controller& ctl, afl::base::Ptr<CommunicationObject> obj);
 
         /** Destructor. */
@@ -51,7 +52,7 @@ namespace afl { namespace async {
         virtual FileSize_t getSize();
         virtual uint32_t getCapabilities();
         virtual String_t getName();
-        virtual afl::base::Ptr<afl::io::Stream> createChild();
+        virtual afl::base::Ref<afl::io::Stream> createChild();
         virtual afl::base::Ptr<afl::io::FileMapping> createFileMapping(FileSize_t limit);
 
      private:

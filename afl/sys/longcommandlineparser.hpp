@@ -23,7 +23,7 @@ namespace afl { namespace sys {
      public:
         /** Constructor.
             \param commandLine Command line to parse */
-        LongCommandLineParser(afl::base::Ptr<Environment::CommandLine_t> commandLine);
+        LongCommandLineParser(afl::base::Ref<Environment::CommandLine_t> commandLine);
 
         ~LongCommandLineParser();
 
@@ -33,7 +33,7 @@ namespace afl { namespace sys {
         virtual Flags_t getFlags();
 
      private:
-        afl::base::Ptr<Environment::CommandLine_t> m_commandLine;
+        afl::base::Ref<Environment::CommandLine_t> m_commandLine;
 
         enum State {
             Idle,               // Must fetch a new element

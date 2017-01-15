@@ -21,12 +21,12 @@
 /** DirectoryEntry implementation for Win32. */
 class arch::win32::Win32Directory::Entry : public afl::io::DirectoryEntry {
  public:
-    Entry(afl::base::Ptr<Win32Directory> parent, String_t name);
+    Entry(afl::base::Ref<Win32Directory> parent, String_t name);
     virtual String_t getTitle();
     virtual String_t getPathName();
-    virtual afl::base::Ptr<afl::io::Stream> openFile(afl::io::FileSystem::OpenMode mode);
-    virtual afl::base::Ptr<afl::io::Directory> openDirectory();
-    virtual afl::base::Ptr<afl::io::Directory> openContainingDirectory();
+    virtual afl::base::Ref<afl::io::Stream> openFile(afl::io::FileSystem::OpenMode mode);
+    virtual afl::base::Ref<afl::io::Directory> openDirectory();
+    virtual afl::base::Ref<afl::io::Directory> openContainingDirectory();
     virtual void updateInfo(uint32_t requested);
     virtual void doRename(String_t newName);
     virtual void doErase();
@@ -35,19 +35,19 @@ class arch::win32::Win32Directory::Entry : public afl::io::DirectoryEntry {
     void setFlagsAndFileType(DWORD attr);
 
  private:
-    afl::base::Ptr<Win32Directory> m_parent;
+    afl::base::Ref<Win32Directory> m_parent;
     String_t m_name;
 };
 
 /** DirectoryEntry enumerator implementation for Win32, Unicode version. */
 class arch::win32::Win32Directory::EnumW : public afl::base::Enumerator<afl::base::Ptr<afl::io::DirectoryEntry> > {
  public:
-    EnumW(afl::base::Ptr<Win32Directory> dir);
+    EnumW(afl::base::Ref<Win32Directory> dir);
     virtual ~EnumW();
     virtual bool getNextElement(afl::base::Ptr<afl::io::DirectoryEntry>& result);
 
  private:
-    afl::base::Ptr<Win32Directory> m_dir;
+    afl::base::Ref<Win32Directory> m_dir;
     WIN32_FIND_DATAW m_data;
     HANDLE m_handle;
     afl::base::Ptr<afl::io::DirectoryEntry> m_currentEntry;
@@ -58,12 +58,12 @@ class arch::win32::Win32Directory::EnumW : public afl::base::Enumerator<afl::bas
 /** DirectoryEntry enumerator implementation for Win32, ANSI version. */
 class arch::win32::Win32Directory::EnumA : public afl::base::Enumerator<afl::base::Ptr<afl::io::DirectoryEntry> > {
  public:
-    EnumA(afl::base::Ptr<Win32Directory> dir);
+    EnumA(afl::base::Ref<Win32Directory> dir);
     virtual ~EnumA();
     virtual bool getNextElement(afl::base::Ptr<afl::io::DirectoryEntry>& result);
 
  private:
-    afl::base::Ptr<Win32Directory> m_dir;
+    afl::base::Ref<Win32Directory> m_dir;
     WIN32_FIND_DATAA m_data;
     HANDLE m_handle;
     afl::base::Ptr<afl::io::DirectoryEntry> m_currentEntry;
@@ -75,7 +75,7 @@ class arch::win32::Win32Directory::EnumA : public afl::base::Enumerator<afl::bas
 /************************* Win32Directory::Entry *************************/
 
 inline
-arch::win32::Win32Directory::Entry::Entry(afl::base::Ptr<Win32Directory> parent, String_t name)
+arch::win32::Win32Directory::Entry::Entry(afl::base::Ref<Win32Directory> parent, String_t name)
     : m_parent(parent),
       m_name(name)
 { }
@@ -92,19 +92,19 @@ arch::win32::Win32Directory::Entry::getPathName()
     return Win32FileSystem().makePathName(m_parent->getDirectoryName(), m_name);
 }
 
-afl::base::Ptr<afl::io::Stream>
+afl::base::Ref<afl::io::Stream>
 arch::win32::Win32Directory::Entry::openFile(afl::io::FileSystem::OpenMode mode)
 {
     return Win32FileSystem().openFile(getPathName(), mode);
 }
 
-afl::base::Ptr<afl::io::Directory>
+afl::base::Ref<afl::io::Directory>
 arch::win32::Win32Directory::Entry::openDirectory()
 {
     return Win32FileSystem().openDirectory(getPathName());
 }
 
-afl::base::Ptr<afl::io::Directory>
+afl::base::Ref<afl::io::Directory>
 arch::win32::Win32Directory::Entry::openContainingDirectory()
 {
     return m_parent;
@@ -241,7 +241,7 @@ arch::win32::Win32Directory::Entry::setFlagsAndFileType(DWORD attr)
 
 
 inline
-arch::win32::Win32Directory::EnumW::EnumW(afl::base::Ptr<Win32Directory> dir)
+arch::win32::Win32Directory::EnumW::EnumW(afl::base::Ref<Win32Directory> dir)
     : m_dir(dir),
       m_data(),
       m_handle(INVALID_HANDLE_VALUE),
@@ -308,7 +308,7 @@ arch::win32::Win32Directory::EnumW::next(bool advance)
 
 
 inline
-arch::win32::Win32Directory::EnumA::EnumA(afl::base::Ptr<Win32Directory> dir)
+arch::win32::Win32Directory::EnumA::EnumA(afl::base::Ref<Win32Directory> dir)
     : m_dir(dir),
       m_data(),
       m_handle(INVALID_HANDLE_VALUE),
@@ -379,19 +379,19 @@ arch::win32::Win32Directory::Win32Directory(String_t dirName)
 arch::win32::Win32Directory::~Win32Directory()
 { }
 
-afl::base::Ptr<afl::io::DirectoryEntry>
+afl::base::Ref<afl::io::DirectoryEntry>
 arch::win32::Win32Directory::getDirectoryEntryByName(String_t name)
 {
-    return new Entry(this, name);
+    return *new Entry(*this, name);
 }
 
-afl::base::Ptr<afl::base::Enumerator<afl::base::Ptr<afl::io::DirectoryEntry> > >
+afl::base::Ref<afl::base::Enumerator<afl::base::Ptr<afl::io::DirectoryEntry> > >
 arch::win32::Win32Directory::getDirectoryEntries()
 {
     if (hasUnicodeSupport()) {
-        return new EnumW(this);
+        return *new EnumW(*this);
     } else {
-        return new EnumA(this);
+        return *new EnumA(*this);
     }
 }
 

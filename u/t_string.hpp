@@ -26,6 +26,9 @@ class TestStringFormat : public CxxTest::TestSuite {
     void testUInt();
     void testFP();
     void testIntStr();
+    void testReorder();
+    void testStream();
+    void testSpecials();
 };
 
 class TestStringFormatState : public CxxTest::TestSuite {

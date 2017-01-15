@@ -7,6 +7,18 @@
 
 #include <cxxtest/TestSuite.h>
 
+class TestNetRedisIntegerKey : public CxxTest::TestSuite {
+ public:
+    void testMock();
+    void testInternal();
+};
+
+class TestNetRedisIntegerSetKey : public CxxTest::TestSuite {
+ public:
+    void testMock();
+    void testInternal();
+};
+
 class TestNetRedisInternalDatabase : public CxxTest::TestSuite {
  public:
     void testKey();
@@ -19,6 +31,38 @@ class TestNetRedisInternalDatabase : public CxxTest::TestSuite {
     void testSortList();
     void testSortSet();
     void testSortExt();
+};
+
+class TestNetRedisKey : public CxxTest::TestSuite {
+ public:
+    void testMock();
+    void testInternal();
+    void testTypes();
+};
+
+class TestNetRedisSortOperation : public CxxTest::TestSuite {
+ public:
+    void testMock();
+    void testResults();
+};
+
+class TestNetRedisStringKey : public CxxTest::TestSuite {
+ public:
+    void testMock();
+    void testInternal();
+    void testSize();
+};
+
+class TestNetRedisStringSetKey : public CxxTest::TestSuite {
+ public:
+    void testMock();
+    void testInternal();
+};
+
+class TestNetRedisSubtree : public CxxTest::TestSuite {
+ public:
+    void testLocal();
+    void testKeys();
 };
 
 #endif

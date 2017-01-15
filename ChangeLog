@@ -1,3 +1,76 @@
+2017-01-14  Stefan Reuther  <streu@gmx.de>
+
+	* afl/bits/value.hpp (get): new
+
+2017-01-09  Stefan Reuther  <streu@gmx.de>
+
+	* afl/sys/environment.hpp (getInvocationName): new
+
+2017-01-02  Stefan Reuther  <streu@gmx.de>
+
+	* afl/net/socket.hpp, afl/net/securecontext.hpp, afl/net/networkstack.hpp: use Ref<> (INCOMPATIBLE!)
+	* afl/net/server.cpp, afl/net/server.hpp: new
+
+2016-12-24  Stefan Reuther  <streu@gmx.de>
+
+	* afl/data/visitor.hpp (visit): make const
+
+2016-12-20  Stefan Reuther  <streu@gmx.de>
+
+	* afl/sys/loglistener.cpp (formatException): new
+	* afl/sys/commandlineparser.cpp (getRequiredParameter): new
+	* afl/except/commandlineexception.hpp: new
+
+2016-12-19  Stefan Reuther  <streu@gmx.de>
+
+	* afl/container/ptrqueue.hpp (pushFrontNew): new
+	* afl/base/observable.hpp: new [cpluslib/signal.h]
+
+2016-12-10  Stefan Reuther  <streu@gmx.de>
+
+	* afl/sys/dialog.hpp: new
+
+2016-12-03  Stefan Reuther  <streu@gmx.de>
+
+	* afl/io/filesystem.hpp (openFileNT): new
+
+2016-11-22  Stefan Reuther  <streu@gmx.de>
+
+	* afl/data/segment.hpp (pushBack): rename to pushBackInteger, pushBackString to remove overload ambiguity (INCOMPATIBLE!)
+
+2016-11-20  Stefan Reuther  <streu@gmx.de>
+
+	* afl/base/baseweaklink.cpp, afl/base/baseweaklink.hpp: new
+	* afl/base/weaklink.hpp: new
+	* afl/base/weaktarget.cpp, afl/base/weaktarget.hpp: new
+
+2016-11-10  Stefan Reuther  <streu@gmx.de>
+
+	* afl/io/transformreaderstream.cpp, afl/io/transformreaderstream.hpp: new
+
+2016-10-23  Stefan Reuther  <streu@gmx.de>
+
+	* afl/io/deflatetransform.cpp, afl/io/deflatetransform.hpp: new
+	* afl/io/archive/zipreader.cpp, afl/io/archive/zipreader.hpp: new [pcc-v2/io/zip.h]
+	* afl/container/ptrvector.hpp (resize): new method
+
+2016-10-21  Stefan Reuther  <streu@gmx.de>
+
+	* afl/io/limitedstream.cpp, afl/io/limitedstream.hpp: new [pcc-v2/io/streams.h]
+
+2016-10-08  Stefan Reuther  <streu@gmx.de>
+
+	* afl/io/filesystem.hpp: use Ref<> (INCOMPATIBLE!)
+	* afl/io/directoryentry.hpp: use Ref<> (INCOMPATIBLE!)
+	* afl/io/directory.hpp: use Ref<> (INCOMPATIBLE!)
+	* afl/io/stream.hpp: use Ref<> (INCOMPATIBLE!)
+	* afl/sys/environment.hpp: use Ref<> (INCOMPATIBLE!)
+	* afl/base/ref.hpp: new
+
+2016-10-03  Stefan Reuther  <streu@gmx.de>
+
+	* afl/io/msexpandtransform.cpp, afl/io/msexpandtransform.hpp: new
+
 2016-09-24  Stefan Reuther  <streu@gmx.de>
 
 	* afl/net/http/client.cpp: fix shutdown behaviour if client is closed while working on requests

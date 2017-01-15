@@ -166,8 +166,8 @@ TestIoRespParser::testVector()
     {
         std::auto_ptr<afl::data::Value> result(parseString("*0\r\n"));
         TS_ASSERT(dynamic_cast<afl::data::VectorValue*>(result.get()) != 0);
-        afl::base::Ptr<afl::data::Vector> vec(dynamic_cast<afl::data::VectorValue*>(result.get())->getValue());
-        TS_ASSERT(vec.get() != 0);
+        afl::base::Ref<afl::data::Vector> vec(dynamic_cast<afl::data::VectorValue*>(result.get())->getValue());
+        TS_ASSERT(&vec.get() != 0);
         TS_ASSERT_EQUALS(vec->size(), 0U);
     }
 
@@ -175,8 +175,8 @@ TestIoRespParser::testVector()
     {
         std::auto_ptr<afl::data::Value> result(parseString("*3\r\n:1\r\n:2\r\n:3\r\n"));
         TS_ASSERT(dynamic_cast<afl::data::VectorValue*>(result.get()) != 0);
-        afl::base::Ptr<afl::data::Vector> vec(dynamic_cast<afl::data::VectorValue*>(result.get())->getValue());
-        TS_ASSERT(vec.get() != 0);
+        afl::base::Ref<afl::data::Vector> vec(dynamic_cast<afl::data::VectorValue*>(result.get())->getValue());
+        TS_ASSERT(&vec.get() != 0);
         TS_ASSERT_EQUALS(vec->size(), 3U);
         TS_ASSERT(dynamic_cast<afl::data::IntegerValue*>(vec->get(0)) != 0);
         TS_ASSERT_EQUALS(dynamic_cast<afl::data::IntegerValue*>(vec->get(0))->getValue(), 1);
@@ -195,8 +195,8 @@ TestIoRespParser::testVector()
                                                            "$-1\r\n"
                                                            "+OK\r\n"));
         TS_ASSERT(dynamic_cast<afl::data::VectorValue*>(result.get()) != 0);
-        afl::base::Ptr<afl::data::Vector> vec(dynamic_cast<afl::data::VectorValue*>(result.get())->getValue());
-        TS_ASSERT(vec.get() != 0);
+        afl::base::Ref<afl::data::Vector> vec(dynamic_cast<afl::data::VectorValue*>(result.get())->getValue());
+        TS_ASSERT(&vec.get() != 0);
         TS_ASSERT_EQUALS(vec->size(), 4U);
         TS_ASSERT(dynamic_cast<afl::data::IntegerValue*>(vec->get(0)) != 0);
         TS_ASSERT_EQUALS(dynamic_cast<afl::data::IntegerValue*>(vec->get(0))->getValue(), 1);
@@ -273,8 +273,8 @@ TestIoRespParser::testShortForm()
 
         std::auto_ptr<afl::data::Value> result(p.extract());
         TS_ASSERT(dynamic_cast<afl::data::VectorValue*>(result.get()) != 0);
-        afl::base::Ptr<afl::data::Vector> vec(dynamic_cast<afl::data::VectorValue*>(result.get())->getValue());
-        TS_ASSERT(vec.get() != 0);
+        afl::base::Ref<afl::data::Vector> vec(dynamic_cast<afl::data::VectorValue*>(result.get())->getValue());
+        TS_ASSERT(&vec.get() != 0);
         TS_ASSERT_EQUALS(vec->size(), 2U);
         TS_ASSERT(dynamic_cast<afl::data::StringValue*>(vec->get(0)) != 0);
         TS_ASSERT_EQUALS(dynamic_cast<afl::data::StringValue*>(vec->get(0))->getValue(), "foo");

@@ -12,13 +12,17 @@ namespace arch { namespace win32 {
      public:
         Win32Environment(const char*const* argv);
 
-        virtual afl::base::Ptr<afl::sys::Environment::CommandLine_t> getCommandLine();
+        virtual afl::base::Ref<afl::sys::Environment::CommandLine_t> getCommandLine();
+        virtual String_t getInvocationName();
         virtual String_t getEnvironmentVariable(const String_t& name);
         virtual String_t getSettingsDirectoryName(const String_t& appName);
         virtual String_t getInstallationDirectoryName();
-        virtual afl::base::Ptr<afl::io::TextWriter> attachTextWriter(Channel ch);
-        virtual afl::base::Ptr<afl::io::TextReader> attachTextReader(Channel ch);
-        virtual afl::base::Ptr<afl::io::Stream> attachStream(Channel ch);
+        virtual afl::base::Ref<afl::io::TextWriter> attachTextWriter(Channel ch);
+        virtual afl::base::Ref<afl::io::TextReader> attachTextReader(Channel ch);
+        virtual afl::base::Ref<afl::io::Stream> attachStream(Channel ch);
+
+     private:
+        String_t m_programName;
     };
 
 } }

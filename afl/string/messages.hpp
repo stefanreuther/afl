@@ -75,6 +75,11 @@ namespace afl { namespace string {
             \return message */
         static String_t cannotAccessDirectories();
 
+        /** Cannot modify archive file.
+            Use whenever someone tries to modify an archive file using a component that cannot modify archives.
+            \return message */
+        static String_t cannotModifyArchiveFile();
+
         /** Cannot write. Use for all sorts of failing writes.
             \return message */
         static String_t cannotWrite();
@@ -107,6 +112,14 @@ namespace afl { namespace string {
             \return message */
         static String_t unsupportedFeature();
 
+        /** Unsupported compression mode.
+            \return message */
+        static String_t unsupportedCompressionMode();
+
+        /** Unexpected error.
+            \return message */
+        static String_t unexpectedError();
+
         /** Assertion failed.
             \return format string with one placeholder for the assertion. */
         static String_t assertionFailed();
@@ -114,6 +127,10 @@ namespace afl { namespace string {
         /** Assertion failed at location.
             \return format string with two placeholders; one for the assertion, one for the location. */
         static String_t assertionFailedAt();
+
+        /** Missing command line option.
+            \return format string with one placeholder for the option name. */
+        static String_t missingCommandLineParameter();
 
 
         /*
@@ -220,6 +237,12 @@ afl::string::Messages::cannotAccessDirectories()
 }
 
 inline String_t
+afl::string::Messages::cannotModifyArchiveFile()
+{
+    return AFL_TRANSLATE_STRING("Cannot modify archive file");
+}
+
+inline String_t
 afl::string::Messages::cannotWrite()
 {
     return AFL_TRANSLATE_STRING("Cannot write");
@@ -268,6 +291,18 @@ afl::string::Messages::unsupportedFeature()
 }
 
 inline String_t
+afl::string::Messages::unsupportedCompressionMode()
+{
+    return AFL_TRANSLATE_STRING("Unsupported compression mode");
+}
+
+inline String_t
+afl::string::Messages::unexpectedError()
+{
+    return AFL_TRANSLATE_STRING("Unexpected error");
+}
+
+inline String_t
 afl::string::Messages::assertionFailed()
 {
     return AFL_TRANSLATE_STRING("Assertion failed: %s");
@@ -277,6 +312,12 @@ inline String_t
 afl::string::Messages::assertionFailedAt()
 {
     return AFL_TRANSLATE_STRING("Assertion failed: %s, at %s");
+}
+
+inline String_t
+afl::string::Messages::missingCommandLineParameter()
+{
+    return AFL_TRANSLATE_STRING("Option \"%s\" is missing its parameter");
 }
 
 inline String_t

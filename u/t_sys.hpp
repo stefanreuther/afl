@@ -17,6 +17,12 @@ class TestSysAtomicInteger : public CxxTest::TestSuite {
 class TestSysCommandLineParser : public CxxTest::TestSuite {
  public:
     void testIt();
+    void testRequired();
+};
+
+class TestSysDialog : public CxxTest::TestSuite {
+ public:
+    void testIt();
 };
 
 class TestSysDuration : public CxxTest::TestSuite {
@@ -32,6 +38,7 @@ class TestSysEnvironment : public CxxTest::TestSuite {
     void testArgs();
     void testEnv();
     void testSettings();
+    void testInterface();
 };
 
 class TestSysError : public CxxTest::TestSuite {
@@ -96,6 +103,7 @@ class TestSysTime : public CxxTest::TestSuite {
     void testComparison();
     void testArithmetic();
     void testCurrent();
+    void testToString();
 };
 
 class TestSysTypes : public CxxTest::TestSuite {

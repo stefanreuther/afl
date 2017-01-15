@@ -105,8 +105,14 @@ namespace afl { namespace container {
 
         /** Reserve space.
             Make sure we can store at least \c size objects in this vector without re-allocation.
+            \param capacity desired capacity */
+        void reserve(size_type capacity);
+
+        /** Resize.
+            If the vector currently is larger, drops elements from the back.
+            If the vector currently is shorter, appends nulls.
             \param size desired size */
-        void reserve(size_type size);
+        void resize(size_type size);
 
         /** Erase single element.
             \param i Iterator pointing to element. The element will be deleted. */
@@ -148,8 +154,9 @@ namespace afl { namespace container {
             Takes ownership of the element.
             The replaced element will be deleted.
             \param a index [0,size())
-            \param value value to store there */
-        void replaceElementNew(size_type a, T* value);
+            \param value value to store there
+            \return value */
+        T* replaceElementNew(size_type a, T* value);
 
         /** Destructively extract element from this vector.
             The element will be replaced by 0, the old value will be returned.
@@ -421,9 +428,23 @@ afl::container::PtrVector<T>::end() const
 // Reserve space.
 template<typename T>
 inline void
-afl::container::PtrVector<T>::reserve(size_type size)
+afl::container::PtrVector<T>::reserve(size_type capacity)
 {
-    m_data.reserve(size);
+    m_data.reserve(capacity);
+}
+
+// Resize.
+template<typename T>
+void
+afl::container::PtrVector<T>::resize(size_type size)
+{
+    // Delete excess
+    while (m_data.size() > size) {
+        popBack();
+    }
+
+    // Resize and append nulls
+    m_data.resize(size, (void*) 0);
 }
 
 // Erase single element.
@@ -495,12 +516,13 @@ afl::container::PtrVector<T>::swapElements(size_type a, PtrVector& other, size_t
 
 // Replace an element.
 template<typename T>
-void
+T*
 afl::container::PtrVector<T>::replaceElementNew(size_type a, T* value)
 {
     typename afl::tmp::CopyCV<T, void>::Type* tv = value;
     delete static_cast<T*>(m_data[a]);
     m_data[a] = const_cast<void*>(tv);
+    return value;
 }
 
 // Destructively extract element from this vector.

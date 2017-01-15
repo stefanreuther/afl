@@ -18,8 +18,7 @@
 # endif
 
 
-config::openssl::OpenSSLSocket::OpenSSLSocket(afl::base::Ptr<OpenSSLContext> ctx,
-                                              afl::base::Ptr<Socket> peer)
+config::openssl::OpenSSLSocket::OpenSSLSocket(afl::base::Ref<OpenSSLContext> ctx, afl::base::Ref<Socket> peer)
     : m_peer(peer),
       m_mutex(),
       m_ssl(0),

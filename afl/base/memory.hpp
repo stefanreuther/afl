@@ -12,6 +12,7 @@
 #include "afl/base/types.hpp"
 #include "afl/tmp/stripcv.hpp"
 #include "afl/tmp/copycv.hpp"
+#include "afl/base/nothingtype.hpp"
 
 namespace afl { namespace base {
 
@@ -30,6 +31,11 @@ namespace afl { namespace base {
         /** Construct empty.
             This is the equivalent of a null pointer. */
         Memory();
+
+        /** Construct empty.
+            Makes an empty object.
+            This constructor allows you to write "return Nothing" to return an empty descriptor. */
+        Memory(NothingType);
 
         /** Construct from array.
             The descriptor refers to the array.
@@ -389,6 +395,13 @@ inline
 afl::base::Memory<T>::Memory()
     : m_ptr(0),
       m_size(0)
+{ }
+
+template<typename T>
+inline
+afl::base::Memory<T>::Memory(NothingType)
+    : m_ptr(),
+      m_size()
 { }
 
 template<typename T>

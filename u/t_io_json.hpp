@@ -10,12 +10,17 @@
 class TestIoJsonParser : public CxxTest::TestSuite {
  public:
     void testKeywords();
+    void testErrors();
 
     void testString();
     void testInteger();
     void testFloat();
     void testHash();
     void testVector();
+
+    void testTestsuiteGood();
+    void testTestsuiteBad();
+    void testTestsuiteUgly();
 };
 
 class TestIoJsonWriter : public CxxTest::TestSuite {

@@ -3,6 +3,7 @@
   *  \brief Test for afl::checksums::CRC16
   */
 
+#include <memory>
 #include "afl/checksums/crc16.hpp"
 
 #include "u/t_checksums.hpp"
@@ -23,6 +24,9 @@ TestChecksumsCRC16::testIt()
     uint8_t hi[2] = { 'h', 'i' };
     TS_ASSERT_EQUALS(t.add(Memory_t(hi), 0), 0x5552);
 
+    // This is also the default instance
+    TS_ASSERT_EQUALS(afl::checksums::CRC16::getDefaultInstance().add(hi, 0), 0x5552);
+
     // 256 bytes
     uint8_t bytes[256];
     for (size_t i = 0; i < sizeof(bytes); ++i) {
@@ -39,4 +43,25 @@ TestChecksumsCRC16::testIt()
 
         TS_ASSERT_EQUALS(t.add(wholeBlock, 0), t.add(secondHalf, t.add(firstHalf, 0)));
     }
+
+    // Test inquiry
+    TS_ASSERT_EQUALS(t.bits(), 16U);
+}
+
+/** Test using the interface. */
+void
+TestChecksumsCRC16::testInterface()
+{
+    typedef afl::checksums::Checksum::Memory_t Memory_t;
+    std::auto_ptr<afl::checksums::Checksum> t(new afl::checksums::CRC16(0x8408));
+
+    // Check empty
+    TS_ASSERT_EQUALS(t->add(Memory_t(), 9999), 9999U);
+
+    // "hi"
+    uint8_t hi[2] = { 'h', 'i' };
+    TS_ASSERT_EQUALS(t->add(hi, 0), 0x5552U);
+
+    // Inquiry
+    TS_ASSERT_EQUALS(t->bits(), 16U);
 }

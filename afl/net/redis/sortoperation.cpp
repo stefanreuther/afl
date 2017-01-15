@@ -15,7 +15,7 @@ afl::net::redis::SortOperation::SortOperation(const Key& key)
     : m_ch(key.getHandler()),
       m_request(new afl::data::Segment())
 {
-    m_request->pushBack("SORT").pushBack(key.getName());
+    m_request->pushBackString("SORT").pushBackString(key.getName());
 }
 
 // Destructor.
@@ -26,7 +26,7 @@ afl::net::redis::SortOperation::~SortOperation()
 afl::net::redis::SortOperation&
 afl::net::redis::SortOperation::by(String_t pattern)
 {
-    m_request->pushBack("BY").pushBack(pattern);
+    m_request->pushBackString("BY").pushBackString(pattern);
     return *this;
 }
 
@@ -48,7 +48,7 @@ afl::net::redis::SortOperation::by(const Field& field)
 afl::net::redis::SortOperation&
 afl::net::redis::SortOperation::get()
 {
-    m_request->pushBack("GET").pushBack("#");
+    m_request->pushBackString("GET").pushBackString("#");
     return *this;
 }
 
@@ -56,7 +56,7 @@ afl::net::redis::SortOperation::get()
 afl::net::redis::SortOperation&
 afl::net::redis::SortOperation::get(String_t pattern)
 {
-    m_request->pushBack("GET").pushBack(pattern);
+    m_request->pushBackString("GET").pushBackString(pattern);
     return *this;
 }
 
@@ -78,7 +78,7 @@ afl::net::redis::SortOperation::get(const Field& field)
 afl::net::redis::SortOperation&
 afl::net::redis::SortOperation::limit(int32_t start, int32_t count)
 {
-    m_request->pushBack("LIMIT").pushBack(start).pushBack(count);
+    m_request->pushBackString("LIMIT").pushBackInteger(start).pushBackInteger(count);
     return *this;
 }
 
@@ -86,7 +86,7 @@ afl::net::redis::SortOperation::limit(int32_t start, int32_t count)
 afl::net::redis::SortOperation&
 afl::net::redis::SortOperation::sortLexicographical()
 {
-    m_request->pushBack("ALPHA");
+    m_request->pushBackString("ALPHA");
     return *this;
 }
 
@@ -94,7 +94,7 @@ afl::net::redis::SortOperation::sortLexicographical()
 afl::net::redis::SortOperation&
 afl::net::redis::SortOperation::sortReversed()
 {
-    m_request->pushBack("DESC");
+    m_request->pushBackString("DESC");
     return *this;
 }
 
@@ -132,6 +132,6 @@ afl::net::redis::SortOperation::getResult()
 void
 afl::net::redis::SortOperation::storeResult(ListKey out)
 {
-    m_request->pushBack("STORE").pushBack(out.getName());
+    m_request->pushBackString("STORE").pushBackString(out.getName());
     m_ch.callVoid(*m_request);
 }

@@ -23,7 +23,7 @@ afl::net::redis::HashKey::HashKey(CommandHandler& ch, String_t name)
 int32_t
 afl::net::redis::HashKey::size() const
 {
-    return getHandler().callInt(Segment().pushBack("HLEN").pushBack(getName()));
+    return getHandler().callInt(Segment().pushBackString("HLEN").pushBackString(getName()));
 }
 
 // FIXME: port this?
@@ -60,7 +60,7 @@ afl::net::redis::HashKey::size() const
 void
 afl::net::redis::HashKey::getFieldNames(afl::data::StringList_t& fieldNames) const
 {
-    std::auto_ptr<afl::data::Value> val(getHandler().call(Segment().pushBack("HKEYS").pushBack(getName())));
+    std::auto_ptr<afl::data::Value> val(getHandler().call(Segment().pushBackString("HKEYS").pushBackString(getName())));
     afl::data::Access(val).toStringList(fieldNames);
 }
 

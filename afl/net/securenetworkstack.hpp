@@ -20,17 +20,17 @@ namespace afl { namespace net {
             \param peer Underlying network stack
             \param ctx SecureContext to use. If not specified, uses an unconfigured default instance
                        which is good for usage as a client. */
-        explicit SecureNetworkStack(NetworkStack& peer, afl::base::Ptr<SecureContext> ctx = SecureContext::create());
+        explicit SecureNetworkStack(NetworkStack& peer, afl::base::Ref<SecureContext> ctx = SecureContext::create());
 
         virtual ~SecureNetworkStack();
 
         // NetworkStack methods:
-        virtual afl::base::Ptr<afl::net::Listener> listen(const Name& name, int backlogSize);
-        virtual afl::base::Ptr<afl::net::Socket> connect(const Name& name, afl::sys::Timeout_t timeout = afl::sys::INFINITE_TIMEOUT);
+        virtual afl::base::Ref<afl::net::Listener> listen(const Name& name, int backlogSize);
+        virtual afl::base::Ref<afl::net::Socket> connect(const Name& name, afl::sys::Timeout_t timeout = afl::sys::INFINITE_TIMEOUT);
 
      private:
         NetworkStack& m_peer;
-        afl::base::Ptr<SecureContext> m_ctx;
+        afl::base::Ref<SecureContext> m_ctx;
 
         class Listener;
     };

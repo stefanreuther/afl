@@ -20,5 +20,5 @@ TestDataVectorValue::testIt()
     TS_ASSERT(vv2.get() != 0);
 
     // Must reference the same vector
-    TS_ASSERT(vv->getValue() == vv2->getValue());
+    TS_ASSERT(&vv->getValue().get() == &vv2->getValue().get());
 }

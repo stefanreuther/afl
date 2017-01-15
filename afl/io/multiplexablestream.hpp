@@ -23,13 +23,13 @@ namespace afl { namespace io {
 
         ~MultiplexableStream();
 
-        afl::base::Ptr<Stream> createChild();
+        afl::base::Ref<Stream> createChild();
 
      private:
         class ControlNode;
         class Child;
 
-        afl::base::Ptr<ControlNode> m_controlNode;
+        afl::base::Ref<ControlNode> m_controlNode;
     };
 
 } }

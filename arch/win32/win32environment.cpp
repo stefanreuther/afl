@@ -72,14 +72,15 @@ namespace {
     }
 }
 
-arch::win32::Win32Environment::Win32Environment(const char*const* /*argv*/)
+arch::win32::Win32Environment::Win32Environment(const char*const* argv)
+    : m_programName(convertFromANSI(afl::string::toMemory(argv[0])))
 { }
 
 /* Get command line */
-afl::base::Ptr<afl::sys::Environment::CommandLine_t>
+afl::base::Ref<afl::sys::Environment::CommandLine_t>
 arch::win32::Win32Environment::getCommandLine()
 {
-    afl::base::Ptr<CommandLine> cmdl = new CommandLine();
+    afl::base::Ref<CommandLine> cmdl = *new CommandLine();
 
     // Unicode command line is supported on all Windows versions.
     // Parse it into argv.
@@ -128,6 +129,12 @@ arch::win32::Win32Environment::getCommandLine()
         }
     }
     return cmdl;
+}
+
+String_t
+arch::win32::Win32Environment::getInvocationName()
+{
+    return Win32FileSystem().getFileName(m_programName);
 }
 
 /* Get environment variable */
@@ -393,7 +400,7 @@ namespace {
        It must also keep the stream alive (Ptr<>). */
     class ConsoleStream : public afl::io::TextReader, public afl::io::TextWriter {
      public:
-        ConsoleStream(afl::base::Ptr<afl::io::Stream> s)
+        ConsoleStream(afl::base::Ref<afl::io::Stream> s)
             : m_stream(s),
               m_buffer(*s)
             { }
@@ -453,13 +460,13 @@ namespace {
             { m_buffer.flush(); }
 
      private:
-        afl::base::Ptr<afl::io::Stream> m_stream;
+        afl::base::Ref<afl::io::Stream> m_stream;
         afl::io::BufferedStream m_buffer;
     };
 
 }
 
-afl::base::Ptr<afl::io::TextWriter>
+afl::base::Ref<afl::io::TextWriter>
 arch::win32::Win32Environment::attachTextWriter(Channel ch)
 {
     DWORD tmp;
@@ -471,17 +478,17 @@ arch::win32::Win32Environment::attachTextWriter(Channel ch)
     } else if (GetConsoleMode(h, &tmp)) {
         // Console
         if (hasUnicodeSupport()) {
-            return new ConsoleWriterW(h);
+            return *new ConsoleWriterW(h);
         } else {
-            return new ConsoleWriterA(h);
+            return *new ConsoleWriterA(h);
         }
     } else {
         // File
-        return new ConsoleStream(attachStream(ch));
+        return *new ConsoleStream(attachStream(ch));
     }
 }
 
-afl::base::Ptr<afl::io::TextReader>
+afl::base::Ref<afl::io::TextReader>
 arch::win32::Win32Environment::attachTextReader(Channel ch)
 {
     DWORD tmp;
@@ -493,17 +500,17 @@ arch::win32::Win32Environment::attachTextReader(Channel ch)
     } else if (GetConsoleMode(h, &tmp)) {
         // Console
         if (hasUnicodeSupport()) {
-            return new ConsoleReaderW(h);
+            return *new ConsoleReaderW(h);
         } else {
-            return new ConsoleReaderA(h);
+            return *new ConsoleReaderA(h);
         }
     } else {
         // File
-        return new ConsoleStream(attachStream(ch));
+        return *new ConsoleStream(attachStream(ch));
     }
 }
 
-afl::base::Ptr<afl::io::Stream>
+afl::base::Ref<afl::io::Stream>
 arch::win32::Win32Environment::attachStream(Channel ch)
 {
     HANDLE h = getChannelHandle(ch);
@@ -520,7 +527,7 @@ arch::win32::Win32Environment::attachStream(Channel ch)
         }
 
         // Return a stream
-        return new Win32Stream(name, newH);
+        return *new Win32Stream(name, newH);
     }
 }
 

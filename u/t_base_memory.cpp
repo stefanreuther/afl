@@ -47,6 +47,11 @@ namespace {
             TS_ASSERT(two.at(2) == 0);
         }
     };
+
+    bool checkEmpty(afl::base::Memory<int> p)
+    {
+        return p.empty();
+    }
 }
 
 /** Test successful instantiation for a number of types. */
@@ -274,4 +279,21 @@ TestBaseMemory::testFind()
         TS_ASSERT_EQUALS(a.findFirstOf(afl::base::Memory<std::string>()), 5U);
         TS_ASSERT_EQUALS(a.findFirstOf(a.subrange(3)), 3U);
     }
+}
+
+/** Test conversion from Nothing. */
+void
+TestBaseMemory::testNothing()
+{
+    // Conversion through constructor
+    int foo[2];
+    TS_ASSERT(checkEmpty(afl::base::Nothing));
+    TS_ASSERT(!checkEmpty(foo));
+
+    long bar[3];
+    afl::base::Memory<long> ml;
+    ml = afl::base::Nothing;
+    TS_ASSERT(ml.empty());
+    ml = bar;
+    TS_ASSERT(!ml.empty());
 }

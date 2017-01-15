@@ -20,5 +20,5 @@ TestDataHashValue::testIt()
     TS_ASSERT(hv2.get() != 0);
 
     // Must reference the same hash
-    TS_ASSERT(hv->getValue() == hv2->getValue());
+    TS_ASSERT(&hv->getValue().get() == &hv2->getValue().get());
 }

@@ -40,7 +40,7 @@ namespace afl { namespace net { namespace redis {
             Normally, you don't call the SortOperation constructor directly,
             but use ListKey::sort or SetKey::sort instead.
             \param key Origin key. Must be a ListKey or SetKey. */
-        SortOperation(const Key& key);
+        explicit SortOperation(const Key& key);
 
         /** Destructor. */
         ~SortOperation();

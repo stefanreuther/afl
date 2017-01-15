@@ -48,7 +48,7 @@ TestNetHttpClient::testStupidServer()
     // Set up network
     afl::net::NetworkStack& ns = afl::net::NetworkStack::getInstance();
     afl::net::Name name("127.0.0.1", uint16_t(std::rand() % 10000 + 20000));
-    afl::base::Ptr<afl::net::Listener> listener = ns.listen(name, 10);
+    afl::base::Ref<afl::net::Listener> listener = ns.listen(name, 10);
 
     // Create a server that serves N requests
     static const int NUM_REQUESTS = 20;
@@ -178,7 +178,7 @@ TestNetHttpClient::testShutdown()
     // Set up network
     afl::net::NetworkStack& ns = afl::net::NetworkStack::getInstance();
     afl::net::Name name("127.0.0.1", uint16_t(std::rand() % 10000 + 20000));
-    afl::base::Ptr<afl::net::Listener> listener = ns.listen(name, 10);
+    afl::base::Ref<afl::net::Listener> listener = ns.listen(name, 10);
 
     // Create a server that serves N requests
     class Server : public afl::base::Runnable {

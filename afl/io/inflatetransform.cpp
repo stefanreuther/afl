@@ -212,7 +212,7 @@ afl::io::InflateTransform::Impl::transform(afl::base::ConstBytes_t& in, afl::bas
          case FinishedHeader:
             // Final state for gzip header parsing, initial state for raw inflate:
             // initialize zlib
-            result = inflateInit2(&m_zStream, -15);
+            result = inflateInit2(&m_zStream, m_personality == Zlib ? 15 : -15);
             m_state = Decompressing;
             if (result != Z_OK) {
                 reportError(result);
@@ -227,7 +227,7 @@ afl::io::InflateTransform::Impl::transform(afl::base::ConstBytes_t& in, afl::bas
 
             afl::base::Bytes_t remainingOutput = out.subrange(outIndex);
             m_zStream.next_out = remainingOutput.unsafeData();
-            m_zStream.avail_out = convertSize(out.size());
+            m_zStream.avail_out = convertSize(remainingOutput.size());
 
             result = inflate(&m_zStream, 0);
 

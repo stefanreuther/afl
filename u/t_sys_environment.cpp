@@ -17,14 +17,19 @@ namespace {
 void
 TestSysEnvironment::testArgs()
 {
-    afl::base::Ptr<afl::base::Enumerator<String_t> > cmdl =
-        afl::sys::Environment::getInstance(argv).getCommandLine();
+    // Command line.
+    // Iterating must work without crash.
+    // Since we may or may not be iterating over the fake argv above, we cannot know what we get.
+    afl::base::Ref<afl::base::Enumerator<String_t> > cmdl = afl::sys::Environment::getInstance(argv).getCommandLine();
 
-    TS_ASSERT(cmdl.get() != 0);
+    TS_ASSERT(&cmdl.get() != 0);
     String_t tmp;
     while (cmdl->getNextElement(tmp)) {
         // nix
     }
+
+    // Invocation name. Must not be empty.
+    TS_ASSERT(afl::sys::Environment::getInstance(argv).getInvocationName() != "");
 }
 
 /** Test getEnvironmentVariable. */
@@ -53,4 +58,35 @@ TestSysEnvironment::testSettings()
     TS_ASSERT_DIFFERS(v1, v2);
     TS_ASSERT_DIFFERS(v2, v3);
     TS_ASSERT_DIFFERS(v1, v3);
+}
+
+/** Interface test. */
+void
+TestSysEnvironment::testInterface()
+{
+    class Tester : public afl::sys::Environment {
+     public:
+        virtual afl::base::Ref<CommandLine_t> getCommandLine()
+            { throw std::runtime_error("no ref"); }
+        virtual String_t getInvocationName()
+            { return String_t(); }
+        virtual String_t getEnvironmentVariable(const String_t& /*name*/)
+            { return String_t(); }
+        virtual String_t getSettingsDirectoryName(const String_t& /*appName*/)
+            { return String_t(); }
+        virtual String_t getInstallationDirectoryName()
+            { return String_t(); }
+        virtual afl::base::Ref<afl::io::TextWriter> attachTextWriter(Channel /*ch*/)
+            { throw std::runtime_error("no ref"); }
+        virtual afl::base::Ref<afl::io::TextReader> attachTextReader(Channel /*ch*/)
+            { throw std::runtime_error("no ref"); }
+        virtual afl::base::Ref<afl::io::Stream> attachStream(Channel /*ch*/)
+            { throw std::runtime_error("no ref"); }
+    };
+    Tester t;
+
+    // Also test the attach...NT cases
+    TS_ASSERT(t.attachTextWriterNT(afl::sys::Environment::Output).get() == 0);
+    TS_ASSERT(t.attachTextReaderNT(afl::sys::Environment::Input).get() == 0);
+    TS_ASSERT(t.attachStreamNT(afl::sys::Environment::Output).get() == 0);
 }

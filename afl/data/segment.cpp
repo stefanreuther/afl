@@ -120,19 +120,19 @@ afl::data::Segment::pushBack(Value* value)
 }
 
 afl::data::Segment&
-afl::data::Segment::pushBack(int32_t value)
+afl::data::Segment::pushBackInteger(int32_t value)
 {
     return pushBackNew(new IntegerValue(value));
 }
 
 afl::data::Segment&
-afl::data::Segment::pushBack(const String_t& value)
+afl::data::Segment::pushBackString(const String_t& value)
 {
     return pushBackNew(new StringValue(value));
 }
 
 afl::data::Segment&
-afl::data::Segment::pushBack(const char* value)
+afl::data::Segment::pushBackString(const char* value)
 {
     return pushBackNew(new StringValue(value));
 }

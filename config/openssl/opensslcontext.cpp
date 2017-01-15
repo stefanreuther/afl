@@ -16,8 +16,12 @@ namespace {
     struct Init {
         Init()
             {
-                SSLeay_add_ssl_algorithms();
+                SSL_library_init();
                 SSL_load_error_strings();
+            }
+        ~Init()
+            {
+                ERR_free_strings();
             }
     };
     Init gInit;
@@ -60,24 +64,24 @@ config::openssl::OpenSSLContext::~OpenSSLContext()
     SSL_CTX_free(m_ctx);
 }
 
-afl::base::Ptr<afl::net::SecureSocket>
-config::openssl::OpenSSLContext::wrapClient(afl::async::Controller& ctl, afl::base::Ptr<afl::net::Socket> peer)
+afl::base::Ref<afl::net::SecureSocket>
+config::openssl::OpenSSLContext::wrapClient(afl::async::Controller& ctl, afl::base::Ref<afl::net::Socket> peer)
 {
     afl::base::Ptr<OpenSSLSocket> result;
 
     {
         afl::sys::MutexGuard g(m_mutex);
-        result = new OpenSSLSocket(this, peer);
+        result = new OpenSSLSocket(*this, peer);
     }
 
     result->connect(ctl);
-    return result;
+    return *result;
 }
 
-afl::base::Ptr<afl::net::SecureSocket>
-config::openssl::OpenSSLContext::wrapServer(afl::async::Controller& ctl, afl::base::Ptr<afl::net::Socket> peer)
+afl::base::Ref<afl::net::SecureSocket>
+config::openssl::OpenSSLContext::wrapServer(afl::async::Controller& ctl, afl::base::Ref<afl::net::Socket> peer)
 {
-    afl::base::Ptr<OpenSSLSocket> result(new OpenSSLSocket(this, peer));
+    afl::base::Ref<OpenSSLSocket> result(*new OpenSSLSocket(*this, peer));
     result->accept(ctl);
     return result;
 }

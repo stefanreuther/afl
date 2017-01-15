@@ -24,8 +24,8 @@ namespace config { namespace openssl {
         virtual ~OpenSSLContext();
 
         // Implementation of SecureContext methods:
-        virtual afl::base::Ptr<afl::net::SecureSocket> wrapClient(afl::async::Controller& ctl, afl::base::Ptr<afl::net::Socket> peer);
-        virtual afl::base::Ptr<afl::net::SecureSocket> wrapServer(afl::async::Controller& ctl, afl::base::Ptr<afl::net::Socket> peer);
+        virtual afl::base::Ref<afl::net::SecureSocket> wrapClient(afl::async::Controller& ctl, afl::base::Ref<afl::net::Socket> peer);
+        virtual afl::base::Ref<afl::net::SecureSocket> wrapServer(afl::async::Controller& ctl, afl::base::Ref<afl::net::Socket> peer);
         virtual void setCertificate(afl::base::ConstBytes_t data);
         virtual void setPrivateKey(afl::base::ConstBytes_t data);
 

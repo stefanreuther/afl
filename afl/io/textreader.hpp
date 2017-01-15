@@ -7,11 +7,12 @@
 
 #include "afl/base/types.hpp"
 #include "afl/string/string.hpp"
+#include "afl/base/refcounted.hpp"
 
 namespace afl { namespace io {
 
     /** Interface for reading text, line-by-line. */
-    class TextReader {
+    class TextReader : public afl::base::RefCounted {
      public:
         /** Line number. */
         typedef int32_t LineNumber_t;

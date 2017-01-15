@@ -39,13 +39,13 @@ namespace {
         \param fileName [in] File name */
     void readFile(std::vector<uint8_t>& data, const char* fileName)
     {
-        using afl::base::Ptr;
+        using afl::base::Ref;
         using afl::io::FileSystem;
         using afl::io::Stream;
 
         data.clear();
         FileSystem& fs(FileSystem::getInstance());
-        Ptr<Stream> s = fs.openFile(fileName, FileSystem::OpenRead);
+        Ref<Stream> s = fs.openFile(fileName, FileSystem::OpenRead);
         uint8_t buf[1024];
         while (size_t n = s->read(buf)) {
             data.insert(data.end(), &buf[0], &buf[n]);
@@ -133,6 +133,7 @@ namespace {
 int main(int argc, char** argv)
 {
     using afl::base::Ptr;
+    using afl::base::Ref;
     using afl::net::Socket;
     using afl::net::Listener;
     using afl::net::NetworkStack;
@@ -143,15 +144,16 @@ int main(int argc, char** argv)
     if (argc == 5 && std::strcmp(argv[1], "listen") == 0) {
         try {
             Controller ctl;
-            Ptr<SecureContext> ctx(SecureContext::create());
+            Ref<SecureContext> ctx(SecureContext::create());
             configureContext(*ctx, argv[3], argv[4]);
 
-            Ptr<Listener> listener(NetworkStack::getInstance().listen(Name::parse(argv[2], "44444"), 5));
+            Ref<Listener> listener(NetworkStack::getInstance().listen(Name::parse(argv[2], "44444"), 5));
             while (1) {
-                Ptr<Socket> sock(listener->accept());
+                // FIXME: null
+                Ref<Socket> sock(*listener->accept());
                 std::cout << "Got a connection.\n";
 #if SECURE
-                sock = ctx->wrapServer(ctl, sock);
+                sock.reset(*ctx->wrapServer(ctl, sock));
                 std::cout << "Encryption ok.\n";
 #endif
                 doServer(ctl, *sock);
@@ -164,11 +166,11 @@ int main(int argc, char** argv)
     } else if (argc == 3 && std::strcmp(argv[1], "connect") == 0) {
         try {
             Controller ctl;
-            Ptr<SecureContext> ctx(SecureContext::create());
-            Ptr<Socket> sock(NetworkStack::getInstance().connect(Name::parse(argv[2], "44444")));
+            Ref<SecureContext> ctx(SecureContext::create());
+            Ref<Socket> sock(NetworkStack::getInstance().connect(Name::parse(argv[2], "44444")));
             std::cout << "Connected.\n";
 #if SECURE
-            sock = ctx->wrapClient(ctl, sock);
+            sock.reset(*ctx->wrapClient(ctl, sock));
             std::cout << "Encryption ok.\n";
 #endif
             doClient(ctl, *sock);

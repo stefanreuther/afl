@@ -29,22 +29,22 @@ namespace {
     }
 }
 
-afl::base::Ptr<afl::io::Stream>
+afl::base::Ref<afl::io::Stream>
 arch::win32::Win32FileSystem::openFile(FileName_t fileName, OpenMode mode)
 {
-    return new Win32Stream(fileName, mode);
+    return *new Win32Stream(fileName, mode);
 }
 
-afl::base::Ptr<afl::io::Directory>
+afl::base::Ref<afl::io::Directory>
 arch::win32::Win32FileSystem::openDirectory(FileName_t dirName)
 {
-    return new Win32Directory(dirName);
+    return *new Win32Directory(dirName);
 }
 
-afl::base::Ptr<afl::io::Directory>
+afl::base::Ref<afl::io::Directory>
 arch::win32::Win32FileSystem::openRootDirectory()
 {
-    return new Win32Root();
+    return *new Win32Root();
 }
 
 bool

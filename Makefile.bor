@@ -2,9 +2,16 @@
 # Makefile
 #
 
-ALL_TARGETS = afl.lib date.exe ls.exe chatserver.exe wget.exe secureio.exe \
-    respclient.exe respserver.exe httpserver.exe env.exe testsuite.exe
-OBJECTS_afl = afl/io/nullfilesystem.obj afl/string/posixfilenames.obj \
+ALL_TARGETS = afl.lib date.exe dialog.exe ls.exe chatserver.exe wget.exe \
+    secureio.exe respclient.exe respserver.exe httpserver.exe env.exe \
+    unzip.exe testsuite.exe
+OBJECTS_afl = afl/net/server.obj afl/sys/commandlineparser.obj \
+    afl/except/commandlineexception.obj arch/posix/posixdialog.obj \
+    arch/win32/win32dialog.obj afl/sys/dialog.obj afl/base/baseweaklink.obj \
+    afl/base/weaktarget.obj afl/io/transformreaderstream.obj \
+    afl/io/deflatetransform.obj afl/io/archive/zipreader.obj \
+    afl/io/limitedstream.obj afl/io/msexpandtransform.obj \
+    afl/io/nullfilesystem.obj afl/string/posixfilenames.obj \
     afl/net/parameterencoder.obj afl/charset/unicode.obj \
     afl/io/nulltextwriter.obj afl/io/textwriter.obj afl/io/textreader.obj \
     afl/except/assertionfailedexception.obj \
@@ -95,17 +102,29 @@ OBJECTS_afl = afl/io/nullfilesystem.obj afl/string/posixfilenames.obj \
     afl/net/securecontext.obj afl/checksums/md5.obj afl/checksums/hash.obj \
     afl/checksums/sha1.obj
 OBJECTS_chatserver = app/chatserver.obj
+LIBDEPEND = $(CONFIG_AFL_LIBDEPEND)
 CXX = $(CONFIG_AFL_CXX)
 LDFLAGS = $(CONFIG_AFL_LDFLAGS)
 LIBS = $(CONFIG_AFL_LIBS)
 OBJECTS_date = app/date.obj
+OBJECTS_dialog = app/dialog1.obj
 OBJECTS_env = app/env.obj
 OBJECTS_httpserver = app/httpserver.obj
 OBJECTS_ls = app/ls.obj
 OBJECTS_respclient = app/respclient.obj
 OBJECTS_respserver = app/respserver.obj
 OBJECTS_secureio = app/secureio.obj
-OBJECTS_testsuite = u/t_io_nullfilesystem.obj u/t_string_posixfilenames.obj \
+OBJECTS_testsuite = u/t_net_server.obj u/t_base_observable.obj \
+    u/t_sys_dialog.obj u/t_base_weaklink.obj u/t_base_baseweaklink.obj \
+    u/t_base_weaktarget.obj u/t_io_transformreaderstream.obj \
+    u/t_io_json_parser_testsuite.obj u/t_io_deflatetransform.obj \
+    u/t_io_archive_zipreader.obj u/t_io_limitedstream.obj u/t_base_ref.obj \
+    u/t_net_http_errorresponse.obj u/t_io_msexpandtransform.obj \
+    u/t_net_redis_sortoperation.obj u/t_net_redis_stringsetkey.obj \
+    u/t_net_redis_integersetkey.obj u/t_net_redis_subtree.obj \
+    u/t_net_redis_key.obj u/t_net_redis_stringkey.obj \
+    u/mock/commandhandlermock.obj u/t_net_redis_integerkey.obj \
+    u/t_io_nullfilesystem.obj u/t_string_posixfilenames.obj \
     u/t_net_http_client.obj u/t_net_parameterencoder.obj \
     u/t_io_nulltextwriter.obj u/t_io_textreader.obj u/t_io_textwriter.obj \
     u/t_except_assertionfailedexception.obj \
@@ -198,16 +217,19 @@ OBJECTS_testsuite = u/t_io_nullfilesystem.obj u/t_string_posixfilenames.obj \
     u/t_checksums_sha1.obj u/t_bits_int16be.obj u/t_bits_int32be.obj \
     u/t_bits_int64be.obj u/t_bits_uint16be.obj u/t_bits_uint32be.obj \
     u/t_bits_uint64be.obj u/t_base_optional.obj
+OBJECTS_unzip = app/unzip.obj
 OBJECTS_wget = app/wget.obj
 CXXFLAGS = $(CONFIG_AFL_CXXFLAGS) -I. -DTARGET_OS_WIN32
+RM = rm
+RUN = $(CONFIG_AFL_RUN)
 HEADERS_testsuite = u/t_*.hpp
 PERL = $(CONFIG_AFL_PERL)
 CXXTESTDIR = $(CONFIG_AFL_CXXTESTDIR)
 
 include config.mk
 
-.PHONY: all clean distclean afl date ls chatserver wget secureio respclient \
-    respserver httpserver env testsuite
+.PHONY: all clean distclean afl date dialog ls chatserver wget secureio \
+    respclient respserver httpserver env unzip testsuite
 
 .SUFFIXES: .cpp .obj .s
 
@@ -221,6 +243,9 @@ chatserver.exe: $(OBJECTS_chatserver) afl.lib $(LIBDEPEND)
 
 date.exe: $(OBJECTS_date) afl.lib $(LIBDEPEND)
 	$(CXX) $(LDFLAGS) $(LINKFLAGS_afl) -edate.exe $(OBJECTS_date) afl.lib $(LIBS)
+
+dialog.exe: $(OBJECTS_dialog) afl.lib $(LIBDEPEND)
+	$(CXX) $(LDFLAGS) $(LINKFLAGS_afl) -edialog.exe $(OBJECTS_dialog) afl.lib $(LIBS)
 
 env.exe: $(OBJECTS_env) afl.lib $(LIBDEPEND)
 	$(CXX) $(LDFLAGS) $(LINKFLAGS_afl) -eenv.exe $(OBJECTS_env) afl.lib $(LIBS)
@@ -242,6 +267,9 @@ secureio.exe: $(OBJECTS_secureio) afl.lib $(LIBDEPEND)
 
 testsuite.exe: $(OBJECTS_testsuite) afl.lib $(LIBDEPEND)
 	$(CXX) $(LDFLAGS) $(LINKFLAGS_afl) -etestsuite.exe $(OBJECTS_testsuite) afl.lib $(LIBS)
+
+unzip.exe: $(OBJECTS_unzip) afl.lib $(LIBDEPEND)
+	$(CXX) $(LDFLAGS) $(LINKFLAGS_afl) -eunzip.exe $(OBJECTS_unzip) afl.lib $(LIBS)
 
 wget.exe: $(OBJECTS_wget) afl.lib $(LIBDEPEND)
 	$(CXX) $(LDFLAGS) $(LINKFLAGS_afl) -ewget.exe $(OBJECTS_wget) afl.lib $(LIBS)
@@ -290,11 +318,18 @@ afl/sys/semaphore1.obj: afl/sys/semaphore.cpp
 afl/sys/semaphore1.s: afl/sys/semaphore.cpp
 	$(CXX) $(CXXFLAGS) -oafl/sys/semaphore1.s -S afl/sys/semaphore.cpp
 
+app/dialog1.obj: app/dialog.cpp
+	$(CXX) $(CXXFLAGS) -oapp/dialog1.obj -c app/dialog.cpp
+
+app/dialog1.s: app/dialog.cpp
+	$(CXX) $(CXXFLAGS) -oapp/dialog1.s -S app/dialog.cpp
+
 chatserver: chatserver.exe
 
 clean:
 	$(RM) $(OBJECTS_afl)
 	$(RM) $(OBJECTS_date)
+	$(RM) $(OBJECTS_dialog)
 	$(RM) $(OBJECTS_ls)
 	$(RM) $(OBJECTS_chatserver)
 	$(RM) $(OBJECTS_wget)
@@ -303,14 +338,18 @@ clean:
 	$(RM) $(OBJECTS_respserver)
 	$(RM) $(OBJECTS_httpserver)
 	$(RM) $(OBJECTS_env)
+	$(RM) $(OBJECTS_unzip)
 	$(RM) $(OBJECTS_testsuite)
 
 date: date.exe
+
+dialog: dialog.exe
 
 distclean: clean
 	$(RM) testsuite.cpp
 	$(RM) afl.lib
 	$(RM) date.exe
+	$(RM) dialog.exe
 	$(RM) ls.exe
 	$(RM) chatserver.exe
 	$(RM) wget.exe
@@ -319,6 +358,7 @@ distclean: clean
 	$(RM) respserver.exe
 	$(RM) httpserver.exe
 	$(RM) env.exe
+	$(RM) unzip.exe
 	$(RM) testsuite.exe
 
 env: env.exe
@@ -337,7 +377,8 @@ respserver: respserver.exe
 secureio: secureio.exe
 
 test: testsuite.exe
-	./testsuite
+	@echo "        Running testsuite..."
+	@$(RUN) ./testsuite.exe
 
 testsuite: testsuite.exe
 
@@ -350,6 +391,12 @@ testsuite.obj: testsuite.cpp
 
 testsuite.s: testsuite.cpp
 	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -U_CXXTEST_HAVE_EH -U_CXXTEST_HAVE_STD -O0 -otestsuite.s -S testsuite.cpp
+
+u/mock/commandhandlermock.obj: u/mock/commandhandlermock.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/mock/commandhandlermock.obj -c u/mock/commandhandlermock.cpp
+
+u/mock/commandhandlermock.s: u/mock/commandhandlermock.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/mock/commandhandlermock.s -S u/mock/commandhandlermock.cpp
 
 u/t_async_cancelable.obj: u/t_async_cancelable.cpp
 	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_async_cancelable.obj -c u/t_async_cancelable.cpp
@@ -441,6 +488,12 @@ u/t_async_timer.obj: u/t_async_timer.cpp
 u/t_async_timer.s: u/t_async_timer.cpp
 	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_async_timer.s -S u/t_async_timer.cpp
 
+u/t_base_baseweaklink.obj: u/t_base_baseweaklink.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_base_baseweaklink.obj -c u/t_base_baseweaklink.cpp
+
+u/t_base_baseweaklink.s: u/t_base_baseweaklink.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_base_baseweaklink.s -S u/t_base_baseweaklink.cpp
+
 u/t_base_clonable.obj: u/t_base_clonable.cpp
 	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_base_clonable.obj -c u/t_base_clonable.cpp
 
@@ -501,6 +554,12 @@ u/t_base_memory.obj: u/t_base_memory.cpp
 u/t_base_memory.s: u/t_base_memory.cpp
 	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_base_memory.s -S u/t_base_memory.cpp
 
+u/t_base_observable.obj: u/t_base_observable.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_base_observable.obj -c u/t_base_observable.cpp
+
+u/t_base_observable.s: u/t_base_observable.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_base_observable.s -S u/t_base_observable.cpp
+
 u/t_base_optional.obj: u/t_base_optional.cpp
 	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_base_optional.obj -c u/t_base_optional.cpp
 
@@ -512,6 +571,12 @@ u/t_base_ptr.obj: u/t_base_ptr.cpp
 
 u/t_base_ptr.s: u/t_base_ptr.cpp
 	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_base_ptr.s -S u/t_base_ptr.cpp
+
+u/t_base_ref.obj: u/t_base_ref.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_base_ref.obj -c u/t_base_ref.cpp
+
+u/t_base_ref.s: u/t_base_ref.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_base_ref.s -S u/t_base_ref.cpp
 
 u/t_base_refcounted.obj: u/t_base_refcounted.cpp
 	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_base_refcounted.obj -c u/t_base_refcounted.cpp
@@ -560,6 +625,18 @@ u/t_base_uncopyable.obj: u/t_base_uncopyable.cpp
 
 u/t_base_uncopyable.s: u/t_base_uncopyable.cpp
 	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_base_uncopyable.s -S u/t_base_uncopyable.cpp
+
+u/t_base_weaklink.obj: u/t_base_weaklink.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_base_weaklink.obj -c u/t_base_weaklink.cpp
+
+u/t_base_weaklink.s: u/t_base_weaklink.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_base_weaklink.s -S u/t_base_weaklink.cpp
+
+u/t_base_weaktarget.obj: u/t_base_weaktarget.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_base_weaktarget.obj -c u/t_base_weaktarget.cpp
+
+u/t_base_weaktarget.s: u/t_base_weaktarget.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_base_weaktarget.s -S u/t_base_weaktarget.cpp
 
 u/t_bits_bits.obj: u/t_bits_bits.cpp
 	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_bits_bits.obj -c u/t_bits_bits.cpp
@@ -1009,6 +1086,12 @@ u/t_functional_unaryfunction.obj: u/t_functional_unaryfunction.cpp
 u/t_functional_unaryfunction.s: u/t_functional_unaryfunction.cpp
 	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_functional_unaryfunction.s -S u/t_functional_unaryfunction.cpp
 
+u/t_io_archive_zipreader.obj: u/t_io_archive_zipreader.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_io_archive_zipreader.obj -c u/t_io_archive_zipreader.cpp
+
+u/t_io_archive_zipreader.s: u/t_io_archive_zipreader.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_io_archive_zipreader.s -S u/t_io_archive_zipreader.cpp
+
 u/t_io_bufferedsink.obj: u/t_io_bufferedsink.cpp
 	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_io_bufferedsink.obj -c u/t_io_bufferedsink.cpp
 
@@ -1032,6 +1115,12 @@ u/t_io_datasink.obj: u/t_io_datasink.cpp
 
 u/t_io_datasink.s: u/t_io_datasink.cpp
 	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_io_datasink.s -S u/t_io_datasink.cpp
+
+u/t_io_deflatetransform.obj: u/t_io_deflatetransform.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_io_deflatetransform.obj -c u/t_io_deflatetransform.cpp
+
+u/t_io_deflatetransform.s: u/t_io_deflatetransform.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_io_deflatetransform.s -S u/t_io_deflatetransform.cpp
 
 u/t_io_directory.obj: u/t_io_directory.cpp
 	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_io_directory.obj -c u/t_io_directory.cpp
@@ -1099,6 +1188,12 @@ u/t_io_json_parser.obj: u/t_io_json_parser.cpp
 u/t_io_json_parser.s: u/t_io_json_parser.cpp
 	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_io_json_parser.s -S u/t_io_json_parser.cpp
 
+u/t_io_json_parser_testsuite.obj: u/t_io_json_parser_testsuite.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_io_json_parser_testsuite.obj -c u/t_io_json_parser_testsuite.cpp
+
+u/t_io_json_parser_testsuite.s: u/t_io_json_parser_testsuite.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_io_json_parser_testsuite.s -S u/t_io_json_parser_testsuite.cpp
+
 u/t_io_json_writer.obj: u/t_io_json_writer.cpp
 	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_io_json_writer.obj -c u/t_io_json_writer.cpp
 
@@ -1111,11 +1206,23 @@ u/t_io_limiteddatasink.obj: u/t_io_limiteddatasink.cpp
 u/t_io_limiteddatasink.s: u/t_io_limiteddatasink.cpp
 	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_io_limiteddatasink.s -S u/t_io_limiteddatasink.cpp
 
+u/t_io_limitedstream.obj: u/t_io_limitedstream.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_io_limitedstream.obj -c u/t_io_limitedstream.cpp
+
+u/t_io_limitedstream.s: u/t_io_limitedstream.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_io_limitedstream.s -S u/t_io_limitedstream.cpp
+
 u/t_io_memorystream.obj: u/t_io_memorystream.cpp
 	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_io_memorystream.obj -c u/t_io_memorystream.cpp
 
 u/t_io_memorystream.s: u/t_io_memorystream.cpp
 	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_io_memorystream.s -S u/t_io_memorystream.cpp
+
+u/t_io_msexpandtransform.obj: u/t_io_msexpandtransform.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_io_msexpandtransform.obj -c u/t_io_msexpandtransform.cpp
+
+u/t_io_msexpandtransform.s: u/t_io_msexpandtransform.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_io_msexpandtransform.s -S u/t_io_msexpandtransform.cpp
 
 u/t_io_multidirectory.obj: u/t_io_multidirectory.cpp
 	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_io_multidirectory.obj -c u/t_io_multidirectory.cpp
@@ -1200,6 +1307,12 @@ u/t_io_transformdatasink.obj: u/t_io_transformdatasink.cpp
 
 u/t_io_transformdatasink.s: u/t_io_transformdatasink.cpp
 	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_io_transformdatasink.s -S u/t_io_transformdatasink.cpp
+
+u/t_io_transformreaderstream.obj: u/t_io_transformreaderstream.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_io_transformreaderstream.obj -c u/t_io_transformreaderstream.cpp
+
+u/t_io_transformreaderstream.s: u/t_io_transformreaderstream.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_io_transformreaderstream.s -S u/t_io_transformreaderstream.cpp
 
 u/t_io_xml_basereader.obj: u/t_io_xml_basereader.cpp
 	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_io_xml_basereader.obj -c u/t_io_xml_basereader.cpp
@@ -1331,6 +1444,12 @@ u/t_net_http_downloadlistener.obj: u/t_net_http_downloadlistener.cpp
 u/t_net_http_downloadlistener.s: u/t_net_http_downloadlistener.cpp
 	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_net_http_downloadlistener.s -S u/t_net_http_downloadlistener.cpp
 
+u/t_net_http_errorresponse.obj: u/t_net_http_errorresponse.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_net_http_errorresponse.obj -c u/t_net_http_errorresponse.cpp
+
+u/t_net_http_errorresponse.s: u/t_net_http_errorresponse.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_net_http_errorresponse.s -S u/t_net_http_errorresponse.cpp
+
 u/t_net_http_formparser.obj: u/t_net_http_formparser.cpp
 	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_net_http_formparser.obj -c u/t_net_http_formparser.cpp
 
@@ -1409,11 +1528,53 @@ u/t_net_protocolhandlerfactory.obj: u/t_net_protocolhandlerfactory.cpp
 u/t_net_protocolhandlerfactory.s: u/t_net_protocolhandlerfactory.cpp
 	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_net_protocolhandlerfactory.s -S u/t_net_protocolhandlerfactory.cpp
 
+u/t_net_redis_integerkey.obj: u/t_net_redis_integerkey.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_net_redis_integerkey.obj -c u/t_net_redis_integerkey.cpp
+
+u/t_net_redis_integerkey.s: u/t_net_redis_integerkey.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_net_redis_integerkey.s -S u/t_net_redis_integerkey.cpp
+
+u/t_net_redis_integersetkey.obj: u/t_net_redis_integersetkey.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_net_redis_integersetkey.obj -c u/t_net_redis_integersetkey.cpp
+
+u/t_net_redis_integersetkey.s: u/t_net_redis_integersetkey.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_net_redis_integersetkey.s -S u/t_net_redis_integersetkey.cpp
+
 u/t_net_redis_internaldatabase.obj: u/t_net_redis_internaldatabase.cpp
 	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_net_redis_internaldatabase.obj -c u/t_net_redis_internaldatabase.cpp
 
 u/t_net_redis_internaldatabase.s: u/t_net_redis_internaldatabase.cpp
 	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_net_redis_internaldatabase.s -S u/t_net_redis_internaldatabase.cpp
+
+u/t_net_redis_key.obj: u/t_net_redis_key.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_net_redis_key.obj -c u/t_net_redis_key.cpp
+
+u/t_net_redis_key.s: u/t_net_redis_key.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_net_redis_key.s -S u/t_net_redis_key.cpp
+
+u/t_net_redis_sortoperation.obj: u/t_net_redis_sortoperation.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_net_redis_sortoperation.obj -c u/t_net_redis_sortoperation.cpp
+
+u/t_net_redis_sortoperation.s: u/t_net_redis_sortoperation.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_net_redis_sortoperation.s -S u/t_net_redis_sortoperation.cpp
+
+u/t_net_redis_stringkey.obj: u/t_net_redis_stringkey.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_net_redis_stringkey.obj -c u/t_net_redis_stringkey.cpp
+
+u/t_net_redis_stringkey.s: u/t_net_redis_stringkey.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_net_redis_stringkey.s -S u/t_net_redis_stringkey.cpp
+
+u/t_net_redis_stringsetkey.obj: u/t_net_redis_stringsetkey.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_net_redis_stringsetkey.obj -c u/t_net_redis_stringsetkey.cpp
+
+u/t_net_redis_stringsetkey.s: u/t_net_redis_stringsetkey.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_net_redis_stringsetkey.s -S u/t_net_redis_stringsetkey.cpp
+
+u/t_net_redis_subtree.obj: u/t_net_redis_subtree.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_net_redis_subtree.obj -c u/t_net_redis_subtree.cpp
+
+u/t_net_redis_subtree.s: u/t_net_redis_subtree.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_net_redis_subtree.s -S u/t_net_redis_subtree.cpp
 
 u/t_net_resp_client.obj: u/t_net_resp_client.cpp
 	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_net_resp_client.obj -c u/t_net_resp_client.cpp
@@ -1444,6 +1605,12 @@ u/t_net_securesocket.obj: u/t_net_securesocket.cpp
 
 u/t_net_securesocket.s: u/t_net_securesocket.cpp
 	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_net_securesocket.s -S u/t_net_securesocket.cpp
+
+u/t_net_server.obj: u/t_net_server.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_net_server.obj -c u/t_net_server.cpp
+
+u/t_net_server.s: u/t_net_server.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_net_server.s -S u/t_net_server.cpp
 
 u/t_net_simpleserver.obj: u/t_net_simpleserver.cpp
 	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_net_simpleserver.obj -c u/t_net_simpleserver.cpp
@@ -1552,6 +1719,12 @@ u/t_sys_commandlineparser.obj: u/t_sys_commandlineparser.cpp
 
 u/t_sys_commandlineparser.s: u/t_sys_commandlineparser.cpp
 	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_sys_commandlineparser.s -S u/t_sys_commandlineparser.cpp
+
+u/t_sys_dialog.obj: u/t_sys_dialog.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_sys_dialog.obj -c u/t_sys_dialog.cpp
+
+u/t_sys_dialog.s: u/t_sys_dialog.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_sys_dialog.s -S u/t_sys_dialog.cpp
 
 u/t_sys_duration.obj: u/t_sys_duration.cpp
 	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_sys_duration.obj -c u/t_sys_duration.cpp
@@ -1684,6 +1857,8 @@ u/t_tmp_typelist.obj: u/t_tmp_typelist.cpp
 
 u/t_tmp_typelist.s: u/t_tmp_typelist.cpp
 	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_tmp_typelist.s -S u/t_tmp_typelist.cpp
+
+unzip: unzip.exe
 
 wget: wget.exe
 

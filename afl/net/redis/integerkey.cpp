@@ -17,54 +17,54 @@ afl::net::redis::IntegerKey::IntegerKey(CommandHandler& ch, String_t name)
 int32_t
 afl::net::redis::IntegerKey::operator--()
 {
-    return getHandler().callInt(Segment().pushBack("DECR").pushBack(getName()));
+    return getHandler().callInt(Segment().pushBackString("DECR").pushBackString(getName()));
 }
 
 // Decrement (DECRBY).
 int32_t
 afl::net::redis::IntegerKey::operator-=(int32_t val)
 {
-    return getHandler().callInt(Segment().pushBack("DECRBY").pushBack(getName()).pushBack(val));
+    return getHandler().callInt(Segment().pushBackString("DECRBY").pushBackString(getName()).pushBackInteger(val));
 }
 
 // Get current value (GET).
 int32_t
 afl::net::redis::IntegerKey::get()
 {
-    return getHandler().callInt(Segment().pushBack("GET").pushBack(getName()));
+    return getHandler().callInt(Segment().pushBackString("GET").pushBackString(getName()));
 }
 
 // Replace with a new value (GETSET).
 int32_t
 afl::net::redis::IntegerKey::replaceBy(int32_t newValue)
 {
-    return getHandler().callInt(Segment().pushBack("GETSET").pushBack(getName()).pushBack(newValue));
+    return getHandler().callInt(Segment().pushBackString("GETSET").pushBackString(getName()).pushBackInteger(newValue));
 }
 
 // Increment by one (INCR).
 int32_t
 afl::net::redis::IntegerKey::operator++()
 {
-    return getHandler().callInt(Segment().pushBack("INCR").pushBack(getName()));
+    return getHandler().callInt(Segment().pushBackString("INCR").pushBackString(getName()));
 }
 
 // Increment (INCRBY).
 int32_t
 afl::net::redis::IntegerKey::operator+=(int32_t val)
 {
-    return getHandler().callInt(Segment().pushBack("INCRBY").pushBack(getName()).pushBack(val));
+    return getHandler().callInt(Segment().pushBackString("INCRBY").pushBackString(getName()).pushBackInteger(val));
 }
 
 // Set value (SET).
 void
 afl::net::redis::IntegerKey::set(int32_t newValue)
 {
-    getHandler().callVoid(Segment().pushBack("SET").pushBack(getName()).pushBack(newValue));
+    getHandler().callVoid(Segment().pushBackString("SET").pushBackString(getName()).pushBackInteger(newValue));
 }
 
 // Set value for new key (SETNX).
 bool
 afl::net::redis::IntegerKey::setUnique(int32_t newValue)
 {
-    return getHandler().callInt(Segment().pushBack("SETNX").pushBack(getName()).pushBack(newValue));
+    return getHandler().callInt(Segment().pushBackString("SETNX").pushBackString(getName()).pushBackInteger(newValue));
 }

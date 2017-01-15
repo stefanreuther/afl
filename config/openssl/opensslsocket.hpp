@@ -13,13 +13,12 @@
 #include "afl/net/securesocket.hpp"
 #include "afl/async/notifier.hpp"
 #include "afl/async/controller.hpp"
-#include "afl/base/ptr.hpp"
+#include "afl/base/ref.hpp"
 #include "afl/async/sendoperation.hpp"
 #include "afl/async/receiveoperation.hpp"
+#include "config/openssl/opensslcontext.hpp"
 
 namespace config { namespace openssl {
-
-    class OpenSSLContext;
 
     /** SecureSocket implementation using OpenSSL.
         Implements a bidirectional, asynchronous, encrypted connection.
@@ -32,8 +31,7 @@ namespace config { namespace openssl {
      public:
         /** Constructor.
             \param peer Underlying socket */
-        OpenSSLSocket(afl::base::Ptr<OpenSSLContext> ctx,
-                      afl::base::Ptr<Socket> peer);
+        OpenSSLSocket(afl::base::Ref<OpenSSLContext> ctx, afl::base::Ref<Socket> peer);
 
         /** Virtual destructor. */
         ~OpenSSLSocket();
@@ -56,7 +54,7 @@ namespace config { namespace openssl {
 
      private:
         // Existing socket
-        afl::base::Ptr<Socket> m_peer;
+        afl::base::Ref<Socket> m_peer;
 
         // Mutex for following stuff
         afl::sys::Mutex m_mutex;

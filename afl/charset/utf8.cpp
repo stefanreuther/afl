@@ -24,10 +24,10 @@ namespace {
             extraBytes = 4;
         } else if (ch <= 0x7FFFFFFF) {
             out.append(1, char(0xFC + (ch >> 30)));
-            extraBytes = 4;
+            extraBytes = 5;
         } else {
             out.append(1, char(0xFE));
-            extraBytes = 5;
+            extraBytes = 6;
         }
         
         while (extraBytes > 0) {

@@ -16,6 +16,7 @@
 #include "u/t_except.hpp"
 #include "afl/io/multiplexablestream.hpp"
 #include "afl/io/filemapping.hpp"
+#include "afl/except/commandlineexception.hpp"
 
 namespace {
     class TestStream : public afl::io::MultiplexableStream {
@@ -233,6 +234,24 @@ TestExcept::testRemoteErrorException()
         afl::except::FileProblemException& f(x);
         std::runtime_error& r(x);
         (void) f;
+        (void) r;
+    }
+}
+
+/** Test CommandLineException. */
+void
+TestExcept::testCommandLineException()
+{
+    {
+        // Constructor
+        afl::except::CommandLineException x("nope");
+        TS_ASSERT_EQUALS(x.what(), String_t("nope"));
+    }
+    {
+        // Copy/Inheritance
+        afl::except::CommandLineException x("nope");
+        afl::except::CommandLineException x2(x);
+        std::runtime_error& r(x);
         (void) r;
     }
 }

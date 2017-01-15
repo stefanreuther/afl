@@ -65,6 +65,11 @@ class TestNetHttpDownloadListener : public CxxTest::TestSuite {
     void testIt();
 };
 
+class TestNetHttpErrorResponse : public CxxTest::TestSuite {
+ public:
+    void testIt();
+};
+
 class TestNetHttpFormParser : public CxxTest::TestSuite {
  public:
     void testIt();

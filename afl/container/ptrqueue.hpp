@@ -45,6 +45,13 @@ namespace afl { namespace container {
             \return t */
         void pushBackNew(T* t);
 
+        /** Add object at front (put back).
+            The pointed object becomes owned by this queue.
+            If this function throws (due to lack of memory to expand the queue), it will delete \c t.
+            \param t object to add (can be null)
+            \return t */
+        void pushFrontNew(T* t);
+
         /** Remove oldest object.
             Deletes the pointed-to object, if any.
             If the queue is empty, this function does nothing. */
@@ -109,6 +116,21 @@ afl::container::PtrQueue<T>::pushBackNew(T* t)
     typename afl::tmp::CopyCV<T, void>::Type* tv = t;
     try {
         m_data.push_back(const_cast<void*>(tv));
+    }
+    catch (...) {
+        delete t;
+        throw;
+    }
+}
+
+// Add object at front.
+template<typename T>
+void
+afl::container::PtrQueue<T>::pushFrontNew(T* t)
+{
+    typename afl::tmp::CopyCV<T, void>::Type* tv = t;
+    try {
+        m_data.push_front(const_cast<void*>(tv));
     }
     catch (...) {
         delete t;

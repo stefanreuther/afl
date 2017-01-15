@@ -89,5 +89,5 @@ afl::net::resp::Client::callVoid(const Segment_t& command)
 void
 afl::net::resp::Client::connect()
 {
-    m_socket = m_stack.connect(m_name);
+    m_socket = m_stack.connect(m_name).asPtr();
 }

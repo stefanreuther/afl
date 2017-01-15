@@ -11,6 +11,7 @@
 #include "afl/io/textwriter.hpp"
 #include "afl/io/textreader.hpp"
 #include "afl/io/stream.hpp"
+#include "afl/base/ref.hpp"
 
 namespace afl { namespace sys {
 
@@ -39,7 +40,12 @@ namespace afl { namespace sys {
         /** Get command line.
             Returns the command line in UTF-8 format.
             \return Enumerator listing all command line arguments (not including the program name) */
-        virtual afl::base::Ptr<CommandLine_t> getCommandLine() = 0;
+        virtual afl::base::Ref<CommandLine_t> getCommandLine() = 0;
+
+        /** Get program name.
+            Returns the program invocation name (argv[0]) in UTF-8.
+            \return value in UTF-8. */
+        virtual String_t getInvocationName() = 0;
 
         /** Get environment variable.
             Returns the value of the environment variable in UTF-8.
@@ -85,7 +91,7 @@ namespace afl { namespace sys {
             \param ch Channel (should be Output or Error; using Input is a non-standard use-case that may or may not work)
             \return TextWriter, never null
             \throw std::runtime_error or FileProblemException if there is a problem */
-        virtual afl::base::Ptr<afl::io::TextWriter> attachTextWriter(Channel ch) = 0;
+        virtual afl::base::Ref<afl::io::TextWriter> attachTextWriter(Channel ch) = 0;
 
         /** Attach standard I/O channel as TextReader.
             This can be used to get a textual handle to standard input.
@@ -100,7 +106,7 @@ namespace afl { namespace sys {
             \param ch Channel (should be Input; using Output or Error is a non-standard use-case that may or may not work)
             \return TextReader, never null
             \throw std::runtime_error or FileProblemException if there is a problem  */
-        virtual afl::base::Ptr<afl::io::TextReader> attachTextReader(Channel ch) = 0;
+        virtual afl::base::Ref<afl::io::TextReader> attachTextReader(Channel ch) = 0;
 
         /** Attach standard I/O stream as Stream.
             This can be used to get a binary handle to standard input, output, or error.
@@ -110,7 +116,7 @@ namespace afl { namespace sys {
             \param ch Channel
             \return Stream, never null
             \throw std::runtime_error or FileProblemException if there is a problem  */
-        virtual afl::base::Ptr<afl::io::Stream> attachStream(Channel ch) = 0;
+        virtual afl::base::Ref<afl::io::Stream> attachStream(Channel ch) = 0;
 
         /** Attach standard I/O channel as TextWriter, don't throw.
             This function is the same as attachTextWriter, but does not throw on error.

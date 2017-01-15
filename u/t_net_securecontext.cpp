@@ -30,6 +30,7 @@ namespace {
     using afl::async::Operation;
     using afl::async::Controller;
     using afl::base::Ptr;
+    using afl::base::Ref;
     using afl::net::Socket;
 
 
@@ -281,13 +282,13 @@ TestNetSecureContext::testConnect()
 {
     // Create virtual socket
     Ptr<Node> pNode(new Node());
-    Ptr<Socket> sockA(new SocketMock(pNode, 0));
-    Ptr<Socket> sockB(new SocketMock(pNode, 1));
+    Ref<Socket> sockA(*new SocketMock(pNode, 0));
+    Ref<Socket> sockB(*new SocketMock(pNode, 1));
     afl::async::Controller ctl;
 
     // Create a SecureContext and configure it
     try {
-        Ptr<afl::net::SecureContext> pContext(afl::net::SecureContext::create());
+        Ref<afl::net::SecureContext> pContext(afl::net::SecureContext::create());
         pContext->setCertificate(afl::string::toBytes(CERTIFICATE));
         pContext->setPrivateKey(afl::string::toBytes(PRIVATE_KEY));
 
@@ -295,23 +296,23 @@ TestNetSecureContext::testConnect()
         // We need a second thread for that.
         class ServerRunnable : public afl::base::Runnable {
          public:
-            ServerRunnable(Ptr<afl::net::SecureContext> pContext, Ptr<Socket> socket)
+            ServerRunnable(Ref<afl::net::SecureContext> pContext, Ref<Socket> socket)
                 : m_pContext(pContext),
                   m_socket(socket)
                 { }
             void run()
                 {
                     Controller ctl;
-                    m_socket = m_pContext->wrapServer(ctl, m_socket);
+                    m_socket.reset(*m_pContext->wrapServer(ctl, m_socket));
                 }
          private:
-            Ptr<afl::net::SecureContext> m_pContext;
-            Ptr<Socket> m_socket;
+            Ref<afl::net::SecureContext> m_pContext;
+            Ref<Socket> m_socket;
         };
         ServerRunnable server(pContext, sockA);
         afl::sys::Thread serverThread("Server", server);
         serverThread.start();
-        sockB = pContext->wrapClient(ctl, sockB);
+        sockB.reset(*pContext->wrapClient(ctl, sockB));
         serverThread.join();
     }
     catch (afl::except::UnsupportedException& /*e*/) {
@@ -329,13 +330,13 @@ TestNetSecureContext::testTransfer1()
 {
     // Create virtual socket
     Ptr<Node> pNode(new Node());
-    Ptr<Socket> sockA(new SocketMock(pNode, 0));
-    Ptr<Socket> sockB(new SocketMock(pNode, 1));
+    Ref<Socket> sockA(*new SocketMock(pNode, 0));
+    Ref<Socket> sockB(*new SocketMock(pNode, 1));
     afl::async::Controller ctl;
 
     // Create a SecureContext and configure it
     try {
-        Ptr<afl::net::SecureContext> pContext(afl::net::SecureContext::create());
+        Ref<afl::net::SecureContext> pContext(afl::net::SecureContext::create());
         pContext->setCertificate(afl::string::toBytes(CERTIFICATE));
         pContext->setPrivateKey(afl::string::toBytes(PRIVATE_KEY));
 
@@ -343,14 +344,14 @@ TestNetSecureContext::testTransfer1()
         // We need a second thread for that.
         class ServerRunnable : public afl::base::Runnable {
          public:
-            ServerRunnable(Ptr<afl::net::SecureContext> pContext, Ptr<Socket> socket)
+            ServerRunnable(Ref<afl::net::SecureContext> pContext, Ref<Socket> socket)
                 : m_pContext(pContext),
                   m_socket(socket)
                 { }
             void run()
                 {
                     Controller ctl;
-                    m_socket = m_pContext->wrapServer(ctl, m_socket);
+                    m_socket.reset(*m_pContext->wrapServer(ctl, m_socket));
 
                     // Send data
                     uint8_t dataToSend[] = {'a','b','c'};
@@ -360,13 +361,13 @@ TestNetSecureContext::testTransfer1()
                     TS_ASSERT_EQUALS(op.getNumSentBytes(), 3U);
                 }
          private:
-            Ptr<afl::net::SecureContext> m_pContext;
-            Ptr<Socket> m_socket;
+            Ref<afl::net::SecureContext> m_pContext;
+            Ref<Socket> m_socket;
         };
         ServerRunnable server(pContext, sockA);
         afl::sys::Thread serverThread("Server", server);
         serverThread.start();
-        sockB = pContext->wrapClient(ctl, sockB);
+        sockB.reset(*pContext->wrapClient(ctl, sockB));
 
         // Receive data
         uint8_t buf[10];
@@ -395,13 +396,13 @@ TestNetSecureContext::testTransfer2()
 {
     // Create virtual socket
     Ptr<Node> pNode(new Node());
-    Ptr<Socket> sockA(new SocketMock(pNode, 0));
-    Ptr<Socket> sockB(new SocketMock(pNode, 1));
+    Ref<Socket> sockA(*new SocketMock(pNode, 0));
+    Ref<Socket> sockB(*new SocketMock(pNode, 1));
     afl::async::Controller ctl;
 
     // Create a SecureContext and configure it
     try {
-        Ptr<afl::net::SecureContext> pContext(afl::net::SecureContext::create());
+        Ref<afl::net::SecureContext> pContext(afl::net::SecureContext::create());
         pContext->setCertificate(afl::string::toBytes(CERTIFICATE));
         pContext->setPrivateKey(afl::string::toBytes(PRIVATE_KEY));
 
@@ -409,14 +410,14 @@ TestNetSecureContext::testTransfer2()
         // We need a second thread for that.
         class ServerRunnable : public afl::base::Runnable {
          public:
-            ServerRunnable(Ptr<afl::net::SecureContext> pContext, Ptr<Socket> socket)
+            ServerRunnable(Ref<afl::net::SecureContext> pContext, Ref<Socket> socket)
                 : m_pContext(pContext),
                   m_socket(socket)
                 { }
             void run()
                 {
                     Controller ctl;
-                    m_socket = m_pContext->wrapServer(ctl, m_socket);
+                    m_socket.reset(*m_pContext->wrapServer(ctl, m_socket));
 
                     // Receive data and echo it back
                     uint8_t buf[10];
@@ -431,13 +432,13 @@ TestNetSecureContext::testTransfer2()
                     TS_ASSERT_EQUALS(op2.getNumSentBytes(), 3U);
                 }
          private:
-            Ptr<afl::net::SecureContext> m_pContext;
-            Ptr<Socket> m_socket;
+            Ref<afl::net::SecureContext> m_pContext;
+            Ref<Socket> m_socket;
         };
         ServerRunnable server(pContext, sockA);
         afl::sys::Thread serverThread("Server", server);
         serverThread.start();
-        sockB = pContext->wrapClient(ctl, sockB);
+        sockB.reset(*pContext->wrapClient(ctl, sockB));
 
         // Send data
         const uint8_t dataToSend[] = {'a','b','c'};

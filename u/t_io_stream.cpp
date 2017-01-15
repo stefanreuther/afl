@@ -28,8 +28,7 @@ TestIoStream::testIt()
 
     {
         // Create a file
-        afl::base::Ptr<afl::io::Stream> ps = fs.openFile(FILENAME, fs.Create);
-        TS_ASSERT(ps.get() != 0);
+        afl::base::Ref<afl::io::Stream> ps = fs.openFile(FILENAME, fs.Create);
         TS_ASSERT((ps->getCapabilities() & afl::io::Stream::CanRead) != 0);
         TS_ASSERT((ps->getCapabilities() & afl::io::Stream::CanWrite) != 0);
         TS_ASSERT((ps->getCapabilities() & afl::io::Stream::CanSeek) != 0);
@@ -67,10 +66,8 @@ TestIoStream::testIt()
 
     {
         // Read the file. It must be possible to open it twice.
-        afl::base::Ptr<afl::io::Stream> ps1 = fs.openFile(FILENAME, fs.OpenRead);
-        afl::base::Ptr<afl::io::Stream> ps2 = fs.openFile(FILENAME, fs.OpenRead);
-        TS_ASSERT(ps1.get() != 0);
-        TS_ASSERT(ps2.get() != 0);
+        afl::base::Ref<afl::io::Stream> ps1 = fs.openFile(FILENAME, fs.OpenRead);
+        afl::base::Ref<afl::io::Stream> ps2 = fs.openFile(FILENAME, fs.OpenRead);
 
         TS_ASSERT_EQUALS(ps1->getSize(), 6U);
         TS_ASSERT_EQUALS(ps2->getSize(), 6U);
@@ -128,8 +125,8 @@ TestIoStream::testInterface()
             { return 0; }
         virtual String_t getName()
             { return String_t(); }
-        virtual afl::base::Ptr<Stream> createChild()
-            { return 0; }
+        virtual afl::base::Ref<Stream> createChild()
+            { throw "geht ned"; }
         virtual afl::base::Ptr<afl::io::FileMapping> createFileMapping(FileSize_t /*limit*/)
             { return 0; }
     };

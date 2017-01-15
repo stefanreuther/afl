@@ -15,17 +15,18 @@ void
 TestIoFileMapping::testIt()
 {
     using afl::base::Ptr;
+    using afl::base::Ref;
     using afl::io::FileMapping;
     
     static const char FILENAME[] = "__test.tmp";
     static const size_t PAGE = 4096;
 
     afl::io::FileSystem& fs = afl::io::FileSystem::getInstance();
-    Ptr<afl::io::Directory> dir = fs.openDirectory(fs.getWorkingDirectoryName());
+    Ref<afl::io::Directory> dir = fs.openDirectory(fs.getWorkingDirectoryName());
     try {
         {
             // Create a file
-            Ptr<afl::io::Stream> s = dir->openFile(FILENAME, fs.Create);
+            Ref<afl::io::Stream> s = dir->openFile(FILENAME, fs.Create);
             for (int i = 1; i <= 10; ++i) {
                 uint8_t buffer[PAGE];
                 afl::base::Bytes_t(buffer).fill(uint8_t(i));
@@ -34,7 +35,7 @@ TestIoFileMapping::testIt()
         }
         {
             // Test 1: map two pages
-            Ptr<afl::io::Stream> s = dir->openFile(FILENAME, fs.OpenRead);
+            Ref<afl::io::Stream> s = dir->openFile(FILENAME, fs.OpenRead);
             Ptr<FileMapping> map = s->createFileMapping(2*PAGE);
             TS_ASSERT(map.get() != 0);
             afl::base::ConstBytes_t content = map->get();
@@ -60,7 +61,7 @@ TestIoFileMapping::testIt()
         }
         {
             // Test 2: map two pages, with offset
-            Ptr<afl::io::Stream> s = dir->openFile(FILENAME, fs.OpenRead);
+            Ref<afl::io::Stream> s = dir->openFile(FILENAME, fs.OpenRead);
             s->setPos(1000);
             Ptr<FileMapping> map = s->createFileMapping(2*PAGE);
             TS_ASSERT(map.get() != 0);
@@ -94,7 +95,7 @@ TestIoFileMapping::testIt()
         }
         {
             // Test 3: map whole file
-            Ptr<afl::io::Stream> s = dir->openFile(FILENAME, fs.OpenRead);
+            Ptr<afl::io::Stream> s = dir->openFile(FILENAME, fs.OpenRead).asPtr();
             Ptr<FileMapping> map = s->createFileMapping();
             TS_ASSERT(map.get() != 0);
             afl::base::ConstBytes_t content = map->get();

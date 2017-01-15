@@ -3,6 +3,7 @@
   *  \brief Test for afl::checksums::CRC32
   */
 
+#include <memory>
 #include "afl/checksums/crc32.hpp"
 
 #include "u/t_checksums.hpp"
@@ -40,4 +41,25 @@ TestChecksumsCRC32::testIt()
 
         TS_ASSERT_EQUALS(t.add(wholeBlock, 0), t.add(secondHalf, t.add(firstHalf, 0)));
     }
+
+    // Inquiry
+    TS_ASSERT_EQUALS(t.bits(), 32U);
+}
+
+/** Test using the interface. */
+void
+TestChecksumsCRC32::testInterface()
+{
+    typedef afl::checksums::Checksum::Memory_t Memory_t;
+    std::auto_ptr<afl::checksums::Checksum> t(new afl::checksums::CRC32(0xEDB88320));
+
+    // Check empty
+    TS_ASSERT_EQUALS(t->add(Memory_t(), 9999), 9999U);
+
+    // "hi" (example verified against gzip)
+    uint8_t hi[2] = { 'h', 'i' };
+    TS_ASSERT_EQUALS(t->add(hi, 0), 0xD8932AACU);
+
+    // Inquiry
+    TS_ASSERT_EQUALS(t->bits(), 32U);
 }

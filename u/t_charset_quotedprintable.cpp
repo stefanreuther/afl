@@ -3,6 +3,7 @@
   *  \brief Test for afl::charset::QuotedPrintable
   */
 
+#include <memory>
 #include "u/t_charset.hpp"
 #include "afl/charset/quotedprintable.hpp"
 
@@ -45,4 +46,14 @@ TestCharsetQuotedPrintable::testIt()
     TS_ASSERT_EQUALS(qp.decode(afl::string::toMemory("=3X")), "=3X");
     TS_ASSERT_EQUALS(qp.decode(afl::string::toMemory("==33")), "==33");
     TS_ASSERT_EQUALS(qp.decode(afl::string::toMemory("====33")), "===3");  // fourth "=" starts a character
+}
+
+/** Test clone. */
+void
+TestCharsetQuotedPrintable::testClone()
+{
+    afl::charset::QuotedPrintable testee;
+    std::auto_ptr<afl::charset::Charset> result(testee.clone());
+    TS_ASSERT(result.get() != 0);
+    TS_ASSERT(dynamic_cast<afl::charset::QuotedPrintable*>(result.get()) != 0);
 }
