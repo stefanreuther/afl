@@ -44,7 +44,7 @@ namespace {
 
             // Write
             afl::base::ConstBytes_t bytes(buffer);
-            TS_ASSERT(!cs.handleData("<source name>", bytes));
+            TS_ASSERT(!cs.handleData(bytes));
             TS_ASSERT(bytes.empty());
         }
     }
@@ -158,6 +158,6 @@ TestAsyncCommunicationSink::testTimeout()
     // Try to send. Must time out with an exception.
     uint8_t tmp[] = {1,2,3};
     afl::base::ConstBytes_t bytes(tmp);
-    TS_ASSERT_THROWS(cs.handleData("<source name>", bytes), std::runtime_error);
-    TS_ASSERT_THROWS(cs.handleData("<source name>", bytes), std::runtime_error);
+    TS_ASSERT_THROWS(cs.handleData(bytes), std::runtime_error);
+    TS_ASSERT_THROWS(cs.handleData(bytes), std::runtime_error);
 }

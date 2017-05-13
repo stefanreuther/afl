@@ -39,6 +39,7 @@ class TestSysEnvironment : public CxxTest::TestSuite {
     void testEnv();
     void testSettings();
     void testInterface();
+    void testInstallationDirectory();
 };
 
 class TestSysError : public CxxTest::TestSuite {
@@ -77,6 +78,10 @@ class TestSysMutexGuard : public CxxTest::TestSuite {
 class TestSysParsedTime : public CxxTest::TestSuite {
  public:
     void testIt();
+    void testFormat();
+    void testMonths();
+    void testWeekdays();
+    void testHours();
 };
 
 class TestSysSemaphore : public CxxTest::TestSuite {

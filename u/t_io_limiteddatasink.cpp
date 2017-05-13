@@ -17,7 +17,7 @@ TestIoLimitedDataSink::testIt()
         afl::io::InternalSink t;
         afl::io::LimitedDataSink lim(t, 0);
         afl::base::ConstBytes_t data;
-        TS_ASSERT(lim.handleData("<source name>", data));
+        TS_ASSERT(lim.handleData(data));
     }
 
     {
@@ -25,7 +25,7 @@ TestIoLimitedDataSink::testIt()
         afl::io::InternalSink t;
         afl::io::LimitedDataSink lim(t, 0);
         afl::base::ConstBytes_t data = afl::string::toBytes("abc");
-        TS_ASSERT(lim.handleData("<source name>", data));
+        TS_ASSERT(lim.handleData(data));
         TS_ASSERT_EQUALS(data.size(), 3U);
     }
 
@@ -34,11 +34,11 @@ TestIoLimitedDataSink::testIt()
         afl::io::InternalSink t;
         afl::io::LimitedDataSink lim(t, 10);
         afl::base::ConstBytes_t data = afl::string::toBytes("abc");
-        TS_ASSERT(!lim.handleData("<source name>", data));
+        TS_ASSERT(!lim.handleData(data));
         TS_ASSERT_EQUALS(data.size(), 0U);
 
         data = afl::string::toBytes("abcdefghi");
-        TS_ASSERT(lim.handleData("<source name>", data));
+        TS_ASSERT(lim.handleData(data));
         TS_ASSERT_EQUALS(data.size(), 2U);
     }
 }

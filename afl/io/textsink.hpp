@@ -18,15 +18,12 @@ namespace afl { namespace io {
         No character set translation will happen.
 
         TextSink accepts "const char*" arguments and treats these as null-terminated strings.
-        In contrast, the ConstStringMemory_t signature would implicitly include the null byte.
-
-        TextSink ignores the DataSink's fullness indicator (DataSink::handleData returning true) and will keep sending data. */
+        In contrast, the ConstStringMemory_t signature would implicitly include the null byte. */
     class TextSink {
      public:
         /** Constructor.
-            \param name Name to use for DataSink::handleData
             \param sink DataSink, must out-live the TextSink */
-        TextSink(String_t name, DataSink& sink);
+        explicit TextSink(DataSink& sink);
 
         /** Write null-terminated string.
             \param str String
@@ -44,7 +41,6 @@ namespace afl { namespace io {
         TextSink& operator<<(afl::string::ConstStringMemory_t mem);
 
      private:
-        String_t m_name;
         DataSink& m_sink;
     };
 

@@ -13,7 +13,7 @@ namespace afl { namespace io {
 
     /** Internal (In-Memory) Stream.
         Implements a virtual file that can be read and written.
-        Internally, the file is represented as a GrowableMemory<uint8_t>.
+        Internally, the file is represented as a GrowableBytes_t.
 
         When written, the file grows as needed. */
     class InternalStream : public MultiplexableStream {
@@ -49,7 +49,7 @@ namespace afl { namespace io {
 
      private:
         String_t m_name;
-        afl::base::GrowableMemory<uint8_t> m_data;
+        afl::base::GrowableBytes_t m_data;
         size_t m_pos;
     };
 

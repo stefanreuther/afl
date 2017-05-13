@@ -116,7 +116,7 @@ afl::net::Url::parse(const String_t& url)
     String_t::size_type n = url.find_first_of("@:/#");
     if (n != String_t::npos && n != 0 && url[n] == ':') {
         // Found a nonzero scheme
-        m_scheme = ue.decode(afl::string::toMemory(String_t(url, 0, n)));
+        m_scheme = ue.decode(afl::string::toBytes(String_t(url, 0, n)));
         ++n;
     } else {
         // No scheme given
@@ -144,10 +144,10 @@ afl::net::Url::parse(const String_t& url)
             }
             if (colonPos < atPos) {
                 // Found username + password
-                m_user = ue.decode(afl::string::toMemory(String_t(url, n, colonPos-n)));
-                m_password = ue.decode(afl::string::toMemory(String_t(url, colonPos+1, atPos-colonPos-1)));
+                m_user = ue.decode(afl::string::toBytes(String_t(url, n, colonPos-n)));
+                m_password = ue.decode(afl::string::toBytes(String_t(url, colonPos+1, atPos-colonPos-1)));
             } else {
-                m_user = ue.decode(afl::string::toMemory(String_t(url, n, atPos-n)));
+                m_user = ue.decode(afl::string::toBytes(String_t(url, n, atPos-n)));
                 m_password.clear();
             }
             n = atPos+1;
@@ -165,7 +165,7 @@ afl::net::Url::parse(const String_t& url)
                 // "foo://[" is a syntax error
                 return false;
             }
-            m_host = ue.decode(afl::string::toMemory(String_t(url, n+1, bracketPos-n-1)));
+            m_host = ue.decode(afl::string::toBytes(String_t(url, n+1, bracketPos-n-1)));
             n = bracketPos+1;
             if (n < url.size() && url[n] != ':' && url[n] != '/' && url[n] != '#') {
                 // "foo://[...]bla" is a syntax error (but "foo://[...]" is not)
@@ -175,10 +175,10 @@ afl::net::Url::parse(const String_t& url)
             // Host name ends at ":" or "/"
             String_t::size_type endPos = url.find_first_of(":/#?", n);
             if (endPos < url.size()) {
-                m_host = ue.decode(afl::string::toMemory(String_t(url, n, endPos-n)));
+                m_host = ue.decode(afl::string::toBytes(String_t(url, n, endPos-n)));
                 n = endPos;
             } else {
-                m_host = ue.decode(afl::string::toMemory(String_t(url, n, String_t::npos)));
+                m_host = ue.decode(afl::string::toBytes(String_t(url, n, String_t::npos)));
                 n = url.size();
             }
         }
@@ -192,10 +192,10 @@ afl::net::Url::parse(const String_t& url)
                 return false;
             }
             if (portEndPos == String_t::npos) {
-                m_port = ue.decode(afl::string::toMemory(String_t(url, n, String_t::npos)));
+                m_port = ue.decode(afl::string::toBytes(String_t(url, n, String_t::npos)));
                 n = url.size();
             } else {
-                m_port = ue.decode(afl::string::toMemory(String_t(url, n, portEndPos-n)));
+                m_port = ue.decode(afl::string::toBytes(String_t(url, n, portEndPos-n)));
                 n = portEndPos;
                 if (url[n] != '/' && url[n] != '#' && url[n] != '?') {
                     // "foo://host:123bla" is a syntax error
@@ -214,7 +214,7 @@ afl::net::Url::parse(const String_t& url)
     String_t::size_type fragPos = url.find('#', n);
     if (fragPos != String_t::npos) {
         m_path.assign(url, n, fragPos-n);
-        m_fragment = ue.decode(afl::string::toMemory(String_t(url, fragPos)));
+        m_fragment = ue.decode(afl::string::toBytes(String_t(url, fragPos)));
     } else {
         m_path.assign(url, n, String_t::npos);
         m_fragment.clear();
@@ -377,12 +377,12 @@ afl::net::matchArguments(String_t& path, HeaderConsumer& consumer)
             if (eq < end) {
                 // ....&name=value&
                 //      n   eq    end
-                consumer.handleHeader(ue.decode(afl::string::toMemory(String_t(path, n, eq-n))),
-                                      ue.decode(afl::string::toMemory(String_t(path, eq+1, end-eq-1))));
+                consumer.handleHeader(ue.decode(afl::string::toBytes(String_t(path, n, eq-n))),
+                                      ue.decode(afl::string::toBytes(String_t(path, eq+1, end-eq-1))));
             } else if (end != n) {
                 // ....&name&
                 //      n   end   eq somewhere after
-                consumer.handleHeader(ue.decode(afl::string::toMemory(String_t(path, n, end-n))),
+                consumer.handleHeader(ue.decode(afl::string::toBytes(String_t(path, n, end-n))),
                                       String_t());
             } else {
                 // ....&

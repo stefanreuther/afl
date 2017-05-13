@@ -37,7 +37,7 @@ namespace afl { namespace net {
             \param bytes [in/out] data to process. On output: unprocessed data.
             \retval true header ends, unprocessed bytes have been left in %bytes
             \retval false header incomplete, data has been processed completely, feed more data */
-        bool handleData(const String_t& name, afl::base::ConstBytes_t& bytes);
+        bool handleData(afl::base::ConstBytes_t& bytes);
 
         /** Check for errors.
             \retval true there were syntax errors processing the header

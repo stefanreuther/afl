@@ -29,6 +29,23 @@ class TestNetHeaderField : public CxxTest::TestSuite {
     void testNoPrimary();
 };
 
+class TestNetMimeBuilder : public CxxTest::TestSuite {
+ public:
+    void testSimple();
+    void testBase64();
+    void testBoundaryConflict();
+};
+
+class TestNetNullCommandHandler : public CxxTest::TestSuite {
+ public:
+    void testIt();
+};
+
+class TestNetNullNetworkStack : public CxxTest::TestSuite {
+ public:
+    void testIt();
+};
+
 class TestNetParameterEncoder : public CxxTest::TestSuite {
  public:
     void testEmpty();
@@ -75,6 +92,11 @@ class TestNetProtocolHandler : public CxxTest::TestSuite {
 class TestNetProtocolHandlerFactory : public CxxTest::TestSuite {
  public:
     void testIt();
+};
+
+class TestNetReconnectable : public CxxTest::TestSuite {
+ public:
+    void testInterface();
 };
 
 class TestNetSecureContext : public CxxTest::TestSuite {

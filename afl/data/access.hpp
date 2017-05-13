@@ -34,7 +34,7 @@ namespace afl { namespace data {
         /** Constructor.
             Makes an access object for the given value.
             \param p [optional] Value (may be null, default) */
-        Access(Value* p = 0);
+        Access(const Value* p = 0);
 
         /** Constructor.
             Makes an access object for the given value.
@@ -109,7 +109,7 @@ namespace afl { namespace data {
 
         /** Get embedded value.
             \return embedded value */
-        Value* getValue() const;
+        const Value* getValue() const;
 
         /** Convert to integer list.
             If this is an array, converts all values as-if by calling toInteger(), and appends them to the list.
@@ -139,7 +139,7 @@ namespace afl { namespace data {
         bool isError(String_t& source, String_t& str) const;
 
      private:
-        Value* m_value;
+        const Value* m_value;
     };
 
 } }

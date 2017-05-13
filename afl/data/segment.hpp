@@ -42,12 +42,17 @@ namespace afl { namespace data {
             \return value (owned by the Segment), or null */
         Value* operator[](Index_t index) const;
 
+        /** Get element by index.
+            \param index Index to access
+            \return value (owned by the Segment), or null */
+        Value* get(Index_t index) const;
+
         /** Set element by index.
             Ownership for the value remains at caller, even if an exception is thrown.
             The value will be cloned.
             \param index Index to access
             \param value Value to set */
-        void set(Index_t index, Value* value);
+        void set(Index_t index, const Value* value);
 
         /** Set element by index.
             Ownership for the value will be taken over by the Segment; if an exception is thrown, it is deleted.
@@ -102,7 +107,7 @@ namespace afl { namespace data {
             The value will be cloned.
             \param value Value to push
             \return *this */
-        Segment& pushBack(Value* value);
+        Segment& pushBack(const Value* value);
 
         /** Push integer.
             \param value Value to push

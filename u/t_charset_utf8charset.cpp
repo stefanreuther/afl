@@ -14,11 +14,11 @@ TestCharsetUtf8Charset::testIt()
 {
     afl::charset::Utf8Charset u8cs;
 
-    TS_ASSERT_EQUALS(u8cs.decode(afl::string::toMemory("foo")), "foo");
-    TS_ASSERT_EQUALS(u8cs.decode(afl::string::toMemory("f\xc2\x90")), "f\xc2\x90");
+    TS_ASSERT_EQUALS(u8cs.decode(afl::string::toBytes("foo")), "foo");
+    TS_ASSERT_EQUALS(u8cs.decode(afl::string::toBytes("f\xc2\x90")), "f\xc2\x90");
 
-    TS_ASSERT_EQUALS(u8cs.encode(afl::string::toMemory("foo")), "foo");
-    TS_ASSERT_EQUALS(u8cs.encode(afl::string::toMemory("f\xc2\x90")), "f\xc2\x90");
+    TS_ASSERT_EQUALS(afl::string::fromBytes(u8cs.encode(afl::string::toMemory("foo"))), "foo");
+    TS_ASSERT_EQUALS(afl::string::fromBytes(u8cs.encode(afl::string::toMemory("f\xc2\x90"))), "f\xc2\x90");
 }
 
 /** Test clone. */

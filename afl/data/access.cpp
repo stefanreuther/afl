@@ -28,7 +28,7 @@ namespace {
     };
 }
 
-afl::data::Access::Access(Value* p)
+afl::data::Access::Access(const Value* p)
     : m_value(p)
 { }
 
@@ -116,7 +116,7 @@ afl::data::Access::toString() const
                     if (i != 0) {
                         m_result += ",";
                     }
-                    visit(vv.get(i));
+                    visit(vv[i]);
                 }
             }
 
@@ -205,7 +205,7 @@ afl::data::Access::getHashKeys(StringList_t& list) const
         virtual void visitVector(const Vector& vv)
             {
                 for (size_t i = 0, n = vv.size(); i+1 < n; i += 2) {
-                    m_result.push_back(Access(vv.get(i)).toString());
+                    m_result.push_back(Access(vv[i]).toString());
                 }
             }
 
@@ -248,7 +248,7 @@ afl::data::Access::operator[](size_t index) const
             { }
 
         virtual void visitVector(const Vector& vv)
-            { m_result = vv.get(m_index); }
+            { m_result = vv[m_index]; }
 
         virtual void visitOther(const Value& /*other*/)
             { }
@@ -294,8 +294,8 @@ afl::data::Access::operator()(String_t key) const
         virtual void visitVector(const Vector& vv)
             {
                 for (size_t i = 0, n = vv.size(); i+1 < n; i += 2) {
-                    if (Access(vv.get(i)).toString() == m_key) {
-                        m_result = vv.get(i+1);
+                    if (Access(vv[i]).toString() == m_key) {
+                        m_result = vv[i+1];
                         break;
                     }
                 }
@@ -318,7 +318,7 @@ afl::data::Access::operator()(const char* key) const
     return operator()(String_t(key));
 }
 
-afl::data::Value*
+const afl::data::Value*
 afl::data::Access::getValue() const
 {
     return m_value;

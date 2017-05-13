@@ -7,6 +7,7 @@
 #include <cmath>
 #include "afl/string/formattraits.hpp"
 #include "afl/string/formatstate.hpp"
+#include "afl/string/hex.hpp"
 
 /*
  *  Generic
@@ -333,7 +334,7 @@ namespace {
     formatUnsigned(uintmax_t c, char typ, char* p)
     {
         int base = (typ == 'o') ? 8 : (typ == 'x' || typ == 'X') ? 16 : 10;
-        const char*const alpha = (typ == 'X') ? "0123456789ABCDEF" : "0123456789abcdef";
+        const char*const alpha = (typ == 'X') ? afl::string::HEX_DIGITS_UPPER : afl::string::HEX_DIGITS_LOWER;
         *--p = 0;
         while (c) {
             *--p = alpha[c % base];

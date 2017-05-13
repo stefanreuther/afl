@@ -11,6 +11,14 @@
 
 namespace arch { namespace posix {
 
+    enum ConversionMode {
+        /** Paranoid conversion: fail on unconvertible characters and nulls. */
+        ParanoidConversion,
+
+        /** Relaxed conversion: translate unconvertible characters to "?". */
+        RelaxedConversion
+    };
+
     /** Convert external string to UTF-8 for internal use.
         \param in Externally-provided string
         \return converted string */
@@ -19,12 +27,10 @@ namespace arch { namespace posix {
     /** Convert UTF-8 string to external string.
         \param result [out] Result goes here
         \param in [in] UTF-8 string
-        \param placeholders [in] true to use placeholders for unencodable characters, false to return an error
-        \retval true conversion succeeded
-        \retval false conversion error, and placeholders was false */
-    bool convertUtf8ToExternal(String_t& result,
-                               afl::string::ConstStringMemory_t in,
-                               bool placeholders);
+        \param mode [in] Conversion mode
+        \retval true conversion succeeded or errors could be recovered
+        \retval false conversion error, and mode said don't recover */
+    bool convertUtf8ToExternal(String_t& result, afl::string::ConstStringMemory_t in, ConversionMode mode);
 
     /** Convert UTF-8 string to path name.
         If the conversion fails, reports a FileProblemException, as if the file open failed.

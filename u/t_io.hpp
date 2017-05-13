@@ -11,6 +11,9 @@
 class TestIoBufferedSink : public CxxTest::TestSuite {
  public:
     void testIt();
+    void testFail();
+    void testFail2();
+    void testFail3();
 };
 
 class TestIoBufferedStream : public CxxTest::TestSuite {
@@ -50,6 +53,7 @@ class TestIoDirectory : public CxxTest::TestSuite {
 class TestIoDirectoryEntry : public CxxTest::TestSuite {
  public:
     void testIt();
+    void testInfo();
 };
 
 class TestIoFileMapping : public CxxTest::TestSuite {
@@ -77,6 +81,8 @@ class TestIoInflateTransform : public CxxTest::TestSuite {
     void testGood();
     void testGood2();
     void testBad();
+    void testTruncate();
+    void testVariant();
 };
 
 class TestIoInternalDirectory : public CxxTest::TestSuite {
@@ -90,6 +96,7 @@ class TestIoInternalDirectory : public CxxTest::TestSuite {
 class TestIoInternalFileMapping : public CxxTest::TestSuite {
  public:
     void testIt();
+    void testMem();
 };
 
 class TestIoInternalSink : public CxxTest::TestSuite {

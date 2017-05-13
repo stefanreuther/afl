@@ -20,7 +20,7 @@ namespace afl { namespace charset {
         ~DefaultCharsetFactory();
 
         // CharsetFactory:
-        virtual Charset* createCharset(afl::base::Deleter& deleter, String_t name);
+        virtual Charset* createCharset(String_t name);
     };
 
 } }

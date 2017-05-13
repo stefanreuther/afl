@@ -17,7 +17,7 @@ class afl::net::http::PageDispatcher::Handler : public afl::net::http::Response 
  public:
     Handler(Page* page, std::auto_ptr<Request> request, String_t root, String_t self, String_t path);
 
-    virtual bool handleData(const String_t& name, afl::base::ConstBytes_t& data);
+    virtual bool handleData(afl::base::ConstBytes_t& data);
     virtual void handleDataComplete();
     virtual bool isKeepalive();
     virtual afl::base::ConstBytes_t getData();
@@ -97,9 +97,9 @@ afl::net::http::PageDispatcher::Handler::init()
 }
 
 bool
-afl::net::http::PageDispatcher::Handler::handleData(const String_t& name, afl::base::ConstBytes_t& data)
+afl::net::http::PageDispatcher::Handler::handleData(afl::base::ConstBytes_t& data)
 {
-    m_pageRequest.handleData(name, data);
+    m_pageRequest.handleData(data);
     return false;
 }
 
@@ -134,21 +134,18 @@ afl::net::http::PageDispatcher::Handler::getData()
         // This means I have to send the headers, if any
         m_outputStatus = SendBody;
         if (m_request->isResponseHeaderRequested()) {
-            // Temporary
-            String_t dataName("<PageDispatcher>");
-
             // Build status line
             String_t statusLine(afl::string::Format("%s %d %s\r\n", m_request->getVersion(), m_pageResponse.getStatusCode(), m_pageResponse.getStatusText()));
             afl::base::ConstBytes_t bytes = afl::string::toBytes(statusLine);
-            m_headerSink.handleData(dataName, bytes);
+            m_headerSink.handleData(bytes);
 
             // Add headers
-            m_pageResponse.headers().writeHeaders(dataName, m_headerSink);
+            m_pageResponse.headers().writeHeaders(m_headerSink);
 
             // Add delimiter
             static const uint8_t CRLF[] = { 13, 10 };
             bytes = CRLF;
-            m_headerSink.handleData(dataName, bytes);
+            m_headerSink.handleData(bytes);
 
             // Produce result
             result = m_headerSink.getContent();

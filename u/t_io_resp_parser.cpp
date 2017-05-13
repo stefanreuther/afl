@@ -30,7 +30,7 @@ namespace {
         afl::io::resp::Parser parser(factory);
         afl::base::ConstBytes_t bytes(toBytes(str));
 
-        bool result = parser.handleData("<source name>", bytes);
+        bool result = parser.handleData(bytes);
         TSM_ASSERT(str, result);
         TSM_ASSERT(str, bytes.empty());
 
@@ -44,7 +44,7 @@ namespace {
         afl::io::resp::Parser parser(factory);
         afl::base::ConstBytes_t bytes(toBytes(str));
 
-        bool result = parser.handleData("<source name>", bytes);
+        bool result = parser.handleData(bytes);
         TSM_ASSERT(str, !result);
         TSM_ASSERT(str, bytes.empty());
     }
@@ -269,7 +269,7 @@ TestIoRespParser::testShortForm()
         Parser p(factory);
 
         p.setAcceptShortForm(true);
-        TS_ASSERT(p.handleData("<source name>", bytes));
+        TS_ASSERT(p.handleData(bytes));
 
         std::auto_ptr<afl::data::Value> result(p.extract());
         TS_ASSERT(dynamic_cast<afl::data::VectorValue*>(result.get()) != 0);
@@ -287,6 +287,6 @@ TestIoRespParser::testShortForm()
         afl::base::ConstBytes_t bytes(toBytes("foo bar"));
         Parser p(factory);
         p.setAcceptShortForm(true);
-        TS_ASSERT(!p.handleData("<source name>", bytes));
+        TS_ASSERT(!p.handleData(bytes));
     }
 }

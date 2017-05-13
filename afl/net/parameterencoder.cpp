@@ -23,7 +23,7 @@ afl::net::ParameterEncoder::handleHeader(String_t key, String_t value)
     } else {
         m_result += "&";
     }
-    m_result += afl::charset::UrlEncoding().encode(afl::string::toMemory(key));
+    m_result += afl::string::fromBytes(afl::charset::UrlEncoding().encode(afl::string::toMemory(key)));
     m_result += "=";
-    m_result += afl::charset::UrlEncoding().encode(afl::string::toMemory(value));
+    m_result += afl::string::fromBytes(afl::charset::UrlEncoding().encode(afl::string::toMemory(value)));
 }

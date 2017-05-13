@@ -112,10 +112,11 @@ afl::io::DirectoryEntry::createAsDirectory()
 }
 
 void
-afl::io::DirectoryEntry::clearInfo()
+afl::io::DirectoryEntry::setFlag(FileFlag flag, bool value)
 {
-    m_requestedInfo = 0;
-    m_availableInfo = 0;
+    // This will invalidate stored information.
+    clearInfo();
+    doSetFlag(flag, value);
 }
 
 void
@@ -151,6 +152,40 @@ afl::io::DirectoryEntry::setFlags(FileFlags_t flags)
 {
     m_flags = flags;
     m_availableInfo |= InfoFlags;
+}
+
+void
+afl::io::DirectoryEntry::clearInfo()
+{
+    m_requestedInfo = 0;
+    m_availableInfo = 0;
+}
+
+void
+afl::io::DirectoryEntry::copyInfo(DirectoryEntry& other, uint32_t requested)
+{
+    // Tell other entry to update itself
+    other.updateInfo(requested);
+
+    // Limit to information we actually got
+    requested &= other.m_availableInfo;
+
+    // Copy
+    if ((requested & InfoType) != 0) {
+        setFileType(other.getFileType());
+    }
+    if ((requested & InfoSize) != 0) {
+        setFileSize(other.getFileSize());
+    }
+    if ((requested & InfoLinkText) != 0) {
+        setLinkText(other.getLinkText());
+    }
+    if ((requested & InfoModificationTime) != 0) {
+        setModificationTime(other.getModificationTime());
+    }
+    if ((requested & InfoFlags) != 0) {
+        setFlags(other.getFlags());
+    }
 }
 
 bool

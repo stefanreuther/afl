@@ -53,9 +53,7 @@ arch::posix::convertExternalToUtf8(afl::string::ConstStringMemory_t in)
 
 // Convert UTF-8 string to external string.
 bool
-arch::posix::convertUtf8ToExternal(String_t& result,
-                                   afl::string::ConstStringMemory_t in,
-                                   bool placeholders)
+arch::posix::convertUtf8ToExternal(String_t& result, afl::string::ConstStringMemory_t in, ConversionMode mode)
 {
     setupLocale();
 
@@ -68,15 +66,26 @@ arch::posix::convertUtf8ToExternal(String_t& result,
         if (afl::charset::isErrorCharacter(ch)) {
             // It's an error character; keep it.
             result += char(afl::charset::getErrorCharacterId(ch));
+        } else if (ch == 0) {
+            // Null byte
+            switch (mode) {
+             case RelaxedConversion:
+                result += '\0';
+                break;
+             case ParanoidConversion:
+                return false;
+            }
         } else {
             // Regular Unicode character
             char tmp[MB_LEN_MAX];
             size_t produced = wcrtomb(tmp, ch, &mbs);
             if (produced > sizeof(tmp)) {
                 // We cannot encode this character.
-                if (placeholders) {
+                switch (mode) {
+                 case RelaxedConversion:
                     result += '?';
-                } else {
+                    break;
+                 case ParanoidConversion:
                     return false;
                 }
             } else {
@@ -92,7 +101,7 @@ String_t
 arch::posix::convertUtf8ToPathName(const String_t in)
 {
     String_t result;
-    if (!convertUtf8ToExternal(result, afl::string::toMemory(in), false)) {
+    if (!convertUtf8ToExternal(result, afl::string::toMemory(in), ParanoidConversion)) {
         throw afl::except::FileProblemException(in, afl::string::Messages::invalidFileName());
     }
     return result;

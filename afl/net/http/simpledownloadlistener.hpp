@@ -98,7 +98,7 @@ namespace afl { namespace net { namespace http {
      private:
         afl::sys::Semaphore m_semaphore;
         afl::io::Stream::FileSize_t m_sizeLimit;
-        afl::base::GrowableMemory<uint8_t> m_data;
+        afl::base::GrowableBytes_t m_data;
         HeaderTable m_headers;
         Status m_result;
         ClientRequest::FailureReason m_failureReason;

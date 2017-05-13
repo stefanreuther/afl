@@ -89,7 +89,7 @@ afl::io::TextFile::doReadLine(String_t& line)
 
     // Produce result
     if (pch != 0 || rawLine.size() != 0) {
-        line = m_charset->decode(afl::string::toMemory(rawLine));
+        line = m_charset->decode(afl::string::toBytes(rawLine));
         return true;
     } else {
         line.clear();
@@ -100,8 +100,7 @@ afl::io::TextFile::doReadLine(String_t& line)
 void
 afl::io::TextFile::doWriteText(afl::string::ConstStringMemory_t text)
 {
-    String_t rawString = m_charset->encode(text);
-    fullWrite(afl::string::toBytes(rawString));
+    fullWrite(m_charset->encode(text));
 }
 
 void

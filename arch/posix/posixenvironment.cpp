@@ -16,6 +16,8 @@
 #include "afl/io/bufferedstream.hpp"
 #include "afl/string/messages.hpp"
 #include "afl/except/unsupportedexception.hpp"
+#include "afl/string/posixfilenames.hpp"
+#include "arch/posix/posixcwd.hpp"
 
 namespace {
     /* CommandLine implementation for POSIX */
@@ -103,7 +105,7 @@ namespace {
         virtual void doWriteText(afl::string::ConstStringMemory_t data)
             {
                 String_t tmp;
-                arch::posix::convertUtf8ToExternal(tmp, data, true);
+                arch::posix::convertUtf8ToExternal(tmp, data, arch::posix::RelaxedConversion);
                 m_buffer.fullWrite(afl::string::toBytes(tmp));
             }
 
@@ -153,7 +155,7 @@ arch::posix::PosixEnvironment::getEnvironmentVariable(const String_t& name)
 {
     // Convert name
     String_t u8Name;
-    if (!convertUtf8ToExternal(u8Name, afl::string::toMemory(name), false)) {
+    if (!convertUtf8ToExternal(u8Name, afl::string::toMemory(name), ParanoidConversion)) {
         return String_t();
     }
 
@@ -184,7 +186,7 @@ arch::posix::PosixEnvironment::getSettingsDirectoryName(const String_t& appName)
         }
     }
     if (transformedName.size() > 1) {
-        homeName = PosixFileSystem().makePathName(homeName, transformedName);
+        homeName = afl::string::PosixFileNames().makePathName(homeName, transformedName);
     }
 
     return homeName;
@@ -195,7 +197,7 @@ String_t
 arch::posix::PosixEnvironment::getInstallationDirectoryName()
 {
     // File system instance
-    PosixFileSystem fs;
+    afl::string::PosixFileNames fs;
 
     // Look up the name
     String_t exeName;
@@ -234,14 +236,14 @@ arch::posix::PosixEnvironment::getInstallationDirectoryName()
 
                 // Check success
                 if (::access(combinedName.c_str(), X_OK) == 0) {
-                    exeName = fs.getAbsolutePathName(combinedName);
+                    exeName = getAbsolutePathName(combinedName);
                     exeNameOK = true;
                     break;
                 }
             }
         } else {
             // Absolute or relative path
-            exeName = fs.getAbsolutePathName(m_argv[0]);
+            exeName = getAbsolutePathName(m_argv[0]);
             exeNameOK = true;
         }
     }

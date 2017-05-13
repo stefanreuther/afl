@@ -60,20 +60,15 @@ afl::net::HeaderTable::enumerateHeaders(HeaderConsumer& consumer) const
 }
 
 void
-afl::net::HeaderTable::writeHeaders(const String_t& dataName, afl::io::DataSink& sink) const
+afl::net::HeaderTable::writeHeaders(afl::io::DataSink& sink) const
 {
     static const uint8_t COLONSP[] = { ':', ' ' };
     static const uint8_t CRLF[] = { '\r', '\n' };
-    afl::base::ConstBytes_t bytes;
     for (size_t i = 0, n = m_headers.size(); i < n; ++i) {
-        bytes = afl::string::toBytes(m_headers[i].getName());
-        sink.handleData(dataName, bytes);
-        bytes = COLONSP;
-        sink.handleData(dataName, bytes);
-        bytes = afl::string::toBytes(m_headers[i].getValue());
-        sink.handleData(dataName, bytes);
-        bytes = CRLF;
-        sink.handleData(dataName, bytes);
+        sink.handleFullData(afl::string::toBytes(m_headers[i].getName()));
+        sink.handleFullData(COLONSP);
+        sink.handleFullData(afl::string::toBytes(m_headers[i].getValue()));
+        sink.handleFullData(CRLF);
     }
 }
 

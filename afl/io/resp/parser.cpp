@@ -59,6 +59,10 @@
 //  5732       0       0    5732    1664 afl/io/resp/parser1.o (PtrVector->auto_ptr)
 //  6952       0       0    6952    1b28 afl/io/resp/parser1.o (add ShortState, d'ooh)
 
+namespace {
+    const char SOURCE_ID[] = "<Parser>";
+}
+
 /* Base class for a parser state. */
 class afl::io::resp::Parser::State {
  public:
@@ -71,22 +75,21 @@ class afl::io::resp::Parser::State {
        - optionally change to a new state (this destroys this state!)
        - optionally produce output and reset the state (this destroys this state!)
        It can exit by throwing an exception.
-       \param name Name of input, for reporting errors
        \param parser Invoking instance
        \param data [in/out] Data to consume */
-    virtual void handleData(const String_t& name, Parser& parser, afl::base::ConstBytes_t& data) = 0;
+    virtual void handleData(Parser& parser, afl::base::ConstBytes_t& data) = 0;
 
  protected:
-    void syntaxError(const String_t& name)
+    void syntaxError()
         {
-            throw afl::except::FileFormatException(name, afl::string::Messages::syntaxError());
+            throw afl::except::FileFormatException(SOURCE_ID, afl::string::Messages::syntaxError());
         }
 };
 
 /* Root state. Reads the type character and produces the next state. */
 class afl::io::resp::Parser::RootState : public State {
  public:
-    virtual void handleData(const String_t& name, Parser& parser, afl::base::ConstBytes_t& data);
+    virtual void handleData(Parser& parser, afl::base::ConstBytes_t& data);
 };
 
 /* String state. Reads a single line and produces a String or Error result. */
@@ -97,7 +100,7 @@ class afl::io::resp::Parser::StringState : public State {
           m_success(success),
           m_value()
         { }
-    virtual void handleData(const String_t& name, Parser& parser, afl::base::ConstBytes_t& data);
+    virtual void handleData(Parser& parser, afl::base::ConstBytes_t& data);
 
  private:
     const bool m_success;
@@ -118,7 +121,7 @@ class afl::io::resp::Parser::IntState : public State {
           m_state(Virgin),
           m_value(0)
         { }
-    virtual void handleData(const String_t& name, Parser& parser, afl::base::ConstBytes_t& data);
+    virtual void handleData(Parser& parser, afl::base::ConstBytes_t& data);
 
  private:
     const Kind m_kind;
@@ -135,7 +138,7 @@ class afl::io::resp::Parser::BulkState : public State {
           m_size(size),
           m_value()
         { }
-    virtual void handleData(const String_t& name, Parser& parser, afl::base::ConstBytes_t& data)
+    virtual void handleData(Parser& parser, afl::base::ConstBytes_t& data)
         {
             afl::base::ConstBytes_t now(data.splitUpdate(m_size));
             if (!now.empty()) {
@@ -150,7 +153,7 @@ class afl::io::resp::Parser::BulkState : public State {
                         parser.m_pState.reset();
                         break;
                     } else {
-                        syntaxError(name);
+                        syntaxError();
                     }
                 }
             }
@@ -172,11 +175,11 @@ class afl::io::resp::Parser::ArrayState : public State {
           m_value(),
           m_parser(factory)
         { }
-    virtual void handleData(const String_t& name, Parser& parser, afl::base::ConstBytes_t& data)
+    virtual void handleData(Parser& parser, afl::base::ConstBytes_t& data)
         {
             // Consume data until we have filled the array
             while (!data.empty() && m_size > 0) {
-                if (m_parser.handleData(name, data)) {
+                if (m_parser.handleData(data)) {
                     m_value.pushBackNew(m_parser.extract());
                     --m_size;
                 }
@@ -204,7 +207,7 @@ class afl::io::resp::Parser::ShortState : public State {
           m_value()
         { }
 
-    virtual void handleData(const String_t& /*name*/, Parser& parser, afl::base::ConstBytes_t& data)
+    virtual void handleData(Parser& parser, afl::base::ConstBytes_t& data)
         {
             while (const uint8_t* pc = data.eat()) {
                 const uint8_t c = *pc;
@@ -233,7 +236,7 @@ class afl::io::resp::Parser::ShortState : public State {
 
 
 void
-afl::io::resp::Parser::RootState::handleData(const String_t& name, Parser& parser, afl::base::ConstBytes_t& data)
+afl::io::resp::Parser::RootState::handleData(Parser& parser, afl::base::ConstBytes_t& data)
 {
     if (const uint8_t* pc = data.eat()) {
         switch (*pc) {
@@ -261,7 +264,7 @@ afl::io::resp::Parser::RootState::handleData(const String_t& name, Parser& parse
             if (parser.m_acceptShort && (afl::string::charIsUpper(*pc) || afl::string::charIsLower(*pc))) {
                 parser.m_pState.reset(new ShortState(*pc));
             } else {
-                syntaxError(name);
+                syntaxError();
             }
             break;
         }
@@ -269,14 +272,14 @@ afl::io::resp::Parser::RootState::handleData(const String_t& name, Parser& parse
 }
 
 void
-afl::io::resp::Parser::StringState::handleData(const String_t& name, Parser& parser, afl::base::ConstBytes_t& data)
+afl::io::resp::Parser::StringState::handleData(Parser& parser, afl::base::ConstBytes_t& data)
 {
     while (const uint8_t* pc = data.eat()) {
         if (*pc == '\r') {
             // ignore
         } else if (*pc == '\n') {
             // finish
-            parser.m_pValue.reset(m_success ? parser.m_factory.createString(m_value) : parser.m_factory.createError(name, m_value));
+            parser.m_pValue.reset(m_success ? parser.m_factory.createString(m_value) : parser.m_factory.createError(SOURCE_ID, m_value));
             parser.m_pState.reset();
             break;
         } else {
@@ -286,31 +289,31 @@ afl::io::resp::Parser::StringState::handleData(const String_t& name, Parser& par
 }
 
 void
-afl::io::resp::Parser::IntState::handleData(const String_t& name, Parser& parser, afl::base::ConstBytes_t& data)
+afl::io::resp::Parser::IntState::handleData(Parser& parser, afl::base::ConstBytes_t& data)
 {
     while (const uint8_t* pc = data.eat()) {
         const uint8_t ch = *pc;
         if (ch == '+') {
             if (m_state != Virgin) {
-                syntaxError(name);
+                syntaxError();
             }
             m_state = Positive;
         } else if (ch == '-') {
             if (m_state != Virgin) {
-                syntaxError(name);
+                syntaxError();
             }
             m_state = Negative;
         } else if (ch >= '0' && ch <= '9') {
             const int32_t digit = (ch - '0');
             if (m_state == Negative || m_state == NegativeDigits) {
                 if (m_value < INT_MIN/10 || (m_value != 0 && 10*m_value - INT_MIN < digit)) {
-                    syntaxError(name);
+                    syntaxError();
                 }
                 m_value = 10*m_value - digit;
                 m_state = NegativeDigits;
             } else {
                 if (m_value > INT_MAX/10 || INT_MAX - 10*m_value < digit) {
-                    syntaxError(name);
+                    syntaxError();
                 }
                 m_value = 10*m_value + digit;
                 m_state = PositiveDigits;
@@ -320,7 +323,7 @@ afl::io::resp::Parser::IntState::handleData(const String_t& name, Parser& parser
         } else if (ch == '\n') {
             // end
             if (m_state != PositiveDigits && m_state != NegativeDigits) {
-                syntaxError(name);
+                syntaxError();
             }
 
             // Save member variables locally because we're going to die
@@ -359,7 +362,7 @@ afl::io::resp::Parser::IntState::handleData(const String_t& name, Parser& parser
             }
             break;
         } else {
-            syntaxError(name);
+            syntaxError();
         }
     }
 }
@@ -378,11 +381,11 @@ afl::io::resp::Parser::~Parser()
 { }
 
 bool
-afl::io::resp::Parser::handleData(const String_t& name, afl::base::ConstBytes_t& data)
+afl::io::resp::Parser::handleData(afl::base::ConstBytes_t& data)
 {
     // Process data
     while (m_pState.get() != 0 && !data.empty()) {
-        m_pState->handleData(name, *this, data);
+        m_pState->handleData(*this, data);
     }
 
     // We're done when we no longer have a state

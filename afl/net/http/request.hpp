@@ -25,11 +25,10 @@ namespace afl { namespace net { namespace http {
         Request();
 
         /** Push header data.
-            \param name [in] Identification of the data source (e.g. peer name), for error reporting.
             \param data [in/out] On input, data to process. On output, remaining unprocessed data.
             \retval false More data required (%data is empty)
             \retval true No more data required (%data has unprocessed data) */
-        bool handleData(const String_t& name, afl::base::ConstBytes_t& bytes);
+        bool handleData(afl::base::ConstBytes_t& bytes);
 
         /** Get request method ("HEAD", "GET", "POST", etc.).
             The method is reported as is, and is interpreted case-sensitively (RfC 2616 5.1.1).

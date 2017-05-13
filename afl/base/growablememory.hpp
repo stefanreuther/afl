@@ -7,7 +7,6 @@
 
 #include <stdexcept>
 #include "afl/base/memory.hpp"
-#include "afl/base/uncopyable.hpp"
 #include "afl/tmp/stripcv.hpp"
 
 namespace afl { namespace base {
@@ -19,12 +18,15 @@ namespace afl { namespace base {
 
         It will most likely perform very bad for items which are not PODs. */
     template<typename T>
-    class GrowableMemory : private Uncopyable {
+    class GrowableMemory {
         static const size_t MINIMUM_CAPACITY = 256 / sizeof(T);
      public:
         /** Constructor.
             Makes an empty container. */
         GrowableMemory();
+
+        /** Copy constructor. */
+        GrowableMemory(const GrowableMemory& other);
 
         /** Destructor. */
         ~GrowableMemory();
@@ -155,7 +157,7 @@ namespace afl { namespace base {
             This may reallocate the container and invalidate all pointers and descriptors obtained from it.
             If the capacity is already big enough, nothing happens.
             \param newCapacity new minimum capacity */
-        void ensureCapacity(size_t newCapacity);
+        void reserve(size_t newCapacity);
 
         /** Ensure a minimum size.
             This may reallocate the container and invalidate all pointers and descriptors obtained from it.
@@ -220,6 +222,9 @@ namespace afl { namespace base {
         T* ensureCapacityInternal(size_t n);
     };
 
+    /** Descriptor for growable raw bytes. */
+    typedef GrowableMemory<uint8_t> GrowableBytes_t;
+
 } }
 
 template<typename T>
@@ -232,6 +237,16 @@ afl::base::GrowableMemory<T>::GrowableMemory()
       m_capacity(0),
       m_size(0)
 { }
+
+// Copy constructor.
+template<typename T>
+afl::base::GrowableMemory<T>::GrowableMemory(const GrowableMemory& other)
+    : m_data(0),
+      m_capacity(0),
+      m_size(0)
+{
+    append(other);
+}
 
 // Destructor.
 template<typename T>
@@ -393,7 +408,7 @@ afl::base::GrowableMemory<T>::unsafeData() const
 // Ensure a minimum capacity.
 template<typename T>
 void
-afl::base::GrowableMemory<T>::ensureCapacity(size_t newCapacity)
+afl::base::GrowableMemory<T>::reserve(size_t newCapacity)
 {
     delete[] ensureCapacityInternal(newCapacity);
 }
@@ -404,7 +419,7 @@ void
 afl::base::GrowableMemory<T>::ensureSize(size_t newSize)
 {
     if (newSize > m_size) {
-        ensureCapacity(newSize);
+        reserve(newSize);
         m_size = newSize;
     }
 }
@@ -465,7 +480,7 @@ afl::base::GrowableMemory<T>::appendN(T what, size_t count)
         if (m_size + count < m_size) {
             throw std::bad_alloc();
         }
-        ensureCapacity(m_size + count);
+        reserve(m_size + count);
         detail::MemoryTraits<T>::fill(&m_data[m_size], what, count);
         m_size += count;
     }

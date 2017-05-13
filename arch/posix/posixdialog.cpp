@@ -79,8 +79,8 @@ namespace {
         // Convert messages to system character set
         String_t sysInfo;
         String_t sysTitle;
-        arch::posix::convertUtf8ToExternal(sysInfo,  afl::string::toMemory(info), true);
-        arch::posix::convertUtf8ToExternal(sysTitle, afl::string::toMemory(title), true);
+        arch::posix::convertUtf8ToExternal(sysInfo,  afl::string::toMemory(info), arch::posix::RelaxedConversion);
+        arch::posix::convertUtf8ToExternal(sysTitle, afl::string::toMemory(title), arch::posix::RelaxedConversion);
 
         // Do we have reason to believe using an X11 message program will work?
         if (std::getenv("DISPLAY") != 0) {

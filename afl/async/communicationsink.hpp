@@ -39,7 +39,7 @@ namespace afl { namespace async {
         void setTimeout(afl::sys::Timeout_t t);
 
         // DataSink methods:
-        virtual bool handleData(const String_t& name, afl::base::ConstBytes_t& data);
+        virtual bool handleData(afl::base::ConstBytes_t& data);
 
      private:
         Controller& m_controller;

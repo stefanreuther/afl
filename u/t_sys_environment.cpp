@@ -6,6 +6,8 @@
 #include "afl/sys/environment.hpp"
 
 #include "u/t_sys.hpp"
+#include "afl/io/filesystem.hpp"
+#include "afl/io/directory.hpp"    // required to properly destroy the result of openDirectory()
 
 namespace {
     // Test argv. Since we cannot give it a real argv, give it a fake one,
@@ -42,6 +44,11 @@ TestSysEnvironment::testEnv()
     String_t v2 = afl::sys::Environment::getInstance(argv).getEnvironmentVariable("SHELL");
     String_t v3 = afl::sys::Environment::getInstance(argv).getEnvironmentVariable("COMSPEC");
     TS_ASSERT(!v1.empty() || !v2.empty() || !v3.empty());
+
+    // Verify sanitation against nulls
+    TS_ASSERT_EQUALS(afl::sys::Environment::getInstance(argv).getEnvironmentVariable(String_t("PATH\0Q", 6)), "");
+    TS_ASSERT_EQUALS(afl::sys::Environment::getInstance(argv).getEnvironmentVariable(String_t("SHELL\0Q", 7)), "");
+    TS_ASSERT_EQUALS(afl::sys::Environment::getInstance(argv).getEnvironmentVariable(String_t("COMSPEC\0Q", 9)), "");
 }
 
 /** Test getSettingsDirectoryName. */
@@ -90,3 +97,17 @@ TestSysEnvironment::testInterface()
     TS_ASSERT(t.attachTextReaderNT(afl::sys::Environment::Input).get() == 0);
     TS_ASSERT(t.attachStreamNT(afl::sys::Environment::Output).get() == 0);
 }
+
+/** Test getInstallationDirectoryName(). */
+void
+TestSysEnvironment::testInstallationDirectory()
+{
+    // This test is a little smelly because it uses a faked argv but PosixEnvironment::getInstallationDirectoryName evaluates it.
+    // However, even in the case of a faked argv, it should return a sensible result.
+    String_t dir = afl::sys::Environment::getInstance(argv).getInstallationDirectoryName();
+    TS_ASSERT(!dir.empty());
+
+    // Must be accessible as a directory
+    TS_ASSERT_THROWS_NOTHING(afl::io::FileSystem::getInstance().openDirectory(dir));
+}
+

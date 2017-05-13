@@ -20,6 +20,7 @@ class TestExcept : public CxxTest::TestSuite {
     void testSystemException();
     void testRemoteErrorException();
     void testCommandLineException();
+    void testModifyFileProblemException();
 };
 
 class TestExceptAssertionFailedException : public CxxTest::TestSuite {

@@ -23,6 +23,7 @@
 #include "afl/sys/error.hpp"
 #include "arch/posix/posixtime.hpp"
 #include "afl/sys/time.hpp"
+#include "afl/string/messages.hpp"
 
 /** DirectoryEntry implementation for POSIX. */
 class arch::posix::PosixDirectory::Entry : public afl::io::DirectoryEntry {
@@ -37,6 +38,7 @@ class arch::posix::PosixDirectory::Entry : public afl::io::DirectoryEntry {
     virtual void doRename(String_t newName);
     virtual void doErase();
     virtual void doCreateAsDirectory();
+    virtual void doSetFlag(FileFlag flag, bool value);
 
  private:
     afl::base::Ref<PosixDirectory> m_parent;
@@ -136,6 +138,9 @@ arch::posix::PosixDirectory::Entry::updateInfo(uint32_t requested)
             if (!m_name.empty() && m_name[0] == '.') {
                 flags += Hidden;
             }
+            if (ok && (st.st_mode & 0111) != 0 && convertFileType(st.st_mode) == tFile) {
+                flags += Executable;
+            }
             setFlags(flags);
         }
         if ((requested & InfoLinkText) != 0) {
@@ -193,6 +198,40 @@ arch::posix::PosixDirectory::Entry::doCreateAsDirectory()
 
     if (::mkdir(sysName.c_str(), 0777) != 0) {
         throw afl::except::FileSystemException(uniName, afl::sys::Error::current());
+    }
+}
+
+void
+arch::posix::PosixDirectory::Entry::doSetFlag(FileFlag flag, bool value)
+{
+    switch (flag) {
+     case Hidden:
+     case Link:
+        throw afl::except::FileProblemException(getPathName(), afl::string::Messages::invalidOperation());
+        break;
+
+     case Executable: {
+        const afl::io::FileSystem::FileName_t sysName = convertUtf8ToPathName(getPathName());
+        struct stat st;
+        if (::stat(sysName.c_str(), &st) != 0) {
+            throw afl::except::FileSystemException(getPathName(), afl::sys::Error::current());
+        }
+
+        mode_t newMode = st.st_mode & 0777;
+        if (value) {
+            // Set executable bit: give it to everyone who has 'r', plus owner in case it was not executable at all
+            // (Rationale: everyone who can read it, can copy it and mark their copy executable.)
+            newMode |= (newMode & 0444) >> 2;
+            newMode |= 0100;
+        } else {
+            // Remove executable bit
+            newMode &= ~0111;
+        }
+        if (::chmod(sysName.c_str(), newMode) != 0) {
+            throw afl::except::FileSystemException(getPathName(), afl::sys::Error::current());
+        }
+        break;
+     }
     }
 }
 

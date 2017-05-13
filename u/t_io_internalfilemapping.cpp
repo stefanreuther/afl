@@ -29,3 +29,22 @@ TestIoInternalFileMapping::testIt()
     TS_ASSERT_EQUALS(*map.get().at(1), 'h');
     TS_ASSERT_EQUALS(*map.get().at(2), 'e');
 }
+
+/** Test creation from Memory instance. */
+void
+TestIoInternalFileMapping::testMem()
+{
+    // Preload the buffer
+    afl::base::GrowableBytes_t in;
+    for (uint8_t i = 1; i <= 10; ++i) {
+        in.append(i);
+    }
+
+    // Create
+    afl::io::InternalFileMapping testee(in);
+    afl::base::ConstBytes_t out(testee.get());
+    TS_ASSERT_EQUALS(out.size(), 10U);
+    for (uint8_t i = 1; i <= 10; ++i) {
+        TS_ASSERT_EQUALS(*out.at(i-1), i);
+    }
+}

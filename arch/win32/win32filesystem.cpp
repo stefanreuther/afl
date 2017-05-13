@@ -1,8 +1,6 @@
 /**
   *  \file arch/win32/win32filesystem.cpp
   *  \brief Class arch::win32::Win32FileSystem
-  *
-  *  \todo UNC support is completely missing here
   */
 
 #if TARGET_OS_WIN32
@@ -14,20 +12,6 @@
 #include "arch/win32/win32directory.hpp"
 #include "arch/win32/win32root.hpp"
 #include "arch/win32/win32.hpp"
-
-namespace {
-    const char PATH_SEPARATOR = '\\';
-
-    /** Convert slashes to backslashes. */
-    void
-    frobSlash(String_t& name)
-    {
-        String_t::size_type n = 0;
-        while ((n = name.find('/', n)) != name.npos) {
-            name[n] = PATH_SEPARATOR;
-        }
-    }
-}
 
 afl::base::Ref<afl::io::Stream>
 arch::win32::Win32FileSystem::openFile(FileName_t fileName, OpenMode mode)
@@ -50,112 +34,32 @@ arch::win32::Win32FileSystem::openRootDirectory()
 bool
 arch::win32::Win32FileSystem::isAbsolutePathName(FileName_t path)
 {
-    return (path.size() > 2 && path[1] == ':' && (path[2] == '\\' || path[2] == '/'));
+    return m_fileNames.isAbsolutePathName(path);
 }
 
 bool
 arch::win32::Win32FileSystem::isPathSeparator(char c)
 {
-    return c == '\\' || c == ':' || c == '/';
+    return m_fileNames.isPathSeparator(c);
 }
 
 arch::win32::Win32FileSystem::FileName_t
 arch::win32::Win32FileSystem::makePathName(FileName_t path, FileName_t name)
 {
-    if (isAbsolutePathName(name) || (name.size() >= 2 && name[1] == ':') || (name.size() > 0 && (name[0] == '/' || name[0] == '\\'))) {
-        // absolute ("c:/foo"), drive-relative ("c:foo"), or root-relative ("\foo")
-        return name;
-    } else {
-        // relative
-        if (path.size() != 0 && !isPathSeparator(path[path.size()-1])) {
-            path += PATH_SEPARATOR;
-        }
-        return path + name;
-    }
+    return m_fileNames.makePathName(path, name);
 }
 
 arch::win32::Win32FileSystem::FileName_t
 arch::win32::Win32FileSystem::getCanonicalPathName(FileName_t name)
 {
-    frobSlash(name);
-
-    // If there is a drive letter, remove it and save it for later. */
-    FileName_t prefix;
-    if (name.size() >= 1 && name[1] == ':') {
-        prefix.assign(name, 0, 2);
-        name.erase(0, 2);
-    }
-
-    // Convert remainder
-    bool isAbsolute = false;
-    size_t upCount = 0;
-    std::list<String_t> out;
-
-    // Check leading slash
-    FileName_t::size_type pos = 0;
-    if (name[0] == PATH_SEPARATOR) {
-        isAbsolute = true;
-        pos = 1;
-    }
-
-    while (pos < name.size()) {
-        // Find next delimiter
-        FileName_t::size_type next = name.find(PATH_SEPARATOR, pos);
-        if (next == FileName_t::npos) {
-            next = name.size();
-        }
-
-        // Process
-        if (next == pos) {
-            // ignore consecutive slashes
-        } else if (next == pos+1 && name[pos] == '.') {
-            // ignore "." components
-        } else if (next == pos+2 && name.compare(pos, 2, "..", 2) == 0) {
-            // ".." component
-            if (!out.empty()) {
-                out.pop_back();
-            } else {
-                ++upCount;
-            }
-        } else {
-            // normal
-            out.push_back(FileName_t(name, pos, next-pos));
-        }
-
-        if (next >= name.size()) {
-            break;
-        }
-        pos = next+1;
-    }
-
-    // Now generate output
-    FileName_t s;
-    if (isAbsolute) {
-        s += PATH_SEPARATOR;
-    } else {
-        while (upCount--) {
-            s += "..";
-            s += PATH_SEPARATOR;
-        }
-    }
-    for (std::list<FileName_t>::iterator i = out.begin(); i != out.end(); ++i) {
-        if (i != out.begin()) {
-            s += PATH_SEPARATOR;
-        }
-        s += *i;
-    }
-
-    if (s.empty()) {
-        s = ".";
-    }
-    return prefix + s;
+    return m_fileNames.getCanonicalPathName(name);
 }
 
 arch::win32::Win32FileSystem::FileName_t
 arch::win32::Win32FileSystem::getAbsolutePathName(FileName_t name)
 {
     // Convert file name
-    frobSlash(name);
+    m_fileNames.flipSlashes(name);
 
     if (hasUnicodeSupport()) {
         // Unicode version
@@ -197,37 +101,13 @@ arch::win32::Win32FileSystem::getAbsolutePathName(FileName_t name)
 arch::win32::Win32FileSystem::FileName_t
 arch::win32::Win32FileSystem::getFileName(FileName_t name)
 {
-    FileName_t::size_type d = name.find_last_of("\\:/");
-    if (d != name.npos && (name[d] == '\\' || name[d] == '/' || d == 1)) {
-        // "fooo\bar", "foo/bar", or "a:" (but not "bla:blub" which is a file with a stream)
-        return name.substr(d+1);
-    } else {
-        // Just a file name
-        return name;
-    }
+    return m_fileNames.getFileName(name);
 }
 
 arch::win32::Win32FileSystem::FileName_t
 arch::win32::Win32FileSystem::getDirectoryName(FileName_t name)
 {
-    frobSlash(name);
-    FileName_t::size_type d = name.find_last_of("\\:");
-    if (d == 0 && name[d] == '\\') {
-        /* `\file' */
-        return FileName_t(1, PATH_SEPARATOR);
-    } else if (d == 1 && name[1] == ':') {
-        /* `a:file' */
-        return name.substr(0, 2);
-    } else if (d == 2 && name[1] == ':' && name[2] == '\\') {
-        /* `a:\file' */
-        return name.substr(0, 3);
-    } else if (d != FileName_t::npos && name[d] == '\\') {
-        /* `dir\file' */
-        return name.substr(0, d);
-    } else {
-        /* `file' */
-        return ".";
-    }
+    return m_fileNames.getDirectoryName(name);
 }
 
 arch::win32::Win32FileSystem::FileName_t

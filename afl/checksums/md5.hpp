@@ -28,6 +28,8 @@ namespace afl { namespace checksums {
         virtual size_t getBlockSize() const;
         virtual Bytes_t getHash(Bytes_t data) const;
 
+        static const size_t HASH_SIZE = 16;
+
      private:
         uint64_t m_count;       ///< Number of bytes written (mod 2^64).
 

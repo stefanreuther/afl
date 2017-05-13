@@ -53,7 +53,7 @@ namespace {
     String_t loadString(afl::io::Stream& in, size_t n)
     {
         // FIXME: move this into a library?
-        afl::base::GrowableMemory<uint8_t> buffer;
+        afl::base::GrowableBytes_t buffer;
         buffer.resize(n);
         in.fullRead(buffer);
         return afl::string::fromBytes(buffer);
@@ -97,6 +97,7 @@ class afl::io::archive::ZipReader::ZipDirEntry : public afl::io::DirectoryEntry 
     virtual void doRename(String_t newName);
     virtual void doErase();
     virtual void doCreateAsDirectory();
+    virtual void doSetFlag(FileFlag flag, bool value);
 
  private:
     const IndexEntry& m_entry;
@@ -244,6 +245,12 @@ afl::io::archive::ZipReader::ZipDirEntry::doErase()
 
 void
 afl::io::archive::ZipReader::ZipDirEntry::doCreateAsDirectory()
+{
+    throw afl::except::FileProblemException(getTitle(), afl::string::Messages::cannotModifyArchiveFile());
+}
+
+void
+afl::io::archive::ZipReader::ZipDirEntry::doSetFlag(FileFlag /*flag*/, bool /*value*/)
 {
     throw afl::except::FileProblemException(getTitle(), afl::string::Messages::cannotModifyArchiveFile());
 }
@@ -554,7 +561,7 @@ afl::io::archive::ZipReader::readNextEntry()
             name.erase(0, n+1);
         }
         if ((flags & gfUnicodeName) == 0) {
-            name = afl::charset::CodepageCharset(afl::charset::g_codepage437).decode(afl::string::toMemory(name));
+            name = afl::charset::CodepageCharset(afl::charset::g_codepage437).decode(afl::string::toMemory(name).toBytes());
         }
 
         /* Skip extra field */

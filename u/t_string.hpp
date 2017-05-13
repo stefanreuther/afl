@@ -29,6 +29,7 @@ class TestStringFormat : public CxxTest::TestSuite {
     void testReorder();
     void testStream();
     void testSpecials();
+    void testPointer();
 };
 
 class TestStringFormatState : public CxxTest::TestSuite {
@@ -43,6 +44,11 @@ class TestStringFormatTraits : public CxxTest::TestSuite {
 };
 
 class TestStringFormatUnion : public CxxTest::TestSuite {
+ public:
+    void testIt();
+};
+
+class TestStringHex : public CxxTest::TestSuite {
  public:
     void testIt();
 };
@@ -97,6 +103,17 @@ class TestStringString : public CxxTest::TestSuite {
 class TestStringTranslator : public CxxTest::TestSuite {
  public:
     void testIt();
+};
+
+class TestStringWin32FileNames : public CxxTest::TestSuite {
+ public:
+    void testFlipSlashes();
+    void testIsAbsolute();
+    void testIsPathSeparator();
+    void testMakePath();
+    void testGetCanonicalPathName();
+    void testGetFileName();
+    void testGetDirectoryName();
 };
 
 #endif

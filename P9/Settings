@@ -48,7 +48,14 @@ PROJ_AUTO += afl:afl/*pp testsuite:u/*pp
 ##  Main Library
 ##
 TARGETS += afl
-FILES_afl = afl/net/server.cpp afl/net/server.hpp \
+FILES_afl = afl/string/win32filenames.cpp afl/string/win32filenames.hpp \
+    afl/net/reconnectable.hpp afl/net/mimebuilder.cpp \
+    afl/net/mimebuilder.hpp afl/net/nullnetworkstack.cpp \
+    afl/net/nullnetworkstack.hpp afl/charset/hexencoding.cpp \
+    afl/charset/hexencoding.hpp afl/string/hex.cpp afl/string/hex.hpp \
+    afl/sys/parsedtime.cpp afl/net/nullcommandhandler.cpp \
+    afl/net/nullcommandhandler.hpp arch/posix/posixcwd.hpp \
+    arch/posix/posixcwd.cpp afl/net/server.cpp afl/net/server.hpp \
     afl/sys/commandlineparser.cpp afl/except/commandlineexception.cpp \
     afl/except/commandlineexception.hpp afl/base/observable.hpp \
     arch/posix/posixdialog.cpp arch/posix/posixdialog.hpp \
@@ -337,20 +344,24 @@ DEPEND_unzip = afl
 ##  Testsuite
 ##
 TARGETS += testsuite
-FILES_testsuite = u/t_net_server.cpp u/t_base_observable.cpp \
-    u/t_sys_dialog.cpp u/t_base_weaklink.cpp u/t_base_baseweaklink.cpp \
-    u/t_base_weaktarget.cpp u/t_io_transformreaderstream.cpp \
-    u/t_io_json_parser_testsuite.cpp u/t_io_deflatetransform.cpp \
-    u/t_io_archive_zipreader.cpp u/t_io_archive.hpp u/t_io_limitedstream.cpp \
-    u/t_base_ref.cpp u/t_net_http_errorresponse.cpp \
-    u/t_io_msexpandtransform.cpp u/t_net_redis_sortoperation.cpp \
-    u/t_net_redis_stringsetkey.cpp u/t_net_redis_integersetkey.cpp \
-    u/t_net_redis_subtree.cpp u/t_net_redis_key.cpp \
-    u/t_net_redis_stringkey.cpp u/mock/commandhandlermock.cpp \
-    u/mock/commandhandlermock.hpp u/t_net_redis_integerkey.cpp \
-    u/t_io_nullfilesystem.cpp u/t_string_posixfilenames.cpp \
-    u/t_net_http_client.cpp u/t_net_parameterencoder.cpp \
-    u/t_io_nulltextwriter.cpp u/t_io_textreader.cpp u/t_io_textwriter.cpp \
+FILES_testsuite = u/t_string_win32filenames.cpp u/t_net_reconnectable.cpp \
+    u/t_net_mimebuilder.cpp u/t_net_nullnetworkstack.cpp \
+    u/t_charset_hexencoding.cpp u/t_string_hex.cpp \
+    u/t_net_nullcommandhandler.cpp u/t_net_server.cpp \
+    u/t_base_observable.cpp u/t_sys_dialog.cpp u/t_base_weaklink.cpp \
+    u/t_base_baseweaklink.cpp u/t_base_weaktarget.cpp \
+    u/t_io_transformreaderstream.cpp u/t_io_json_parser_testsuite.cpp \
+    u/t_io_deflatetransform.cpp u/t_io_archive_zipreader.cpp \
+    u/t_io_archive.hpp u/t_io_limitedstream.cpp u/t_base_ref.cpp \
+    u/t_net_http_errorresponse.cpp u/t_io_msexpandtransform.cpp \
+    u/t_net_redis_sortoperation.cpp u/t_net_redis_stringsetkey.cpp \
+    u/t_net_redis_integersetkey.cpp u/t_net_redis_subtree.cpp \
+    u/t_net_redis_key.cpp u/t_net_redis_stringkey.cpp \
+    u/mock/commandhandlermock.cpp u/mock/commandhandlermock.hpp \
+    u/t_net_redis_integerkey.cpp u/t_io_nullfilesystem.cpp \
+    u/t_string_posixfilenames.cpp u/t_net_http_client.cpp \
+    u/t_net_parameterencoder.cpp u/t_io_nulltextwriter.cpp \
+    u/t_io_textreader.cpp u/t_io_textwriter.cpp \
     u/t_except_assertionfailedexception.cpp \
     u/t_sys_longcommandlineparser.cpp u/t_string_proxytranslator.cpp \
     u/t_sys_standardcommandlineparser.cpp u/t_sys_commandlineparser.cpp \

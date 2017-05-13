@@ -24,7 +24,7 @@ namespace afl { namespace net { namespace http {
         ErrorResponse(const std::auto_ptr<Request>& req, String_t text);
 
         // Response:
-        virtual bool handleData(const String_t& name, afl::base::ConstBytes_t& data);
+        virtual bool handleData(afl::base::ConstBytes_t& data);
         virtual void handleDataComplete();
         virtual bool isKeepalive();
         virtual afl::base::ConstBytes_t getData();

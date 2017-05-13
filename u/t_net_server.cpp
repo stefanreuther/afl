@@ -40,7 +40,7 @@ namespace {
         virtual void advanceTime(afl::sys::Timeout_t /*msecs*/)
             { }
 
-        virtual void handleData(const String_t&, afl::base::ConstBytes_t bytes)
+        virtual void handleData(afl::base::ConstBytes_t bytes)
             {
                 TS_ASSERT(m_sent);
                 TS_ASSERT(!bytes.empty());

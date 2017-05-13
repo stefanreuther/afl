@@ -10,6 +10,11 @@
 class TestNetRespClient : public CxxTest::TestSuite {
  public:
     void testIt();
+    void testReconnect();
+    void testReconnect2();
+    void testNoConnect();
+    void testError();
+    void testReconnectOnce();
 };
 
 class TestNetRespProtocolHandler : public CxxTest::TestSuite {

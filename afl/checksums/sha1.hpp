@@ -28,13 +28,13 @@ namespace afl { namespace checksums {
         virtual size_t getBlockSize() const;
         virtual Bytes_t getHash(Bytes_t data) const;
 
-     private:
-        static const size_t SHA1HashSize = 20;
+        static const size_t HASH_SIZE = 20;
 
+     private:
         typedef uint8_t Block_t[64];
         Block_t m_block;
 
-        uint32_t m_state[SHA1HashSize/4];
+        uint32_t m_state[HASH_SIZE/4];
 
         uint64_t m_bytes;
 

@@ -75,7 +75,7 @@ class afl::sys::Thread::Impl {
             // Set name (see above)
             {
                 String_t name;
-                arch::posix::convertUtf8ToExternal(name, afl::string::toMemory(me->m_parent->getName()), true);
+                arch::posix::convertUtf8ToExternal(name, afl::string::toMemory(me->m_parent->getName()), arch::posix::RelaxedConversion);
                 if (name.size() > THREAD_NAME_LIMIT) {
                     name.erase(THREAD_NAME_LIMIT);
                 }

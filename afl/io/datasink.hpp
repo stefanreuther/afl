@@ -16,21 +16,15 @@ namespace afl { namespace io {
     class DataSink : public afl::base::Deletable {
      public:
         /** Consume data.
-
-            If this function throws an exception, it can use \c name to identify the data source
-            (for example, RemoteErrorException's or FileProblemException's \c fileName parameter).
-
-            \param name [in] Identification of the data source, for error reporting.
             \param data [in/out] On input, data to process. On output, remaining unprocessed data.
             \retval false More data required (%data is empty)
             \retval true No more data required (%data has unprocessed data) */
-        virtual bool handleData(const String_t& name, afl::base::ConstBytes_t& data) = 0;
+        virtual bool handleData(afl::base::ConstBytes_t& data) = 0;
 
         /** Consume data, full version.
             Like handleData(), but throws a FileProblemException if not all data could be processed.
-            \param name [in] Identification of the data source, for error reporting.
             \param data [in] Data to process. */
-        void handleFullData(const String_t& name, afl::base::ConstBytes_t data);
+        void handleFullData(afl::base::ConstBytes_t data);
     };
 
 } }

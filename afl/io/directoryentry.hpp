@@ -53,7 +53,9 @@ namespace afl { namespace io {
             /** This is a hidden file. */
             Hidden,
             /** This is a symbolic link. */
-            Link
+            Link,
+            /** This is an executable file. */
+            Executable
         };
         typedef afl::bits::SmallSet<FileFlag> FileFlags_t;
 
@@ -118,6 +120,11 @@ namespace afl { namespace io {
             The created directory can be opened using openDirectory().
             \throw FileProblemException if there is a problem */
         void createAsDirectory();
+
+        /** Set flag.
+            \param flag Flag to change
+            \param value New value */
+        void setFlag(FileFlag flag, bool value);
 
         /** Get title of this directory entry.
             This is the title to be shown to users.
@@ -184,6 +191,13 @@ namespace afl { namespace io {
             \throw FileProblemException if there is a problem */
         virtual void doCreateAsDirectory() = 0;
 
+        /** Set flag, implementation.
+            \param flag Flag to change
+            \param value New value
+            \throw FileProblemException if there is a problem */
+        virtual void doSetFlag(FileFlag flag, bool value) = 0;
+
+
         /** Set file type.
             updateInfo() should call this to set the file type.
             \param type File type */
@@ -214,6 +228,11 @@ namespace afl { namespace io {
             Future calls to information retrieval functions will call updateInfo() again.
             You can call this if you know that the information now is stale. */
         void clearInfo();
+
+        /** Copy information.
+            \param other Other DirectoryEntry to copy from
+            \param requested Information to copy */
+        void copyInfo(DirectoryEntry& other, uint32_t requested);
 
      private:
         /** Bitfield of available information. */

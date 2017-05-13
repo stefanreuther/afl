@@ -84,7 +84,7 @@ afl::net::http::PageResponse::finish()
     if (m_body.getContent().empty() && m_statusCode >= 300) {
         String_t errorDocument = getStatusText();
         afl::base::ConstBytes_t bytes(afl::string::toBytes(errorDocument));
-        m_body.handleData("<PageResponse>", bytes);
+        m_body.handleData(bytes);
         m_headers.add("Content-Type", "text/plain; charset=UTF-8");
     }
 

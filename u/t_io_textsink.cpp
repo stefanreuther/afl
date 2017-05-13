@@ -14,7 +14,7 @@ void
 TestIoTextSink::testIt()
 {
     afl::io::InternalSink sink;
-    afl::io::TextSink text("label", sink);
+    afl::io::TextSink text(sink);
 
     static char mem[] = {'m','e','m'};
     static const char ntbs[] = "ntbs";

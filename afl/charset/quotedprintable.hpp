@@ -16,8 +16,8 @@ namespace afl { namespace charset {
     class QuotedPrintable : public Charset {
      public:
         virtual ~QuotedPrintable();
-        virtual String_t encode(afl::string::ConstStringMemory_t in);
-        virtual String_t decode(afl::string::ConstStringMemory_t in);
+        virtual afl::base::GrowableBytes_t encode(afl::string::ConstStringMemory_t in);
+        virtual String_t decode(afl::base::ConstBytes_t in);
         virtual QuotedPrintable* clone() const;
     };
 

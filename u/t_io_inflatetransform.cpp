@@ -213,3 +213,74 @@ TestIoInflateTransform::testBad()
         }
     }
 }
+
+/** Test truncation. */
+void
+TestIoInflateTransform::testTruncate()
+{
+    if (!afl::io::InflateTransform::isAvailable()) {
+        return;
+    }
+
+    // Test data
+    static const uint8_t HI[] = {
+        0x1f, 0x8b, 0x08, 0x08, 0x46, 0x62, 0xc9, 0x58, 0x02, 0x03, 0x68, 0x69,
+        0x00, 0xcb, 0xc8, 0x04, 0x00, 0xac, 0x2a, 0x93, 0xd8, 0x02, 0x00, 0x00,
+        0x00
+    };
+
+    // Starting at any place other than the first byte will fail
+    for (size_t i = 1; i < sizeof(HI) - 10; ++i) {
+        afl::base::ConstBytes_t in(HI);
+        in.split(i);
+
+        uint8_t buffer[4096];
+        afl::base::Bytes_t out(buffer);
+
+        afl::io::InflateTransform inf(afl::io::InflateTransform::Gzip);
+        TS_ASSERT_THROWS(inf.transform(in, out), afl::except::InvalidDataException);
+    }
+
+    // Ending before the stream ends will not fail, but demonstrate that we can shut down in any state
+    for (size_t i = 0; i < sizeof(HI); ++i) {
+        afl::base::ConstBytes_t in(HI);
+        in.trim(i);
+
+        uint8_t buffer[4096];
+        afl::base::Bytes_t out(buffer);
+
+        afl::io::InflateTransform inf(afl::io::InflateTransform::Gzip);
+        TS_ASSERT_THROWS_NOTHING(inf.transform(in, out));
+    }
+}
+
+/** Test header variant. */
+void
+TestIoInflateTransform::testVariant()
+{
+    if (!afl::io::InflateTransform::isAvailable()) {
+        return;
+    }
+
+    // Data.
+    // I cannot find a tool that creates the extra header fields, so this is manually crafted (gunzip decompresses it ok).
+    static const uint8_t HI[] = {
+        0x1f, 0x8b, 0x08, 0x1C,     // header
+        0x46, 0x62, 0xc9, 0x58,     // mtime
+        0x02, 0x03,                 // flag/os
+        7, 0, 5,5,5,5,5,5,5,        // extra data
+        0x68, 0x69, 0x00,           // filename
+        1,1,1,1,1,1,1,1, 0,         // comment
+        0xcb, 0xc8, 0x04, 0x00, 0xac, 0x2a, 0x93, 0xd8, 0x02, 0x00, 0x00, 0x00
+    };
+
+    // Decompress
+    afl::base::ConstBytes_t in(HI);
+    uint8_t buffer[4096];
+    afl::base::Bytes_t out(buffer);
+    afl::io::InflateTransform(afl::io::InflateTransform::Gzip).transform(in, out);
+
+    TS_ASSERT_EQUALS(out.size(), 2U);
+    TS_ASSERT_EQUALS(buffer[0], 'h');
+    TS_ASSERT_EQUALS(buffer[1], 'i');
+}

@@ -38,7 +38,7 @@ namespace {
                 afl::base::ConstBytes_t bytes(dataChars.toBytes());
 
                 afl::net::HeaderParser p(*this);
-                TSM_ASSERT(expectedResult, p.handleData("<source name>", bytes));
+                TSM_ASSERT(expectedResult, p.handleData(bytes));
                 TSM_ASSERT(expectedResult, bytes.empty());
                 TSM_ASSERT(expectedResult, !p.hasErrors());
                 TSM_ASSERT(expectedResult, p.isCompleted());
@@ -54,7 +54,7 @@ namespace {
                 afl::base::ConstBytes_t bytes(dataChars.toBytes());
 
                 afl::net::HeaderParser p(*this);
-                TS_ASSERT(!p.handleData("<source name>", bytes));
+                TS_ASSERT(!p.handleData(bytes));
                 TS_ASSERT(!p.isCompleted());
                 TS_ASSERT(bytes.empty());
             }
@@ -68,7 +68,7 @@ namespace {
                 afl::base::ConstBytes_t bytes(dataChars.toBytes());
 
                 afl::net::HeaderParser p(*this);
-                TSM_ASSERT(expectedResult, p.handleData("<source name>", bytes));
+                TSM_ASSERT(expectedResult, p.handleData(bytes));
                 TSM_ASSERT(expectedResult, bytes.empty());
                 TSM_ASSERT(expectedResult, p.hasErrors());
                 TSM_ASSERT(expectedResult, p.isCompleted());
@@ -98,7 +98,7 @@ TestNetHeaderParser::testPartition()
         Consumer c;
         afl::net::HeaderParser p(c);
         afl::base::ConstBytes_t mem(dataChars.toBytes());
-        TS_ASSERT(p.handleData("<source name>", mem));
+        TS_ASSERT(p.handleData(mem));
         TS_ASSERT(mem.empty());
         TS_ASSERT_EQUALS(c.m_buffer, result);
     }
@@ -110,9 +110,9 @@ TestNetHeaderParser::testPartition()
 
         afl::base::ConstBytes_t mem1(dataChars.subrange(0, i).toBytes());
         afl::base::ConstBytes_t mem2(dataChars.subrange(i).toBytes());
-        TS_ASSERT(!p.handleData("<source name>", mem1));
+        TS_ASSERT(!p.handleData(mem1));
         TS_ASSERT(mem1.empty());
-        TS_ASSERT(p.handleData("<source name>", mem2));
+        TS_ASSERT(p.handleData(mem2));
         TS_ASSERT(mem2.empty());
         TS_ASSERT_EQUALS(c.m_buffer, result);
     }

@@ -18,7 +18,7 @@ TestNetHttpRequest::testIt()
         // HTTP/0.9 request
         Request req;
         ConstBytes_t bytes(afl::string::toBytes("GET /foo\r\n"));
-        TS_ASSERT(req.handleData("<test>", bytes));
+        TS_ASSERT(req.handleData(bytes));
         TS_ASSERT(bytes.empty());
         TS_ASSERT_EQUALS(req.getMethod(), "GET");
         TS_ASSERT_EQUALS(req.getPath(), "/foo");
@@ -31,7 +31,7 @@ TestNetHttpRequest::testIt()
         // HTTP/0.9 request with more spaces
         Request req;
         ConstBytes_t bytes(afl::string::toBytes("GET     /foo  \r\n"));
-        TS_ASSERT(req.handleData("<test>", bytes));
+        TS_ASSERT(req.handleData(bytes));
         TS_ASSERT(bytes.empty());
         TS_ASSERT_EQUALS(req.getMethod(), "GET");
         TS_ASSERT_EQUALS(req.getPath(), "/foo");
@@ -44,10 +44,10 @@ TestNetHttpRequest::testIt()
         // Fragmented HTTP/0.9 request
         Request req;
         ConstBytes_t bytes(afl::string::toBytes("GET /fo"));
-        TS_ASSERT(!req.handleData("<test>", bytes));
+        TS_ASSERT(!req.handleData(bytes));
         TS_ASSERT(bytes.empty());
         bytes = afl::string::toBytes("o\r\nxy");
-        TS_ASSERT(req.handleData("<test>", bytes));
+        TS_ASSERT(req.handleData(bytes));
         TS_ASSERT_EQUALS(bytes.size(), 2U);                    // "xy" remains
         TS_ASSERT_EQUALS(req.getMethod(), "GET");
         TS_ASSERT_EQUALS(req.getPath(), "/foo");
@@ -60,7 +60,7 @@ TestNetHttpRequest::testIt()
         // HTTP/1.0 request
         Request req;
         ConstBytes_t bytes(afl::string::toBytes("GET / HTTP/1.0\r\nContent-Type: text/json\r\nContent-Length: 10\r\n\r\n"));
-        TS_ASSERT(req.handleData("<test>", bytes));
+        TS_ASSERT(req.handleData(bytes));
         TS_ASSERT(bytes.empty());
         TS_ASSERT_EQUALS(req.getMethod(), "GET");
         TS_ASSERT_EQUALS(req.getPath(), "/");
@@ -78,7 +78,7 @@ TestNetHttpRequest::testIt()
         // HTTP/1.0 request with keepalive
         Request req;
         ConstBytes_t bytes(afl::string::toBytes("GET / HTTP/1.0\r\nConnection: keepalive\r\n\r\n"));
-        TS_ASSERT(req.handleData("<test>", bytes));
+        TS_ASSERT(req.handleData(bytes));
         TS_ASSERT(bytes.empty());
         TS_ASSERT_EQUALS(req.getMethod(), "GET");
         TS_ASSERT_EQUALS(req.getPath(), "/");
@@ -92,7 +92,7 @@ TestNetHttpRequest::testIt()
         // HTTP/1.1 request
         Request req;
         ConstBytes_t bytes(afl::string::toBytes("GET / HTTP/1.1\r\n\r\n"));
-        TS_ASSERT(req.handleData("<test>", bytes));
+        TS_ASSERT(req.handleData(bytes));
         TS_ASSERT(bytes.empty());
         TS_ASSERT_EQUALS(req.getMethod(), "GET");
         TS_ASSERT_EQUALS(req.getPath(), "/");
@@ -106,7 +106,7 @@ TestNetHttpRequest::testIt()
         // HTTP/1.0 request without keepalive
         Request req;
         ConstBytes_t bytes(afl::string::toBytes("GET / HTTP/1.1\r\nConnection: close\r\n\r\n"));
-        TS_ASSERT(req.handleData("<test>", bytes));
+        TS_ASSERT(req.handleData(bytes));
         TS_ASSERT(bytes.empty());
         TS_ASSERT_EQUALS(req.getMethod(), "GET");
         TS_ASSERT_EQUALS(req.getPath(), "/");
@@ -120,7 +120,7 @@ TestNetHttpRequest::testIt()
         // Error
         Request req;
         ConstBytes_t bytes(afl::string::toBytes("\r\n"));
-        TS_ASSERT(req.handleData("<test>", bytes));
+        TS_ASSERT(req.handleData(bytes));
         TS_ASSERT(req.hasErrors());
     }
 }
@@ -136,7 +136,7 @@ TestNetHttpRequest::testPath()
         Request req;
         String_t sub;
         ConstBytes_t bytes(afl::string::toBytes("GET /dir/sub HTTP/1.0\r\n\r\n"));
-        TS_ASSERT(req.handleData("<test>", bytes));
+        TS_ASSERT(req.handleData(bytes));
         TS_ASSERT_EQUALS(req.getPath(), "/dir/sub");
         TS_ASSERT(req.matchPath("", sub));
         TS_ASSERT_EQUALS(sub, "/dir/sub");
@@ -152,7 +152,7 @@ TestNetHttpRequest::testPath()
         Request req;
         String_t sub;
         ConstBytes_t bytes(afl::string::toBytes("GET /dir/sub?q HTTP/1.0\r\n\r\n"));
-        TS_ASSERT(req.handleData("<test>", bytes));
+        TS_ASSERT(req.handleData(bytes));
         TS_ASSERT_EQUALS(req.getPath(), "/dir/sub?q");
         TS_ASSERT(req.matchPath("", sub));
         TS_ASSERT_EQUALS(sub, "/dir/sub?q");

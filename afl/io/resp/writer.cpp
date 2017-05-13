@@ -77,7 +77,7 @@ afl::io::resp::Writer::visitHash(const afl::data::Hash& hv)
 void
 afl::io::resp::Writer::visitVector(const afl::data::Vector& vv)
 {
-    visitSegment(vv.getValues());
+    visitSegment(vv);
 }
 
 void
@@ -122,5 +122,5 @@ void
 afl::io::resp::Writer::write(afl::string::ConstStringMemory_t str)
 {
     afl::base::ConstBytes_t bytes = str.toBytes();
-    m_sink.handleData("<resp::Writer>", bytes);
+    m_sink.handleData(bytes); // FIXME: handleFullData?
 }

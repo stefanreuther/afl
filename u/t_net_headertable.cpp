@@ -64,7 +64,7 @@ TestNetHeaderTable::testIt()
 
         // Write to sink and check
         afl::io::InternalSink sink;
-        ht.writeHeaders("<test>", sink);
+        ht.writeHeaders(sink);
         TS_ASSERT(sink.getContent().equalContent(afl::string::toMemory("foo: baz\r\n"
                                                                        "foo: bar2\r\n"
                                                                        "other: bar\r\n"

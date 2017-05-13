@@ -42,7 +42,7 @@ namespace afl { namespace net { namespace http {
         /** Process body data.
             Depending on the request message headers, this will parse the data as form argument,
             store it away for later retrieval in body(), or discard it. */
-        void handleData(const String_t& name, afl::base::ConstBytes_t data);
+        void handleData(afl::base::ConstBytes_t data);
 
         /** Finalize.
             Call this when the object has been completely configured.

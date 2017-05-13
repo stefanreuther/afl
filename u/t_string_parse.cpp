@@ -52,6 +52,10 @@ TestStringParse::testStrToInt()
     TS_ASSERT(strToInteger(f, u8));
     TS_ASSERT_EQUALS(u8, 240U);
 
+    String_t t = "1000";
+    TS_ASSERT(!strToInteger(t, i8));
+    TS_ASSERT(!strToInteger(t, u8));
+
     // Negative
     String_t g = "-10";
     TS_ASSERT(strToInteger(g, i8));

@@ -16,7 +16,7 @@ TestNetHttpErrorResponse::testIt()
     std::auto_ptr<afl::net::http::Request> req(new afl::net::http::Request());
     afl::base::ConstBytes_t bytes = afl::string::toBytes("GET / HTTP/1.0\r\n"
                                                          "Host: wherever\r\n\r\n");
-    bool ok = req->handleData("data", bytes);
+    bool ok = req->handleData(bytes);
     TS_ASSERT(ok);
     TS_ASSERT(bytes.empty());
 
@@ -25,7 +25,7 @@ TestNetHttpErrorResponse::testIt()
 
     // Must ignore additional data
     bytes = afl::string::toBytes("xyz");
-    TS_ASSERT(!testee.handleData("data", bytes));
+    TS_ASSERT(!testee.handleData(bytes));
     TS_ASSERT_EQUALS(bytes.size(), 3U);
 
     // Not keepalive

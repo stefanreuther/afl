@@ -16,7 +16,7 @@ afl::net::http::ChunkedSink::~ChunkedSink()
 { }
 
 bool
-afl::net::http::ChunkedSink::handleData(const String_t& name, afl::base::ConstBytes_t& data)
+afl::net::http::ChunkedSink::handleData(afl::base::ConstBytes_t& data)
 {
     while (m_state != Final && data.size() != 0) {
         switch (m_state) {
@@ -62,7 +62,7 @@ afl::net::http::ChunkedSink::handleData(const String_t& name, afl::base::ConstBy
             }
             m_size -= n;
             afl::base::ConstBytes_t payload(data.split(n));
-            m_peer.handleData(name, payload);
+            m_peer.handleData(payload);
             if (m_size == 0) {
                 m_state = PayloadEnd;
             }

@@ -27,7 +27,7 @@ namespace {
         ResponseSink(afl::net::http::ClientRequest* req)
             : m_request(req)
             { }
-        virtual bool handleData(const String_t& /*name*/, afl::base::ConstBytes_t& data)
+        virtual bool handleData(afl::base::ConstBytes_t& data)
             {
                 m_request->handleResponseData(data);
                 data.reset();
@@ -284,7 +284,7 @@ afl::net::http::ClientConnection::handleReception(afl::base::ConstBytes_t data)
     try {
         if (m_state == DuringReceiveHeader) {
             // I was receiving headers. Check whether we finish that.
-            if (m_response->handleData(m_name.toString(), data)) {
+            if (m_response->handleData(data)) {
                 // Finished the header.
                 m_request->handleResponseHeader(*m_response);
 
@@ -336,7 +336,7 @@ afl::net::http::ClientConnection::handleReception(afl::base::ConstBytes_t data)
         if (m_state == DuringReceivePayload) {
             // I was receiving payloads. Check whether we finish that.
             // FIXME: exception handling!
-            if (m_pResponseSink->handleData(m_name.toString(), data)) {
+            if (m_pResponseSink->handleData(data)) {
                 // Finished the payload -> finish off the request
                 m_request->handleSuccess();
                 reset();

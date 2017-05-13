@@ -89,6 +89,9 @@ int main(int /*argc*/, char** argv)
                 if (entry->getFlags().contains(entry->Hidden)) {
                     out->writeLine("  Hidden");
                 }
+                if (entry->getFlags().contains(entry->Executable)) {
+                    out->writeLine("  Executable");
+                }
             }
         }
         catch (afl::except::FileProblemException& fpe) {

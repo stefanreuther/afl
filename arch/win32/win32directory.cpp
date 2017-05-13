@@ -16,6 +16,7 @@
 #include "arch/win32/win32time.hpp"
 #include "afl/except/fileproblemexception.hpp"
 #include "afl/except/filesystemexception.hpp"
+#include "afl/string/messages.hpp"
 #include "afl/sys/error.hpp"
 
 /** DirectoryEntry implementation for Win32. */
@@ -31,6 +32,7 @@ class arch::win32::Win32Directory::Entry : public afl::io::DirectoryEntry {
     virtual void doRename(String_t newName);
     virtual void doErase();
     virtual void doCreateAsDirectory();
+    virtual void doSetFlag(FileFlag flag, bool value);
 
     void setFlagsAndFileType(DWORD attr);
 
@@ -217,6 +219,19 @@ arch::win32::Win32Directory::Entry::doCreateAsDirectory()
     }
     if (!success) {
         throw afl::except::FileSystemException(utfName, afl::sys::Error::current());
+    }
+}
+
+void
+arch::win32::Win32Directory::Entry::doSetFlag(FileFlag flag, bool value)
+{
+    // FIXME: changing the "hidden" bit is actually supported
+    switch (flag) {
+     case Hidden:
+     case Link:
+     case Executable:
+        throw afl::except::FileProblemException(getPathName(), afl::string::Messages::invalidOperation());
+        break;
     }
 }
 

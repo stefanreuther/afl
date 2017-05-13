@@ -5,7 +5,7 @@
 
 #include "afl/bits/fixedstring.hpp"
 
-String_t
+afl::base::ConstBytes_t
 afl::bits::unpackFixedString(afl::base::ConstBytes_t mem)
 {
     const uint8_t* p = mem.unsafeData();
@@ -23,15 +23,14 @@ afl::bits::unpackFixedString(afl::base::ConstBytes_t mem)
     }
 
     // Produce result
-    // FIXME: better notation possible?
-    return String_t(static_cast<const char*>(static_cast<const void*>(p)), len);
+    return mem.subrange(0, len);
 }
 
 void
-afl::bits::packFixedString(afl::base::Bytes_t mem, afl::string::ConstStringMemory_t src)
+afl::bits::packFixedString(afl::base::Bytes_t mem, afl::base::ConstBytes_t src)
 {
     // Copy initial part
-    size_t copied = mem.copyFrom(src.toBytes()).size();
+    size_t copied = mem.copyFrom(src).size();
 
     // Fill remaining part
     mem.subrange(copied).fill(' ');

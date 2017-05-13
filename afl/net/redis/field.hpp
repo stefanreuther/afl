@@ -7,6 +7,7 @@
 
 #include "afl/string/string.hpp"
 #include "afl/net/redis/hashkey.hpp"
+#include "afl/data/value.hpp"
 
 namespace afl { namespace net { namespace redis {
 
@@ -37,6 +38,10 @@ namespace afl { namespace net { namespace redis {
             \retval true Field successfully deleted
             \retval false Field did not exist */
         bool remove();
+
+        /** Get raw value (HGET).
+            \return Newly-allocated value, null if field does not exist. */
+        afl::data::Value* getRawValue() const;
 
         /** Get name of this field.
             \return name */

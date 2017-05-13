@@ -21,8 +21,8 @@ namespace afl { namespace charset {
         virtual ~Utf8Charset();
 
         // Charset:
-        virtual String_t encode(afl::string::ConstStringMemory_t in);
-        virtual String_t decode(afl::string::ConstStringMemory_t in);
+        virtual afl::base::GrowableBytes_t encode(afl::string::ConstStringMemory_t in);
+        virtual String_t decode(afl::base::ConstBytes_t in);
 
         // Clonable:
         virtual Utf8Charset* clone() const;

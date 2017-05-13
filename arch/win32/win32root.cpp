@@ -34,6 +34,7 @@ class arch::win32::Win32Root::Entry : public afl::io::DirectoryEntry {
     virtual void doRename(String_t newName);
     virtual void doErase();
     virtual void doCreateAsDirectory();
+    virtual void doSetFlag(FileFlag flag, bool value);
 
  private:
     afl::base::Ref<Win32Root> m_parent;
@@ -138,6 +139,12 @@ arch::win32::Win32Root::Entry::doErase()
 
 void
 arch::win32::Win32Root::Entry::doCreateAsDirectory()
+{
+    fail();
+}
+
+void
+arch::win32::Win32Root::Entry::doSetFlag(FileFlag /*flag*/, bool /*value*/)
 {
     fail();
 }

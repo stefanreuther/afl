@@ -80,7 +80,7 @@ afl::io::Stream::createVirtualMapping(FileSize_t limit)
 }
 
 bool
-afl::io::Stream::handleData(const String_t& /*name*/, afl::base::ConstBytes_t& data)
+afl::io::Stream::handleData(afl::base::ConstBytes_t& data)
 {
     data.split(write(data));
     return !data.empty();

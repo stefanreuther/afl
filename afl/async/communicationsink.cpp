@@ -28,7 +28,7 @@ afl::async::CommunicationSink::setTimeout(afl::sys::Timeout_t t)
 
 // DataSink methods:
 bool
-afl::async::CommunicationSink::handleData(const String_t& /*name*/, afl::base::ConstBytes_t& data)
+afl::async::CommunicationSink::handleData(afl::base::ConstBytes_t& data)
 {
     while (!data.empty()) {
         SendOperation op(data);

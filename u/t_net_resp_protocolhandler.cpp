@@ -36,13 +36,13 @@ TestNetRespProtocolHandler::testIt()
     TS_ASSERT_EQUALS(op.m_dataToSend.size(), 0U);
 
     // Give them some [incomplete] data
-    testee.handleData("<input>", afl::string::toBytes("one two "));
+    testee.handleData(afl::string::toBytes("one two "));
     testee.getOperation(op);
     TS_ASSERT(!op.m_close);
     TS_ASSERT_EQUALS(op.m_dataToSend.size(), 0U);
 
     // Give them some more data
-    testee.handleData("<input>", afl::string::toBytes("three\n"));
+    testee.handleData(afl::string::toBytes("three\n"));
     testee.getOperation(op);
     TS_ASSERT(!op.m_close);
     TS_ASSERT(op.m_dataToSend.equalContent(afl::string::toBytes("$1\r\n3\r\n")));
@@ -53,7 +53,7 @@ TestNetRespProtocolHandler::testIt()
     TS_ASSERT_EQUALS(op.m_dataToSend.size(), 0U);
 
     // Give a bad command
-    testee.handleData("<input>", afl::string::toBytes(":1\n"));
+    testee.handleData(afl::string::toBytes(":1\n"));
     testee.getOperation(op);
     TS_ASSERT(!op.m_close);
     TS_ASSERT_DIFFERS(op.m_dataToSend.size(), 0U);

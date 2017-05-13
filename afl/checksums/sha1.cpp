@@ -47,7 +47,7 @@
 // add without copy:   1.47
 // optimisations:      1.39        unrolled: 1.03
 
-const size_t afl::checksums::SHA1::SHA1HashSize;
+const size_t afl::checksums::SHA1::HASH_SIZE;
 
 afl::checksums::SHA1::SHA1()
 {
@@ -99,7 +99,7 @@ afl::checksums::SHA1::add(ConstBytes_t data)
 size_t
 afl::checksums::SHA1::getHashSize() const
 {
-    return SHA1HashSize;
+    return HASH_SIZE;
 }
 
 // Get block size in bytes.
@@ -116,7 +116,7 @@ afl::checksums::SHA1::getHash(Bytes_t data) const
     SHA1 copy(*this);
     copy.padMessage();
 
-    uint8_t buffer[SHA1HashSize];
+    uint8_t buffer[HASH_SIZE];
     afl::bits::packArray<afl::bits::UInt32BE>(buffer, copy.m_state);
     return data.copyFrom(buffer);
 }

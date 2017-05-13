@@ -12,6 +12,13 @@ afl::io::InternalFileMapping::InternalFileMapping(Stream& stream, Stream::FileSi
     init(stream, limit);
 }
 
+// Construct from memory buffer.
+afl::io::InternalFileMapping::InternalFileMapping(afl::base::GrowableBytes_t& mem)
+    : m_data()
+{
+    m_data.swap(mem);
+}
+
 // Destructor.
 afl::io::InternalFileMapping::~InternalFileMapping()
 { }

@@ -50,6 +50,11 @@ namespace afl { namespace net { namespace redis {
             \param fieldName name of field
             \return handle to field */
         StringField stringField(const String_t& fieldName);
+
+        /** Get all content (HGETALL).
+            Produces a list of alternating keys and values in \c result.
+            \param result [in/out] Keys and values will be appended here */
+        void getAll(afl::data::StringList_t& result) const;
     };
 
 } } }

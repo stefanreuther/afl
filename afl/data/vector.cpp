@@ -7,71 +7,23 @@
 
 inline
 afl::data::Vector::Vector()
-    : m_values()
+    : RefCounted(),
+      Segment()
 { }
 
 afl::data::Vector::~Vector()
 { }
 
-afl::base::Ref<afl::data::Vector>
+afl::data::Vector::Ref_t
 afl::data::Vector::create()
 {
     return *new Vector();
 }
 
-afl::base::Ref<afl::data::Vector>
+afl::data::Vector::Ref_t
 afl::data::Vector::create(Segment& values)
 {
     afl::base::Ref<afl::data::Vector> vec = *new Vector();
-    vec->m_values.swap(values);
+    vec->swap(values);
     return vec;
 }
-
-void
-afl::data::Vector::set(Index_t index, Value* value)
-{
-    m_values.set(index, value);
-}
-
-void
-afl::data::Vector::setNew(Index_t index, Value* value)
-{
-    m_values.setNew(index, value);
-}
-
-afl::data::Value*
-afl::data::Vector::get(Index_t index) const
-{
-    return m_values[index];
-}
-
-const afl::data::Segment&
-afl::data::Vector::getValues() const
-{
-    return m_values;
-}
-
-afl::data::Segment&
-afl::data::Vector::getValues()
-{
-    return m_values;
-}
-
-afl::data::Vector::Index_t
-afl::data::Vector::size() const
-{
-    return m_values.size();
-}
-
-void
-afl::data::Vector::pushBack(Value* value)
-{
-    m_values.pushBack(value);
-}
-
-void
-afl::data::Vector::pushBackNew(Value* value)
-{
-    m_values.pushBackNew(value);
-}
-

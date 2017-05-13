@@ -56,7 +56,7 @@ struct afl::net::Server::ConnectionState {
     afl::base::Ptr<Socket> socket;
 
     /** Name of socket.
-        Needed for every handleData() call and therefore stored upon construction to avoid allocation. */
+        Stored upon construction to avoid allocation during runtime. */
     const String_t socketName;
 
     /** Protocol handler. */
@@ -348,7 +348,7 @@ afl::net::Server::handleConnectionEvent(afl::async::Controller& ctl, ConnectionS
                 m_closeSignal = true;
             } else {
                 // Process received data and fetch next command
-                state.handler->handleData(state.socketName, state.receiveOperation.getReceivedBytes());
+                state.handler->handleData(state.receiveOperation.getReceivedBytes());
                 state.state = ConnectionState::Idle;
                 startConnection(ctl, state);
             }

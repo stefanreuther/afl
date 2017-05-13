@@ -34,6 +34,7 @@
 #include "afl/bits/rotate.hpp"
 #include "afl/bits/uint64le.hpp"
 
+const size_t afl::checksums::MD5::HASH_SIZE;
 
 namespace {
     // Constants for MD5Transform routine.
@@ -146,7 +147,7 @@ afl::checksums::MD5::add(ConstBytes_t data)
 size_t
 afl::checksums::MD5::getHashSize() const
 {
-    return 16;
+    return HASH_SIZE;
 }
 
 // Get block size in bytes.

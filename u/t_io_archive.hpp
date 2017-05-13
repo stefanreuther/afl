@@ -11,6 +11,10 @@ class TestIoArchiveZipReader : public CxxTest::TestSuite {
  public:
     void testReadMembers();
     void testBadOperations();
+    void testMeta();
+    void testUncompr();
+    void testCrypt();
+    void testUnsupported();
 };
 
 #endif

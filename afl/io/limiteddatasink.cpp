@@ -15,9 +15,9 @@ afl::io::LimitedDataSink::~LimitedDataSink()
 { }
 
 bool
-afl::io::LimitedDataSink::handleData(const String_t& name, afl::base::ConstBytes_t& data)
+afl::io::LimitedDataSink::handleData(afl::base::ConstBytes_t& data)
 {
     afl::base::ConstBytes_t peerData(data.splitUpdate(m_limit));
-    m_peer.handleData(name, peerData);
+    m_peer.handleData(peerData);
     return m_limit == 0;
 }

@@ -31,11 +31,10 @@ namespace afl { namespace io { namespace resp {
         ~Parser();
 
         /** Consume data.
-            \param name [in] Identification of the data source, for error reporting
             \param data [in/out] On input, data to process. On output, remaining unprocessed data.
             \retval false More data required (%data is empty)
             \retval true No more data required (%data has unprocessed data), call extract() to obtain result */
-        virtual bool handleData(const String_t& name, afl::base::ConstBytes_t& data);
+        virtual bool handleData(afl::base::ConstBytes_t& data);
 
         /** Set acceptance of short form.
             In short form, we accept unstructured lines which are broken into words as array of string.

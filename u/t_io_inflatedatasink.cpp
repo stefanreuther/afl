@@ -127,7 +127,7 @@ TestIoInflateDataSink::testGood()
         // Post it through the InflateDataSink in pieces
         for (size_t pos = 0; pos < data.size(); pos += blockSizes[i]) {
             afl::base::ConstBytes_t range(data.subrange(pos, blockSizes[i]));
-            inf.handleData("<source name>", range);
+            inf.handleData(range);
             TS_ASSERT(range.empty());
         }
         
@@ -160,7 +160,7 @@ TestIoInflateDataSink::testBad()
         try {
             for (size_t pos = 0; pos < data.size(); pos += blockSizes[i]) {
                 afl::base::ConstBytes_t range(data.subrange(pos, blockSizes[i]));
-                inf.handleData("<source name>", range);
+                inf.handleData(range);
                 TS_ASSERT(range.empty());
             }
         }

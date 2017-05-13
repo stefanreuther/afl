@@ -23,6 +23,8 @@ TestStringString::testMemory()
 
     TS_ASSERT_EQUALS(afl::string::toMemoryLimited("foobar", 9).size(), 6U);
     TS_ASSERT_EQUALS(afl::string::toMemoryLimited("foobar", 3).size(), 3U);
+
+    TS_ASSERT_EQUALS(afl::string::toMemoryLimited(0, 3).size(), 0U);
 }
 
 /** Test strCaseCompare. */

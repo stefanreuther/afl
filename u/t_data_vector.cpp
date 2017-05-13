@@ -16,7 +16,6 @@ TestDataVector::testIt()
     afl::base::Ref<afl::data::Vector> p = afl::data::Vector::create();
     TS_ASSERT(&p.get() != 0);
     TS_ASSERT_EQUALS(p->size(), 0U);
-    TS_ASSERT_EQUALS(p->getValues().size(), 0U);
 
     // Set some value
     TS_ASSERT(p->get(2) == 0);

@@ -11,7 +11,7 @@
 namespace afl { namespace io {
 
     /** Internal (In-Memory) Sink.
-        Internally, the sink is represented as a GrowableMemory<uint8_t>, and grows with each append. */
+        Internally, the sink is represented as a GrowableBytes_t, and grows with each append. */
     class InternalSink : public DataSink {
      public:
         /** Constructor. */
@@ -19,7 +19,7 @@ namespace afl { namespace io {
 
         // DataSink:
         virtual ~InternalSink();
-        virtual bool handleData(const String_t& name, afl::base::ConstBytes_t& data);
+        virtual bool handleData(afl::base::ConstBytes_t& data);
 
         /** Get content of stream.
             \return Handle to the content of the sink.
@@ -30,7 +30,7 @@ namespace afl { namespace io {
         void clear();
 
      private:
-        afl::base::GrowableMemory<uint8_t> m_data;
+        afl::base::GrowableBytes_t m_data;
     };
 
 } }

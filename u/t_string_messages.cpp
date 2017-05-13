@@ -32,6 +32,8 @@ TestStringMessages::testIt()
     TS_ASSERT(afl::string::Messages::unknownError().size() != 0);
     TS_ASSERT(afl::string::Messages::operationCancelled().size() != 0);
     TS_ASSERT(afl::string::Messages::unsupportedFeature().size() != 0);
+    TS_ASSERT(afl::string::Messages::unsupportedCompressionMode().size() != 0);
+    TS_ASSERT(afl::string::Messages::unexpectedError().size() != 0);
     TS_ASSERT(afl::string::Messages::rootDirTitle().size() != 0);
     TS_ASSERT(afl::string::Messages::myFilesLinkTitle().size() != 0);
     TS_ASSERT(afl::string::Messages::desktopLinkTitle().size() != 0);

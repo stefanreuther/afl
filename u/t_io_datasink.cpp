@@ -20,7 +20,7 @@ TestIoDataSink::testIt()
             : m_size(10)
             { }
 
-        virtual bool handleData(const String_t& /*name*/, afl::base::ConstBytes_t& data)
+        virtual bool handleData(afl::base::ConstBytes_t& data)
             {
                 data.splitUpdate(m_size);
                 return m_size == 0;
@@ -34,16 +34,16 @@ TestIoDataSink::testIt()
     // Hit the end exactly
     {
         Tester t;
-        TS_ASSERT_THROWS_NOTHING(t.handleFullData("TestIoDataSink", afl::string::toBytes("12345")));
-        TS_ASSERT_THROWS_NOTHING(t.handleFullData("TestIoDataSink", afl::string::toBytes("12345")));
-        TS_ASSERT_THROWS(t.handleFullData("TestIoDataSink", afl::string::toBytes("12345")), afl::except::FileProblemException);
+        TS_ASSERT_THROWS_NOTHING(t.handleFullData(afl::string::toBytes("12345")));
+        TS_ASSERT_THROWS_NOTHING(t.handleFullData(afl::string::toBytes("12345")));
+        TS_ASSERT_THROWS(t.handleFullData(afl::string::toBytes("12345")), afl::except::FileProblemException);
     }
 
     // Inexact hit
     {
         Tester t;
-        TS_ASSERT_THROWS_NOTHING(t.handleFullData("TestIoDataSink", afl::string::toBytes("123456")));
-        TS_ASSERT_THROWS(t.handleFullData("TestIoDataSink", afl::string::toBytes("123456")), afl::except::FileProblemException);
-        TS_ASSERT_THROWS(t.handleFullData("TestIoDataSink", afl::string::toBytes("123456")), afl::except::FileProblemException);
+        TS_ASSERT_THROWS_NOTHING(t.handleFullData(afl::string::toBytes("123456")));
+        TS_ASSERT_THROWS(t.handleFullData(afl::string::toBytes("123456")), afl::except::FileProblemException);
+        TS_ASSERT_THROWS(t.handleFullData(afl::string::toBytes("123456")), afl::except::FileProblemException);
     }
 }

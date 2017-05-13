@@ -36,6 +36,10 @@ namespace afl { namespace except {
             \return File name */
         const String_t& getFileName() const;
 
+        /** Set file name.
+            \param fileName File name */
+        void setFileName(const String_t& fileName);
+
      private:
         /** File name. */
         String_t m_fileName;

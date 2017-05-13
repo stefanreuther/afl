@@ -23,9 +23,9 @@ TestCharsetCharset::testInterface()
 {
     class Tester : public afl::charset::Charset {
      public:
-        virtual String_t encode(afl::string::ConstStringMemory_t /*in*/)
-            { return String_t(); }
-        virtual String_t decode(afl::string::ConstStringMemory_t /*in*/)
+        virtual afl::base::GrowableBytes_t encode(afl::string::ConstStringMemory_t /*in*/)
+            { return afl::base::GrowableBytes_t(); }
+        virtual String_t decode(afl::base::ConstBytes_t /*in*/)
             { return String_t(); }
         Tester* clone() const
             { return new Tester(); }

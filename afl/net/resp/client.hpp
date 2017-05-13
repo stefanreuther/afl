@@ -14,6 +14,7 @@
 #include "afl/net/commandhandler.hpp"
 #include "afl/net/name.hpp"
 #include "afl/net/networkstack.hpp"
+#include "afl/net/reconnectable.hpp"
 #include "afl/net/socket.hpp"
 #include "afl/sys/mutex.hpp"
 
@@ -26,8 +27,12 @@ namespace afl { namespace net { namespace resp {
 
         resp::Client is a CommandHandler.
         Each command is sent to the server encoded as an array (multi-bulk).
-        call() and callVoid() effectively have the same semantics. */
-    class Client : public CommandHandler {
+        call() and callVoid() effectively have the same semantics.
+
+        resp::Client is Reconnectable. */
+    class Client : public CommandHandler,
+                   public Reconnectable
+    {
      public:
         /** Constructor.
             \param stack Network stack to use. Lifetime must be greater than the lifetime of the Client.
@@ -41,6 +46,9 @@ namespace afl { namespace net { namespace resp {
         virtual Value_t* call(const Segment_t& command);
         virtual void callVoid(const Segment_t& command);
 
+        // Reconnectable:
+        virtual void setReconnectMode(Mode mode);
+
      private:
         // Red tape
         NetworkStack& m_stack;                    // Network stack
@@ -48,6 +56,9 @@ namespace afl { namespace net { namespace resp {
         afl::sys::Mutex m_mutex;                  // Mutex for everything
         afl::data::DefaultValueFactory m_factory; // Value factory
         afl::async::Controller m_controller;      // Controller for socket access
+
+        // Configuration
+        Mode m_mode;
 
         // Network connection
         afl::base::Ptr<Socket> m_socket;          // Socket
@@ -57,6 +68,8 @@ namespace afl { namespace net { namespace resp {
         afl::base::ConstBytes_t m_input;          // Input buffer descriptor
         afl::io::resp::Parser m_parser;           // Input parser
 
+        void sendCommand(const Segment_t& command);
+        afl::data::Value* readResponse();
         void connect();
     };
 

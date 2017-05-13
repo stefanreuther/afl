@@ -19,6 +19,7 @@
 #include "afl/data/errorvalue.hpp"
 #include "afl/except/remoteerrorexception.hpp"
 #include "afl/data/stringlist.hpp"
+#include "afl/data/floatvalue.hpp"
 
 /** Simple tests. */
 void
@@ -35,6 +36,7 @@ TestDataAccess::testSimple()
         TS_ASSERT(Access(&iv0)("foo").isNull());
         TS_ASSERT(Access(&iv0)(String_t("foo")).isNull());
         TS_ASSERT(Access(&iv0)[99].isNull());
+        TS_ASSERT(Access(&iv0)("a").isNull());
     }
     {
         afl::data::IntegerValue iv1(42);
@@ -42,42 +44,111 @@ TestDataAccess::testSimple()
         TS_ASSERT_EQUALS(Access(&iv1).toString(), "42");
         TS_ASSERT_EQUALS(Access(&iv1).getArraySize(), 0U);
         TS_ASSERT_EQUALS(Access(&iv1).getValue(), &iv1);
+        TS_ASSERT(Access(&iv1)[0].isNull());
+        TS_ASSERT(Access(&iv1)("a").isNull());
+
+        afl::data::StringList_t sl;
+        Access(&iv1).getHashKeys(sl);
+        TS_ASSERT_EQUALS(sl.size(), 0U);
+
+        String_t source, str;
+        TS_ASSERT(!Access(&iv1).isError(source, str));
     }
     {
         afl::data::BooleanValue bv0(false);
         TS_ASSERT_EQUALS(Access(&bv0).toInteger(), 0);
         TS_ASSERT_EQUALS(Access(&bv0).toString(), "false");
         TS_ASSERT_EQUALS(Access(&bv0).getArraySize(), 0U);
+        TS_ASSERT(Access(&bv0)[0].isNull());
+        TS_ASSERT(Access(&bv0)("a").isNull());
     }
     {
         afl::data::BooleanValue bv1(true);
         TS_ASSERT_EQUALS(Access(&bv1).toInteger(), 1);
         TS_ASSERT_EQUALS(Access(&bv1).toString(), "true");
         TS_ASSERT_EQUALS(Access(&bv1).getArraySize(), 0U);
+        TS_ASSERT(Access(&bv1)[0].isNull());
+        TS_ASSERT(Access(&bv1)("a").isNull());
+
+        afl::data::StringList_t sl;
+        Access(&bv1).getHashKeys(sl);
+        TS_ASSERT_EQUALS(sl.size(), 0U);
+
+        String_t source, str;
+        TS_ASSERT(!Access(&bv1).isError(source, str));
     }
     {
         afl::data::StringValue sv0("");
         TS_ASSERT_EQUALS(Access(&sv0).toInteger(), 0);
         TS_ASSERT_EQUALS(Access(&sv0).toString(), "");
         TS_ASSERT_EQUALS(Access(&sv0).getArraySize(), 0U);
+        TS_ASSERT(Access(&sv0)[0].isNull());
+        TS_ASSERT(Access(&sv0)("a").isNull());
     }
     {
         afl::data::StringValue sv1("0");
         TS_ASSERT_EQUALS(Access(&sv1).toInteger(), 0);
         TS_ASSERT_EQUALS(Access(&sv1).toString(), "0");
         TS_ASSERT_EQUALS(Access(&sv1).getArraySize(), 0U);
+        TS_ASSERT(Access(&sv1)[0].isNull());
+        TS_ASSERT(Access(&sv1)("a").isNull());
+
+        afl::data::StringList_t sl;
+        Access(&sv1).getHashKeys(sl);
+        TS_ASSERT_EQUALS(sl.size(), 0U);
+
+        String_t source, str;
+        TS_ASSERT(!Access(&sv1).isError(source, str));
     }
     {
         afl::data::StringValue sv2("123");
         TS_ASSERT_EQUALS(Access(&sv2).toInteger(), 123);
         TS_ASSERT_EQUALS(Access(&sv2).toString(), "123");
         TS_ASSERT_EQUALS(Access(&sv2).getArraySize(), 0U);
+        TS_ASSERT(Access(&sv2)[0].isNull());
+        TS_ASSERT(Access(&sv2)("a").isNull());
     }
     {
         afl::data::StringValue sv3("xyz");
         TS_ASSERT_THROWS(Access(&sv3).toInteger(), afl::except::InvalidDataException);
         TS_ASSERT_EQUALS(Access(&sv3).toString(), "xyz");
         TS_ASSERT_EQUALS(Access(&sv3).getArraySize(), 0U);
+        TS_ASSERT(Access(&sv3)[0].isNull());
+        TS_ASSERT(Access(&sv3)("a").isNull());
+    }
+    {
+        // Try const for a change...
+        const afl::data::FloatValue fv1(3.25);
+        TS_ASSERT_EQUALS(Access(&fv1).toInteger(), 3);
+        TS_ASSERT_EQUALS(Access(&fv1).toString(), "3.25");
+        TS_ASSERT_EQUALS(Access(&fv1).getArraySize(), 0U);
+        TS_ASSERT_EQUALS(Access(&fv1).getValue(), &fv1);
+        TS_ASSERT(Access(&fv1)[0].isNull());
+        TS_ASSERT(Access(&fv1)("a").isNull());
+
+        afl::data::StringList_t sl;
+        Access(&fv1).getHashKeys(sl);
+        TS_ASSERT_EQUALS(sl.size(), 0U);
+
+        String_t source, str;
+        TS_ASSERT(!Access(&fv1).isError(source, str));
+    }
+    {
+        TS_ASSERT_EQUALS(Access(0).toInteger(), 0);
+        TS_ASSERT_EQUALS(Access(0).toString(), "");
+        TS_ASSERT_EQUALS(Access(0).getArraySize(), 0U);
+        TS_ASSERT(Access(0).isNull());
+        TS_ASSERT(Access(0)[0].isNull());
+        TS_ASSERT(Access(0)[0][1][2][3][4][5].isNull());
+        TS_ASSERT(Access(0)("a").isNull());
+        TS_ASSERT(Access(0)("a")("b")("c")("d").isNull());
+
+        afl::data::StringList_t sl;
+        Access(0).getHashKeys(sl);
+        TS_ASSERT_EQUALS(sl.size(), 0U);
+
+        String_t source, str;
+        TS_ASSERT(!Access(0).isError(source, str));
     }
 }
 
@@ -128,6 +199,14 @@ TestDataAccess::testVector()
     TS_ASSERT_EQUALS(Access(&vv)("abc").toInteger(), 7);
     TS_ASSERT(Access(&vv)("9").isNull());
     TS_ASSERT(Access(&vv)("042").isNull());
+
+    // 7 elements = 3 complete pairs
+    afl::data::StringList_t sl;
+    Access(&vv).getHashKeys(sl);
+    TS_ASSERT_EQUALS(sl.size(), 3U);
+    TS_ASSERT_EQUALS(sl[0], "1");
+    TS_ASSERT_EQUALS(sl[1], "42");
+    TS_ASSERT_EQUALS(sl[2], "abc");
 }
 
 /** Test accessing a hash. */
@@ -156,6 +235,14 @@ TestDataAccess::testHash()
     TS_ASSERT_EQUALS(Access(&hv)("xyz").toInteger(), 42);
     TS_ASSERT_EQUALS(Access(&hv)("01").toInteger(), 77);
     TS_ASSERT_EQUALS(Access(&hv)("whatever").toInteger(), 0);
+
+    // Get keys
+    afl::data::StringList_t sl;
+    Access(&hv).getHashKeys(sl);
+    TS_ASSERT_EQUALS(sl.size(), 3U);
+    TS_ASSERT_EQUALS(sl[0], "1");
+    TS_ASSERT_EQUALS(sl[1], "xyz");
+    TS_ASSERT_EQUALS(sl[2], "01");
 }
 
 /** Test accessing an error. */

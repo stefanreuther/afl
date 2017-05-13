@@ -63,9 +63,8 @@ namespace afl { namespace net {
 
         /** Write headers to a DataSink.
             Writes the headers in standard "key: value\r\n" format.
-            \param dataName Name to use for DataSink::handleData
             \param sink Data sink to write to */
-        void writeHeaders(const String_t& dataName, afl::io::DataSink& sink) const;
+        void writeHeaders(afl::io::DataSink& sink) const;
 
         // HeaderConsumer:
 

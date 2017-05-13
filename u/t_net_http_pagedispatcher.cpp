@@ -27,7 +27,7 @@ namespace {
         virtual void handleRequest(afl::net::http::PageRequest& /*in*/, afl::net::http::PageResponse& out)
             {
                 afl::base::ConstBytes_t bytes(afl::string::toBytes(m_result));
-                out.body().handleData("<MyPage>", bytes);
+                out.body().handleData(bytes);
                 out.headers().set("Content-Type", "text/plain");
             }
      private:
@@ -67,7 +67,7 @@ TestNetHttpPageDispatcher::testIt()
     {
         afl::base::ConstBytes_t bytes(afl::string::toBytes("GET /one HTTP/1.0\r\n\r\n"));
         std::auto_ptr<Request> req(new Request());
-        req->handleData("<TestNetHttpPageDispatcher>", bytes);
+        req->handleData(bytes);
         std::auto_ptr<Response> resp(disp.createNewResponse(req));
         TS_ASSERT(resp.get() == 0);
     }
@@ -76,10 +76,10 @@ TestNetHttpPageDispatcher::testIt()
     {
         afl::base::ConstBytes_t bytes(afl::string::toBytes("GET /root/zero HTTP/1.0\r\n\r\n"));
         std::auto_ptr<Request> req(new Request());
-        req->handleData("<TestNetHttpPageDispatcher>", bytes);
+        req->handleData(bytes);
         std::auto_ptr<Response> resp(disp.createNewResponse(req));
         TS_ASSERT(resp.get() != 0);
-        resp->handleData("<TestNetHttpPageDispatcher>", bytes);
+        resp->handleData(bytes);
         resp->handleDataComplete();
         String_t result = pullData(*resp);
         TS_ASSERT_EQUALS(result.substr(0, 24), "HTTP/1.0 404 Not Found\r\n");
@@ -89,24 +89,50 @@ TestNetHttpPageDispatcher::testIt()
     {
         afl::base::ConstBytes_t bytes(afl::string::toBytes("GET /root/one HTTP/1.0\r\n\r\n"));
         std::auto_ptr<Request> req(new Request());
-        req->handleData("<TestNetHttpPageDispatcher>", bytes);
+        req->handleData(bytes);
         std::auto_ptr<Response> resp(disp.createNewResponse(req));
         TS_ASSERT(resp.get() != 0);
-        resp->handleData("<TestNetHttpPageDispatcher>", bytes);
+        resp->handleData(bytes);
         resp->handleDataComplete();
         String_t result = pullData(*resp);
         TS_ASSERT_EQUALS(result.substr(0, 17), "HTTP/1.0 200 OK\r\n");
         TS_ASSERT(result.find("one") != String_t::npos);
     }
 
+    // "/root/one/x": within root, does not exist
+    {
+        afl::base::ConstBytes_t bytes(afl::string::toBytes("GET /root/one/x HTTP/1.0\r\n\r\n"));
+        std::auto_ptr<Request> req(new Request());
+        req->handleData(bytes);
+        std::auto_ptr<Response> resp(disp.createNewResponse(req));
+        TS_ASSERT(resp.get() != 0);
+        resp->handleData(bytes);
+        resp->handleDataComplete();
+        String_t result = pullData(*resp);
+        TS_ASSERT_EQUALS(result.substr(0, 24), "HTTP/1.0 404 Not Found\r\n");
+    }
+
+    // "/root/one": bad method
+    {
+        afl::base::ConstBytes_t bytes(afl::string::toBytes("OPTIONS /root/one HTTP/1.0\r\n\r\n"));
+        std::auto_ptr<Request> req(new Request());
+        req->handleData(bytes);
+        std::auto_ptr<Response> resp(disp.createNewResponse(req));
+        TS_ASSERT(resp.get() != 0);
+        resp->handleData(bytes);
+        resp->handleDataComplete();
+        String_t result = pullData(*resp);
+        TS_ASSERT_EQUALS(result.substr(0, 19), "HTTP/1.0 405 Method");
+    }
+
     // "/root/two": within root, exists
     {
         afl::base::ConstBytes_t bytes(afl::string::toBytes("GET /root/two HTTP/1.0\r\n\r\n"));
         std::auto_ptr<Request> req(new Request());
-        req->handleData("<TestNetHttpPageDispatcher>", bytes);
+        req->handleData(bytes);
         std::auto_ptr<Response> resp(disp.createNewResponse(req));
         TS_ASSERT(resp.get() != 0);
-        resp->handleData("<TestNetHttpPageDispatcher>", bytes);
+        resp->handleData(bytes);
         resp->handleDataComplete();
         String_t result = pullData(*resp);
         TS_ASSERT_EQUALS(result.substr(0, 17), "HTTP/1.0 200 OK\r\n");
@@ -117,10 +143,10 @@ TestNetHttpPageDispatcher::testIt()
     {
         afl::base::ConstBytes_t bytes(afl::string::toBytes("GET /root/two/sub HTTP/1.0\r\n\r\n"));
         std::auto_ptr<Request> req(new Request());
-        req->handleData("<TestNetHttpPageDispatcher>", bytes);
+        req->handleData(bytes);
         std::auto_ptr<Response> resp(disp.createNewResponse(req));
         TS_ASSERT(resp.get() != 0);
-        resp->handleData("<TestNetHttpPageDispatcher>", bytes);
+        resp->handleData(bytes);
         resp->handleDataComplete();
         String_t result = pullData(*resp);
         TS_ASSERT_EQUALS(result.substr(0, 17), "HTTP/1.0 200 OK\r\n");
@@ -131,10 +157,10 @@ TestNetHttpPageDispatcher::testIt()
     {
         afl::base::ConstBytes_t bytes(afl::string::toBytes("GET /root/two/a HTTP/1.0\r\n\r\n"));
         std::auto_ptr<Request> req(new Request());
-        req->handleData("<TestNetHttpPageDispatcher>", bytes);
+        req->handleData(bytes);
         std::auto_ptr<Response> resp(disp.createNewResponse(req));
         TS_ASSERT(resp.get() != 0);
-        resp->handleData("<TestNetHttpPageDispatcher>", bytes);
+        resp->handleData(bytes);
         resp->handleDataComplete();
         String_t result = pullData(*resp);
         TS_ASSERT_EQUALS(result.substr(0, 17), "HTTP/1.0 200 OK\r\n");
@@ -145,10 +171,10 @@ TestNetHttpPageDispatcher::testIt()
     {
         afl::base::ConstBytes_t bytes(afl::string::toBytes("GET /root/two/z HTTP/1.0\r\n\r\n"));
         std::auto_ptr<Request> req(new Request());
-        req->handleData("<TestNetHttpPageDispatcher>", bytes);
+        req->handleData(bytes);
         std::auto_ptr<Response> resp(disp.createNewResponse(req));
         TS_ASSERT(resp.get() != 0);
-        resp->handleData("<TestNetHttpPageDispatcher>", bytes);
+        resp->handleData(bytes);
         resp->handleDataComplete();
         String_t result = pullData(*resp);
         TS_ASSERT_EQUALS(result.substr(0, 17), "HTTP/1.0 200 OK\r\n");
@@ -159,10 +185,10 @@ TestNetHttpPageDispatcher::testIt()
     {
         afl::base::ConstBytes_t bytes(afl::string::toBytes("HEAD /root/two/z HTTP/1.0\r\n\r\n"));
         std::auto_ptr<Request> req(new Request());
-        req->handleData("<TestNetHttpPageDispatcher>", bytes);
+        req->handleData(bytes);
         std::auto_ptr<Response> resp(disp.createNewResponse(req));
         TS_ASSERT(resp.get() != 0);
-        resp->handleData("<TestNetHttpPageDispatcher>", bytes);
+        resp->handleData(bytes);
         resp->handleDataComplete();
         String_t result = pullData(*resp);
         TS_ASSERT_EQUALS(result.substr(0, 17), "HTTP/1.0 200 OK\r\n");

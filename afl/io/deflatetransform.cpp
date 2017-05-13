@@ -46,6 +46,8 @@ class afl::io::DeflateTransform::Impl {
     };
  public:
     Impl(Personality pers);
+    ~Impl();
+
     void transform(afl::base::ConstBytes_t& in, afl::base::Bytes_t& out);
     void flush();
     static bool isAvailable();
@@ -86,6 +88,23 @@ afl::io::DeflateTransform::Impl::Impl(Personality pers)
       m_gzipCRC(0),
       m_zStream()
 { }
+
+afl::io::DeflateTransform::Impl::~Impl()
+{
+    switch (m_state) {
+     case PrepareHeader:
+     case WriteHeader:
+     case PrepareCompression:
+        break;
+
+     case Compressing:
+     case PrepareTrailer:
+     case WriteTrailer:
+     case EndReached:
+        deflateEnd(&m_zStream);
+        break;
+    }
+}
 
 inline void
 afl::io::DeflateTransform::Impl::transform(afl::base::ConstBytes_t& in, afl::base::Bytes_t& out)

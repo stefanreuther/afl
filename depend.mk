@@ -1,3 +1,11 @@
+-include afl/string/win32filenames.d
+-include afl/net/mimebuilder.d
+-include afl/net/nullnetworkstack.d
+-include afl/charset/hexencoding.d
+-include afl/string/hex.d
+-include afl/sys/parsedtime.d
+-include afl/net/nullcommandhandler.d
+-include arch/posix/posixcwd.d
 -include afl/net/server.d
 -include afl/sys/commandlineparser.d
 -include afl/except/commandlineexception.d
@@ -216,6 +224,13 @@
 -include app/httpserver.d
 -include app/env.d
 -include app/unzip.d
+-include u/t_string_win32filenames.d
+-include u/t_net_reconnectable.d
+-include u/t_net_mimebuilder.d
+-include u/t_net_nullnetworkstack.d
+-include u/t_charset_hexencoding.d
+-include u/t_string_hex.d
+-include u/t_net_nullcommandhandler.d
 -include u/t_net_server.d
 -include u/t_base_observable.d
 -include u/t_sys_dialog.d

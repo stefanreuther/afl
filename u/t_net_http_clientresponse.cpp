@@ -7,6 +7,7 @@
 
 #include "u/t_net_http.hpp"
 
+/** Test good responses. */
 void
 TestNetHttpClientResponse::testOK()
 {
@@ -17,7 +18,7 @@ TestNetHttpClientResponse::testOK()
                                                             "Content-Length: 3\r\n"
                                                             "\r\n"
                                                             "foo").toBytes());
-        bool ok = resp.handleData("<source name>", bytes);
+        bool ok = resp.handleData(bytes);
         TS_ASSERT(ok);
         TS_ASSERT(!resp.hasErrors());
         TS_ASSERT(resp.hasBody());
@@ -39,7 +40,7 @@ TestNetHttpClientResponse::testOK()
                                                             "Content-Length: 3\r\n"
                                                             "\r\n"
                                                             "foo").toBytes());
-        bool ok = resp.handleData("<source name>", bytes);
+        bool ok = resp.handleData(bytes);
         TS_ASSERT(ok);
         TS_ASSERT(!resp.hasErrors());
         TS_ASSERT(resp.hasBody());
@@ -61,7 +62,7 @@ TestNetHttpClientResponse::testOK()
                                                             "Content-Length: 3\r\n"
                                                             "\r\n"
                                                             "foo").toBytes());
-        bool ok = resp.handleData("<source name>", bytes);
+        bool ok = resp.handleData(bytes);
         TS_ASSERT(ok);
         TS_ASSERT(!resp.hasErrors());
         TS_ASSERT(!resp.hasBody());
@@ -84,7 +85,7 @@ TestNetHttpClientResponse::testOK()
                                                             "Content-Range: bytes 10-15/100\r\n"
                                                             "\r\n"
                                                             "foobar").toBytes());
-        bool ok = resp.handleData("<source name>", bytes);
+        bool ok = resp.handleData(bytes);
         TS_ASSERT(ok);
         TS_ASSERT(!resp.hasErrors());
         TS_ASSERT(resp.hasBody());
@@ -106,7 +107,7 @@ TestNetHttpClientResponse::testOK()
                                                             "Transfer-Encoding: chunked\r\n"
                                                             "\r\n"
                                                             "foobar").toBytes());
-        bool ok = resp.handleData("<source name>", bytes);
+        bool ok = resp.handleData(bytes);
         TS_ASSERT(ok);
         TS_ASSERT(!resp.hasErrors());
         TS_ASSERT(resp.hasBody());
@@ -127,7 +128,7 @@ TestNetHttpClientResponse::testOK()
         afl::base::ConstBytes_t bytes(afl::string::toMemory("HTTP/1.1 200 OK\r\n"
                                                             "\r\n"
                                                             "foobar").toBytes());
-        bool ok = resp.handleData("<source name>", bytes);
+        bool ok = resp.handleData(bytes);
         TS_ASSERT(ok);
         TS_ASSERT(!resp.hasErrors());
         TS_ASSERT(resp.hasBody());
@@ -143,6 +144,7 @@ TestNetHttpClientResponse::testOK()
     }
 }
 
+/** Test bad responses. */
 void
 TestNetHttpClientResponse::testError()
 {
@@ -150,7 +152,25 @@ TestNetHttpClientResponse::testError()
         // Bad intro
         afl::net::http::ClientResponse resp(false);
         afl::base::ConstBytes_t bytes(afl::string::toBytes("Hi mom!\r\n"));
-        bool ok = resp.handleData("<source name>", bytes);
+        bool ok = resp.handleData(bytes);
+        TS_ASSERT(ok);
+        TS_ASSERT(resp.hasErrors());
+    }
+
+    {
+        // Bad intro
+        afl::net::http::ClientResponse resp(false);
+        afl::base::ConstBytes_t bytes(afl::string::toBytes("lol\r\n"));
+        bool ok = resp.handleData(bytes);
+        TS_ASSERT(ok);
+        TS_ASSERT(resp.hasErrors());
+    }
+
+    {
+        // Overlong version
+        afl::net::http::ClientResponse resp(false);
+        afl::base::ConstBytes_t bytes(afl::string::toBytes("HTTP/3.1415926535897932384626433832795028841968 200 OK\r\n"));
+        bool ok = resp.handleData(bytes);
         TS_ASSERT(ok);
         TS_ASSERT(resp.hasErrors());
     }
@@ -159,7 +179,7 @@ TestNetHttpClientResponse::testError()
         // Bad code
         afl::net::http::ClientResponse resp(false);
         afl::base::ConstBytes_t bytes(afl::string::toBytes("200 OK\r\n"));
-        bool ok = resp.handleData("<source name>", bytes);
+        bool ok = resp.handleData(bytes);
         TS_ASSERT(ok);
         TS_ASSERT(resp.hasErrors());
     }
@@ -169,7 +189,7 @@ TestNetHttpClientResponse::testError()
         afl::net::http::ClientResponse resp(false);
         afl::base::ConstBytes_t bytes(afl::string::toMemory("HTTP/1.0 200 OK\r\n"
                                                             " foo : bar\r\n\r\n").toBytes());
-        bool ok = resp.handleData("<source name>", bytes);
+        bool ok = resp.handleData(bytes);
         TS_ASSERT(ok);
         TS_ASSERT(resp.hasErrors());
     }
@@ -179,11 +199,12 @@ TestNetHttpClientResponse::testError()
         afl::net::http::ClientResponse resp(false);
         afl::base::ConstBytes_t bytes(afl::string::toMemory("HTTP/1.0 200 OK\r\n"
                                                             "Content-Length: 3\r\n").toBytes());
-        bool ok = resp.handleData("<source name>", bytes);
+        bool ok = resp.handleData(bytes);
         TS_ASSERT(!ok);
     }
 }
 
+/** Test user headers. */
 void
 TestNetHttpClientResponse::testUserHeaders()
 {
@@ -194,7 +215,7 @@ TestNetHttpClientResponse::testUserHeaders()
                                                             "Content-Type: text/plain\r\n"
                                                             "Server: whatever\r\n"
                                                             "Content-Length: 0\r\n\r\n").toBytes());
-        bool ok = resp.handleData("<source name>", bytes);
+        bool ok = resp.handleData(bytes);
         TS_ASSERT(ok);
 
         const afl::net::HeaderField* f = resp.getResponseHeaders().get("content-type");
@@ -215,7 +236,7 @@ TestNetHttpClientResponse::testUserHeaders()
                                                             "Content-Type: text/plain\r\n"
                                                             "Content-Type: whatever\r\n"
                                                             "Content-Length: 0\r\n\r\n").toBytes());
-        bool ok = resp.handleData("<source name>", bytes);
+        bool ok = resp.handleData(bytes);
         TS_ASSERT(ok);
 
         const afl::net::HeaderField* f = resp.getResponseHeaders().get("content-type");
@@ -235,7 +256,7 @@ TestNetHttpClientResponse::testUserHeaders()
                                                             "Set-Cookie: lang=en-US; Path=/; Domain=example.com\r\n"
                                                             "Content-Type: text/plain\r\n"
                                                             "Content-Length: 0\r\n\r\n").toBytes());
-        bool ok = resp.handleData("<source name>", bytes);
+        bool ok = resp.handleData(bytes);
         TS_ASSERT(ok);
 
         const afl::net::HeaderField* f = resp.getResponseHeaders().get("content-type");
@@ -260,3 +281,176 @@ TestNetHttpClientResponse::testUserHeaders()
         TS_ASSERT_EQUALS(f->getPrimaryValue(), "en-US");
     }
 }
+
+/** Test keepalive handling, HTTP 1.0. */
+void
+TestNetHttpClientResponse::testKeepalive()
+{
+    // No content-length, so cannot be keepalive
+    {
+        afl::net::http::ClientResponse resp(false);
+        afl::base::ConstBytes_t bytes(afl::string::toMemory("HTTP/1.0 200 OK\r\n"
+                                                            "\r\n").toBytes());
+        bool ok = resp.handleData(bytes);
+        TS_ASSERT(ok);
+        TS_ASSERT(!resp.isKeepalive());
+    }
+
+    // Content-length given, but opt-in required for 1.0
+    {
+        afl::net::http::ClientResponse resp(false);
+        afl::base::ConstBytes_t bytes(afl::string::toMemory("HTTP/1.0 200 OK\r\n"
+                                                            "Content-Length: 3\r\n"
+                                                            "\r\n").toBytes());
+        bool ok = resp.handleData(bytes);
+        TS_ASSERT(ok);
+        TS_ASSERT(!resp.isKeepalive());
+    }
+
+    // Content-length given, but opt-in required for 1.0
+    {
+        afl::net::http::ClientResponse resp(false);
+        afl::base::ConstBytes_t bytes(afl::string::toMemory("HTTP/1.0 200 OK\r\n"
+                                                            "Content-Length: 3\r\n"
+                                                            "Connection: keep-alive\r\n"
+                                                            "\r\n").toBytes());
+        bool ok = resp.handleData(bytes);
+        TS_ASSERT(ok);
+        TS_ASSERT(resp.isKeepalive());
+    }
+
+    // Content-length given, bogus Connection header
+    {
+        afl::net::http::ClientResponse resp(false);
+        afl::base::ConstBytes_t bytes(afl::string::toMemory("HTTP/1.0 200 OK\r\n"
+                                                            "Content-Length: 3\r\n"
+                                                            "Connection: lol\r\n"
+                                                            "\r\n").toBytes());
+        bool ok = resp.handleData(bytes);
+        TS_ASSERT(ok);
+        TS_ASSERT(!resp.isKeepalive());
+    }
+}
+
+/** Test keepalive handling, HTTP 1.1. */
+void
+TestNetHttpClientResponse::testKeepalive11()
+{
+    // No content-length, so cannot be keepalive
+    {
+        afl::net::http::ClientResponse resp(false);
+        afl::base::ConstBytes_t bytes(afl::string::toMemory("HTTP/1.1 200 OK\r\n"
+                                                            "\r\n").toBytes());
+        bool ok = resp.handleData(bytes);
+        TS_ASSERT(ok);
+        TS_ASSERT(!resp.isKeepalive());
+    }
+
+    // Content-length given, so ok
+    {
+        afl::net::http::ClientResponse resp(false);
+        afl::base::ConstBytes_t bytes(afl::string::toMemory("HTTP/1.1 200 OK\r\n"
+                                                            "Content-Length: 3\r\n"
+                                                            "\r\n").toBytes());
+        bool ok = resp.handleData(bytes);
+        TS_ASSERT(ok);
+        TS_ASSERT(resp.isKeepalive());
+    }
+
+    // Content-length given, but opt-out
+    {
+        afl::net::http::ClientResponse resp(false);
+        afl::base::ConstBytes_t bytes(afl::string::toMemory("HTTP/1.1 200 OK\r\n"
+                                                            "Content-Length: 3\r\n"
+                                                            "Connection: close\r\n"
+                                                            "\r\n").toBytes());
+        bool ok = resp.handleData(bytes);
+        TS_ASSERT(ok);
+        TS_ASSERT(!resp.isKeepalive());
+    }
+
+    // Case-insensitive
+    {
+        afl::net::http::ClientResponse resp(false);
+        afl::base::ConstBytes_t bytes(afl::string::toMemory("HTTP/1.1 200 OK\r\n"
+                                                            "CONTENT-LENGTH: 3\r\n"
+                                                            "CONNECTION: CLOSE\r\n"
+                                                            "\r\n").toBytes());
+        bool ok = resp.handleData(bytes);
+        TS_ASSERT(ok);
+        TS_ASSERT(!resp.isKeepalive());
+    }
+
+    // Content-length given, bogus Connection header
+    {
+        afl::net::http::ClientResponse resp(false);
+        afl::base::ConstBytes_t bytes(afl::string::toMemory("HTTP/1.1 200 OK\r\n"
+                                                            "Content-Length: 3\r\n"
+                                                            "Connection: lol\r\n"
+                                                            "\r\n").toBytes());
+        bool ok = resp.handleData(bytes);
+        TS_ASSERT(ok);
+        TS_ASSERT(resp.isKeepalive());
+    }
+}
+
+/** Test Content-Encoding. */
+void
+TestNetHttpClientResponse::testContentEncoding()
+{
+    // Default
+    {
+        afl::net::http::ClientResponse resp(false);
+        afl::base::ConstBytes_t bytes(afl::string::toMemory("HTTP/1.1 200 OK\r\n"
+                                                            "Content-Length: 3\r\n"
+                                                            "\r\n").toBytes());
+        bool ok = resp.handleData(bytes);
+        TS_ASSERT(ok);
+        TS_ASSERT_EQUALS(resp.getResponseEncoding(), afl::net::http::ClientResponse::IdentityEncoding);
+    }
+
+    // gzip
+    {
+        afl::net::http::ClientResponse resp(false);
+        afl::base::ConstBytes_t bytes(afl::string::toMemory("HTTP/1.1 200 OK\r\n"
+                                                            "Content-Encoding: gzip\r\n"
+                                                            "\r\n").toBytes());
+        bool ok = resp.handleData(bytes);
+        TS_ASSERT(ok);
+        TS_ASSERT_EQUALS(resp.getResponseEncoding(), afl::net::http::ClientResponse::GzipEncoding);
+    }
+
+    // deflate
+    {
+        afl::net::http::ClientResponse resp(false);
+        afl::base::ConstBytes_t bytes(afl::string::toMemory("HTTP/1.1 200 OK\r\n"
+                                                            "Content-Encoding: deflate\r\n"
+                                                            "\r\n").toBytes());
+        bool ok = resp.handleData(bytes);
+        TS_ASSERT(ok);
+        TS_ASSERT_EQUALS(resp.getResponseEncoding(), afl::net::http::ClientResponse::DeflateEncoding);
+    }
+
+    // case-insensitive!
+    {
+        afl::net::http::ClientResponse resp(false);
+        afl::base::ConstBytes_t bytes(afl::string::toMemory("HTTP/1.1 200 OK\r\n"
+                                                            "CONTENT-ENCODING: DEFLATE\r\n"
+                                                            "\r\n").toBytes());
+        bool ok = resp.handleData(bytes);
+        TS_ASSERT(ok);
+        TS_ASSERT_EQUALS(resp.getResponseEncoding(), afl::net::http::ClientResponse::DeflateEncoding);
+    }
+
+    // unknown
+    {
+        afl::net::http::ClientResponse resp(false);
+        afl::base::ConstBytes_t bytes(afl::string::toMemory("HTTP/1.1 200 OK\r\n"
+                                                            "Content-Encoding: 1337\r\n"
+                                                            "\r\n").toBytes());
+        bool ok = resp.handleData(bytes);
+        TS_ASSERT(ok);
+        TS_ASSERT_EQUALS(resp.getResponseEncoding(), afl::net::http::ClientResponse::UnknownEncoding);
+    }
+}
+

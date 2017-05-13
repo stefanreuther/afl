@@ -96,6 +96,12 @@ TestIoFileSystem::testPosix()
     TS_ASSERT_EQUALS(fs.getDirectoryName("a/b/.."), "a/b");
 
     // getWorkingDirectoryName -- see generic test
+
+    // Reading a directory: opening "." or "/" works, but check that null is correctly rejected
+    TS_ASSERT_THROWS_NOTHING(fs.openDirectory(".")->getDirectoryEntries());
+    TS_ASSERT_THROWS_NOTHING(fs.openDirectory("/")->getDirectoryEntries());
+    TS_ASSERT_THROWS(fs.openDirectory(String_t(".\0Q", 3))->getDirectoryEntries(), afl::except::FileProblemException);
+    TS_ASSERT_THROWS(fs.openDirectory(String_t("/\0Q", 3))->getDirectoryEntries(), afl::except::FileProblemException);
 #endif
 }
 
@@ -202,8 +208,14 @@ TestIoFileSystem::testRoot()
     // Must be able to open it
     afl::base::Ref<afl::io::Directory> root = fs.openRootDirectory();
 
-    // Root has no parent
+    // Root properties:
+    // - no parent, no name
     TS_ASSERT(root->getParentDirectory().get() == 0);
+    TS_ASSERT_EQUALS(root->getDirectoryName(), "");
+    // - but a title
+    TS_ASSERT(!root->getTitle().empty());
+    // - cannot access files
+    TS_ASSERT_THROWS(root->getDirectoryEntryByName("x")->createAsDirectory(), afl::except::FileProblemException);
 
     // Enumerate content
     afl::base::Ref<afl::base::Enumerator<afl::base::Ptr<afl::io::DirectoryEntry> > > entries = root->getDirectoryEntries();
@@ -212,7 +224,21 @@ TestIoFileSystem::testRoot()
     afl::base::Ptr<afl::io::DirectoryEntry> entry;
     size_t n = 0;
     while (entries->getNextElement(entry)) {
+        // Verify the entry
         TS_ASSERT(entry.get() != 0);
+        TS_ASSERT(!entry->getTitle().empty());
+        TS_ASSERT_EQUALS(&*entry->openContainingDirectory(), &*root);
+        TS_ASSERT_EQUALS(entry->getFileType(), afl::io::DirectoryEntry::tDirectory);
+        if (entry->getFlags().contains(afl::io::DirectoryEntry::Link)) {
+            TS_ASSERT(!entry->getLinkText().empty());
+        }
+
+        // Cannot be modified
+        TS_ASSERT_THROWS(entry->renameTo("foo"), afl::except::FileProblemException);
+        TS_ASSERT_THROWS(entry->erase(), afl::except::FileProblemException);
+        TS_ASSERT_THROWS(entry->createAsDirectory(), afl::except::FileProblemException);
+        TS_ASSERT_THROWS(entry->setFlag(afl::io::DirectoryEntry::Hidden, true), afl::except::FileProblemException);
+
         ++n;
     }
 

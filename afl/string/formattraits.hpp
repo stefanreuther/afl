@@ -71,7 +71,7 @@ namespace afl { namespace string {
         storage of the pointer in the FormatUnion. */
     template<typename T>
     struct FormatTraits<T*> {
-        static void store(FormatUnion& u, const char* p)
+        static void store(FormatUnion& u, const T* p)
             {
                 u.m_ptr = p;
             }

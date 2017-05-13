@@ -16,8 +16,8 @@ namespace afl { namespace charset {
     class UrlEncoding : public Charset {
      public:
         virtual ~UrlEncoding();
-        virtual String_t encode(afl::string::ConstStringMemory_t in);
-        virtual String_t decode(afl::string::ConstStringMemory_t in);
+        virtual afl::base::GrowableBytes_t encode(afl::string::ConstStringMemory_t in);
+        virtual String_t decode(afl::base::ConstBytes_t in);
         virtual UrlEncoding* clone() const;
     };
 

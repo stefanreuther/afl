@@ -32,7 +32,7 @@ namespace afl { namespace io {
         void setNewTransform(Transform* pTransform);
 
         // DataSink:
-        virtual bool handleData(const String_t& name, afl::base::ConstBytes_t& data);
+        virtual bool handleData(afl::base::ConstBytes_t& data);
 
      private:
         /** Transformation. Can be null. */

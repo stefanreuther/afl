@@ -41,6 +41,11 @@ class TestCharsetDefaultCharsetFactory : public CxxTest::TestSuite {
     void testIt();
 };
 
+class TestCharsetHexEncoding : public CxxTest::TestSuite {
+ public:
+    void testIt();
+};
+
 class TestCharsetQuotedPrintable : public CxxTest::TestSuite {
  public:
     void testIt();

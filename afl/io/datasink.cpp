@@ -8,11 +8,11 @@
 #include "afl/string/messages.hpp"
 
 void
-afl::io::DataSink::handleFullData(const String_t& name, afl::base::ConstBytes_t data)
+afl::io::DataSink::handleFullData(afl::base::ConstBytes_t data)
 {
-    if (handleData(name, data)) {
+    if (handleData(data)) {
         if (!data.empty()) {
-            throw afl::except::FileProblemException(name, afl::string::Messages::cannotWrite());
+            throw afl::except::FileProblemException("<DataSink>", afl::string::Messages::cannotWrite());
         }
     }
 }

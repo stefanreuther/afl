@@ -24,6 +24,10 @@ namespace afl { namespace io {
             \param limit Size limit. Load at most this many bytes. */
         InternalFileMapping(Stream& stream, Stream::FileSize_t limit = Stream::FileSize_t(-1));
 
+        /** Construct from memory buffer.
+            \param mem Memory buffer. Will be cleared (moved) in the process of creating this object. */
+        explicit InternalFileMapping(afl::base::GrowableBytes_t& mem);
+
         /** Destructor. */
         virtual ~InternalFileMapping();
 
@@ -31,7 +35,7 @@ namespace afl { namespace io {
         virtual afl::base::ConstBytes_t get() const;
 
      private:
-        afl::base::GrowableMemory<uint8_t> m_data;
+        afl::base::GrowableBytes_t m_data;
 
         void init(Stream& stream, Stream::FileSize_t limit);
     };

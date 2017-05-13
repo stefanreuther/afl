@@ -28,11 +28,10 @@ namespace afl { namespace net { namespace http {
             This function receives all data uploaded by the client with the request, e.g. POST data.
             Transport encoding has already been decoded.
 
-            \param name [in] Identification of the data source, for error reporting.
             \param data [in/out] On input, data to process. On output, remaining unprocessed data.
             \retval false More data required (%data is empty)
             \retval true No more data required (%data has unprocessed data; should not be used) */
-        virtual bool handleData(const String_t& name, afl::base::ConstBytes_t& data) = 0;
+        virtual bool handleData(afl::base::ConstBytes_t& data) = 0;
 
         /** Handle data completion.
             This function is called after the final handleData() call. */

@@ -22,11 +22,11 @@ afl::io::TransformDataSink::setNewTransform(Transform* pTransform)
 }
 
 bool
-afl::io::TransformDataSink::handleData(const String_t& name, afl::base::ConstBytes_t& data)
+afl::io::TransformDataSink::handleData(afl::base::ConstBytes_t& data)
 {
     if (m_pTransform.get() == 0) {
         // Trivial (uninitialized) case
-        return m_other.handleData(name, data);
+        return m_other.handleData(data);
     } else {
         // Normal case
         uint8_t buffer[4096];
@@ -39,7 +39,7 @@ afl::io::TransformDataSink::handleData(const String_t& name, afl::base::ConstByt
                 // transforming data, pushing that into the sink, relying on it to keep reporting completion.
                 // In the future, we could hold back data, and possibly allow the user to plug in a different sink.
                 afl::base::ConstBytes_t in(out);
-                result = m_other.handleData(name, in);
+                result = m_other.handleData(in);
             }
         }
         return result;

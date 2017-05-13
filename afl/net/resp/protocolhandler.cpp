@@ -57,11 +57,11 @@ afl::net::resp::ProtocolHandler::advanceTime(afl::sys::Timeout_t /*msecs*/)
 { }
 
 void
-afl::net::resp::ProtocolHandler::handleData(const String_t& name, afl::base::ConstBytes_t bytes)
+afl::net::resp::ProtocolHandler::handleData(afl::base::ConstBytes_t bytes)
 {
     try {
         while (!bytes.empty()) {
-            if (m_parser.handleData(name, bytes)) {
+            if (m_parser.handleData(bytes)) {
                 handleNewValue(m_parser.extract());
             }
         }
@@ -109,7 +109,7 @@ afl::net::resp::ProtocolHandler::handleNewValue(afl::data::Value* p)
         virtual void visitVector(const afl::data::Vector& vv)
             {
                 try {
-                    std::auto_ptr<afl::data::Value> result(m_ch.call(vv.getValues()));
+                    std::auto_ptr<afl::data::Value> result(m_ch.call(vv));
                     m_writer.visit(result.get());
                 }
                 catch (std::exception& e) {

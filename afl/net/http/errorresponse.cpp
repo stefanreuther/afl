@@ -26,7 +26,7 @@ afl::net::http::ErrorResponse::ErrorResponse(const std::auto_ptr<Request>& req, 
 
 // Ignore all incoming data.
 bool
-afl::net::http::ErrorResponse::handleData(const String_t& /*name*/, afl::base::ConstBytes_t& /*data*/)
+afl::net::http::ErrorResponse::handleData(afl::base::ConstBytes_t& /*data*/)
 {
     return false;
 }

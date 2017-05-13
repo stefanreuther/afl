@@ -255,3 +255,29 @@ TestExcept::testCommandLineException()
         (void) r;
     }
 }
+
+/** Test modifying a FileProblemException descendant. */
+void
+TestExcept::testModifyFileProblemException()
+{
+    try {
+        try {
+            // Throw an exception...
+            throw afl::except::FileTooShortException("a");
+        }
+        catch (afl::except::FileProblemException& fpe) {
+            // ...catch it by base type and modify it...
+            fpe.setFileName("b");
+
+            // ..,rethrow...
+            throw;
+        }
+    }
+    catch (afl::except::FileTooShortException& e) {
+        // ...and catch modified exception by original type.
+        TS_ASSERT_EQUALS(e.getFileName(), "b");
+    }
+    catch (...) {
+        TS_ASSERT(!"bad exception");
+    }
+}

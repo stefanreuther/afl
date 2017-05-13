@@ -146,7 +146,7 @@ afl::base::InlineOptional<StorageType, NullValue, UserType>::InlineOptional(Noth
 template<class StorageType, StorageType NullValue, class UserType>
 inline
 afl::base::InlineOptional<StorageType, NullValue, UserType>::InlineOptional(const UserType& value)
-    : m_value(value)
+    : m_value(StorageType(value))
 { }
 
 // Copy constructor for related object.

@@ -48,6 +48,7 @@ TestChecksumsMD5::testBasic()
 
     // Self-information
     TS_ASSERT_EQUALS(md5.getHashSize(), 16U);
+    TS_ASSERT_EQUALS(md5.getHashSize(), md5.HASH_SIZE);
 }
 
 /** Test testsuite from RFC 1321. */

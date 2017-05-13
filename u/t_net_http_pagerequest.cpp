@@ -65,7 +65,7 @@ TestNetHttpPageRequest::testBody()
     // GET has no body, so we ignore it
     {
         afl::net::http::PageRequest rq("/a", "/b", "");
-        rq.handleData("<test>", BODY);
+        rq.handleData(BODY);
         rq.finish();
         TS_ASSERT_EQUALS(rq.body().getContent().size(), 0U);
     }
@@ -75,7 +75,7 @@ TestNetHttpPageRequest::testBody()
         afl::net::http::PageRequest rq("/a", "/b", "");
         rq.setMethod("POST");
         rq.headers().add("Content-Type", "application/octet-stream");
-        rq.handleData("<test>", BODY);
+        rq.handleData(BODY);
         rq.finish();
         TS_ASSERT_EQUALS(rq.body().getContent().size(), 4U);
         TS_ASSERT(rq.body().getContent().compareContent(BODY));
@@ -86,7 +86,7 @@ TestNetHttpPageRequest::testBody()
         afl::net::http::PageRequest rq("/a", "/b", "");
         rq.setMethod("POST");
         rq.headers().add("Content-Type", "application/x-www-form-urlencoded");
-        rq.handleData("<test>", afl::string::toBytes("a=1&b=2&c=%3D"));
+        rq.handleData(afl::string::toBytes("a=1&b=2&c=%3D"));
         rq.finish();
 
         // Body is empty because it has been parsed!

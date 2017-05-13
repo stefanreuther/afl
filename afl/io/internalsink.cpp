@@ -14,7 +14,7 @@ afl::io::InternalSink::~InternalSink()
 { }
 
 bool
-afl::io::InternalSink::handleData(const String_t& /*name*/, afl::base::ConstBytes_t& data)
+afl::io::InternalSink::handleData(afl::base::ConstBytes_t& data)
 {
     m_data.append(data);
     return false;

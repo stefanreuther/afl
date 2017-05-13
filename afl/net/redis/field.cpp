@@ -39,6 +39,16 @@ afl::net::redis::Field::remove()
                                           .pushBackString(getName()));
 }
 
+// Get raw value (HGET).
+afl::data::Value*
+afl::net::redis::Field::getRawValue() const
+{
+    return getHash().getHandler().call(Segment()
+                                       .pushBackString("HGET")
+                                       .pushBackString(getHash().getName())
+                                       .pushBackString(getName()));
+}
+
 // Get name of this field.
 const String_t&
 afl::net::redis::Field::getName() const

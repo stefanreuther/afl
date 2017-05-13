@@ -81,7 +81,7 @@ namespace {
             }
 
         // Handle data. We ignore everything.
-        virtual bool handleData(const String_t& /*name*/, afl::base::ConstBytes_t& /*data*/)
+        virtual bool handleData(afl::base::ConstBytes_t& /*data*/)
             { return false; }
 
         // Data completion. We ignore everything.

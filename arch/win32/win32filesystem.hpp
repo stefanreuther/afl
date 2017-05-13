@@ -6,6 +6,7 @@
 #define AFL_ARCH_WIN32_WIN32FILESYSTEM_HPP
 
 #include "afl/io/filesystem.hpp"
+#include "afl/string/win32filenames.hpp"
 
 namespace arch { namespace win32 {
 
@@ -27,6 +28,9 @@ namespace arch { namespace win32 {
         virtual FileName_t getFileName(FileName_t name);
         virtual FileName_t getDirectoryName(FileName_t name);
         virtual FileName_t getWorkingDirectoryName();
+
+     private:
+        afl::string::Win32FileNames m_fileNames;
     };
 
 } }

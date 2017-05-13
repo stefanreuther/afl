@@ -33,13 +33,6 @@ afl::net::redis::HashKey::size() const
 //     client.callVoid(DbRequest().withString("HMSET").withString(key).withInlineStringList(vec));
 // }
 
-// FIXME: port this?
-// void
-// DbHash::getAll(StringList_t& vec)
-// {
-//     std::auto_ptr<IntValue> val(client.call(DbRequest().withString("HGETALL").withString(key)));
-//     toStringListResult(val.get(), vec);
-// }
 
 // FIXME: port this?
 // void
@@ -96,4 +89,12 @@ afl::net::redis::StringField
 afl::net::redis::HashKey::stringField(const String_t& fieldName)
 {
     return StringField(*this, fieldName);
+}
+
+// Get all content (HGETALL).
+void
+afl::net::redis::HashKey::getAll(afl::data::StringList_t& result) const
+{
+    std::auto_ptr<afl::data::Value> val(getHandler().call(Segment().pushBackString("HGETALL").pushBackString(getName())));
+    afl::data::Access(val).toStringList(result);
 }

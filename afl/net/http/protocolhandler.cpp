@@ -62,11 +62,11 @@ afl::net::http::ProtocolHandler::advanceTime(afl::sys::Timeout_t /*msecs*/)
 
 // Handle incoming data.
 void
-afl::net::http::ProtocolHandler::handleData(const String_t& name, afl::base::ConstBytes_t bytes)
+afl::net::http::ProtocolHandler::handleData(afl::base::ConstBytes_t bytes)
 {
     while (!bytes.empty() && m_state != Close) {
         if (m_state == ReadingRequest) {
-            if (m_request->handleData(name, bytes)) {
+            if (m_request->handleData(bytes)) {
                 // I have read the complete request. Digest it.
                 // - Save the keepalive flag to override the Response if needed.
                 m_responseKeepalive = m_request->isKeepalive();
@@ -111,7 +111,7 @@ afl::net::http::ProtocolHandler::handleData(const String_t& name, afl::base::Con
             }
         }
         if (m_state == ReadingData) {
-            if (m_responseSink->handleData(name, bytes)) {
+            if (m_responseSink->handleData(bytes)) {
                 // Finish response and check next state
                 m_response->handleDataComplete();
                 if (m_responseKeepalive && m_response->isKeepalive()) {

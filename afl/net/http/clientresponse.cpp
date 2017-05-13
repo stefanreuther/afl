@@ -40,7 +40,7 @@ afl::net::http::ClientResponse::~ClientResponse()
 { }
 
 bool
-afl::net::http::ClientResponse::handleData(const String_t& name, afl::base::ConstBytes_t& data)
+afl::net::http::ClientResponse::handleData(afl::base::ConstBytes_t& data)
 {
     // Parse version
     if (m_state == ParseVersion) {
@@ -101,7 +101,7 @@ afl::net::http::ClientResponse::handleData(const String_t& name, afl::base::Cons
 
     // Parse header
     if (m_state == ParseHeader) {
-        if (m_headerParser.handleData(name, data)) {
+        if (m_headerParser.handleData(data)) {
             m_state = FinalSuccess;
         }
     }

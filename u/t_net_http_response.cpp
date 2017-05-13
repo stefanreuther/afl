@@ -14,7 +14,7 @@ TestNetHttpResponse::testIt()
     /* This is an interface, so we instantiate it and check whether it works the way it's intented. */
     class Resp : public afl::net::http::Response {
      public:
-        virtual bool handleData(const String_t& /*name*/, afl::base::ConstBytes_t& /*data*/)
+        virtual bool handleData(afl::base::ConstBytes_t& /*data*/)
             { return false; }
         virtual void handleDataComplete()
             { }

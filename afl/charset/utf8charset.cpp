@@ -8,16 +8,18 @@
 afl::charset::Utf8Charset::~Utf8Charset()
 { }
 
-String_t
+afl::base::GrowableBytes_t
 afl::charset::Utf8Charset::encode(afl::string::ConstStringMemory_t in)
 {
-    return afl::string::fromMemory(in);
+    afl::base::GrowableBytes_t result;
+    result.append(in.toBytes());
+    return result;
 }
 
 String_t
-afl::charset::Utf8Charset::decode(afl::string::ConstStringMemory_t in)
+afl::charset::Utf8Charset::decode(afl::base::ConstBytes_t in)
 {
-    return afl::string::fromMemory(in);
+    return afl::string::fromBytes(in);
 }
 
 afl::charset::Utf8Charset*

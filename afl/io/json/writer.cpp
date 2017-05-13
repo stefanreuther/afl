@@ -106,12 +106,11 @@ void
 afl::io::json::Writer::visitVector(const afl::data::Vector& vv)
 {
     write("[", NewlineAfter | IndentAfter);
-    const afl::data::Segment& values = vv.getValues();
-    for (size_t i = 0, n = values.size(); i < n; ++i) {
+    for (size_t i = 0, n = vv.size(); i < n; ++i) {
         if (i != 0) {
             write(",", NewlineAfter);
         }
-        visit(values[i]);
+        visit(vv[i]);
     }
     write("]", NewlineBefore | UndentBefore);
 }
@@ -138,7 +137,6 @@ void
 afl::io::json::Writer::write(const String_t& str, uint32_t flags)
 {
     static const uint8_t NEWLINE[] = { '\n' };
-    static const char SOURCE[] = "<json::Writer>";
 
     // Process un-indentation
     if ((flags & UndentBefore) != 0) {
@@ -154,7 +152,7 @@ afl::io::json::Writer::write(const String_t& str, uint32_t flags)
             || (m_lineLength != 0 && m_currentLineLength + str.size() > m_lineLength)))
     {
         afl::base::ConstBytes_t newlineBytes(NEWLINE);
-        m_sink.handleData(SOURCE, newlineBytes);
+        m_sink.handleData(newlineBytes);
 
         // Indentation
         if (m_currentIndentLevel > 0) {
@@ -168,7 +166,7 @@ afl::io::json::Writer::write(const String_t& str, uint32_t flags)
             while (n > 0) {
                 afl::base::ConstBytes_t indentBytes(bytes.subrange(0, n));
                 n -= indentBytes.size();
-                m_sink.handleData(SOURCE, indentBytes);
+                m_sink.handleData(indentBytes);
             }
         }
 
@@ -177,7 +175,7 @@ afl::io::json::Writer::write(const String_t& str, uint32_t flags)
 
     // Actual element
     afl::base::ConstBytes_t stringBytes = afl::string::toBytes(str);
-    m_sink.handleData(SOURCE, stringBytes);
+    m_sink.handleData(stringBytes);
     m_currentLineLength += str.size();
 
     // Post-process

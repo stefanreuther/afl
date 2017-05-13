@@ -20,7 +20,7 @@ afl::net::http::FormParser::handleDataComplete()
 {
     if (!m_key.empty() || !m_value.empty()) {
         afl::charset::UrlEncoding ue;
-        m_consumer.handleHeader(ue.decode(afl::string::toMemory(m_key)), ue.decode(afl::string::toMemory(m_value)));
+        m_consumer.handleHeader(ue.decode(afl::string::toBytes(m_key)), ue.decode(afl::string::toBytes(m_value)));
         m_key.clear();
         m_value.clear();
     }
@@ -29,7 +29,7 @@ afl::net::http::FormParser::handleDataComplete()
 
 // DataSink:
 bool
-afl::net::http::FormParser::handleData(const String_t& /*name*/, afl::base::ConstBytes_t& data)
+afl::net::http::FormParser::handleData(afl::base::ConstBytes_t& data)
 {
     while (const uint8_t* p = data.eat()) {
         if (*p == '&') {

@@ -19,7 +19,7 @@ namespace afl { namespace data {
         typedef String_t Name_t;
 
         /** Type for indexes: integer. */
-        typedef uint32_t Index_t;
+        typedef size_t Index_t;
 
         /** Index meaning "not found". */
         static const Index_t nil = Index_t(-1);

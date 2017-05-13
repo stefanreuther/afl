@@ -37,7 +37,7 @@ namespace afl { namespace net { namespace http {
         // ProtocolHandler:
         virtual void getOperation(Operation& op);
         virtual void advanceTime(afl::sys::Timeout_t msecs);
-        virtual void handleData(const String_t& name, afl::base::ConstBytes_t bytes);
+        virtual void handleData(afl::base::ConstBytes_t bytes);
         virtual void handleSendTimeout(afl::base::ConstBytes_t unsentBytes);
         virtual void handleConnectionClose();
 

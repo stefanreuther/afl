@@ -64,7 +64,7 @@ namespace afl { namespace net { namespace http {
             \param data [in/out] Reference to data to process
             \retval true Header parsing complete, do not call this method again
             \retval false Header parsing incomplete, call this method again */
-        bool handleData(const String_t& name, afl::base::ConstBytes_t& data);
+        bool handleData(afl::base::ConstBytes_t& data);
 
         /** Check for errors.
             Can be used after headers have been received to check for errors.

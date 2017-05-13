@@ -17,3 +17,9 @@ afl::except::FileProblemException::FileProblemException(afl::io::Stream& file, c
 
 afl::except::FileProblemException::~FileProblemException() throw()
 { }
+
+void
+afl::except::FileProblemException::setFileName(const String_t& fileName)
+{
+    m_fileName = fileName;
+}

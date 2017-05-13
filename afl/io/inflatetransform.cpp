@@ -66,6 +66,7 @@ namespace {
 class afl::io::InflateTransform::Impl {
  public:
     Impl(Personality pers);
+    ~Impl();
     void transform(afl::base::ConstBytes_t& in, afl::base::Bytes_t& out);
     static bool isAvailable();
 
@@ -105,6 +106,25 @@ afl::io::InflateTransform::Impl::Impl(Personality pers)
       m_gzExtraDataLength(0),
       m_zStream()
 { }
+
+afl::io::InflateTransform::Impl::~Impl()
+{
+    switch (m_state) {
+     case CheckHeader:
+     case CheckExtraDataLength:
+     case CheckExtraData:
+     case CheckFileName:
+     case CheckComment:
+     case CheckHeaderCRC:
+     case FinishedHeader:
+        break;
+     case Decompressing:
+     case CheckingTrailer:
+     case EndReached:
+        inflateEnd(&m_zStream);
+        break;
+    }
+}
 
 inline void
 afl::io::InflateTransform::Impl::transform(afl::base::ConstBytes_t& in, afl::base::Bytes_t& out)

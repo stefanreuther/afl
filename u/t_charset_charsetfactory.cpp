@@ -13,7 +13,7 @@ TestCharsetCharsetFactory::testIt()
 {
     class Factory : public afl::charset::CharsetFactory {
      public:
-        virtual afl::charset::Charset* createCharset(afl::base::Deleter& /*del*/, String_t /*name*/)
+        virtual afl::charset::Charset* createCharset(String_t /*name*/)
             { return 0; }
     };
     Factory f;

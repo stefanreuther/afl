@@ -48,4 +48,27 @@ TestDataHash::testIt()
     TS_ASSERT(p->getKeys().getNumNames() == 2);
     TS_ASSERT(p->getValues().size() == 2);
     TS_ASSERT(dynamic_cast<afl::data::IntegerValue*>(p->get("y"))->getValue() == 77);
+
+    // Overwrite with clone
+    afl::data::IntegerValue iv(66);
+    p->set("y", &iv);
+    TS_ASSERT(p->get("y") != 0);
+    TS_ASSERT(p->get("y") != &iv);
+    TS_ASSERT(dynamic_cast<afl::data::IntegerValue*>(p->get("y"))->getValue() == 66);
+
+    // Index access
+    afl::data::Hash::Index_t x;
+    TS_ASSERT(p->getIndexByKey("y", x));
+    TS_ASSERT(p->getValueByIndex(x) != 0);
+    TS_ASSERT(dynamic_cast<afl::data::IntegerValue*>(p->getValueByIndex(x))->getValue() == 66);
+
+    // Index modification
+    p->setValueByIndexNew(x, new afl::data::IntegerValue(99));
+    TS_ASSERT(dynamic_cast<afl::data::IntegerValue*>(p->getValueByIndex(x))->getValue() == 99);
+
+    p->setValueByIndex(x, &iv);
+    TS_ASSERT(dynamic_cast<afl::data::IntegerValue*>(p->getValueByIndex(x))->getValue() == 66);
+
+    // Nonexistant
+    TS_ASSERT(!p->getIndexByKey("yyy", x));
 }

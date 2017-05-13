@@ -445,6 +445,19 @@ afl::net::redis::InternalDatabase::call(const Segment_t& command)
         } else {
             return factory.createNull();
         }
+    } else if (verb == "HGETALL") {
+        // HGETALL key
+        checkArgumentCount(v, 1);
+        v.eat(keyArg);
+
+        Segment_t result;
+        if (Hash* hk = get<Hash>(keyArg)) {
+            for (std::map<String_t, String_t>::const_iterator it = hk->m_hash.begin(), e = hk->m_hash.end(); it != e; ++it) {
+                result.pushBackString(it->first);
+                result.pushBackString(it->second);
+            }
+        }
+        return factory.createVector(result);
     } else if (verb == "HINCRBY") {
         // HINCRBY key field value
         checkArgumentCount(v, 3);
@@ -1003,6 +1016,8 @@ afl::net::redis::InternalDatabase::call(const Segment_t& command)
         } else {
             return factory.createString(k->getType());
         }
+    } else if (verb == "PING") {
+        return factory.createString("PONG");
     } else {
         fail(INVALID_COMMAND);
         return 0;

@@ -28,7 +28,7 @@ afl::net::http::PageRequest::setIgnoreData()
 }
 
 void
-afl::net::http::PageRequest::handleData(const String_t& name, afl::base::ConstBytes_t data)
+afl::net::http::PageRequest::handleData(afl::base::ConstBytes_t data)
 {
     if (m_inputStatus == Undecided) {
         // Determine what to do with a potential body
@@ -59,11 +59,11 @@ afl::net::http::PageRequest::handleData(const String_t& name, afl::base::ConstBy
         break;
 
      case SaveBody:
-        m_body.handleData(name, data);
+        m_body.handleData(data);
         break;
 
      case ParseForm:
-        m_formParser.handleData(name, data);
+        m_formParser.handleData(data);
         break;
     }
 }

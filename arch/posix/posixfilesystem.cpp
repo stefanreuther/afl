@@ -4,16 +4,12 @@
   */
 
 #if TARGET_OS_POSIX
-#include <vector>
-#include <unistd.h>
-#include <errno.h>
-#include <limits.h>
 #include "arch/posix/posixfilesystem.hpp"
-#include "arch/posix/posix.hpp"
 #include "afl/except/systemexception.hpp"
-#include "arch/posix/posixstream.hpp"
+#include "arch/posix/posixcwd.hpp"
 #include "arch/posix/posixdirectory.hpp"
 #include "arch/posix/posixroot.hpp"
+#include "arch/posix/posixstream.hpp"
 
 afl::base::Ref<afl::io::Stream>
 arch::posix::PosixFileSystem::openFile(FileName_t fileName, OpenMode mode)
@@ -60,11 +56,7 @@ arch::posix::PosixFileSystem::getCanonicalPathName(FileName_t name)
 arch::posix::PosixFileSystem::FileName_t
 arch::posix::PosixFileSystem::getAbsolutePathName(FileName_t name)
 {
-    if (isAbsolutePathName(name)) {
-        return getCanonicalPathName(name);
-    } else {
-        return getCanonicalPathName(makePathName(getWorkingDirectoryName(), name));
-    }
+    return arch::posix::getAbsolutePathName(name);
 }
 
 arch::posix::PosixFileSystem::FileName_t
@@ -82,24 +74,7 @@ arch::posix::PosixFileSystem::getDirectoryName(FileName_t name)
 arch::posix::PosixFileSystem::FileName_t
 arch::posix::PosixFileSystem::getWorkingDirectoryName()
 {
-    // FIXME: maybe it makes sense to handle symlink-awareness of some shells here,
-    // i.e.
-    //   if ($PWD exists && $PWD and "." refer to same inode)
-    //   then return $PWD
-    //   else get physical directory name
-
-    std::vector<char> buffer;
-    while (1) {
-        buffer.resize(buffer.size() + PATH_MAX);
-        if (getcwd(&buffer[0], buffer.size())) {
-            break;
-        }
-        if (errno != ERANGE) {
-            throw afl::except::SystemException(afl::sys::Error::current(), "<getWorkingDirectoryName>");
-        }
-    }
-
-    return convertExternalToUtf8(afl::string::toMemory(&buffer[0]));
+    return arch::posix::getWorkingDirectoryName();
 }
 
 #else

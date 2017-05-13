@@ -21,6 +21,7 @@ class afl::io::InternalDirectory::Entry : public afl::io::DirectoryEntry {
     virtual void doRename(String_t newName);
     virtual void doErase();
     virtual void doCreateAsDirectory();
+    virtual void doSetFlag(FileFlag flag, bool value);
 
  private:
     afl::base::Ref<InternalDirectory> m_parent;
@@ -148,6 +149,12 @@ void
 afl::io::InternalDirectory::Entry::doCreateAsDirectory()
 {
     throw afl::except::FileProblemException(m_name, afl::string::Messages::cannotAccessDirectories());
+}
+
+void
+afl::io::InternalDirectory::Entry::doSetFlag(FileFlag /*flag*/, bool /*value*/)
+{
+    throw afl::except::FileProblemException(m_name, afl::string::Messages::invalidOperation());
 }
 
 

@@ -8,6 +8,7 @@
 #include "afl/base/deletable.hpp"
 #include "afl/string/string.hpp"
 #include "afl/base/clonable.hpp"
+#include "afl/base/growablememory.hpp"
 
 namespace afl { namespace charset {
 
@@ -20,13 +21,13 @@ namespace afl { namespace charset {
      public:
         /** Encode UTF-8 string into this charset.
             \param in Input string, UTF-8
-            \return Result, in class-specific charset */
-        virtual String_t encode(afl::string::ConstStringMemory_t in) = 0;
+            \return Result bytes, in class-specific charset */
+        virtual afl::base::GrowableBytes_t encode(afl::string::ConstStringMemory_t in) = 0;
 
         /** Decode charset string into UTF-8.
-            \param in Input string, in class-specific charset
+            \param in Input bytes in class-specific charset
             \return Result, UTF-8 */
-        virtual String_t decode(afl::string::ConstStringMemory_t in) = 0;
+        virtual String_t decode(afl::base::ConstBytes_t in) = 0;
     };
 
 } }

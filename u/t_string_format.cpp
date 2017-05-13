@@ -324,3 +324,22 @@ TestStringFormat::testSpecials()
     TS_ASSERT_EQUALS(String_t(Format("%%")), "%");
     TS_ASSERT_EQUALS(String_t(Format("%5%")), "    %");
 }
+
+/** Test pointers. */
+void
+TestStringFormat::testPointer()
+{
+    using afl::string::Format;
+
+    // Null pointer
+    TS_ASSERT_EQUALS(String_t(Format("%p", (void*) 0)), "(nil)");
+    TS_ASSERT_EQUALS(String_t(Format("%p", (const char*) 0)), "(nil)");
+    TS_ASSERT_EQUALS(String_t(Format("%s", (const char*) 0)), "(nil)");
+
+    // Non-null pointer
+    TS_ASSERT_EQUALS(String_t(Format("%p", "xyz")).substr(0, 2), "0x");
+    TS_ASSERT_EQUALS(String_t(Format("%s", (void*) "xyz")).substr(0, 2), "0x");
+    int a;
+    TS_ASSERT_EQUALS(String_t(Format("%s", &a)).substr(0, 2), "0x");
+}
+

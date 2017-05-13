@@ -16,7 +16,7 @@ TestIoInternalSink::testIt()
 
     uint8_t data[] = {1,2,3};
     afl::base::ConstBytes_t data1(data);
-    TS_ASSERT(!sink.handleData("<source name>", data1));
+    TS_ASSERT(!sink.handleData(data1));
     TS_ASSERT_EQUALS(sink.getContent().size(), 3U);
     TS_ASSERT(sink.getContent().equalContent(data));
 }

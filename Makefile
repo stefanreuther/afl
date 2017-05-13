@@ -4,7 +4,10 @@
 
 ALL_TARGETS = libafl.a date dialog ls chatserver wget secureio respclient \
     respserver httpserver env unzip testsuite
-OBJECTS_afl = afl/net/server.o afl/sys/commandlineparser.o \
+OBJECTS_afl = afl/string/win32filenames.o afl/net/mimebuilder.o \
+    afl/net/nullnetworkstack.o afl/charset/hexencoding.o afl/string/hex.o \
+    afl/sys/parsedtime.o afl/net/nullcommandhandler.o arch/posix/posixcwd.o \
+    afl/net/server.o afl/sys/commandlineparser.o \
     afl/except/commandlineexception.o arch/posix/posixdialog.o \
     arch/win32/win32dialog.o afl/sys/dialog.o afl/base/baseweaklink.o \
     afl/base/weaktarget.o afl/io/transformreaderstream.o \
@@ -106,7 +109,10 @@ OBJECTS_ls = app/ls.o
 OBJECTS_respclient = app/respclient.o
 OBJECTS_respserver = app/respserver.o
 OBJECTS_secureio = app/secureio.o
-OBJECTS_testsuite = u/t_net_server.o u/t_base_observable.o u/t_sys_dialog.o \
+OBJECTS_testsuite = u/t_string_win32filenames.o u/t_net_reconnectable.o \
+    u/t_net_mimebuilder.o u/t_net_nullnetworkstack.o \
+    u/t_charset_hexencoding.o u/t_string_hex.o u/t_net_nullcommandhandler.o \
+    u/t_net_server.o u/t_base_observable.o u/t_sys_dialog.o \
     u/t_base_weaklink.o u/t_base_baseweaklink.o u/t_base_weaktarget.o \
     u/t_io_transformreaderstream.o u/t_io_json_parser_testsuite.o \
     u/t_io_deflatetransform.o u/t_io_archive_zipreader.o \
@@ -1080,6 +1086,16 @@ u/t_charset_defaultcharsetfactory.o: u/t_charset_defaultcharsetfactory.cpp
 
 u/t_charset_defaultcharsetfactory.s: u/t_charset_defaultcharsetfactory.cpp
 	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_charset_defaultcharsetfactory.s -S u/t_charset_defaultcharsetfactory.cpp
+
+u/t_charset_hexencoding.lo: u/t_charset_hexencoding.cpp
+	$(CXX) -fPIC $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_charset_hexencoding.lo -c u/t_charset_hexencoding.cpp
+
+u/t_charset_hexencoding.o: u/t_charset_hexencoding.cpp
+	@echo "        Compiling u/t_charset_hexencoding.cpp..."
+	@$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_charset_hexencoding.o -c u/t_charset_hexencoding.cpp
+
+u/t_charset_hexencoding.s: u/t_charset_hexencoding.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_charset_hexencoding.s -S u/t_charset_hexencoding.cpp
 
 u/t_charset_quotedprintable.lo: u/t_charset_quotedprintable.cpp
 	$(CXX) -fPIC $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_charset_quotedprintable.lo -c u/t_charset_quotedprintable.cpp
@@ -2253,6 +2269,16 @@ u/t_net_listener.o: u/t_net_listener.cpp
 u/t_net_listener.s: u/t_net_listener.cpp
 	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_net_listener.s -S u/t_net_listener.cpp
 
+u/t_net_mimebuilder.lo: u/t_net_mimebuilder.cpp
+	$(CXX) -fPIC $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_net_mimebuilder.lo -c u/t_net_mimebuilder.cpp
+
+u/t_net_mimebuilder.o: u/t_net_mimebuilder.cpp
+	@echo "        Compiling u/t_net_mimebuilder.cpp..."
+	@$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_net_mimebuilder.o -c u/t_net_mimebuilder.cpp
+
+u/t_net_mimebuilder.s: u/t_net_mimebuilder.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_net_mimebuilder.s -S u/t_net_mimebuilder.cpp
+
 u/t_net_name.lo: u/t_net_name.cpp
 	$(CXX) -fPIC $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_net_name.lo -c u/t_net_name.cpp
 
@@ -2272,6 +2298,26 @@ u/t_net_networkstack.o: u/t_net_networkstack.cpp
 
 u/t_net_networkstack.s: u/t_net_networkstack.cpp
 	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_net_networkstack.s -S u/t_net_networkstack.cpp
+
+u/t_net_nullcommandhandler.lo: u/t_net_nullcommandhandler.cpp
+	$(CXX) -fPIC $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_net_nullcommandhandler.lo -c u/t_net_nullcommandhandler.cpp
+
+u/t_net_nullcommandhandler.o: u/t_net_nullcommandhandler.cpp
+	@echo "        Compiling u/t_net_nullcommandhandler.cpp..."
+	@$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_net_nullcommandhandler.o -c u/t_net_nullcommandhandler.cpp
+
+u/t_net_nullcommandhandler.s: u/t_net_nullcommandhandler.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_net_nullcommandhandler.s -S u/t_net_nullcommandhandler.cpp
+
+u/t_net_nullnetworkstack.lo: u/t_net_nullnetworkstack.cpp
+	$(CXX) -fPIC $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_net_nullnetworkstack.lo -c u/t_net_nullnetworkstack.cpp
+
+u/t_net_nullnetworkstack.o: u/t_net_nullnetworkstack.cpp
+	@echo "        Compiling u/t_net_nullnetworkstack.cpp..."
+	@$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_net_nullnetworkstack.o -c u/t_net_nullnetworkstack.cpp
+
+u/t_net_nullnetworkstack.s: u/t_net_nullnetworkstack.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_net_nullnetworkstack.s -S u/t_net_nullnetworkstack.cpp
 
 u/t_net_parameterencoder.lo: u/t_net_parameterencoder.cpp
 	$(CXX) -fPIC $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_net_parameterencoder.lo -c u/t_net_parameterencoder.cpp
@@ -2302,6 +2348,16 @@ u/t_net_protocolhandlerfactory.o: u/t_net_protocolhandlerfactory.cpp
 
 u/t_net_protocolhandlerfactory.s: u/t_net_protocolhandlerfactory.cpp
 	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_net_protocolhandlerfactory.s -S u/t_net_protocolhandlerfactory.cpp
+
+u/t_net_reconnectable.lo: u/t_net_reconnectable.cpp
+	$(CXX) -fPIC $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_net_reconnectable.lo -c u/t_net_reconnectable.cpp
+
+u/t_net_reconnectable.o: u/t_net_reconnectable.cpp
+	@echo "        Compiling u/t_net_reconnectable.cpp..."
+	@$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_net_reconnectable.o -c u/t_net_reconnectable.cpp
+
+u/t_net_reconnectable.s: u/t_net_reconnectable.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_net_reconnectable.s -S u/t_net_reconnectable.cpp
 
 u/t_net_redis_integerkey.lo: u/t_net_redis_integerkey.cpp
 	$(CXX) -fPIC $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_net_redis_integerkey.lo -c u/t_net_redis_integerkey.cpp
@@ -2523,6 +2579,16 @@ u/t_string_formatunion.o: u/t_string_formatunion.cpp
 u/t_string_formatunion.s: u/t_string_formatunion.cpp
 	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_string_formatunion.s -S u/t_string_formatunion.cpp
 
+u/t_string_hex.lo: u/t_string_hex.cpp
+	$(CXX) -fPIC $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_string_hex.lo -c u/t_string_hex.cpp
+
+u/t_string_hex.o: u/t_string_hex.cpp
+	@echo "        Compiling u/t_string_hex.cpp..."
+	@$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_string_hex.o -c u/t_string_hex.cpp
+
+u/t_string_hex.s: u/t_string_hex.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_string_hex.s -S u/t_string_hex.cpp
+
 u/t_string_messages.lo: u/t_string_messages.cpp
 	$(CXX) -fPIC $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_string_messages.lo -c u/t_string_messages.cpp
 
@@ -2602,6 +2668,16 @@ u/t_string_translator.o: u/t_string_translator.cpp
 
 u/t_string_translator.s: u/t_string_translator.cpp
 	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_string_translator.s -S u/t_string_translator.cpp
+
+u/t_string_win32filenames.lo: u/t_string_win32filenames.cpp
+	$(CXX) -fPIC $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_string_win32filenames.lo -c u/t_string_win32filenames.cpp
+
+u/t_string_win32filenames.o: u/t_string_win32filenames.cpp
+	@echo "        Compiling u/t_string_win32filenames.cpp..."
+	@$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_string_win32filenames.o -c u/t_string_win32filenames.cpp
+
+u/t_string_win32filenames.s: u/t_string_win32filenames.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_string_win32filenames.s -S u/t_string_win32filenames.cpp
 
 u/t_sys_atomicinteger.lo: u/t_sys_atomicinteger.cpp
 	$(CXX) -fPIC $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_sys_atomicinteger.lo -c u/t_sys_atomicinteger.cpp

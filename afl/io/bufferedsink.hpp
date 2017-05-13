@@ -6,13 +6,14 @@
 #define AFL_AFL_IO_BUFFEREDSINK_HPP
 
 #include "afl/io/datasink.hpp"
+#include "afl/base/uncopyable.hpp"
 
 namespace afl { namespace io {
 
     /** Buffered data sink.
         Attempts to increase efficiency by writing larger blocks.
         Small data blocks are combined before being written. */
-    class BufferedSink : public DataSink {
+    class BufferedSink : public DataSink, private afl::base::Uncopyable {
      public:
         /** Constructor.
             \param sink Data sink that receives the buffered data. Lifetime must exceed that of the BufferedSink. */
@@ -20,7 +21,7 @@ namespace afl { namespace io {
 
         // DataSink:
         virtual ~BufferedSink();
-        virtual bool handleData(const String_t& name, afl::base::ConstBytes_t& data);
+        virtual bool handleData(afl::base::ConstBytes_t& data);
 
         /** Flush buffered data.
             Writes all pending data to the output stream, even if the buffer is not yet filled. */
@@ -29,9 +30,6 @@ namespace afl { namespace io {
      private:
         /** Output data sink. */
         DataSink& m_sink;
-
-        /** Name for reporting. */
-        String_t m_lastName;
 
         /** Buffer descriptor. */
         afl::base::Bytes_t m_buffer;

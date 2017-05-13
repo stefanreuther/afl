@@ -1,3 +1,63 @@
+2017-04-25  Stefan Reuther  <streu@gmx.de>
+
+	* afl/charset/charsetfactory.hpp: remove "deleter" argument (INCOMPATIBLE!)
+
+2017-04-23  Stefan Reuther  <streu@gmx.de>
+
+	* afl/data/hash.hpp: add index-based access functions
+
+2017-03-25  Stefan Reuther  <streu@gmx.de>
+
+	* afl/string/win32filenames.hpp: new
+	* afl/net/reconnectable.hpp: new
+
+2017-03-19  Stefan Reuther  <streu@gmx.de>
+
+	* afl/bits/fixedstring.hpp: use ConstBytes_t, not String_t (INCOMPATIBLE!)
+	* afl/charset/charset.hpp: change prototypes so that encoded stuff is bytes, not chars (INCOMPATIBLE!)
+	* afl/io/datasink.hpp: remove "name" argument (INCOMPATIBLE!)
+
+2017-03-17  Stefan Reuther  <streu@gmx.de>
+
+	* afl/net/mimebuilder.hpp: new [planetscentral/net/mimebuilder.h]
+
+2017-03-15  Stefan Reuther  <streu@gmx.de>
+
+	* afl/net/nullnetworkstack.cpp, afl/net/nullnetworkstack.hpp: new
+	* afl/io/directoryentry.hpp (setFlag, copyInfo, Executable): new
+
+2017-03-12  Stefan Reuther  <streu@gmx.de>
+
+	* afl/io/deflatetransform.cpp, afl/io/inflatetransform.cpp: shut down zlib correctly (d'ooh!)
+
+2017-03-06  Stefan Reuther  <streu@gmx.de>
+
+	* afl/string/hex.hpp: new
+	* afl/charset/hexencoding.hpp: new
+
+2017-02-11  Stefan Reuther  <streu@gmx.de>
+
+	* afl/sys/parsedtime.cpp (format): new
+	* afl/checksums/md5.hpp, afl/checksums/sha1.hpp: add HASH_SIZE
+	* afl/data/segment.hpp (set, pushBack): add const
+	* afl/net/redis/hashkey.cpp (getAll): new
+
+2017-02-04  Stefan Reuther  <streu@gmx.de>
+
+	* afl/net/nullcommandhandler.hpp: new
+
+2017-01-28  Stefan Reuther  <streu@gmx.de>
+
+	* afl/data/vector.hpp: simplify by deriving from Segment (INCOMPATIBLE!)
+
+2017-01-22  Stefan Reuther  <streu@gmx.de>
+
+	* arch/posix/posixcwd.cpp, arch/posix/posixcwd.hpp: new. Decouples link-dependencies so a program using Environment does not pull in FileSystem
+
+2017-01-21  Stefan Reuther  <streu@gmx.de>
+
+	* afl/net/resp/client.cpp: initial implementation of auto-reconnect
+
 2017-01-14  Stefan Reuther  <streu@gmx.de>
 
 	* afl/bits/value.hpp (get): new

@@ -2,8 +2,8 @@
   *  \file afl/string/posixfilenames.hpp
   *  \brief Class afl::string::PosixFileNames
   */
-#ifndef _AFL_STRING_POSIXFILENAMES_HPP
-#define _AFL_STRING_POSIXFILENAMES_HPP
+#ifndef AFL_AFL_STRING_POSIXFILENAMES_HPP
+#define AFL_AFL_STRING_POSIXFILENAMES_HPP
 
 #include "afl/string/string.hpp"
 

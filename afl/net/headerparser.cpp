@@ -19,7 +19,7 @@ afl::net::HeaderParser::~HeaderParser()
 { }
 
 bool
-afl::net::HeaderParser::handleData(const String_t& /*name*/, afl::base::ConstBytes_t& bytes)
+afl::net::HeaderParser::handleData(afl::base::ConstBytes_t& bytes)
 {
     const uint8_t* p;
     while (m_state != FinalState && (p = bytes.eat()) != 0) {

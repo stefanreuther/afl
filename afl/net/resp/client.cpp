@@ -23,6 +23,7 @@ afl::net::resp::Client::Client(NetworkStack& stack, const Name& name)
       m_mutex(),
       m_factory(),
       m_controller(),
+      m_mode(Always),
 
       m_socket(),
 
@@ -44,35 +45,38 @@ afl::net::resp::Client::call(const Segment_t& command)
     afl::sys::MutexGuard g(m_mutex);
 
     // Send the command
-    afl::async::CommunicationSink comSink(m_controller, m_socket);
-    afl::io::BufferedSink sink(comSink);
-    afl::io::resp::Writer(sink).visitSegment(command);
-    sink.flush();
+    try {
+        sendCommand(command);
+    }
+    catch (std::exception&) {
+        // Send threw. Try to reconnect and send again (if configured).
+        // If it fails again, fail the call.
+        if (m_mode == Never) {
+            throw;
+        }
+        connect();
+        sendCommand(command);
+    }
+
+    // If we are configured to reconnect once, this was our request. Disable reconnect.
+    if (m_mode == Once) {
+        m_mode = Never;
+    }
 
     // Read response
-    while (1) {
-        if (m_input.empty()) {
-            // Read some input data
-            afl::async::ReceiveOperation op(m_inputBuffer);
-            if (!m_socket->receive(m_controller, op)) {
-                // FIXME?
-                assert(0);
-            }
-            if (op.getNumReceivedBytes() == 0) {
-                // FIXME
-                throw afl::except::FileTooShortException(m_socket->getName());
-            }
-            m_input = op.getReceivedBytes();
+    try {
+        return readResponse();
+    }
+    catch (afl::except::RemoteErrorException&) {
+        throw;
+    }
+    catch (std::exception&) {
+        if (m_mode == Never) {
+            throw;
         }
-        if (m_parser.handleData(m_socket->getName(), m_input)) {
-            // Fetch result, fend off errors
-            std::auto_ptr<Value_t> result(m_parser.extract());
-            String_t src, err;
-            if (afl::data::Access(result.get()).isError(src, err)) {
-                throw afl::except::RemoteErrorException(m_socket->getName(), err);
-            }
-            return result.release();
-        }
+        connect();
+        sendCommand(command);
+        return readResponse();
     }
 }
 
@@ -85,9 +89,58 @@ afl::net::resp::Client::callVoid(const Segment_t& command)
     delete call(command);
 }
 
+// Set reconnect mode.
+void
+afl::net::resp::Client::setReconnectMode(Mode mode)
+{
+    m_mode = mode;
+}
+
+// Send a command.
+void
+afl::net::resp::Client::sendCommand(const Segment_t& command)
+{
+    afl::async::CommunicationSink comSink(m_controller, m_socket);
+    afl::io::BufferedSink sink(comSink);
+    afl::io::resp::Writer(sink).visitSegment(command);
+    sink.flush();
+}
+
+// Read a response.
+afl::data::Value*
+afl::net::resp::Client::readResponse()
+{
+    while (1) {
+        if (m_input.empty()) {
+            // Read some input data
+            afl::async::ReceiveOperation op(m_inputBuffer);
+            if (!m_socket->receive(m_controller, op)) {
+                // FIXME: how to deal with timeouts?
+                assert(0);
+            }
+            if (op.getNumReceivedBytes() == 0) {
+                // End of file, i.e. other side closed.
+                throw afl::except::FileTooShortException(m_socket->getName());
+            }
+            m_input = op.getReceivedBytes();
+        }
+        if (m_parser.handleData(m_input)) {
+            // Fetch result, fend off errors
+            std::auto_ptr<Value_t> result(m_parser.extract());
+            String_t src, err;
+            if (afl::data::Access(result.get()).isError(src, err)) {
+                throw afl::except::RemoteErrorException(m_socket->getName(), err);
+            }
+            return result.release();
+        }
+    }
+}
+
 // Build connection.
 void
 afl::net::resp::Client::connect()
 {
-    m_socket = m_stack.connect(m_name).asPtr();
+    // Use a timeout of 10000. It hangs forever on Windows otherwise.
+    // FIXME: make this configurable (or figure out why Windows hangs here).
+    m_socket = m_stack.connect(m_name, 10000).asPtr();
 }

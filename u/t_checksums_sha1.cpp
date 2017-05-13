@@ -51,6 +51,7 @@ TestChecksumsSHA1::testBasic()
 
     // Self-information
     TS_ASSERT_EQUALS(cc.getHashSize(), 20U);
+    TS_ASSERT_EQUALS(cc.getHashSize(), cc.HASH_SIZE);
 }
 
 /** Test testsuite from RFC 3174. */

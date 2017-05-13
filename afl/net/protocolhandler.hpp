@@ -47,9 +47,8 @@ namespace afl { namespace net {
         virtual void advanceTime(afl::sys::Timeout_t msecs) = 0;
 
         /** Handle incoming data.
-            \param name [in] Name of data source
             \param bytes [in] Data to process */
-        virtual void handleData(const String_t& name, afl::base::ConstBytes_t bytes) = 0;
+        virtual void handleData(afl::base::ConstBytes_t bytes) = 0;
 
         /** Handle send timeout. */
         virtual void handleSendTimeout(afl::base::ConstBytes_t unsentBytes) = 0;

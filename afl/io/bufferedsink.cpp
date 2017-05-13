@@ -8,24 +8,27 @@
 
 afl::io::BufferedSink::BufferedSink(DataSink& sink)
     : m_sink(sink),
-      m_lastName(),
       m_buffer(m_rawBuffer),
       m_bufferFill(0)
 { }
 
 afl::io::BufferedSink::~BufferedSink()
 {
-    flush();
+    try {
+        flush();
+    }
+    catch (...) {
+        // Ignore exception during destruction
+    }
 }
 
 bool
-afl::io::BufferedSink::handleData(const String_t& name, afl::base::ConstBytes_t& data)
+afl::io::BufferedSink::handleData(afl::base::ConstBytes_t& data)
 {
-    m_lastName = name;
     while (!data.empty()) {
         if (m_bufferFill == 0 && data.size() >= m_buffer.size()) {
             // Write directly
-            m_sink.handleData(name, data);
+            m_sink.handleData(data);
             data.reset();
         } else {
             // Write through buffer
@@ -45,13 +48,15 @@ void
 afl::io::BufferedSink::flush()
 {
     if (m_bufferFill != 0) {
-        // Write out data
+        // Determine data to write out
         afl::base::ConstBytes_t tmp(m_buffer);
         tmp.trim(m_bufferFill);
-        m_sink.handleData(m_lastName, tmp);
 
         // Reset state
         m_buffer = m_rawBuffer;
         m_bufferFill = 0;
+
+        // Write data
+        m_sink.handleData(tmp);
     }
 }

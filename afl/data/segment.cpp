@@ -19,6 +19,12 @@ afl::data::Segment::~Segment()
 afl::data::Value*
 afl::data::Segment::operator[](Index_t index) const
 {
+    return get(index);
+}
+
+afl::data::Value*
+afl::data::Segment::get(Index_t index) const
+{
     if (index < m_content.size()) {
         return m_content[index];
     } else {
@@ -27,7 +33,7 @@ afl::data::Segment::operator[](Index_t index) const
 }
 
 void
-afl::data::Segment::set(Index_t index, Value* value)
+afl::data::Segment::set(Index_t index, const Value* value)
 {
     setNew(index, Value::cloneOf(value));
 }
@@ -114,7 +120,7 @@ afl::data::Segment::getNumUsedSlots()
 
 // Stack interface
 afl::data::Segment&
-afl::data::Segment::pushBack(Value* value)
+afl::data::Segment::pushBack(const Value* value)
 {
     return pushBackNew(Value::cloneOf(value));
 }

@@ -50,7 +50,7 @@ afl::net::http::Request::Request()
 
 // Parse header data.
 bool
-afl::net::http::Request::handleData(const String_t& name, afl::base::ConstBytes_t& bytes)
+afl::net::http::Request::handleData(afl::base::ConstBytes_t& bytes)
 {
     while (!bytes.empty()) {
         switch (m_state) {
@@ -92,7 +92,7 @@ afl::net::http::Request::handleData(const String_t& name, afl::base::ConstBytes_
             }
             break;
          case Header:
-            if (m_headerParser.handleData(name, bytes)) {
+            if (m_headerParser.handleData(bytes)) {
                 m_state = Done;
             }
             break;

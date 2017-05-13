@@ -30,7 +30,7 @@ class TestNetHttpClientConnectionProvider : public CxxTest::TestSuite {
 
 class TestNetHttpClientRequest : public CxxTest::TestSuite {
  public:
-    void testIt();
+    void testInterface();
 };
 
 class TestNetHttpClientResponse : public CxxTest::TestSuite {
@@ -38,6 +38,9 @@ class TestNetHttpClientResponse : public CxxTest::TestSuite {
     void testOK();
     void testError();
     void testUserHeaders();
+    void testKeepalive();
+    void testKeepalive11();
+    void testContentEncoding();
 };
 
 class TestNetHttpCookie : public CxxTest::TestSuite {
@@ -95,6 +98,8 @@ class TestNetHttpPageRequest : public CxxTest::TestSuite {
 class TestNetHttpPageResponse : public CxxTest::TestSuite {
  public:
     void testAccessors();
+    void testStatusCodes();
+    void testRedirect();
 };
 
 class TestNetHttpRequest : public CxxTest::TestSuite {

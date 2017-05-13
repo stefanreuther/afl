@@ -8,7 +8,7 @@
 #include "afl/string/formatunion.hpp"
 
 /** Test specialisation on all types.
-    All of these must compiler.
+    All of these must compile.
     Proper operation is tested later on in TestStringFormat::testTypes(). */
 void
 TestStringFormatTraits::testTypes()
@@ -46,4 +46,6 @@ TestStringFormatTraits::testTypes()
 
     // other
     afl::string::FormatTraits<const char*>::store(u, "hi there");
+    afl::string::FormatTraits<const void*>::store(u, (void*) 0);
+    afl::string::FormatTraits<const void*>::store(u, (void*) &u);
 }

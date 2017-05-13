@@ -8,6 +8,7 @@
 #include "afl/base/staticassert.hpp"
 #include "afl/except/unsupportedexception.hpp"
 #include "afl/bits/uint32be.hpp"
+#include "afl/string/hex.hpp"
 
 // Maximum size
 const size_t afl::checksums::Hash::MAX_HASH_SIZE;
@@ -117,15 +118,13 @@ afl::checksums::Hash::computePBKDF2(Bytes_t out, ConstBytes_t password, ConstByt
 String_t
 afl::checksums::Hash::getHashAsHexString() const
 {
-    static const char hex[] = "0123456789abcdef";
     uint8_t buffer[MAX_HASH_SIZE];
     ConstBytes_t hash(getHash(buffer));
 
     String_t result;
     result.reserve(hash.size()*2);
     while (const uint8_t* p = hash.eat()) {
-        result += hex[(*p >> 4) & 15];
-        result += hex[(*p) & 15];
+        afl::string::putHexByte(result, *p, afl::string::HEX_DIGITS_LOWER);
     }
     return result;
 }

@@ -11,7 +11,7 @@
 namespace {
     class TestSink : public afl::io::DataSink {
      public:
-        bool handleData(const String_t& /*name*/, afl::base::ConstBytes_t& data)
+        bool handleData(afl::base::ConstBytes_t& data)
             {
                 m_text.append(reinterpret_cast<const char*>(data.unsafeData()), data.size());
                 data.reset();
@@ -59,7 +59,7 @@ TestNetHttpChunkedSink::testIt()
         TestSink t;
         afl::net::http::ChunkedSink cs(t);
         afl::base::ConstBytes_t data = afl::string::toBytes(TRIVIAL);
-        TS_ASSERT(cs.handleData("<source name>", data));
+        TS_ASSERT(cs.handleData(data));
         TS_ASSERT(data.empty());
         TS_ASSERT_EQUALS(t.m_text, "");
     }
@@ -68,7 +68,7 @@ TestNetHttpChunkedSink::testIt()
         TestSink t;
         afl::net::http::ChunkedSink cs(t);
         afl::base::ConstBytes_t data = afl::string::toBytes(SIMPLE);
-        TS_ASSERT(cs.handleData("<source name>", data));
+        TS_ASSERT(cs.handleData(data));
         TS_ASSERT(data.empty());
         TS_ASSERT_EQUALS(t.m_text, "abcde");
     }
@@ -77,7 +77,7 @@ TestNetHttpChunkedSink::testIt()
         TestSink t;
         afl::net::http::ChunkedSink cs(t);
         afl::base::ConstBytes_t data = afl::string::toBytes(REMAIN);
-        TS_ASSERT(cs.handleData("<source name>", data));
+        TS_ASSERT(cs.handleData(data));
         TS_ASSERT(!data.empty());
         TS_ASSERT_EQUALS(t.m_text, "abcde");
         TS_ASSERT_EQUALS(data.size(), 5U);
@@ -88,7 +88,7 @@ TestNetHttpChunkedSink::testIt()
         TestSink t;
         afl::net::http::ChunkedSink cs(t);
         afl::base::ConstBytes_t data = afl::string::toBytes(TWO_PARTS);
-        TS_ASSERT(cs.handleData("<source name>", data));
+        TS_ASSERT(cs.handleData(data));
         TS_ASSERT(data.empty());
         TS_ASSERT_EQUALS(t.m_text, "abcdefgh");
     }
@@ -97,7 +97,7 @@ TestNetHttpChunkedSink::testIt()
         TestSink t;
         afl::net::http::ChunkedSink cs(t);
         afl::base::ConstBytes_t data = afl::string::toBytes(EXTENSION);
-        TS_ASSERT(cs.handleData("<source name>", data));
+        TS_ASSERT(cs.handleData(data));
         TS_ASSERT(data.empty());
         TS_ASSERT_EQUALS(t.m_text, "abcdefgh");
     }
@@ -109,10 +109,10 @@ TestNetHttpChunkedSink::testIt()
             TestSink t;
             afl::net::http::ChunkedSink cs(t);
             afl::base::ConstBytes_t part(data.subrange(0, i));
-            TS_ASSERT(!cs.handleData("<source name>", part));
+            TS_ASSERT(!cs.handleData(part));
             TS_ASSERT(part.empty());
             part = data.subrange(i);
-            TS_ASSERT(cs.handleData("<source name>", part));
+            TS_ASSERT(cs.handleData(part));
             TS_ASSERT(part.empty());
             TS_ASSERT_EQUALS(t.m_text, "abcdefgh");
         }
@@ -124,10 +124,10 @@ TestNetHttpChunkedSink::testIt()
             TestSink t;
             afl::net::http::ChunkedSink cs(t);
             afl::base::ConstBytes_t part(data.subrange(0, i));
-            TS_ASSERT(!cs.handleData("<source name>", part));
+            TS_ASSERT(!cs.handleData(part));
             TS_ASSERT(part.empty());
             part = data.subrange(i);
-            TS_ASSERT(cs.handleData("<source name>", part));
+            TS_ASSERT(cs.handleData(part));
             TS_ASSERT(part.empty());
             TS_ASSERT_EQUALS(t.m_text, "abcdefgh");
         }

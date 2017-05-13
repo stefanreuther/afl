@@ -110,7 +110,7 @@ afl::net::SimpleServer::handleConnection(Socket& socket)
                     handler->handleConnectionClose();
                     break;
                 } else {
-                    handler->handleData(socket.getName(), rx.getReceivedBytes());
+                    handler->handleData(rx.getReceivedBytes());
                 }
             }
         }

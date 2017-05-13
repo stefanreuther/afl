@@ -24,7 +24,7 @@ namespace afl { namespace io {
         ~LimitedDataSink();
 
         // DataSink:
-        virtual bool handleData(const String_t& name, afl::base::ConstBytes_t& data);
+        virtual bool handleData(afl::base::ConstBytes_t& data);
 
      private:
         DataSink& m_peer;

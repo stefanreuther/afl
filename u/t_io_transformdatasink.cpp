@@ -17,7 +17,7 @@ namespace {
         TestSink(String_t& text)
             : m_text(text)
             { }
-        virtual bool handleData(const String_t& /*name*/, afl::base::ConstBytes_t& data)
+        virtual bool handleData(afl::base::ConstBytes_t& data)
             {
                 m_text.append(reinterpret_cast<const char*>(data.unsafeData()), data.size());
                 data.reset();
@@ -77,7 +77,7 @@ TestIoTransformDataSink::testNull()
 
     // Perform operation
     afl::base::ConstBytes_t bytes(afl::string::toBytes("abc"));
-    bool result = sink.handleData("<source name>", bytes);
+    bool result = sink.handleData(bytes);
 
     // Check invocation result
     TS_ASSERT(!result);
@@ -99,7 +99,7 @@ TestIoTransformDataSink::testSimple()
 
     // Perform operation
     afl::base::ConstBytes_t bytes(afl::string::toBytes("abc"));
-    bool result = sink.handleData("<source name>", bytes);
+    bool result = sink.handleData(bytes);
 
     // Check invocation result
     TS_ASSERT(!result);
@@ -131,7 +131,7 @@ TestIoTransformDataSink::testLarge()
             afl::base::ConstBytes_t bytes(buf);
             bytes.trim(sz);
 
-            sink.handleData("<source name>", bytes);
+            sink.handleData(bytes);
             TS_ASSERT_EQUALS(text.size(), (i+1)*5*sz);
         }
     }

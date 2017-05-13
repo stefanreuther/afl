@@ -117,10 +117,8 @@ arch::posix::PosixStream::createFileMapping(FileSize_t limit)
 void
 arch::posix::PosixStream::init(afl::io::FileSystem::FileName_t name, afl::io::FileSystem::OpenMode mode)
 {
-    afl::io::FileSystem::FileName_t sysName;
-    if (!convertUtf8ToExternal(sysName, afl::string::toMemory(name), false)) {
-        throw afl::except::FileProblemException(*this, afl::string::Messages::invalidFileName());
-    }
+    // Convert path name
+    afl::io::FileSystem::FileName_t sysName = convertUtf8ToPathName(name);
 
     // Pre-initialize status/errors in case the enum switch is broken somehow
     m_capabilities = 0;
