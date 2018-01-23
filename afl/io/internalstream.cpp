@@ -13,7 +13,8 @@ afl::io::InternalStream::InternalStream()
     : MultiplexableStream(),
       m_name("<internal>"),
       m_data(),
-      m_pos(0)
+      m_pos(0),
+      m_allowWrite(true)
 { }
 
 afl::io::InternalStream::~InternalStream()
@@ -32,6 +33,11 @@ afl::io::InternalStream::read(Bytes_t m)
 size_t
 afl::io::InternalStream::write(ConstBytes_t m)
 {
+    // Check permission
+    if (!m_allowWrite) {
+        throw afl::except::FileProblemException(*this, afl::string::Messages::cannotWrite());
+    }
+
     // Compute new size and check overflow
     size_t end = m_pos + m.size();
     if (end < m_pos) {
@@ -84,7 +90,11 @@ afl::io::InternalStream::getSize()
 uint32_t
 afl::io::InternalStream::getCapabilities()
 {
-    return CanRead | CanWrite | CanSeek;
+    uint32_t result = CanRead | CanSeek;
+    if (m_allowWrite) {
+        result |= CanWrite;
+    }
+    return result;
 }
 
 String_t
@@ -109,4 +119,10 @@ afl::io::Stream::ConstBytes_t
 afl::io::InternalStream::getContent() const
 {
     return m_data;  // implicitly converted
+}
+
+void
+afl::io::InternalStream::setWritePermission(bool allowWrite)
+{
+    m_allowWrite = allowWrite;
 }

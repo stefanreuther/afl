@@ -1,0 +1,10 @@
+/** \file afl/net/line/Intro.dox
+    \brief Namespace afl::net::line */
+
+/** \namespace afl::net::line
+    \brief Line-based interaction protocols
+
+    This namespace contains classes for building applications that implement or use line-based interaction protocols.
+    In these protocols, a conversation consists of an exchange of lines between client and server.
+    Typically, the client sends requests, the server sends responses.
+    Protocols of this type include POP3, SMTP. */

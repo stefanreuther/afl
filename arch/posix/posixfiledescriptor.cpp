@@ -8,15 +8,15 @@
 
 #include <errno.h>
 #include <unistd.h>
-#include <sys/select.h>         // select
-#include <sys/time.h>           // struct timeval
+#include <poll.h>
+#include <limits.h>
+#include "afl/async/notifier.hpp"
 #include "afl/except/systemexception.hpp"
 #include "afl/string/messages.hpp"
 #include "afl/sys/error.hpp"
 #include "afl/sys/mutexguard.hpp"
 #include "arch/controller.hpp"
 #include "arch/posix/posixcontrollerimpl.hpp"
-#include "afl/async/notifier.hpp"
 
 bool
 arch::posix::PosixFileDescriptor::send(afl::async::Controller& /*ctl*/, afl::async::SendOperation& op, afl::sys::Timeout_t timeout)
@@ -24,8 +24,8 @@ arch::posix::PosixFileDescriptor::send(afl::async::Controller& /*ctl*/, afl::asy
     afl::base::ConstBytes_t m(op.getUnsentBytes());
     if (m.size() == 0) {
         return true;
-    } else if (waitReady(m_fd, timeout, WaitForWrite)) {
-        ssize_t n = ::write(m_fd, m.unsafeData(), m.size());
+    } else if (waitReady(m_pImpl->fd, timeout, WaitForWrite)) {
+        ssize_t n = ::write(m_pImpl->fd, m.unsafeData(), m.size());
         if (n < 0) {
             // FIXME: can we throw here?
             throw afl::except::SystemException(afl::sys::Error::current(), "send");
@@ -40,14 +40,12 @@ arch::posix::PosixFileDescriptor::send(afl::async::Controller& /*ctl*/, afl::asy
 void
 arch::posix::PosixFileDescriptor::sendAsync(afl::async::Controller& ctl, afl::async::SendOperation& op)
 {
-    afl::sys::MutexGuard g(m_mutex);
+    afl::base::Ref<Content> self(m_pImpl);
+    afl::sys::MutexGuard g(self->mutex);
     afl::async::Controller::Impl& pi = ctl.getImplementation();
-    if (m_pendingSends.empty()) {
-        // FIXME: this is wrong! must always add to controller!
-        pi.addRequest(*this, m_fd, false);
-    }
     op.setController(&ctl);
-    m_pendingSends.pushBack(&op);
+    pi.addRequest(*this, op, self->fd, false);
+    self->pendingSends.pushBack(&op);
 }
 
 bool
@@ -56,8 +54,8 @@ arch::posix::PosixFileDescriptor::receive(afl::async::Controller& /*ctl*/, afl::
     afl::base::Bytes_t m(op.getUnreceivedBytes());
     if (m.size() == 0) {
         return true;
-    } else if (waitReady(m_fd, timeout, WaitForRead)) {
-        ssize_t n = ::read(m_fd, m.unsafeData(), m.size());
+    } else if (waitReady(m_pImpl->fd, timeout, WaitForRead)) {
+        ssize_t n = ::read(m_pImpl->fd, m.unsafeData(), m.size());
         if (n < 0) {
             // FIXME: can we throw here?
             throw afl::except::SystemException(afl::sys::Error::current(), "receive");
@@ -72,114 +70,137 @@ arch::posix::PosixFileDescriptor::receive(afl::async::Controller& /*ctl*/, afl::
 void
 arch::posix::PosixFileDescriptor::receiveAsync(afl::async::Controller& ctl, afl::async::ReceiveOperation& op)
 {
-    afl::sys::MutexGuard g(m_mutex);
+    afl::base::Ref<Content> self(m_pImpl);
+    afl::sys::MutexGuard g(self->mutex);
     arch::posix::PosixControllerImpl& pi = ctl.getImplementation();
-    if (m_pendingReceives.empty()) {
-        // FIXME: this is wrong! must always add to controller!
-        pi.addRequest(*this, m_fd, true);
-    }
     op.setController(&ctl);
-    m_pendingReceives.pushBack(&op);
+    pi.addRequest(*this, op, self->fd, true);
+    self->pendingReceives.pushBack(&op);
 }
 
 void
 arch::posix::PosixFileDescriptor::cancel(afl::async::Controller& ctl, afl::async::Operation& op)
 {
-    afl::sys::MutexGuard g(m_mutex);
-    m_pendingSends.remove(&op);
-    m_pendingReceives.remove(&op);
+    afl::base::Ref<Content> self(m_pImpl);
+    afl::sys::MutexGuard g(self->mutex);
+    self->pendingSends.remove(&op);
+    self->pendingReceives.remove(&op);
     ctl.revertPost(op);
-
-    // FIXME: what to do with the SelectRequest?
+    ctl.getImplementation().removeRequest(op);
 }
 
 bool
 arch::posix::PosixFileDescriptor::waitReady(int fd, afl::sys::Timeout_t timeout, WaitMode mode)
 {
-    // FIXME: handle FD_SETSIZE
-    fd_set set;
-    FD_ZERO(&set);
-    FD_SET(fd, &set);
+    // Prepare struct pollfd
+    struct pollfd pfd;
+    pfd.fd = fd;
+    pfd.events = (mode == WaitForRead ? POLLIN : POLLOUT);
+    pfd.revents = 0;
 
     // Prepare timeout
-    struct timeval tv;
-    struct timeval* ptv;
-    if (timeout == afl::sys::INFINITE_TIMEOUT) {
-        ptv = 0;
-    } else {
-        tv.tv_sec = timeout / 1000;
-        tv.tv_usec = (timeout % 1000) * 1000;
-        ptv = &tv;
-    }
+    int convertedTimeout = convertTimeout(timeout);
 
     // System call
     errno = 0;
-    int result = mode == WaitForRead
-        ? ::select(fd + 1, &set, 0, 0, ptv)
-        : ::select(fd + 1, 0, &set, 0, ptv);
+    int result = ::poll(&pfd, 1, convertedTimeout);
 
     // Return
-    if (result > 0 && FD_ISSET(fd, &set)) {
+    if (result > 0 && pfd.revents != 0) {
         return true;
     } else {
         return false;
     }
 }
 
+int
+arch::posix::PosixFileDescriptor::convertTimeout(afl::sys::Timeout_t timeout)
+{
+    if (timeout == afl::sys::INFINITE_TIMEOUT) {
+        // Negative means infinite
+        return -1;
+    } else if (timeout > INT_MAX) {
+        // Overflows
+        return INT_MAX;
+    } else {
+        // Fits
+        return static_cast<int>(timeout);
+    }
+}
+
 bool
 arch::posix::PosixFileDescriptor::handleReadReady()
 {
-    afl::sys::MutexGuard g(m_mutex);
-    while (afl::async::ReceiveOperation* op = m_pendingReceives.front()) {
+    /*
+     *  This is pretty delicate because it must deal with a callback adding/removing more instances of the same object.
+     *  The system test case for exercising this is the SOCKS "accept" operation:
+     *  if the remote end (SOCKS server) dies, this will cause a socket to be closed,
+     *  which originally caused a deleted object access (Valgrind).
+     *
+     *  - Use Ref<Content> to secure access to the data in case the callback deletes this object.
+     *    (This could possibly be removed by switching to fine-granular locking and calling the notifier outside the lock.)
+     *  - Process only one callback. This used to optimize and process multiple callbacks.
+     *    If a callback adds a new request, that one could be processed in the same run through this loop
+     *    as the original callback, leading to confusion about when to add/remove the SelectRequest to the PosixControllerImpl.
+     *  - Remove callback from queue before invoking it.
+     */
+    afl::base::Ref<Content> self(m_pImpl);
+    afl::sys::MutexGuard g(self->mutex);
+    bool result = true;
+    if (afl::async::ReceiveOperation* op = self->pendingReceives.front()) {
         // How much remains?
         afl::base::Bytes_t buf = op->getUnreceivedBytes();
 
         // Call read()
-        ssize_t n = buf.empty() ? 0 : ::read(m_fd, buf.unsafeData(), buf.size());
+        ssize_t n = buf.empty() ? 0 : ::read(self->fd, buf.unsafeData(), buf.size());
         if (n > 0) {
             op->addReceivedBytes(n);
         }
 
         // Exit when getting EAGAIN, this means data is exhausted
         if (n < 0 && errno == EAGAIN) {
-            break;
+            return false;
         }
 
         // For now, return immediately, even partial reads.
         // This would check for completed only (or EOF): "if (op->isCompleted() || n <= 0)"
+        // Remove from queue first, in case notify() modifies the queue.
+        self->pendingReceives.extractFront();
         op->getNotifier().notify(*op);
-        m_pendingReceives.extractFront();
     }
 
-    return m_pendingReceives.empty();
+    return result;
 }
 
 bool
 arch::posix::PosixFileDescriptor::handleWriteReady()
 {
-    afl::sys::MutexGuard g(m_mutex);
-    while (afl::async::SendOperation* op = m_pendingSends.front()) {
+    // See handleReadReady().
+    afl::base::Ref<Content> self(m_pImpl);
+    afl::sys::MutexGuard g(self->mutex);
+    bool result = true;
+    if (afl::async::SendOperation* op = self->pendingSends.front()) {
         // How much remains?
         afl::base::ConstBytes_t buf = op->getUnsentBytes();
 
-        // Call read()
-        ssize_t n = buf.empty() ? 0 : ::write(m_fd, buf.unsafeData(), buf.size());
+        // Call write()
+        ssize_t n = buf.empty() ? 0 : ::write(self->fd, buf.unsafeData(), buf.size());
         if (n > 0) {
             op->addSentBytes(n);
         }
 
         // Exit when getting EAGAIN, this means data is exhausted
         if (n < 0 && errno == EAGAIN) {
-            break;
+            return false;
         }
 
         // For now, return immediately, even partial writes.
         // This would check for completed only: "if (op->isCompleted() || n <= 0)"
+        self->pendingSends.extractFront();
         op->getNotifier().notify(*op);
-        m_pendingSends.extractFront();
     }
 
-    return m_pendingSends.empty();
+    return result;
 }
 #else
 int g_variableToMakePosixFileDescriptorObjectFileNotEmpty;

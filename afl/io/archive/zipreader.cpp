@@ -18,6 +18,7 @@
 #include "afl/io/multiplexablestream.hpp"
 #include "afl/charset/codepagecharset.hpp"
 #include "afl/charset/codepage.hpp"
+#include "afl/io/unchangeabledirectoryentry.hpp"
 
 namespace {
     // General flags
@@ -81,7 +82,7 @@ struct afl::io::archive::ZipReader::IndexEntry {
 };
 
 /** Zip "DirectoryEntry" implementation. */
-class afl::io::archive::ZipReader::ZipDirEntry : public afl::io::DirectoryEntry {
+class afl::io::archive::ZipReader::ZipDirEntry : public afl::io::UnchangeableDirectoryEntry {
  public:
     ZipDirEntry(const IndexEntry& entry, afl::base::Ref<ZipReader> parent);
     ~ZipDirEntry();
@@ -89,15 +90,11 @@ class afl::io::archive::ZipReader::ZipDirEntry : public afl::io::DirectoryEntry 
     // DirectoryEntry:
     virtual String_t getTitle();
     virtual String_t getPathName();
-    virtual afl::base::Ref<Stream> openFile(FileSystem::OpenMode mode);
+    virtual afl::base::Ref<Stream> openFileForReading();
     virtual afl::base::Ref<Directory> openDirectory();
     virtual afl::base::Ref<Directory> openContainingDirectory();
 
     virtual void updateInfo(uint32_t requested);
-    virtual void doRename(String_t newName);
-    virtual void doErase();
-    virtual void doCreateAsDirectory();
-    virtual void doSetFlag(FileFlag flag, bool value);
 
  private:
     const IndexEntry& m_entry;
@@ -176,7 +173,7 @@ class afl::io::archive::ZipReader::ZipDeflatedMember : public afl::io::Multiplex
     \param entry Index entry for this directory entry
     \param parent Link to containing zip file. */
 afl::io::archive::ZipReader::ZipDirEntry::ZipDirEntry(const IndexEntry& entry, afl::base::Ref<ZipReader> parent)
-    : DirectoryEntry(),
+    : UnchangeableDirectoryEntry(afl::string::Messages::cannotModifyArchiveFile()),
       m_entry(entry),
       m_parent(parent)
 { }
@@ -198,11 +195,9 @@ afl::io::archive::ZipReader::ZipDirEntry::getPathName()
 }
 
 afl::base::Ref<afl::io::Stream>
-afl::io::archive::ZipReader::ZipDirEntry::openFile(FileSystem::OpenMode mode)
+afl::io::archive::ZipReader::ZipDirEntry::openFileForReading()
 {
-    if (mode != FileSystem::OpenRead) {
-        throw afl::except::FileProblemException(getTitle(), afl::string::Messages::cannotModifyArchiveFile());
-    } else if (m_entry.method == cmStored) {
+    if (m_entry.method == cmStored) {
         return *new ZipStoredMember(m_parent->m_file, m_entry);
     } else if (m_entry.method == cmDeflated) {
         return *new ZipDeflatedMember(m_parent->m_file, m_entry);
@@ -229,30 +224,6 @@ afl::io::archive::ZipReader::ZipDirEntry::updateInfo(uint32_t /*requested*/)
     setFileType(tFile);
     setFileSize(m_entry.uncompressedSize);
     // FIXME: setModificationTime, setFlags
-}
-
-void
-afl::io::archive::ZipReader::ZipDirEntry::doRename(String_t /*newName*/)
-{
-    throw afl::except::FileProblemException(getTitle(), afl::string::Messages::cannotModifyArchiveFile());
-}
-
-void
-afl::io::archive::ZipReader::ZipDirEntry::doErase()
-{
-    throw afl::except::FileProblemException(getTitle(), afl::string::Messages::cannotModifyArchiveFile());
-}
-
-void
-afl::io::archive::ZipReader::ZipDirEntry::doCreateAsDirectory()
-{
-    throw afl::except::FileProblemException(getTitle(), afl::string::Messages::cannotModifyArchiveFile());
-}
-
-void
-afl::io::archive::ZipReader::ZipDirEntry::doSetFlag(FileFlag /*flag*/, bool /*value*/)
-{
-    throw afl::except::FileProblemException(getTitle(), afl::string::Messages::cannotModifyArchiveFile());
 }
 
 /************************** ZipReader::ZipDirEnum **************************/

@@ -1,0 +1,7 @@
+/** \file afl/net/smtp/Intro.dox
+    \brief Namespace afl::net::smtp */
+
+/** \namespace afl::net::smtp
+    \brief SMTP
+
+    This namespace contains classes for dealing with SMTP (Internet Mail). */

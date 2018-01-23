@@ -66,8 +66,8 @@ namespace {
 
     // Helper for select() syscall
     enum WaitMode {
-        WaitForRead,
-        WaitForWrite
+        WaitForAccept,
+        WaitForConnect
     };
     bool waitReady(SOCKET fd, afl::sys::Timeout_t timeout, WaitMode mode);
 
@@ -89,7 +89,7 @@ namespace {
         hints.ai_socktype = SOCK_STREAM;
         DWORD ai = ::getaddrinfo(name.getName().c_str(), name.getService().c_str(), &hints, &result);
         if (ai != 0) {
-            throw afl::except::FileSystemException(name.getService(), afl::sys::Error(ai));
+            throw afl::except::FileSystemException(name.toString(), afl::sys::Error(ai));
         }
 
         // Make a socket
@@ -118,9 +118,9 @@ namespace {
         // Anything found?
         if (sock == INVALID_SOCKET) {
             if (errorCode == 0) {
-                throw afl::except::FileProblemException(name.getService(), afl::string::Messages::networkNameNotFound());
+                throw afl::except::FileProblemException(name.toString(), afl::string::Messages::networkNameNotFound());
             } else {
-                throw afl::except::FileSystemException(name.getService(), afl::sys::Error(errorCode));
+                throw afl::except::FileSystemException(name.toString(), afl::sys::Error(errorCode));
             }
         }
         return sock;
@@ -147,7 +147,7 @@ namespace {
         // Handle asynchronous case
         DWORD err = GetLastError();
         if (err == WSAEWOULDBLOCK) {
-            if (waitReady(sock, m_timeout, WaitForWrite)) {
+            if (waitReady(sock, m_timeout, WaitForConnect)) {
                 // Connect finished. Did it succeed?
                 int status = 424242;
                 int length = sizeof(status);
@@ -185,9 +185,11 @@ namespace {
 
     bool waitReady(SOCKET fd, afl::sys::Timeout_t timeout, WaitMode mode)
     {
-        fd_set set;
+        fd_set set, set2;
         FD_ZERO(&set);
+        FD_ZERO(&set2);
         FD_SET(fd, &set);
+        FD_SET(fd, &set2);
 
         // Prepare timeout
         struct timeval tv;
@@ -201,9 +203,17 @@ namespace {
         }
 
         // System call
-        int result = mode == WaitForRead
-            ? ::select(fd + 1, &set, 0, 0, ptv)
-            : ::select(fd + 1, 0, &set, 0, ptv);
+        int result = 0;
+        switch (mode) {
+         case WaitForAccept:
+            // accept: reports success if it becomes readable
+            result = ::select(fd + 1, &set, 0, 0, ptv);
+            break;
+        case WaitForConnect:
+            // connect: reports success by becoming writable, error by becoming exceptional
+            result = ::select(fd + 1, 0, &set, &set2, ptv);
+            break;
+        }
 
         // Return
         if (result > 0 && FD_ISSET(fd, &set)) {
@@ -296,7 +306,7 @@ arch::win32::Win32NetworkStack::Listener::~Listener()
 afl::base::Ptr<afl::net::Socket>
 arch::win32::Win32NetworkStack::Listener::accept(afl::sys::Timeout_t timeout)
 {
-    if (waitReady(m_fd, timeout, WaitForRead)) {
+    if (waitReady(m_fd, timeout, WaitForAccept)) {
         // Accept a socket
         SOCKET data = ::accept(m_fd, 0, 0);
         if (data != INVALID_SOCKET) {

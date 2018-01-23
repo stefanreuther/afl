@@ -5,23 +5,61 @@
 
 #include <iostream>
 #include <cstring>
-#include "afl/io/filesystem.hpp"
+#include "afl/except/fileproblemexception.hpp"
+#include "afl/io/archive/tarreader.hpp"
+#include "afl/io/archive/zipreader.hpp"
 #include "afl/io/directory.hpp"
 #include "afl/io/directoryentry.hpp"
-#include "afl/except/fileproblemexception.hpp"
-#include "afl/string/format.hpp"
+#include "afl/io/filesystem.hpp"
 #include "afl/io/textwriter.hpp"
+#include "afl/string/format.hpp"
 #include "afl/sys/environment.hpp"
+#include "afl/io/inflatetransform.hpp"
+#include "afl/io/transformreaderstream.hpp"
+
+using afl::base::Ptr;
+using afl::base::Ref;
+using afl::io::FileSystem;
+using afl::io::Directory;
+using afl::io::DirectoryEntry;
+using afl::sys::Environment;
+
+namespace {
+    bool endsWith(const String_t& s, const String_t& suffix)
+    {
+        return s.size() >= suffix.size()
+            && s.compare(s.size() - suffix.size(), suffix.size(), suffix) == 0;
+    }
+    
+    Ref<Directory> openDir(const String_t& arg)
+    {
+        if (arg == "--root") {
+            return FileSystem::getInstance().openRootDirectory();
+        } else if (endsWith(arg, ".zip")) {
+            return afl::io::archive::ZipReader::open(FileSystem::getInstance().openFile(arg, FileSystem::OpenRead), 0);
+        } else if (endsWith(arg, ".tar")) {
+            return afl::io::archive::TarReader::open(FileSystem::getInstance().openFile(arg, FileSystem::OpenRead), 0);
+        } else if (endsWith(arg, ".tar.gz") || endsWith(arg, ".tgz")) {
+            class InflateReader : private afl::io::InflateTransform,
+                                  private Ref<afl::io::Stream>,
+                                  public afl::io::TransformReaderStream
+            {
+             public:
+                InflateReader(Ref<afl::io::Stream> in)
+                    : InflateTransform(Gzip), Ref<afl::io::Stream>(in), TransformReaderStream(*in, *this)
+                    { }
+            };
+            Ref<afl::io::TransformReaderStream> file = *new InflateReader(FileSystem::getInstance().openFile(arg, FileSystem::OpenRead));
+            return afl::io::archive::TarReader::open(file, 0);
+        } else {
+            return FileSystem::getInstance().openDirectory(arg);
+        }
+    }
+}
+
 
 int main(int /*argc*/, char** argv)
 {
-    using afl::base::Ptr;
-    using afl::base::Ref;
-    using afl::io::FileSystem;
-    using afl::io::Directory;
-    using afl::io::DirectoryEntry;
-    using afl::sys::Environment;
-
     /* Fetch environment */
     Environment& env = Environment::getInstance(argv);
 
@@ -48,7 +86,7 @@ int main(int /*argc*/, char** argv)
     String_t arg;
     while (cmdl->getNextElement(arg)) {
         try {
-            Ref<Directory> dir = (arg == "--root") ? FileSystem::getInstance().openRootDirectory() : FileSystem::getInstance().openDirectory(arg);
+            Ref<Directory> dir = openDir(arg);
             Ref<afl::base::Enumerator<Ptr<DirectoryEntry> > > e = dir->getDirectoryEntries();
             Ptr<DirectoryEntry> entry;
             while (e->getNextElement(entry)) {

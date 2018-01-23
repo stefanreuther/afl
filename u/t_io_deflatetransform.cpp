@@ -22,7 +22,7 @@ namespace {
         \param pers1,pers2 [in] Personalities to use
         \param header     [out] Initial part of compressed data will be produced here
         \param loops       [in] Number of iterations */
-    void testZipRoundtrip(afl::io::DeflateTransform::Personality pers1,
+    bool testZipRoundtrip(afl::io::DeflateTransform::Personality pers1,
                           afl::io::InflateTransform::Personality pers2,
                           afl::base::Bytes_t header,
                           int32_t loops)
@@ -31,7 +31,7 @@ namespace {
             // Test how it refuses being constructed.
             TS_ASSERT_THROWS(new afl::io::DeflateTransform(pers1),
                              afl::except::UnsupportedException);
-            return;
+            return false;
         }
 
         // Make a deflater and an inflater
@@ -108,6 +108,7 @@ namespace {
         uint8_t inputHashBuffer[20];
         uint8_t outputHashBuffer[20];
         TS_ASSERT(inputMD5.getHash(inputHashBuffer).equalContent(outputMD5.getHash(outputHashBuffer)));
+        return true;
     }
 }
 
@@ -118,23 +119,26 @@ TestIoDeflateTransform::testGzip()
     // No data; tests flushing without compressing
     {
         uint8_t header[] = { 0, 0 };
-        testZipRoundtrip(afl::io::DeflateTransform::Gzip, afl::io::InflateTransform::Gzip, header, 0);
-        TS_ASSERT_EQUALS(header[0], 0x1F);
-        TS_ASSERT_EQUALS(header[1], 0x8B);
+        if (testZipRoundtrip(afl::io::DeflateTransform::Gzip, afl::io::InflateTransform::Gzip, header, 0)) {
+            TS_ASSERT_EQUALS(header[0], 0x1F);
+            TS_ASSERT_EQUALS(header[1], 0x8B);
+        }
     }
     // Small data; initial data feed will not produce output
     {
         uint8_t header[] = { 0, 0 };
-        testZipRoundtrip(afl::io::DeflateTransform::Gzip, afl::io::InflateTransform::Gzip, header, 2);
-        TS_ASSERT_EQUALS(header[0], 0x1F);
-        TS_ASSERT_EQUALS(header[1], 0x8B);
+        if (testZipRoundtrip(afl::io::DeflateTransform::Gzip, afl::io::InflateTransform::Gzip, header, 2)) {
+            TS_ASSERT_EQUALS(header[0], 0x1F);
+            TS_ASSERT_EQUALS(header[1], 0x8B);
+        }
     }
     // Large data
     {
         uint8_t header[] = { 0, 0 };
-        testZipRoundtrip(afl::io::DeflateTransform::Gzip, afl::io::InflateTransform::Gzip, header, 100000);
-        TS_ASSERT_EQUALS(header[0], 0x1F);
-        TS_ASSERT_EQUALS(header[1], 0x8B);
+        if (testZipRoundtrip(afl::io::DeflateTransform::Gzip, afl::io::InflateTransform::Gzip, header, 100000)) {
+            TS_ASSERT_EQUALS(header[0], 0x1F);
+            TS_ASSERT_EQUALS(header[1], 0x8B);
+        }
     }
 }
 
@@ -160,20 +164,23 @@ TestIoDeflateTransform::testZlib()
     // No data; tests flushing without compressing
     {
         uint8_t header[] = { 0, 0 };
-        testZipRoundtrip(afl::io::DeflateTransform::Zlib, afl::io::InflateTransform::Zlib, header, 0);
-        TS_ASSERT_EQUALS(header[0] & 15, 8);
+        if (testZipRoundtrip(afl::io::DeflateTransform::Zlib, afl::io::InflateTransform::Zlib, header, 0)) {
+            TS_ASSERT_EQUALS(header[0] & 15, 8);
+        }
     }
     // Small data; initial data feed will not produce output
     {
         uint8_t header[] = { 0, 0 };
-        testZipRoundtrip(afl::io::DeflateTransform::Zlib, afl::io::InflateTransform::Zlib, header, 2);
-        TS_ASSERT_EQUALS(header[0] & 15, 8);
+        if (testZipRoundtrip(afl::io::DeflateTransform::Zlib, afl::io::InflateTransform::Zlib, header, 2)) {
+            TS_ASSERT_EQUALS(header[0] & 15, 8);
+        }
     }
     // Large data
     {
         uint8_t header[] = { 0, 0 };
-        testZipRoundtrip(afl::io::DeflateTransform::Zlib, afl::io::InflateTransform::Zlib, header, 100000);
-        TS_ASSERT_EQUALS(header[0] & 15, 8);
+        if (testZipRoundtrip(afl::io::DeflateTransform::Zlib, afl::io::InflateTransform::Zlib, header, 100000)) {
+            TS_ASSERT_EQUALS(header[0] & 15, 8);
+        }
     }
 }
 

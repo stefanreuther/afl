@@ -1,0 +1,11 @@
+/** \file afl/test/Intro.dox
+    \brief Namespace afl::test */
+
+/** \namespace afl::test
+    \brief Testing
+
+    This namespace contains classes for testing.
+    Those classes use afl::except::AssertionFailedException for error reporting.
+    They are not necessarily optimized for efficiency.
+
+    In contrast to "InternalXXX" classes, we do not expect to use these in production code. */

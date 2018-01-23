@@ -7,6 +7,16 @@
 
 #include <cxxtest/TestSuite.h>
 
+class TestIoArchiveTarReader : public CxxTest::TestSuite {
+ public:
+    void testListCompressed();
+    void testListWithPath();
+    void testListUncompressed();
+    void testReadCompressed();
+    void testReadUncompressed();
+    void testNameCompressed();
+};
+
 class TestIoArchiveZipReader : public CxxTest::TestSuite {
  public:
     void testReadMembers();

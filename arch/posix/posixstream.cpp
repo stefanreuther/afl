@@ -5,6 +5,7 @@
 
 #if TARGET_OS_POSIX
 #define _FILE_OFFSET_BITS 64
+#define _POSIX_C_SOURCE 200809L
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <unistd.h>
@@ -19,6 +20,29 @@
 #ifndef O_LARGEFILE
 # define O_LARGEFILE 0
 #endif
+
+namespace {
+    int dupWrap(int fd)
+    {
+        int result;
+#ifdef F_DUPFD_CLOEXEC
+        /* Atomic duplicate-and-make-close-on-exec, part of SUSv4 (2008),
+           Linux since 2.6.24, glibc since 2.7 (2007) */
+        result = ::fcntl(fd, F_DUPFD_CLOEXEC);
+        if (result >= 0) {
+            return result;
+        }
+#endif
+        /* This part is used if the F_DUPFD_CLOEXEC does not exist or
+           is refused by the kernel for whatever reason (not supported?). */
+        result = ::dup(fd);
+        if (result >= 0) {
+            ::fcntl(fd, F_SETFD, FD_CLOEXEC);
+            return result;
+        }
+        return -1;
+    }
+}
 
 arch::posix::PosixStream::PosixStream(afl::io::FileSystem::FileName_t name, afl::io::FileSystem::OpenMode mode)
     : afl::io::MultiplexableStream(),
@@ -152,6 +176,8 @@ arch::posix::PosixStream::init(afl::io::FileSystem::FileName_t name, afl::io::Fi
         // FIXME: use a FileOpenException?
         error();
     }
+
+    ::fcntl(m_fd, F_SETFD, FD_CLOEXEC);
 }
 
 void
@@ -159,10 +185,7 @@ arch::posix::PosixStream::init(int fd)
 {
     // Initialize
     m_capabilities = 0;
-    m_fd = ::dup(fd);
-    if (m_fd < 0) {
-        error();
-    }
+    m_fd = dupWrap(fd);
 
     // Determine capabilities
     int mode = ::fcntl(fd, F_GETFL);

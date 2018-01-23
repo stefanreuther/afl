@@ -65,9 +65,17 @@ TestBitsPack::testUnpackArray()
     TS_ASSERT_EQUALS(a2[0], 0x3412);
     TS_ASSERT_EQUALS(a2[1], 0);
 
+    afl::bits::unpackArray<afl::bits::UInt16LE>(a2, one, 77);
+    TS_ASSERT_EQUALS(a2[0], 0x3412);
+    TS_ASSERT_EQUALS(a2[1], 77);
+
     // Unpack partial
     static const uint8_t half[] = { 0x11, 0x22, 0x33 };
     afl::bits::unpackArray<afl::bits::UInt16LE>(a2, half);
     TS_ASSERT_EQUALS(a2[0], 0x2211);
     TS_ASSERT_EQUALS(a2[1], 0);
+
+    afl::bits::unpackArray<afl::bits::UInt16LE>(a2, half, 99);
+    TS_ASSERT_EQUALS(a2[0], 0x2211);
+    TS_ASSERT_EQUALS(a2[1], 99);
 }

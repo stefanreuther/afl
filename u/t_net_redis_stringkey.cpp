@@ -6,60 +6,60 @@
 #include "afl/net/redis/stringkey.hpp"
 
 #include "t_net_redis.hpp"
+#include "afl/data/integervalue.hpp"
 #include "afl/data/stringvalue.hpp"
 #include "afl/net/redis/internaldatabase.hpp"
-#include "u/mock/commandhandlermock.hpp"
-#include "afl/data/integervalue.hpp"
+#include "afl/test/commandhandler.hpp"
 
 /** Test StringKey against the mock. */
 void
 TestNetRedisStringKey::testMock()
 {
-    CommandHandlerMock mock;
+    afl::test::CommandHandler mock("testMock");
     afl::net::redis::StringKey testee(mock, "s");
     String_t s;
 
     // get/set
-    mock.addParameterList("SET, s, hello");
-    mock.addNewResult(new afl::data::IntegerValue(1));
-    mock.addParameterList("GET, s");
-    mock.addNewResult(new afl::data::StringValue("hello"));
+    mock.expectCall("SET, s, hello");
+    mock.provideNewResult(new afl::data::IntegerValue(1));
+    mock.expectCall("GET, s");
+    mock.provideNewResult(new afl::data::StringValue("hello"));
     testee.set("hello");
     s = testee.get();
     TS_ASSERT_EQUALS(s, "hello");
 
     // string operations
-    mock.addParameterList("APPEND, s, world");
-    mock.addNewResult(0);
+    mock.expectCall("APPEND, s, world");
+    mock.provideNewResult(0);
     testee.append("world");
 
-    mock.addParameterList("GETRANGE, s, 5, 6");     // fifth to sixth character, inclusive
-    mock.addNewResult(new afl::data::StringValue("wo"));
+    mock.expectCall("GETRANGE, s, 5, 6");     // fifth to sixth character, inclusive
+    mock.provideNewResult(new afl::data::StringValue("wo"));
     s = testee.substr(5, 2);
     TS_ASSERT_EQUALS(s, "wo");
 
-    mock.addParameterList("GETRANGE, s, 5, 5");     // fifth character (just one)
-    mock.addNewResult(new afl::data::StringValue("w"));
+    mock.expectCall("GETRANGE, s, 5, 5");     // fifth character (just one)
+    mock.provideNewResult(new afl::data::StringValue("w"));
     s = testee.substr(5, 1);
     TS_ASSERT_EQUALS(s, "w");
 
     s = testee.substr(5, 0);      // no network communication
     TS_ASSERT_EQUALS(s, "");
 
-    mock.addParameterList("STRLEN, s");
-    mock.addNewResult(new afl::data::IntegerValue(10));
+    mock.expectCall("STRLEN, s");
+    mock.provideNewResult(new afl::data::IntegerValue(10));
     size_t n = testee.size();
     TS_ASSERT_EQUALS(n, 10U);
 
     // Getset
-    mock.addParameterList("GETSET, s, bye");
-    mock.addNewResult(new afl::data::StringValue("helloworld"));
+    mock.expectCall("GETSET, s, bye");
+    mock.provideNewResult(new afl::data::StringValue("helloworld"));
     s = testee.replaceBy("bye");
     TS_ASSERT_EQUALS(s, "helloworld");
 
     // setnx
-    mock.addParameterList("SETNX, s, what");
-    mock.addNewResult(new afl::data::IntegerValue(0));
+    mock.expectCall("SETNX, s, what");
+    mock.provideNewResult(new afl::data::IntegerValue(0));
     TS_ASSERT(!testee.setUnique("what"));
 }
 
@@ -103,27 +103,27 @@ TestNetRedisStringKey::testInternal()
 void
 TestNetRedisStringKey::testSize()
 {
-    CommandHandlerMock mock;
+    afl::test::CommandHandler mock("testSize");
     afl::net::redis::StringKey testee(mock, "x");
 
     // No network communication for this one
     testee.substr(512*1024*1024 + 1, 1);
 
     // Truncated size
-    mock.addParameterList("GETRANGE, x, 1, 536870912");
-    mock.addNewResult(new afl::data::StringValue("x"));
+    mock.expectCall("GETRANGE, x, 1, 536870912");
+    mock.provideNewResult(new afl::data::StringValue("x"));
     testee.substr(1, 512L*1024*1024+1);
 
-    mock.addParameterList("GETRANGE, x, 1, 536870912");
-    mock.addNewResult(new afl::data::StringValue("x"));
+    mock.expectCall("GETRANGE, x, 1, 536870912");
+    mock.provideNewResult(new afl::data::StringValue("x"));
     testee.substr(1, 1024L*1024*1024);
 
     // Server returning bogus size
-    mock.addParameterList("STRLEN, x");
-    mock.addNewResult(new afl::data::StringValue("-3"));
+    mock.expectCall("STRLEN, x");
+    mock.provideNewResult(new afl::data::StringValue("-3"));
     TS_ASSERT_EQUALS(testee.size(), 0U);
 
-    mock.addParameterList("STRLEN, x");
-    mock.addNewResult(new afl::data::IntegerValue(-3));
+    mock.expectCall("STRLEN, x");
+    mock.provideNewResult(new afl::data::IntegerValue(-3));
     TS_ASSERT_EQUALS(testee.size(), 0U);
 }

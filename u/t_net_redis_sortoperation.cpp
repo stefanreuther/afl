@@ -6,14 +6,14 @@
 #include "afl/net/redis/sortoperation.hpp"
 
 #include "t_net_redis.hpp"
-#include "u/mock/commandhandlermock.hpp"
-#include "afl/net/redis/key.hpp"
-#include "afl/net/redis/listkey.hpp"
+#include "afl/data/access.hpp"
 #include "afl/net/redis/hashkey.hpp"
 #include "afl/net/redis/integerfield.hpp"
 #include "afl/net/redis/internaldatabase.hpp"
-#include "afl/data/access.hpp"
+#include "afl/net/redis/key.hpp"
+#include "afl/net/redis/listkey.hpp"
 #include "afl/net/redis/stringlistkey.hpp"
+#include "afl/test/commandhandler.hpp"
 
 /** Test against the mock. */
 void
@@ -22,60 +22,60 @@ TestNetRedisSortOperation::testMock()
     using afl::net::redis::SortOperation;
 
     // Key to work on
-    CommandHandlerMock mock;
+    afl::test::CommandHandler mock("testMock");
     afl::net::redis::Key key(mock, "key");
     afl::net::redis::ListKey result(mock, "result");
 
     // Sort by...
-    mock.addParameterList("SORT, key, BY, foo:*:bar, STORE, result");
-    mock.addNewResult(0);
+    mock.expectCall("SORT, key, BY, foo:*:bar, STORE, result");
+    mock.provideNewResult(0);
     SortOperation(key).by("foo:*:bar").storeResult(result);
 
-    mock.addParameterList("SORT, key, BY, wild:*:card, STORE, result");
-    mock.addNewResult(0);
+    mock.expectCall("SORT, key, BY, wild:*:card, STORE, result");
+    mock.provideNewResult(0);
     SortOperation(key).by(afl::net::redis::Key(mock, "wild:*:card")).storeResult(result);
 
-    mock.addParameterList("SORT, key, BY, hash:*:foo->bar, STORE, result");
-    mock.addNewResult(0);
+    mock.expectCall("SORT, key, BY, hash:*:foo->bar, STORE, result");
+    mock.provideNewResult(0);
     SortOperation(key).by(afl::net::redis::HashKey(mock, "hash:*:foo").intField("bar")).storeResult(result);
 
     // Get...
-    mock.addParameterList("SORT, key, GET, #, STORE, result");
-    mock.addNewResult(0);
+    mock.expectCall("SORT, key, GET, #, STORE, result");
+    mock.provideNewResult(0);
     SortOperation(key).get().storeResult(result);
 
-    mock.addParameterList("SORT, key, GET, a:*:b, STORE, result");
-    mock.addNewResult(0);
+    mock.expectCall("SORT, key, GET, a:*:b, STORE, result");
+    mock.provideNewResult(0);
     SortOperation(key).get("a:*:b").storeResult(result);
 
-    mock.addParameterList("SORT, key, GET, wild:*:card, STORE, result");
-    mock.addNewResult(0);
+    mock.expectCall("SORT, key, GET, wild:*:card, STORE, result");
+    mock.provideNewResult(0);
     SortOperation(key).get(afl::net::redis::Key(mock, "wild:*:card")).storeResult(result);
 
-    mock.addParameterList("SORT, key, GET, hash:*:foo->bar, STORE, result");
-    mock.addNewResult(0);
+    mock.expectCall("SORT, key, GET, hash:*:foo->bar, STORE, result");
+    mock.provideNewResult(0);
     SortOperation(key).get(afl::net::redis::HashKey(mock, "hash:*:foo").intField("bar")).storeResult(result);
 
-    mock.addParameterList("SORT, key, GET, #, GET, wild:*:card, STORE, result");
-    mock.addNewResult(0);
+    mock.expectCall("SORT, key, GET, #, GET, wild:*:card, STORE, result");
+    mock.provideNewResult(0);
     SortOperation(key).get().get(afl::net::redis::Key(mock, "wild:*:card")).storeResult(result);
 
     // Sort orders
-    mock.addParameterList("SORT, key, ALPHA, STORE, result");
-    mock.addNewResult(0);
+    mock.expectCall("SORT, key, ALPHA, STORE, result");
+    mock.provideNewResult(0);
     SortOperation(key).sortLexicographical().storeResult(result);
 
-    mock.addParameterList("SORT, key, DESC, STORE, result");
-    mock.addNewResult(0);
+    mock.expectCall("SORT, key, DESC, STORE, result");
+    mock.provideNewResult(0);
     SortOperation(key).sortReversed().storeResult(result);
 
-    mock.addParameterList("SORT, key, BY, nosort, STORE, result");
-    mock.addNewResult(0);
+    mock.expectCall("SORT, key, BY, nosort, STORE, result");
+    mock.provideNewResult(0);
     SortOperation(key).sortDisable().storeResult(result);
 
     // Range
-    mock.addParameterList("SORT, key, LIMIT, 0, 10, STORE, result");
-    mock.addNewResult(0);
+    mock.expectCall("SORT, key, LIMIT, 0, 10, STORE, result");
+    mock.provideNewResult(0);
     SortOperation(key).limit(0, 10).storeResult(result);
 }
 

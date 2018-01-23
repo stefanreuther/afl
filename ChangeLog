@@ -1,3 +1,122 @@
+2018-01-07  Stefan Reuther  <streu@gmx.de>
+
+	* afl/base/memory.hpp (findNot): new
+
+2018-01-06  Stefan Reuther  <streu@gmx.de>
+
+	* arch/posix/posixcontrollerimpl.cpp, arch/posix/posixfiledescriptor.cpp, arch/posix/posixnetworkstack.cpp: implement proper cancel();
+	The previous implementation was indefinitely growing the poll() lists until exceeding the kernel limit (65536 elements) and breaking totally.
+
+2017-12-31  Stefan Reuther  <streu@gmx.de>
+
+	* afl/bits/bits.hpp (bitPop etc.): new
+
+2017-12-15  Stefan Reuther  <streu@gmx.de>
+
+	* afl/sys/thread.hpp: take Stoppable, not Runnable, to allow safe termination (INCOMPATIBLE)
+	* afl/base/stoppable.hpp: new
+
+2017-11-26  Stefan Reuther  <streu@gmx.de>
+
+	* afl/base/inlinememory.hpp: new
+	* afl/test/assert.hpp: new
+	* afl/test/networkstack.hpp: new
+	* afl/test/socket.hpp: new
+	* afl/test/callreceiver.hpp: new [c2ng/u/helper/callreceiver.hpp]
+	* afl/test/commandhandler.hpp: new [afl/u/mock/commandhandlermock.hpp]
+
+2017-11-25  Stefan Reuther  <streu@gmx.de>
+
+	* afl/checksums/sha224.hpp: new
+	* afl/checksums/sha256.hpp: new
+	* afl/checksums/sha2core.hpp: new
+	* afl/checksums/sha384.hpp: new
+	* afl/checksums/sha512.hpp: new
+
+2017-11-24  Stefan Reuther  <streu@gmx.de>
+
+	* arch/posix/posixcontrollerimpl.cpp: convert to poll()
+	* arch/posix/posixfiledescriptor.cpp: convert to poll()
+	* arch/posix/posixnetworkstack.cpp: convert to poll()
+	* afl/net/tunnel/socks5networkstack.hpp: new
+	* afl/net/tunnel/tunnelablenetworkstack.hpp: new
+
+2017-11-19  Stefan Reuther  <streu@gmx.de>
+
+	* afl/net/tunnel/socketwrapper.hpp: new
+	* afl/net/tunnel/socks4networkstack.hpp: new
+	* arch/posix/posixfiledescriptor.cpp: make adding requests, deleting objects from callback work
+
+2017-11-04  Stefan Reuther  <streu@gmx.de>
+
+	* afl/net/smtp/configuration.hpp: new [planetscentral/net/smtp.h, integrator/src/net/smtp.h]
+	* afl/net/smtp/mailrequest.hpp: new [planetscentral/net/smtp.h, integrator/src/net/smtp.h]
+	* afl/net/smtp/client.hpp: new [planetscentral/net/smtp.h, integrator/src/net/smtp.h]
+
+2017-10-31  Stefan Reuther  <streu@gmx.de>
+
+	* afl/net/simpleserver.hpp: add simple means of stopping it
+	* afl/net/interact.hpp: new [extracted from afl/net/simpleserver.hpp]
+
+2017-10-29  Stefan Reuther  <streu@gmx.de>
+
+	* afl/net/line/client.cpp, afl/net/line/client.hpp: new [planetscentral/dbclient/routerclient.h]
+	* afl/net/line/linehandler.hpp: new
+	* afl/net/line/linesink.hpp: new
+	* afl/net/line/protocolhandler.cpp, afl/net/line/protocolhandler.hpp: new [server/request.h]
+	* afl/net/line/simplequery.hpp: new
+	* afl/base/ptr.hpp: abuse protection: don't crash if someone modifies a Ptr being destroyed
+
+2017-10-13  Stefan Reuther  <streu@gmx.de>
+
+	* afl/io/internaltextwriter.hpp: new
+
+2017-10-06  Stefan Reuther  <streu@gmx.de>
+
+	* arch/win32/win32networkstack.cpp: detect connect errors on Windows correctly
+
+2017-10-03  Stefan Reuther  <streu@gmx.de>
+
+	* arch/win32/win32.cpp: handle (=reject) zero-terminated names
+
+2017-10-02  Stefan Reuther  <streu@gmx.de>
+
+	* afl/net/resp/client.cpp: improve reconnect behaviour; c2ng service reconnect works for now
+	* afl/async/interrupt.hpp: new
+
+2017-10-01  Stefan Reuther  <streu@gmx.de>
+
+	* afl/net/resp/client.cpp (sendCommand): send command as one transaction; required for performance
+	* afl/io/unchangeabledirectoryentry.hpp: new
+	* afl/io/internalstream.cpp (setWritePermission): new
+
+2017-09-27  Stefan Reuther  <streu@gmx.de>
+
+	* afl/net/headerfield.cpp (getAddressValue): new [planetscentral/net/mimeparser.h]
+
+2017-09-26  Stefan Reuther  <streu@gmx.de>
+
+	* afl/net/mimeparser.hpp: new [planetscentral/net/mimeparser.h]
+
+2017-09-25  Stefan Reuther  <streu@gmx.de>
+
+	* afl/net/redis/internaldatabase.cpp: implement HMGET; report failing verb in exception
+
+2017-08-31  Stefan Reuther  <streu@gmx.de>
+
+	* afl/io/archive/tarreader.hpp: new
+	* afl/io/multiplexablestream.cpp (activateChild): do not call setPos() when called by setPos(). Needed to support unseekable streams (TransformReaderStream)
+	* afl/io/transformreaderstream.cpp: fix position behaviour if a result is built from multiple transform() invocations
+	* afl/bits/pack.hpp: add parameter to specify a default value when unpacking an array
+
+2017-08-19  Stefan Reuther  <streu@gmx.de>
+
+	* arch/posix/posixcontrollerimpl.cpp, arch/posix/posixstream.cpp: make fds close-on-exec
+
+2017-08-13  Stefan Reuther  <streu@gmx.de>
+
+	* arch/posix/posixnetworkstack.cpp, arch/posix/posixstream.cpp: make fds close-on-exec
+
 2017-04-25  Stefan Reuther  <streu@gmx.de>
 
 	* afl/charset/charsetfactory.hpp: remove "deleter" argument (INCOMPATIBLE!)

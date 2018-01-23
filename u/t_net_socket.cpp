@@ -8,12 +8,13 @@
 #include <cstdlib>
 #include <cstdio>
 #include "u/t_net.hpp"
+#include "afl/async/controller.hpp"
+#include "afl/async/receiveoperation.hpp"
+#include "afl/async/sendoperation.hpp"
+#include "afl/base/stoppable.hpp"
+#include "afl/net/name.hpp"
 #include "afl/net/networkstack.hpp"
 #include "afl/sys/thread.hpp"
-#include "afl/net/name.hpp"
-#include "afl/async/receiveoperation.hpp"
-#include "afl/async/controller.hpp"
-#include "afl/async/sendoperation.hpp"
 
 /** Simple socket test.
     This exercises the socket methods in a bidirectional connection. */
@@ -30,7 +31,7 @@ TestNetSocket::testBidi()
     afl::base::Ref<afl::net::Listener> listener = ns.listen(name, 1);
 
     // Create a listening thread
-    class Server : public afl::base::Runnable {
+    class Server : public afl::base::Stoppable {
      public:
         Server(afl::net::Listener& listener)
             : m_listener(listener)
@@ -52,6 +53,8 @@ TestNetSocket::testBidi()
                     s->send(ctl, tx);
                 }
             }
+        void stop()
+            { }
      private:
         afl::net::Listener& m_listener;
     };
@@ -100,7 +103,7 @@ TestNetSocket::testClose()
     afl::base::Ref<afl::net::Listener> listener = ns.listen(name, 1);
 
     // Create a listening thread
-    class Server : public afl::base::Runnable {
+    class Server : public afl::base::Stoppable {
      public:
         Server(afl::net::Listener& listener)
             : m_listener(listener)
@@ -122,6 +125,8 @@ TestNetSocket::testClose()
                     count += rx.getNumReceivedBytes();
                 }
             }
+        void stop()
+            { }
      private:
         afl::net::Listener& m_listener;
     };

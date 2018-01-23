@@ -22,7 +22,15 @@ namespace afl { namespace net {
         - host     (optional, only allowed when path is present)
         - port     (optional, only allowed when host (and therefore path) is present)
         - path     (mandatory)
-        - fragment (optional) */
+        - fragment (optional)
+
+        Possible syntactic forms:
+        - scheme:path[#fragment]
+        - scheme://host[:port][path][#fragment]
+        - scheme://user[:password]@host[:port][path][#fragment]
+        - path[#fragment]
+
+        The path includes a possible query string. */
     class Url {
      public:
         /** Constructor. Makes a blank (null) URL. */

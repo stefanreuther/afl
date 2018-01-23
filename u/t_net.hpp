@@ -27,6 +27,7 @@ class TestNetHeaderField : public CxxTest::TestSuite {
     void testNormal();
     void testSpecial();
     void testNoPrimary();
+    void testAddress();
 };
 
 class TestNetMimeBuilder : public CxxTest::TestSuite {
@@ -34,6 +35,33 @@ class TestNetMimeBuilder : public CxxTest::TestSuite {
     void testSimple();
     void testBase64();
     void testBoundaryConflict();
+};
+
+class TestNetMimeParser : public CxxTest::TestSuite {
+ public:
+    void testInit();
+    void testSimple();
+    void testMinLF();
+    void testMinCRLF();
+    void testFoldedHeader();
+    void testGetFileName();
+    void testGetFileName1();
+    void testGetFileName2();
+    void testQPBody();
+    void testBase64Body();
+    void testEncodedHeader();
+    void testEncodedHeader2();
+    void testEncodedHeader3();
+    void testEncodedHeader4();
+    void testTrace();
+    void testHeader();
+    void testClear();
+    void testIncomplete();
+    void testMultipart();
+    void testMultipartBad();
+    void testMultipartModif();
+    void testMultipartMissing();
+    void testMessage();
 };
 
 class TestNetNullCommandHandler : public CxxTest::TestSuite {
@@ -142,6 +170,11 @@ class TestNetUrl : public CxxTest::TestSuite {
     void testSet();
     void testMatchPath();
     void testMatchArgs();
+};
+
+class TestNetInteract : public CxxTest::TestSuite {
+ public:
+    void testIt();
 };
 
 #endif

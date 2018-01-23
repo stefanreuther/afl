@@ -61,6 +61,12 @@ namespace arch { namespace win32 {
         \param csidl Folder ID (CSIDL_xxx). */
     String_t getShellFolder(int csidl);
 
+    /** Zero-terminate an unicode string.
+        \out [in/out] String to test/update
+        \retval false String contains embedded nulls and cannot be zero-terminated
+        \retval true Success */
+    bool terminateUnicode(WStr& str);
+
 } }
 #else
 # error Invalid operating system

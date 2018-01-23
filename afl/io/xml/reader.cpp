@@ -138,7 +138,7 @@ afl::io::xml::Reader::readNextToken()
                 readNextChar();
                 m_tag.clear();
                 readCharacterSequence(WhitespaceChar, 0);
-                readCharacterSequence(~(WhitespaceChar | GTChar | QuesChar | GTChar), &m_tag);
+                readCharacterSequence(~(WhitespaceChar | GTChar | QuesChar), &m_tag);
                 m_state = InPI;
                 return PIStart;
             } else if (m_currentCharacter == '/') {

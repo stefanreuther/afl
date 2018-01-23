@@ -8,7 +8,7 @@
 #include "u/t_async.hpp"
 #include "afl/sys/thread.hpp"
 #include "afl/sys/semaphore.hpp"
-#include "afl/base/runnable.hpp"
+#include "afl/base/stoppable.hpp"
 #include "afl/async/controller.hpp"
 
 void
@@ -29,7 +29,7 @@ TestAsyncMutex::testSimple()
     Testee testee;
 
     // Tester threads
-    class Tester : public afl::base::Runnable {
+    class Tester : public afl::base::Stoppable {
      public:
         Tester(Testee& t)
             : m_testee(t)
@@ -44,6 +44,8 @@ TestAsyncMutex::testSimple()
                     m_testee.m_mutex.post(ctl);
                 }
             }
+        void stop()
+            { }
      private:
         Testee& m_testee;
     };
@@ -67,7 +69,7 @@ void
 TestAsyncMutex::testMulti()
 {
     // Start helper thread
-    class Tester : public afl::base::Runnable {
+    class Tester : public afl::base::Stoppable {
      public:
         Tester()
             : m_stepAux(0),
@@ -89,6 +91,9 @@ TestAsyncMutex::testMulti()
                 // Terminate when caller says so
                 m_stepAux.wait();
             }
+
+        void stop()
+            { }
 
         afl::sys::Semaphore m_stepAux;
         afl::sys::Semaphore m_stepMain;

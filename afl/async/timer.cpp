@@ -5,13 +5,13 @@
 
 #include <list>
 #include "afl/async/timer.hpp"
-#include "afl/sys/time.hpp"
-#include "afl/sys/thread.hpp"
-#include "afl/base/runnable.hpp"
-#include "afl/sys/mutexguard.hpp"
-#include "afl/sys/semaphore.hpp"
 #include "afl/async/controller.hpp"
 #include "afl/async/notifier.hpp"
+#include "afl/base/stoppable.hpp"
+#include "afl/sys/mutexguard.hpp"
+#include "afl/sys/semaphore.hpp"
+#include "afl/sys/thread.hpp"
+#include "afl/sys/time.hpp"
 
 /******************************** Manager ********************************/
 
@@ -24,24 +24,22 @@
     \todo Would it make sense to shut down the thread after being idle for a given time?
     This would make starting it a little more complicated.
     \internal */
-class afl::async::Timer::Manager : public afl::base::Runnable {
+class afl::async::Timer::Manager : public afl::base::Stoppable {
  public:
     /** Constructor. */
     Manager()
-        : m_thread("AsyncTimer", *this),
-          m_mutex(),
+        : m_mutex(),
           m_semaphore(0),
-          m_timers()
+          m_timers(),
+          m_terminating(false),
+          m_thread("AsyncTimer", *this)
         {
             m_thread.start();
         }
 
     /** Destructor. */
     ~Manager()
-        {
-            m_terminating = true;
-            m_semaphore.post();
-        }
+        { }
 
     /** Add a timer.
         \param t the timer */
@@ -66,11 +64,17 @@ class afl::async::Timer::Manager : public afl::base::Runnable {
         }
 
     /** Main loop. */
-    void run()
+    virtual void run()
         {
             while (!m_terminating) {
                 m_semaphore.wait(update(afl::sys::Time::getTickCounter()));
             }
+        }
+
+    virtual void stop()
+        {
+            m_terminating = true;
+            m_semaphore.post();
         }
 
     /** Get global timer manager instance. */
@@ -81,11 +85,13 @@ class afl::async::Timer::Manager : public afl::base::Runnable {
         }
 
  private:
-    afl::sys::Thread m_thread;
     afl::sys::Mutex m_mutex;
     afl::sys::Semaphore m_semaphore;
     std::list<Timer*> m_timers;
     bool m_terminating;
+
+    // Thread. Must be last so it dies first, and all other properties are still present.
+    afl::sys::Thread m_thread;
 
     /** Update all timers.
         \param now Current tick counter

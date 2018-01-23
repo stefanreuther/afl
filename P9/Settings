@@ -48,21 +48,52 @@ PROJ_AUTO += afl:afl/*pp testsuite:u/*pp
 ##  Main Library
 ##
 TARGETS += afl
-FILES_afl = afl/string/win32filenames.cpp afl/string/win32filenames.hpp \
-    afl/net/reconnectable.hpp afl/net/mimebuilder.cpp \
-    afl/net/mimebuilder.hpp afl/net/nullnetworkstack.cpp \
-    afl/net/nullnetworkstack.hpp afl/charset/hexencoding.cpp \
-    afl/charset/hexencoding.hpp afl/string/hex.cpp afl/string/hex.hpp \
-    afl/sys/parsedtime.cpp afl/net/nullcommandhandler.cpp \
-    afl/net/nullcommandhandler.hpp arch/posix/posixcwd.hpp \
-    arch/posix/posixcwd.cpp afl/net/server.cpp afl/net/server.hpp \
-    afl/sys/commandlineparser.cpp afl/except/commandlineexception.cpp \
-    afl/except/commandlineexception.hpp afl/base/observable.hpp \
-    arch/posix/posixdialog.cpp arch/posix/posixdialog.hpp \
-    arch/win32/win32dialog.cpp arch/win32/win32dialog.hpp arch/dialog.hpp \
-    afl/sys/dialog.cpp afl/sys/dialog.hpp afl/base/baseweaklink.cpp \
-    afl/base/baseweaklink.hpp afl/base/weaktarget.cpp \
-    afl/base/weaktarget.hpp afl/base/weaklink.hpp \
+FILES_afl = afl/base/stoppable.hpp afl/base/inlinememory.hpp \
+    afl/test/commandhandler.cpp afl/test/commandhandler.hpp \
+    afl/test/callreceiver.cpp afl/test/callreceiver.hpp \
+    afl/test/networkstack.cpp afl/test/networkstack.hpp afl/test/socket.cpp \
+    afl/test/socket.hpp afl/test/assert.cpp afl/test/assert.hpp \
+    afl/checksums/sha512.cpp afl/checksums/sha512.hpp \
+    afl/checksums/sha384.cpp afl/checksums/sha384.hpp \
+    afl/checksums/sha224.hpp afl/checksums/sha224.cpp \
+    afl/checksums/sha256.cpp afl/checksums/sha256.hpp \
+    afl/checksums/sha2core.cpp afl/checksums/sha2core.hpp \
+    afl/net/tunnel/tunnelablenetworkstack.cpp \
+    afl/net/tunnel/tunnelablenetworkstack.hpp \
+    afl/net/tunnel/socks5networkstack.cpp \
+    afl/net/tunnel/socks5networkstack.hpp afl/async/communicationobject.cpp \
+    afl/net/tunnel/socks4networkstack.cpp \
+    afl/net/tunnel/socks4networkstack.hpp afl/net/tunnel/socketwrapper.cpp \
+    afl/net/tunnel/socketwrapper.hpp afl/net/smtp/client.cpp \
+    afl/net/smtp/mailrequest.cpp afl/net/smtp/configuration.hpp \
+    afl/net/smtp/mailrequest.hpp afl/net/smtp/client.hpp \
+    afl/net/interact.cpp afl/net/interact.hpp afl/net/line/simplequery.cpp \
+    afl/net/line/simplequery.hpp afl/net/line/client.cpp \
+    afl/net/line/client.hpp afl/net/line/linesink.hpp \
+    afl/net/line/protocolhandler.cpp afl/net/line/protocolhandler.hpp \
+    afl/net/line/linehandler.hpp afl/io/internaltextwriter.cpp \
+    afl/io/internaltextwriter.hpp arch/win32/win32interrupt.hpp \
+    arch/win32/win32interrupt.cpp arch/posix/posixinterrupt.hpp \
+    arch/posix/posixinterrupt.cpp afl/async/interruptoperation.hpp \
+    afl/async/interrupt.cpp afl/async/interrupt.hpp \
+    afl/io/unchangeabledirectoryentry.cpp \
+    afl/io/unchangeabledirectoryentry.hpp afl/net/mimeparser.cpp \
+    afl/net/mimeparser.hpp afl/io/archive/tarreader.cpp \
+    afl/io/archive/tarreader.hpp afl/string/win32filenames.cpp \
+    afl/string/win32filenames.hpp afl/net/reconnectable.hpp \
+    afl/net/mimebuilder.cpp afl/net/mimebuilder.hpp \
+    afl/net/nullnetworkstack.cpp afl/net/nullnetworkstack.hpp \
+    afl/charset/hexencoding.cpp afl/charset/hexencoding.hpp \
+    afl/string/hex.cpp afl/string/hex.hpp afl/sys/parsedtime.cpp \
+    afl/net/nullcommandhandler.cpp afl/net/nullcommandhandler.hpp \
+    arch/posix/posixcwd.hpp arch/posix/posixcwd.cpp afl/net/server.cpp \
+    afl/net/server.hpp afl/sys/commandlineparser.cpp \
+    afl/except/commandlineexception.cpp afl/except/commandlineexception.hpp \
+    afl/base/observable.hpp arch/posix/posixdialog.cpp \
+    arch/posix/posixdialog.hpp arch/win32/win32dialog.cpp \
+    arch/win32/win32dialog.hpp arch/dialog.hpp afl/sys/dialog.cpp \
+    afl/sys/dialog.hpp afl/base/baseweaklink.cpp afl/base/baseweaklink.hpp \
+    afl/base/weaktarget.cpp afl/base/weaktarget.hpp afl/base/weaklink.hpp \
     afl/io/transformreaderstream.cpp afl/io/transformreaderstream.hpp \
     afl/io/deflatetransform.cpp afl/io/deflatetransform.hpp \
     afl/io/archive/zipreader.cpp afl/io/archive/zipreader.hpp \
@@ -310,6 +341,11 @@ FILES_wget = app/wget.cpp
 TYPE_wget = app
 DEPEND_wget = afl
 
+TARGETS += hash
+FILES_hash = app/hash.cpp
+TYPE_hash = app
+DEPEND_hash = afl
+
 TARGETS += secureio
 FILES_secureio = app/secureio.cpp
 TYPE_secureio = app
@@ -344,7 +380,22 @@ DEPEND_unzip = afl
 ##  Testsuite
 ##
 TARGETS += testsuite
-FILES_testsuite = u/t_string_win32filenames.cpp u/t_net_reconnectable.cpp \
+FILES_testsuite = u/t_base_stoppable.cpp u/t_base_inlinememory.cpp \
+    u/t_test_commandhandler.cpp u/t_test_callreceiver.cpp \
+    u/t_test_networkstack.cpp u/t_test_socket.cpp u/t_test_assert.cpp \
+    u/t_test.hpp u/t_checksums_sha512.cpp u/t_checksums_sha384.cpp \
+    u/t_checksums_sha256.cpp u/t_checksums_sha224.cpp \
+    u/t_net_tunnel_tunnelablenetworkstack.cpp \
+    u/t_net_tunnel_socks5networkstack.cpp u/t_net_tunnel_socketwrapper.cpp \
+    u/t_net_tunnel_socks4networkstack.cpp u/t_net_tunnel.hpp \
+    u/t_net_smtp_configuration.cpp u/t_net_smtp_mailrequest.cpp \
+    u/t_net_smtp.hpp u/t_net_interact.cpp u/t_net_line_simplequery.cpp \
+    u/t_net_line_client.cpp u/t_net_line_protocolhandler.cpp \
+    u/t_net_line_linehandler.cpp u/t_net_line_linesink.cpp u/t_net_line.hpp \
+    u/t_io_internaltextwriter.cpp u/t_async_interrupt.cpp \
+    u/t_async_interruptoperation.cpp u/t_io_unchangeabledirectoryentry.cpp \
+    u/t_net_mimeparser.cpp u/t_io_archive_tarreader.cpp \
+    u/t_string_win32filenames.cpp u/t_net_reconnectable.cpp \
     u/t_net_mimebuilder.cpp u/t_net_nullnetworkstack.cpp \
     u/t_charset_hexencoding.cpp u/t_string_hex.cpp \
     u/t_net_nullcommandhandler.cpp u/t_net_server.cpp \
@@ -357,7 +408,6 @@ FILES_testsuite = u/t_string_win32filenames.cpp u/t_net_reconnectable.cpp \
     u/t_net_redis_sortoperation.cpp u/t_net_redis_stringsetkey.cpp \
     u/t_net_redis_integersetkey.cpp u/t_net_redis_subtree.cpp \
     u/t_net_redis_key.cpp u/t_net_redis_stringkey.cpp \
-    u/mock/commandhandlermock.cpp u/mock/commandhandlermock.hpp \
     u/t_net_redis_integerkey.cpp u/t_io_nullfilesystem.cpp \
     u/t_string_posixfilenames.cpp u/t_net_http_client.cpp \
     u/t_net_parameterencoder.cpp u/t_io_nulltextwriter.cpp \

@@ -80,6 +80,19 @@ arch::win32::Win32ControllerImpl::addRequest(WaitRequest& req, HANDLE h)
 {
     m_requests.push_back(Request(req, h));
 }
+
+void
+arch::win32::Win32ControllerImpl::removeRequest(WaitRequest& req, HANDLE h)
+{
+    // FIXME: must deal with a wait running in parallel!!!!!
+    for (std::list<Request>::iterator it = m_requests.begin(); it != m_requests.end(); ++it) {
+        if (it->m_pWaitRequest == &req && it->m_handle == h) {
+            m_requests.erase(it);
+            break;
+        }
+    }
+}
+
 #else
 int g_variableToMakeWin32ControllerImplObjectFileNotEmpty;
 #endif

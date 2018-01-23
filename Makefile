@@ -2,9 +2,22 @@
 # Makefile
 #
 
-ALL_TARGETS = libafl.a date dialog ls chatserver wget secureio respclient \
-    respserver httpserver env unzip testsuite
-OBJECTS_afl = afl/string/win32filenames.o afl/net/mimebuilder.o \
+ALL_TARGETS = libafl.a date dialog ls chatserver wget hash secureio \
+    respclient respserver httpserver env unzip testsuite
+OBJECTS_afl = afl/test/commandhandler1.o afl/test/callreceiver.o \
+    afl/test/networkstack1.o afl/test/socket.o afl/test/assert.o \
+    afl/checksums/sha512.o afl/checksums/sha384.o afl/checksums/sha224.o \
+    afl/checksums/sha256.o afl/checksums/sha2core.o \
+    afl/net/tunnel/tunnelablenetworkstack.o \
+    afl/net/tunnel/socks5networkstack.o afl/async/communicationobject.o \
+    afl/net/tunnel/socks4networkstack.o afl/net/tunnel/socketwrapper.o \
+    afl/net/smtp/client3.o afl/net/smtp/mailrequest.o afl/net/interact.o \
+    afl/net/line/simplequery.o afl/net/line/client1.o \
+    afl/net/line/protocolhandler1.o afl/io/internaltextwriter.o \
+    arch/win32/win32interrupt.o arch/posix/posixinterrupt.o \
+    afl/async/interrupt.o afl/io/unchangeabledirectoryentry.o \
+    afl/net/mimeparser.o afl/io/archive/tarreader.o \
+    afl/string/win32filenames.o afl/net/mimebuilder.o \
     afl/net/nullnetworkstack.o afl/charset/hexencoding.o afl/string/hex.o \
     afl/sys/parsedtime.o afl/net/nullcommandhandler.o arch/posix/posixcwd.o \
     afl/net/server.o afl/sys/commandlineparser.o \
@@ -27,7 +40,7 @@ OBJECTS_afl = afl/string/win32filenames.o afl/net/mimebuilder.o \
     afl/net/http/pageresponse.o afl/net/http/pagerequest.o \
     afl/net/http/pagedispatcher.o afl/net/http/errorresponse.o \
     afl/net/http/request.o afl/net/http/protocolhandler.o \
-    afl/net/commandhandler.o afl/net/resp/protocolhandler1.o \
+    afl/net/commandhandler.o afl/net/resp/protocolhandler2.o \
     afl/net/redis/internaldatabase.o afl/data/segmentview.o \
     afl/net/redis/stringsetoperation.o afl/net/redis/integersetoperation.o \
     afl/net/redis/stringsetkey.o afl/net/redis/integersetkey.o \
@@ -37,7 +50,7 @@ OBJECTS_afl = afl/string/win32filenames.o afl/net/mimebuilder.o \
     afl/net/redis/stringfield.o afl/net/redis/integerfield.o \
     afl/net/redis/field.o afl/net/redis/hashkey.o afl/net/redis/stringkey.o \
     afl/net/redis/integerkey.o afl/net/redis/key.o \
-    afl/async/communicationsink.o afl/net/resp/client1.o \
+    afl/async/communicationsink.o afl/net/resp/client2.o \
     afl/io/internalsink.o afl/io/bufferedsink.o afl/data/errorvalue.o \
     afl/io/transformdatasink.o afl/io/inflatetransform.o \
     arch/win32/win32root.o arch/win32/win32directory.o \
@@ -104,12 +117,26 @@ LIBS = $(CONFIG_AFL_LIBS)
 OBJECTS_date = app/date.o
 OBJECTS_dialog = app/dialog1.o
 OBJECTS_env = app/env.o
+OBJECTS_hash = app/hash2.o
 OBJECTS_httpserver = app/httpserver.o
 OBJECTS_ls = app/ls.o
 OBJECTS_respclient = app/respclient.o
 OBJECTS_respserver = app/respserver.o
 OBJECTS_secureio = app/secureio.o
-OBJECTS_testsuite = u/t_string_win32filenames.o u/t_net_reconnectable.o \
+OBJECTS_testsuite = u/t_base_stoppable.o u/t_base_inlinememory.o \
+    u/t_test_commandhandler.o u/t_test_callreceiver.o \
+    u/t_test_networkstack.o u/t_test_socket.o u/t_test_assert.o \
+    u/t_checksums_sha512.o u/t_checksums_sha384.o u/t_checksums_sha256.o \
+    u/t_checksums_sha224.o u/t_net_tunnel_tunnelablenetworkstack.o \
+    u/t_net_tunnel_socks5networkstack.o u/t_net_tunnel_socketwrapper.o \
+    u/t_net_tunnel_socks4networkstack.o u/t_net_smtp_configuration.o \
+    u/t_net_smtp_mailrequest.o u/t_net_interact.o u/t_net_line_simplequery.o \
+    u/t_net_line_client.o u/t_net_line_protocolhandler.o \
+    u/t_net_line_linehandler.o u/t_net_line_linesink.o \
+    u/t_io_internaltextwriter.o u/t_async_interrupt.o \
+    u/t_async_interruptoperation.o u/t_io_unchangeabledirectoryentry.o \
+    u/t_net_mimeparser.o u/t_io_archive_tarreader.o \
+    u/t_string_win32filenames.o u/t_net_reconnectable.o \
     u/t_net_mimebuilder.o u/t_net_nullnetworkstack.o \
     u/t_charset_hexencoding.o u/t_string_hex.o u/t_net_nullcommandhandler.o \
     u/t_net_server.o u/t_base_observable.o u/t_sys_dialog.o \
@@ -120,21 +147,21 @@ OBJECTS_testsuite = u/t_string_win32filenames.o u/t_net_reconnectable.o \
     u/t_io_msexpandtransform.o u/t_net_redis_sortoperation.o \
     u/t_net_redis_stringsetkey.o u/t_net_redis_integersetkey.o \
     u/t_net_redis_subtree.o u/t_net_redis_key.o u/t_net_redis_stringkey.o \
-    u/mock/commandhandlermock.o u/t_net_redis_integerkey.o \
-    u/t_io_nullfilesystem.o u/t_string_posixfilenames.o \
-    u/t_net_http_client.o u/t_net_parameterencoder.o u/t_io_nulltextwriter.o \
-    u/t_io_textreader.o u/t_io_textwriter.o \
-    u/t_except_assertionfailedexception.o u/t_sys_longcommandlineparser.o \
-    u/t_string_proxytranslator.o u/t_sys_standardcommandlineparser.o \
-    u/t_sys_commandlineparser.o u/t_data_namequery.o \
-    u/t_base_inlineoptional.o u/t_base_clonable.o u/t_base_growablememory.o \
-    u/t_functional_stringtable.o u/t_functional_mapping.o \
-    u/t_functional_binaryfunction.o u/t_functional_unaryfunction.o \
-    u/t_io_internalfilemapping.o u/t_io_filemapping.o \
-    u/t_charset_defaultcharsetfactory.o u/t_charset_charsetfactory.o \
-    u/t_io_xml_defaultentityhandler.o u/t_io_xml_entityhandler.o \
-    u/t_io_xml_basereader.o u/t_io_xml_reader.o u/t_net_http_formparser.o \
-    u/t_io_textsink.o u/t_net_http_pagedispatcher.o u/t_net_http_page.o \
+    u/t_net_redis_integerkey.o u/t_io_nullfilesystem.o \
+    u/t_string_posixfilenames.o u/t_net_http_client.o \
+    u/t_net_parameterencoder.o u/t_io_nulltextwriter.o u/t_io_textreader.o \
+    u/t_io_textwriter.o u/t_except_assertionfailedexception.o \
+    u/t_sys_longcommandlineparser.o u/t_string_proxytranslator.o \
+    u/t_sys_standardcommandlineparser.o u/t_sys_commandlineparser.o \
+    u/t_data_namequery.o u/t_base_inlineoptional.o u/t_base_clonable.o \
+    u/t_base_growablememory.o u/t_functional_stringtable.o \
+    u/t_functional_mapping.o u/t_functional_binaryfunction.o \
+    u/t_functional_unaryfunction.o u/t_io_internalfilemapping.o \
+    u/t_io_filemapping.o u/t_charset_defaultcharsetfactory.o \
+    u/t_charset_charsetfactory.o u/t_io_xml_defaultentityhandler.o \
+    u/t_io_xml_entityhandler.o u/t_io_xml_basereader.o u/t_io_xml_reader.o \
+    u/t_net_http_formparser.o u/t_io_textsink.o \
+    u/t_net_http_pagedispatcher.o u/t_net_http_page.o \
     u/t_net_http_pageresponse.o u/t_net_http_pagerequest.o \
     u/t_net_http_response.o u/t_net_http_dispatcher.o u/t_net_http_request.o \
     u/t_net_commandhandler.o u/t_net_resp_protocolhandler.o \
@@ -242,6 +269,10 @@ env: $(OBJECTS_env) libafl.a $(LIBDEPEND)
 	@echo "        Linking env..."
 	@$(CXX) $(LDFLAGS) -o env $(OBJECTS_env) -L. -lafl $(LIBS)
 
+hash: $(OBJECTS_hash) libafl.a $(LIBDEPEND)
+	@echo "        Linking hash..."
+	@$(CXX) $(LDFLAGS) -o hash $(OBJECTS_hash) -L. -lafl $(LIBS)
+
 httpserver: $(OBJECTS_httpserver) libafl.a $(LIBDEPEND)
 	@echo "        Linking httpserver..."
 	@$(CXX) $(LDFLAGS) -o httpserver $(OBJECTS_httpserver) -L. -lafl $(LIBS)
@@ -310,25 +341,55 @@ afl/io/resp/writer1.o: afl/io/resp/writer.cpp
 afl/io/resp/writer1.s: afl/io/resp/writer.cpp
 	$(CXX) $(CXXFLAGS) -o afl/io/resp/writer1.s -S afl/io/resp/writer.cpp
 
-afl/net/resp/client1.lo: afl/net/resp/client.cpp
-	$(CXX) -fPIC $(CXXFLAGS) -o afl/net/resp/client1.lo -c afl/net/resp/client.cpp
+afl/net/line/client1.lo: afl/net/line/client.cpp
+	$(CXX) -fPIC $(CXXFLAGS) -o afl/net/line/client1.lo -c afl/net/line/client.cpp
 
-afl/net/resp/client1.o: afl/net/resp/client.cpp
+afl/net/line/client1.o: afl/net/line/client.cpp
+	@echo "        Compiling afl/net/line/client.cpp..."
+	@$(CXX) $(CXXFLAGS) -o afl/net/line/client1.o -c afl/net/line/client.cpp
+
+afl/net/line/client1.s: afl/net/line/client.cpp
+	$(CXX) $(CXXFLAGS) -o afl/net/line/client1.s -S afl/net/line/client.cpp
+
+afl/net/line/protocolhandler1.lo: afl/net/line/protocolhandler.cpp
+	$(CXX) -fPIC $(CXXFLAGS) -o afl/net/line/protocolhandler1.lo -c afl/net/line/protocolhandler.cpp
+
+afl/net/line/protocolhandler1.o: afl/net/line/protocolhandler.cpp
+	@echo "        Compiling afl/net/line/protocolhandler.cpp..."
+	@$(CXX) $(CXXFLAGS) -o afl/net/line/protocolhandler1.o -c afl/net/line/protocolhandler.cpp
+
+afl/net/line/protocolhandler1.s: afl/net/line/protocolhandler.cpp
+	$(CXX) $(CXXFLAGS) -o afl/net/line/protocolhandler1.s -S afl/net/line/protocolhandler.cpp
+
+afl/net/resp/client2.lo: afl/net/resp/client.cpp
+	$(CXX) -fPIC $(CXXFLAGS) -o afl/net/resp/client2.lo -c afl/net/resp/client.cpp
+
+afl/net/resp/client2.o: afl/net/resp/client.cpp
 	@echo "        Compiling afl/net/resp/client.cpp..."
-	@$(CXX) $(CXXFLAGS) -o afl/net/resp/client1.o -c afl/net/resp/client.cpp
+	@$(CXX) $(CXXFLAGS) -o afl/net/resp/client2.o -c afl/net/resp/client.cpp
 
-afl/net/resp/client1.s: afl/net/resp/client.cpp
-	$(CXX) $(CXXFLAGS) -o afl/net/resp/client1.s -S afl/net/resp/client.cpp
+afl/net/resp/client2.s: afl/net/resp/client.cpp
+	$(CXX) $(CXXFLAGS) -o afl/net/resp/client2.s -S afl/net/resp/client.cpp
 
-afl/net/resp/protocolhandler1.lo: afl/net/resp/protocolhandler.cpp
-	$(CXX) -fPIC $(CXXFLAGS) -o afl/net/resp/protocolhandler1.lo -c afl/net/resp/protocolhandler.cpp
+afl/net/resp/protocolhandler2.lo: afl/net/resp/protocolhandler.cpp
+	$(CXX) -fPIC $(CXXFLAGS) -o afl/net/resp/protocolhandler2.lo -c afl/net/resp/protocolhandler.cpp
 
-afl/net/resp/protocolhandler1.o: afl/net/resp/protocolhandler.cpp
+afl/net/resp/protocolhandler2.o: afl/net/resp/protocolhandler.cpp
 	@echo "        Compiling afl/net/resp/protocolhandler.cpp..."
-	@$(CXX) $(CXXFLAGS) -o afl/net/resp/protocolhandler1.o -c afl/net/resp/protocolhandler.cpp
+	@$(CXX) $(CXXFLAGS) -o afl/net/resp/protocolhandler2.o -c afl/net/resp/protocolhandler.cpp
 
-afl/net/resp/protocolhandler1.s: afl/net/resp/protocolhandler.cpp
-	$(CXX) $(CXXFLAGS) -o afl/net/resp/protocolhandler1.s -S afl/net/resp/protocolhandler.cpp
+afl/net/resp/protocolhandler2.s: afl/net/resp/protocolhandler.cpp
+	$(CXX) $(CXXFLAGS) -o afl/net/resp/protocolhandler2.s -S afl/net/resp/protocolhandler.cpp
+
+afl/net/smtp/client3.lo: afl/net/smtp/client.cpp
+	$(CXX) -fPIC $(CXXFLAGS) -o afl/net/smtp/client3.lo -c afl/net/smtp/client.cpp
+
+afl/net/smtp/client3.o: afl/net/smtp/client.cpp
+	@echo "        Compiling afl/net/smtp/client.cpp..."
+	@$(CXX) $(CXXFLAGS) -o afl/net/smtp/client3.o -c afl/net/smtp/client.cpp
+
+afl/net/smtp/client3.s: afl/net/smtp/client.cpp
+	$(CXX) $(CXXFLAGS) -o afl/net/smtp/client3.s -S afl/net/smtp/client.cpp
 
 afl/sys/mutex1.lo: afl/sys/mutex.cpp
 	$(CXX) -fPIC $(CXXFLAGS) -o afl/sys/mutex1.lo -c afl/sys/mutex.cpp
@@ -350,6 +411,26 @@ afl/sys/semaphore1.o: afl/sys/semaphore.cpp
 afl/sys/semaphore1.s: afl/sys/semaphore.cpp
 	$(CXX) $(CXXFLAGS) -o afl/sys/semaphore1.s -S afl/sys/semaphore.cpp
 
+afl/test/commandhandler1.lo: afl/test/commandhandler.cpp
+	$(CXX) -fPIC $(CXXFLAGS) -o afl/test/commandhandler1.lo -c afl/test/commandhandler.cpp
+
+afl/test/commandhandler1.o: afl/test/commandhandler.cpp
+	@echo "        Compiling afl/test/commandhandler.cpp..."
+	@$(CXX) $(CXXFLAGS) -o afl/test/commandhandler1.o -c afl/test/commandhandler.cpp
+
+afl/test/commandhandler1.s: afl/test/commandhandler.cpp
+	$(CXX) $(CXXFLAGS) -o afl/test/commandhandler1.s -S afl/test/commandhandler.cpp
+
+afl/test/networkstack1.lo: afl/test/networkstack.cpp
+	$(CXX) -fPIC $(CXXFLAGS) -o afl/test/networkstack1.lo -c afl/test/networkstack.cpp
+
+afl/test/networkstack1.o: afl/test/networkstack.cpp
+	@echo "        Compiling afl/test/networkstack.cpp..."
+	@$(CXX) $(CXXFLAGS) -o afl/test/networkstack1.o -c afl/test/networkstack.cpp
+
+afl/test/networkstack1.s: afl/test/networkstack.cpp
+	$(CXX) $(CXXFLAGS) -o afl/test/networkstack1.s -S afl/test/networkstack.cpp
+
 app/dialog1.lo: app/dialog.cpp
 	$(CXX) -fPIC $(CXXFLAGS) -o app/dialog1.lo -c app/dialog.cpp
 
@@ -360,6 +441,16 @@ app/dialog1.o: app/dialog.cpp
 app/dialog1.s: app/dialog.cpp
 	$(CXX) $(CXXFLAGS) -o app/dialog1.s -S app/dialog.cpp
 
+app/hash2.lo: app/hash.cpp
+	$(CXX) -fPIC $(CXXFLAGS) -o app/hash2.lo -c app/hash.cpp
+
+app/hash2.o: app/hash.cpp
+	@echo "        Compiling app/hash.cpp..."
+	@$(CXX) $(CXXFLAGS) -o app/hash2.o -c app/hash.cpp
+
+app/hash2.s: app/hash.cpp
+	$(CXX) $(CXXFLAGS) -o app/hash2.s -S app/hash.cpp
+
 clean:
 	$(RM) $(OBJECTS_afl)
 	$(RM) $(OBJECTS_date)
@@ -367,6 +458,7 @@ clean:
 	$(RM) $(OBJECTS_ls)
 	$(RM) $(OBJECTS_chatserver)
 	$(RM) $(OBJECTS_wget)
+	$(RM) $(OBJECTS_hash)
 	$(RM) $(OBJECTS_secureio)
 	$(RM) $(OBJECTS_respclient)
 	$(RM) $(OBJECTS_respserver)
@@ -381,7 +473,7 @@ config.mk afl/config.h:
 
 depend.mk: Makefile
 	@echo "        Regenerating depend.mk..."
-	@for i in $(OBJECTS_afl) $(OBJECTS_date) $(OBJECTS_dialog) $(OBJECTS_ls) $(OBJECTS_chatserver) $(OBJECTS_wget) $(OBJECTS_secureio) $(OBJECTS_respclient) $(OBJECTS_respserver) $(OBJECTS_httpserver) $(OBJECTS_env) $(OBJECTS_unzip) $(OBJECTS_testsuite); do echo "-include $${i%o}d"; done > depend.mk
+	@for i in $(OBJECTS_afl) $(OBJECTS_date) $(OBJECTS_dialog) $(OBJECTS_ls) $(OBJECTS_chatserver) $(OBJECTS_wget) $(OBJECTS_hash) $(OBJECTS_secureio) $(OBJECTS_respclient) $(OBJECTS_respserver) $(OBJECTS_httpserver) $(OBJECTS_env) $(OBJECTS_unzip) $(OBJECTS_testsuite); do echo "-include $${i%o}d"; done > depend.mk
 
 distclean: clean
 	$(RM) testsuite.cpp
@@ -391,6 +483,7 @@ distclean: clean
 	$(RM) ls
 	$(RM) chatserver
 	$(RM) wget
+	$(RM) hash
 	$(RM) secureio
 	$(RM) respclient
 	$(RM) respserver
@@ -416,16 +509,6 @@ testsuite.o: testsuite.cpp
 
 testsuite.s: testsuite.cpp
 	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -U_CXXTEST_HAVE_EH -U_CXXTEST_HAVE_STD -O0 -o testsuite.s -S testsuite.cpp
-
-u/mock/commandhandlermock.lo: u/mock/commandhandlermock.cpp
-	$(CXX) -fPIC $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/mock/commandhandlermock.lo -c u/mock/commandhandlermock.cpp
-
-u/mock/commandhandlermock.o: u/mock/commandhandlermock.cpp
-	@echo "        Compiling u/mock/commandhandlermock.cpp..."
-	@$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/mock/commandhandlermock.o -c u/mock/commandhandlermock.cpp
-
-u/mock/commandhandlermock.s: u/mock/commandhandlermock.cpp
-	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/mock/commandhandlermock.s -S u/mock/commandhandlermock.cpp
 
 u/t_async_cancelable.lo: u/t_async_cancelable.cpp
 	$(CXX) -fPIC $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_async_cancelable.lo -c u/t_async_cancelable.cpp
@@ -476,6 +559,26 @@ u/t_async_controller.o: u/t_async_controller.cpp
 
 u/t_async_controller.s: u/t_async_controller.cpp
 	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_async_controller.s -S u/t_async_controller.cpp
+
+u/t_async_interrupt.lo: u/t_async_interrupt.cpp
+	$(CXX) -fPIC $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_async_interrupt.lo -c u/t_async_interrupt.cpp
+
+u/t_async_interrupt.o: u/t_async_interrupt.cpp
+	@echo "        Compiling u/t_async_interrupt.cpp..."
+	@$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_async_interrupt.o -c u/t_async_interrupt.cpp
+
+u/t_async_interrupt.s: u/t_async_interrupt.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_async_interrupt.s -S u/t_async_interrupt.cpp
+
+u/t_async_interruptoperation.lo: u/t_async_interruptoperation.cpp
+	$(CXX) -fPIC $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_async_interruptoperation.lo -c u/t_async_interruptoperation.cpp
+
+u/t_async_interruptoperation.o: u/t_async_interruptoperation.cpp
+	@echo "        Compiling u/t_async_interruptoperation.cpp..."
+	@$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_async_interruptoperation.o -c u/t_async_interruptoperation.cpp
+
+u/t_async_interruptoperation.s: u/t_async_interruptoperation.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_async_interruptoperation.s -S u/t_async_interruptoperation.cpp
 
 u/t_async_messageexchange.lo: u/t_async_messageexchange.cpp
 	$(CXX) -fPIC $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_async_messageexchange.lo -c u/t_async_messageexchange.cpp
@@ -667,6 +770,16 @@ u/t_base_growablememory.o: u/t_base_growablememory.cpp
 u/t_base_growablememory.s: u/t_base_growablememory.cpp
 	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_base_growablememory.s -S u/t_base_growablememory.cpp
 
+u/t_base_inlinememory.lo: u/t_base_inlinememory.cpp
+	$(CXX) -fPIC $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_base_inlinememory.lo -c u/t_base_inlinememory.cpp
+
+u/t_base_inlinememory.o: u/t_base_inlinememory.cpp
+	@echo "        Compiling u/t_base_inlinememory.cpp..."
+	@$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_base_inlinememory.o -c u/t_base_inlinememory.cpp
+
+u/t_base_inlinememory.s: u/t_base_inlinememory.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_base_inlinememory.s -S u/t_base_inlinememory.cpp
+
 u/t_base_inlineoptional.lo: u/t_base_inlineoptional.cpp
 	$(CXX) -fPIC $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_base_inlineoptional.lo -c u/t_base_inlineoptional.cpp
 
@@ -786,6 +899,16 @@ u/t_base_staticassert.o: u/t_base_staticassert.cpp
 
 u/t_base_staticassert.s: u/t_base_staticassert.cpp
 	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_base_staticassert.s -S u/t_base_staticassert.cpp
+
+u/t_base_stoppable.lo: u/t_base_stoppable.cpp
+	$(CXX) -fPIC $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_base_stoppable.lo -c u/t_base_stoppable.cpp
+
+u/t_base_stoppable.o: u/t_base_stoppable.cpp
+	@echo "        Compiling u/t_base_stoppable.cpp..."
+	@$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_base_stoppable.o -c u/t_base_stoppable.cpp
+
+u/t_base_stoppable.s: u/t_base_stoppable.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_base_stoppable.s -S u/t_base_stoppable.cpp
 
 u/t_base_types.lo: u/t_base_types.cpp
 	$(CXX) -fPIC $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_base_types.lo -c u/t_base_types.cpp
@@ -1237,6 +1360,46 @@ u/t_checksums_sha1.o: u/t_checksums_sha1.cpp
 u/t_checksums_sha1.s: u/t_checksums_sha1.cpp
 	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_checksums_sha1.s -S u/t_checksums_sha1.cpp
 
+u/t_checksums_sha224.lo: u/t_checksums_sha224.cpp
+	$(CXX) -fPIC $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_checksums_sha224.lo -c u/t_checksums_sha224.cpp
+
+u/t_checksums_sha224.o: u/t_checksums_sha224.cpp
+	@echo "        Compiling u/t_checksums_sha224.cpp..."
+	@$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_checksums_sha224.o -c u/t_checksums_sha224.cpp
+
+u/t_checksums_sha224.s: u/t_checksums_sha224.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_checksums_sha224.s -S u/t_checksums_sha224.cpp
+
+u/t_checksums_sha256.lo: u/t_checksums_sha256.cpp
+	$(CXX) -fPIC $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_checksums_sha256.lo -c u/t_checksums_sha256.cpp
+
+u/t_checksums_sha256.o: u/t_checksums_sha256.cpp
+	@echo "        Compiling u/t_checksums_sha256.cpp..."
+	@$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_checksums_sha256.o -c u/t_checksums_sha256.cpp
+
+u/t_checksums_sha256.s: u/t_checksums_sha256.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_checksums_sha256.s -S u/t_checksums_sha256.cpp
+
+u/t_checksums_sha384.lo: u/t_checksums_sha384.cpp
+	$(CXX) -fPIC $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_checksums_sha384.lo -c u/t_checksums_sha384.cpp
+
+u/t_checksums_sha384.o: u/t_checksums_sha384.cpp
+	@echo "        Compiling u/t_checksums_sha384.cpp..."
+	@$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_checksums_sha384.o -c u/t_checksums_sha384.cpp
+
+u/t_checksums_sha384.s: u/t_checksums_sha384.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_checksums_sha384.s -S u/t_checksums_sha384.cpp
+
+u/t_checksums_sha512.lo: u/t_checksums_sha512.cpp
+	$(CXX) -fPIC $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_checksums_sha512.lo -c u/t_checksums_sha512.cpp
+
+u/t_checksums_sha512.o: u/t_checksums_sha512.cpp
+	@echo "        Compiling u/t_checksums_sha512.cpp..."
+	@$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_checksums_sha512.o -c u/t_checksums_sha512.cpp
+
+u/t_checksums_sha512.s: u/t_checksums_sha512.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_checksums_sha512.s -S u/t_checksums_sha512.cpp
+
 u/t_container_dereferencingiterator.lo: \
     u/t_container_dereferencingiterator.cpp
 	$(CXX) -fPIC $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_container_dereferencingiterator.lo -c u/t_container_dereferencingiterator.cpp
@@ -1583,6 +1746,16 @@ u/t_functional_unaryfunction.o: u/t_functional_unaryfunction.cpp
 u/t_functional_unaryfunction.s: u/t_functional_unaryfunction.cpp
 	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_functional_unaryfunction.s -S u/t_functional_unaryfunction.cpp
 
+u/t_io_archive_tarreader.lo: u/t_io_archive_tarreader.cpp
+	$(CXX) -fPIC $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_io_archive_tarreader.lo -c u/t_io_archive_tarreader.cpp
+
+u/t_io_archive_tarreader.o: u/t_io_archive_tarreader.cpp
+	@echo "        Compiling u/t_io_archive_tarreader.cpp..."
+	@$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_io_archive_tarreader.o -c u/t_io_archive_tarreader.cpp
+
+u/t_io_archive_tarreader.s: u/t_io_archive_tarreader.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_io_archive_tarreader.s -S u/t_io_archive_tarreader.cpp
+
 u/t_io_archive_zipreader.lo: u/t_io_archive_zipreader.cpp
 	$(CXX) -fPIC $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_io_archive_zipreader.lo -c u/t_io_archive_zipreader.cpp
 
@@ -1742,6 +1915,16 @@ u/t_io_internalstream.o: u/t_io_internalstream.cpp
 
 u/t_io_internalstream.s: u/t_io_internalstream.cpp
 	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_io_internalstream.s -S u/t_io_internalstream.cpp
+
+u/t_io_internaltextwriter.lo: u/t_io_internaltextwriter.cpp
+	$(CXX) -fPIC $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_io_internaltextwriter.lo -c u/t_io_internaltextwriter.cpp
+
+u/t_io_internaltextwriter.o: u/t_io_internaltextwriter.cpp
+	@echo "        Compiling u/t_io_internaltextwriter.cpp..."
+	@$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_io_internaltextwriter.o -c u/t_io_internaltextwriter.cpp
+
+u/t_io_internaltextwriter.s: u/t_io_internaltextwriter.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_io_internaltextwriter.s -S u/t_io_internaltextwriter.cpp
 
 u/t_io_json_parser.lo: u/t_io_json_parser.cpp
 	$(CXX) -fPIC $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_io_json_parser.lo -c u/t_io_json_parser.cpp
@@ -1962,6 +2145,16 @@ u/t_io_transformreaderstream.o: u/t_io_transformreaderstream.cpp
 
 u/t_io_transformreaderstream.s: u/t_io_transformreaderstream.cpp
 	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_io_transformreaderstream.s -S u/t_io_transformreaderstream.cpp
+
+u/t_io_unchangeabledirectoryentry.lo: u/t_io_unchangeabledirectoryentry.cpp
+	$(CXX) -fPIC $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_io_unchangeabledirectoryentry.lo -c u/t_io_unchangeabledirectoryentry.cpp
+
+u/t_io_unchangeabledirectoryentry.o: u/t_io_unchangeabledirectoryentry.cpp
+	@echo "        Compiling u/t_io_unchangeabledirectoryentry.cpp..."
+	@$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_io_unchangeabledirectoryentry.o -c u/t_io_unchangeabledirectoryentry.cpp
+
+u/t_io_unchangeabledirectoryentry.s: u/t_io_unchangeabledirectoryentry.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_io_unchangeabledirectoryentry.s -S u/t_io_unchangeabledirectoryentry.cpp
 
 u/t_io_xml_basereader.lo: u/t_io_xml_basereader.cpp
 	$(CXX) -fPIC $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_io_xml_basereader.lo -c u/t_io_xml_basereader.cpp
@@ -2259,6 +2452,66 @@ u/t_net_http_response.o: u/t_net_http_response.cpp
 u/t_net_http_response.s: u/t_net_http_response.cpp
 	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_net_http_response.s -S u/t_net_http_response.cpp
 
+u/t_net_interact.lo: u/t_net_interact.cpp
+	$(CXX) -fPIC $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_net_interact.lo -c u/t_net_interact.cpp
+
+u/t_net_interact.o: u/t_net_interact.cpp
+	@echo "        Compiling u/t_net_interact.cpp..."
+	@$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_net_interact.o -c u/t_net_interact.cpp
+
+u/t_net_interact.s: u/t_net_interact.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_net_interact.s -S u/t_net_interact.cpp
+
+u/t_net_line_client.lo: u/t_net_line_client.cpp
+	$(CXX) -fPIC $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_net_line_client.lo -c u/t_net_line_client.cpp
+
+u/t_net_line_client.o: u/t_net_line_client.cpp
+	@echo "        Compiling u/t_net_line_client.cpp..."
+	@$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_net_line_client.o -c u/t_net_line_client.cpp
+
+u/t_net_line_client.s: u/t_net_line_client.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_net_line_client.s -S u/t_net_line_client.cpp
+
+u/t_net_line_linehandler.lo: u/t_net_line_linehandler.cpp
+	$(CXX) -fPIC $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_net_line_linehandler.lo -c u/t_net_line_linehandler.cpp
+
+u/t_net_line_linehandler.o: u/t_net_line_linehandler.cpp
+	@echo "        Compiling u/t_net_line_linehandler.cpp..."
+	@$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_net_line_linehandler.o -c u/t_net_line_linehandler.cpp
+
+u/t_net_line_linehandler.s: u/t_net_line_linehandler.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_net_line_linehandler.s -S u/t_net_line_linehandler.cpp
+
+u/t_net_line_linesink.lo: u/t_net_line_linesink.cpp
+	$(CXX) -fPIC $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_net_line_linesink.lo -c u/t_net_line_linesink.cpp
+
+u/t_net_line_linesink.o: u/t_net_line_linesink.cpp
+	@echo "        Compiling u/t_net_line_linesink.cpp..."
+	@$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_net_line_linesink.o -c u/t_net_line_linesink.cpp
+
+u/t_net_line_linesink.s: u/t_net_line_linesink.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_net_line_linesink.s -S u/t_net_line_linesink.cpp
+
+u/t_net_line_protocolhandler.lo: u/t_net_line_protocolhandler.cpp
+	$(CXX) -fPIC $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_net_line_protocolhandler.lo -c u/t_net_line_protocolhandler.cpp
+
+u/t_net_line_protocolhandler.o: u/t_net_line_protocolhandler.cpp
+	@echo "        Compiling u/t_net_line_protocolhandler.cpp..."
+	@$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_net_line_protocolhandler.o -c u/t_net_line_protocolhandler.cpp
+
+u/t_net_line_protocolhandler.s: u/t_net_line_protocolhandler.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_net_line_protocolhandler.s -S u/t_net_line_protocolhandler.cpp
+
+u/t_net_line_simplequery.lo: u/t_net_line_simplequery.cpp
+	$(CXX) -fPIC $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_net_line_simplequery.lo -c u/t_net_line_simplequery.cpp
+
+u/t_net_line_simplequery.o: u/t_net_line_simplequery.cpp
+	@echo "        Compiling u/t_net_line_simplequery.cpp..."
+	@$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_net_line_simplequery.o -c u/t_net_line_simplequery.cpp
+
+u/t_net_line_simplequery.s: u/t_net_line_simplequery.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_net_line_simplequery.s -S u/t_net_line_simplequery.cpp
+
 u/t_net_listener.lo: u/t_net_listener.cpp
 	$(CXX) -fPIC $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_net_listener.lo -c u/t_net_listener.cpp
 
@@ -2278,6 +2531,16 @@ u/t_net_mimebuilder.o: u/t_net_mimebuilder.cpp
 
 u/t_net_mimebuilder.s: u/t_net_mimebuilder.cpp
 	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_net_mimebuilder.s -S u/t_net_mimebuilder.cpp
+
+u/t_net_mimeparser.lo: u/t_net_mimeparser.cpp
+	$(CXX) -fPIC $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_net_mimeparser.lo -c u/t_net_mimeparser.cpp
+
+u/t_net_mimeparser.o: u/t_net_mimeparser.cpp
+	@echo "        Compiling u/t_net_mimeparser.cpp..."
+	@$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_net_mimeparser.o -c u/t_net_mimeparser.cpp
+
+u/t_net_mimeparser.s: u/t_net_mimeparser.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_net_mimeparser.s -S u/t_net_mimeparser.cpp
 
 u/t_net_name.lo: u/t_net_name.cpp
 	$(CXX) -fPIC $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_net_name.lo -c u/t_net_name.cpp
@@ -2509,6 +2772,26 @@ u/t_net_simpleserver.o: u/t_net_simpleserver.cpp
 u/t_net_simpleserver.s: u/t_net_simpleserver.cpp
 	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_net_simpleserver.s -S u/t_net_simpleserver.cpp
 
+u/t_net_smtp_configuration.lo: u/t_net_smtp_configuration.cpp
+	$(CXX) -fPIC $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_net_smtp_configuration.lo -c u/t_net_smtp_configuration.cpp
+
+u/t_net_smtp_configuration.o: u/t_net_smtp_configuration.cpp
+	@echo "        Compiling u/t_net_smtp_configuration.cpp..."
+	@$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_net_smtp_configuration.o -c u/t_net_smtp_configuration.cpp
+
+u/t_net_smtp_configuration.s: u/t_net_smtp_configuration.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_net_smtp_configuration.s -S u/t_net_smtp_configuration.cpp
+
+u/t_net_smtp_mailrequest.lo: u/t_net_smtp_mailrequest.cpp
+	$(CXX) -fPIC $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_net_smtp_mailrequest.lo -c u/t_net_smtp_mailrequest.cpp
+
+u/t_net_smtp_mailrequest.o: u/t_net_smtp_mailrequest.cpp
+	@echo "        Compiling u/t_net_smtp_mailrequest.cpp..."
+	@$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_net_smtp_mailrequest.o -c u/t_net_smtp_mailrequest.cpp
+
+u/t_net_smtp_mailrequest.s: u/t_net_smtp_mailrequest.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_net_smtp_mailrequest.s -S u/t_net_smtp_mailrequest.cpp
+
 u/t_net_socket.lo: u/t_net_socket.cpp
 	$(CXX) -fPIC $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_net_socket.lo -c u/t_net_socket.cpp
 
@@ -2518,6 +2801,49 @@ u/t_net_socket.o: u/t_net_socket.cpp
 
 u/t_net_socket.s: u/t_net_socket.cpp
 	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_net_socket.s -S u/t_net_socket.cpp
+
+u/t_net_tunnel_socketwrapper.lo: u/t_net_tunnel_socketwrapper.cpp
+	$(CXX) -fPIC $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_net_tunnel_socketwrapper.lo -c u/t_net_tunnel_socketwrapper.cpp
+
+u/t_net_tunnel_socketwrapper.o: u/t_net_tunnel_socketwrapper.cpp
+	@echo "        Compiling u/t_net_tunnel_socketwrapper.cpp..."
+	@$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_net_tunnel_socketwrapper.o -c u/t_net_tunnel_socketwrapper.cpp
+
+u/t_net_tunnel_socketwrapper.s: u/t_net_tunnel_socketwrapper.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_net_tunnel_socketwrapper.s -S u/t_net_tunnel_socketwrapper.cpp
+
+u/t_net_tunnel_socks4networkstack.lo: u/t_net_tunnel_socks4networkstack.cpp
+	$(CXX) -fPIC $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_net_tunnel_socks4networkstack.lo -c u/t_net_tunnel_socks4networkstack.cpp
+
+u/t_net_tunnel_socks4networkstack.o: u/t_net_tunnel_socks4networkstack.cpp
+	@echo "        Compiling u/t_net_tunnel_socks4networkstack.cpp..."
+	@$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_net_tunnel_socks4networkstack.o -c u/t_net_tunnel_socks4networkstack.cpp
+
+u/t_net_tunnel_socks4networkstack.s: u/t_net_tunnel_socks4networkstack.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_net_tunnel_socks4networkstack.s -S u/t_net_tunnel_socks4networkstack.cpp
+
+u/t_net_tunnel_socks5networkstack.lo: u/t_net_tunnel_socks5networkstack.cpp
+	$(CXX) -fPIC $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_net_tunnel_socks5networkstack.lo -c u/t_net_tunnel_socks5networkstack.cpp
+
+u/t_net_tunnel_socks5networkstack.o: u/t_net_tunnel_socks5networkstack.cpp
+	@echo "        Compiling u/t_net_tunnel_socks5networkstack.cpp..."
+	@$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_net_tunnel_socks5networkstack.o -c u/t_net_tunnel_socks5networkstack.cpp
+
+u/t_net_tunnel_socks5networkstack.s: u/t_net_tunnel_socks5networkstack.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_net_tunnel_socks5networkstack.s -S u/t_net_tunnel_socks5networkstack.cpp
+
+u/t_net_tunnel_tunnelablenetworkstack.lo: \
+    u/t_net_tunnel_tunnelablenetworkstack.cpp
+	$(CXX) -fPIC $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_net_tunnel_tunnelablenetworkstack.lo -c u/t_net_tunnel_tunnelablenetworkstack.cpp
+
+u/t_net_tunnel_tunnelablenetworkstack.o: \
+    u/t_net_tunnel_tunnelablenetworkstack.cpp
+	@echo "        Compiling u/t_net_tunnel_tunnelablenetworkstack.cpp..."
+	@$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_net_tunnel_tunnelablenetworkstack.o -c u/t_net_tunnel_tunnelablenetworkstack.cpp
+
+u/t_net_tunnel_tunnelablenetworkstack.s: \
+    u/t_net_tunnel_tunnelablenetworkstack.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_net_tunnel_tunnelablenetworkstack.s -S u/t_net_tunnel_tunnelablenetworkstack.cpp
 
 u/t_net_url.lo: u/t_net_url.cpp
 	$(CXX) -fPIC $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_net_url.lo -c u/t_net_url.cpp
@@ -2848,6 +3174,56 @@ u/t_sys_types.o: u/t_sys_types.cpp
 
 u/t_sys_types.s: u/t_sys_types.cpp
 	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_sys_types.s -S u/t_sys_types.cpp
+
+u/t_test_assert.lo: u/t_test_assert.cpp
+	$(CXX) -fPIC $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_test_assert.lo -c u/t_test_assert.cpp
+
+u/t_test_assert.o: u/t_test_assert.cpp
+	@echo "        Compiling u/t_test_assert.cpp..."
+	@$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_test_assert.o -c u/t_test_assert.cpp
+
+u/t_test_assert.s: u/t_test_assert.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_test_assert.s -S u/t_test_assert.cpp
+
+u/t_test_callreceiver.lo: u/t_test_callreceiver.cpp
+	$(CXX) -fPIC $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_test_callreceiver.lo -c u/t_test_callreceiver.cpp
+
+u/t_test_callreceiver.o: u/t_test_callreceiver.cpp
+	@echo "        Compiling u/t_test_callreceiver.cpp..."
+	@$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_test_callreceiver.o -c u/t_test_callreceiver.cpp
+
+u/t_test_callreceiver.s: u/t_test_callreceiver.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_test_callreceiver.s -S u/t_test_callreceiver.cpp
+
+u/t_test_commandhandler.lo: u/t_test_commandhandler.cpp
+	$(CXX) -fPIC $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_test_commandhandler.lo -c u/t_test_commandhandler.cpp
+
+u/t_test_commandhandler.o: u/t_test_commandhandler.cpp
+	@echo "        Compiling u/t_test_commandhandler.cpp..."
+	@$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_test_commandhandler.o -c u/t_test_commandhandler.cpp
+
+u/t_test_commandhandler.s: u/t_test_commandhandler.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_test_commandhandler.s -S u/t_test_commandhandler.cpp
+
+u/t_test_networkstack.lo: u/t_test_networkstack.cpp
+	$(CXX) -fPIC $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_test_networkstack.lo -c u/t_test_networkstack.cpp
+
+u/t_test_networkstack.o: u/t_test_networkstack.cpp
+	@echo "        Compiling u/t_test_networkstack.cpp..."
+	@$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_test_networkstack.o -c u/t_test_networkstack.cpp
+
+u/t_test_networkstack.s: u/t_test_networkstack.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_test_networkstack.s -S u/t_test_networkstack.cpp
+
+u/t_test_socket.lo: u/t_test_socket.cpp
+	$(CXX) -fPIC $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_test_socket.lo -c u/t_test_socket.cpp
+
+u/t_test_socket.o: u/t_test_socket.cpp
+	@echo "        Compiling u/t_test_socket.cpp..."
+	@$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_test_socket.o -c u/t_test_socket.cpp
+
+u/t_test_socket.s: u/t_test_socket.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_test_socket.s -S u/t_test_socket.cpp
 
 u/t_tmp_copycv.lo: u/t_tmp_copycv.cpp
 	$(CXX) -fPIC $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_tmp_copycv.lo -c u/t_tmp_copycv.cpp

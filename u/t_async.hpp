@@ -15,6 +15,8 @@ class TestAsyncCancelable : public CxxTest::TestSuite {
 class TestAsyncCommunicationObject : public CxxTest::TestSuite {
  public:
     void testIt();
+    void testFullSend();
+    void testFullReceive();
 };
 
 class TestAsyncCommunicationSink : public CxxTest::TestSuite {
@@ -32,6 +34,16 @@ class TestAsyncCommunicationStream : public CxxTest::TestSuite {
 };
 
 class TestAsyncController : public CxxTest::TestSuite {
+ public:
+    void testIt();
+};
+
+class TestAsyncInterrupt : public CxxTest::TestSuite {
+ public:
+    void testDummy();
+};
+
+class TestAsyncInterruptOperation : public CxxTest::TestSuite {
  public:
     void testIt();
 };

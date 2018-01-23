@@ -34,6 +34,12 @@ afl::net::HeaderTable::add(const HeaderField& field)
     m_headers.push_back(field);
 }
 
+void
+afl::net::HeaderTable::clear()
+{
+    m_headers.clear();
+}
+
 const afl::net::HeaderField*
 afl::net::HeaderTable::get(const String_t& name) const
 {

@@ -12,6 +12,7 @@ class TestBitsBits : public CxxTest::TestSuite {
     void testPower();
     void testLog();
     void testReverse();
+    void testBitPop();
 };
 
 class TestBitsFixedString : public CxxTest::TestSuite {

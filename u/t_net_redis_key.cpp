@@ -6,24 +6,24 @@
 #include "afl/net/redis/key.hpp"
 
 #include "t_net_redis.hpp"
-#include "u/mock/commandhandlermock.hpp"
 #include "afl/data/integervalue.hpp"
 #include "afl/data/stringvalue.hpp"
-#include "afl/net/redis/integersetkey.hpp"
-#include "afl/net/redis/internaldatabase.hpp"
-#include "afl/net/redis/integerkey.hpp"
-#include "afl/net/redis/stringkey.hpp"
-#include "afl/net/redis/stringsetkey.hpp"
-#include "afl/net/redis/integerlistkey.hpp"
-#include "afl/net/redis/stringlistkey.hpp"
 #include "afl/net/redis/hashkey.hpp"
 #include "afl/net/redis/integerfield.hpp"
+#include "afl/net/redis/integerkey.hpp"
+#include "afl/net/redis/integerlistkey.hpp"
+#include "afl/net/redis/integersetkey.hpp"
+#include "afl/net/redis/internaldatabase.hpp"
+#include "afl/net/redis/stringkey.hpp"
+#include "afl/net/redis/stringlistkey.hpp"
+#include "afl/net/redis/stringsetkey.hpp"
+#include "afl/test/commandhandler.hpp"
 
 /** Test Key against the mock. */
 void
 TestNetRedisKey::testMock()
 {
-    CommandHandlerMock mock;
+    afl::test::CommandHandler mock("testMock");
     afl::net::redis::Key testee(mock, "k");
 
     // Local inquiry
@@ -31,30 +31,30 @@ TestNetRedisKey::testMock()
     TS_ASSERT_EQUALS(&testee.getHandler(), &mock);
 
     // Network inquiry
-    mock.addParameterList("EXISTS, k");
-    mock.addNewResult(new afl::data::IntegerValue(1));
+    mock.expectCall("EXISTS, k");
+    mock.provideNewResult(new afl::data::IntegerValue(1));
     bool ok = testee.exists();
     TS_ASSERT(ok);
 
-    mock.addParameterList("TYPE, k");
-    mock.addNewResult(new afl::data::StringValue("set"));
+    mock.expectCall("TYPE, k");
+    mock.provideNewResult(new afl::data::StringValue("set"));
     TS_ASSERT_EQUALS(testee.getType(), afl::net::redis::Key::Set);
 
     // Rename
-    mock.addParameterList("RENAME, k, u");
-    mock.addNewResult(new afl::data::IntegerValue(1));
+    mock.expectCall("RENAME, k, u");
+    mock.provideNewResult(new afl::data::IntegerValue(1));
     testee.renameTo("u");
     TS_ASSERT_EQUALS(testee.getName(), "u");
 
-    mock.addParameterList("RENAMENX, u, v");
-    mock.addNewResult(new afl::data::IntegerValue(1));
+    mock.expectCall("RENAMENX, u, v");
+    mock.provideNewResult(new afl::data::IntegerValue(1));
     ok = testee.renameToUnique("v");
     TS_ASSERT(ok);
     TS_ASSERT_EQUALS(testee.getName(), "v");
 
     // Remove
-    mock.addParameterList("DEL, v");
-    mock.addNewResult(new afl::data::IntegerValue(1));
+    mock.expectCall("DEL, v");
+    mock.provideNewResult(new afl::data::IntegerValue(1));
     testee.remove();
 }
 

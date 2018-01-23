@@ -31,7 +31,7 @@ afl::io::TransformReaderStream::read(Bytes_t m)
         did += out.size();
 
         // Update file position at this place, so if the stream throws, we're not affected.
-        m_numBytesRead += did;
+        m_numBytesRead += out.size();
 
         if (did >= m.size()) {
             break;

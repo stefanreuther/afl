@@ -20,7 +20,7 @@ namespace {
 }
 
 afl::net::http::Client::Client()
-    : afl::base::Runnable(),
+    : afl::base::Stoppable(),
       m_provider(),
       m_mutex(),
       m_wake(0),

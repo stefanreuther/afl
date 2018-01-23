@@ -118,3 +118,59 @@ TestBitsBits::testReverse()
     TS_ASSERT_EQUALS(afl::bits::bitReverse8(14), 0x70);
     TS_ASSERT_EQUALS(afl::bits::bitReverse8(15), 0xF0);
 }
+
+/** Test bitPop8(), bitPop16(), bitPop32(), bitPop64(). */
+void
+TestBitsBits::testBitPop()
+{
+    TS_ASSERT_EQUALS(afl::bits::bitPop8(0),   0U);
+    TS_ASSERT_EQUALS(afl::bits::bitPop8(1),   1U);
+    TS_ASSERT_EQUALS(afl::bits::bitPop8(17),  2U);
+    TS_ASSERT_EQUALS(afl::bits::bitPop8(128), 1U);
+    TS_ASSERT_EQUALS(afl::bits::bitPop8(129), 2U);
+    TS_ASSERT_EQUALS(afl::bits::bitPop8(255), 8U);
+
+    TS_ASSERT_EQUALS(afl::bits::bitPop16(0),     0U);
+    TS_ASSERT_EQUALS(afl::bits::bitPop16(1),     1U);
+    TS_ASSERT_EQUALS(afl::bits::bitPop16(17),    2U);
+    TS_ASSERT_EQUALS(afl::bits::bitPop16(128),   1U);
+    TS_ASSERT_EQUALS(afl::bits::bitPop16(129),   2U);
+    TS_ASSERT_EQUALS(afl::bits::bitPop16(255),   8U);
+    TS_ASSERT_EQUALS(afl::bits::bitPop16(256),   1U);
+    TS_ASSERT_EQUALS(afl::bits::bitPop16(32768), 1U);
+    TS_ASSERT_EQUALS(afl::bits::bitPop16(65535), 16U);
+
+    TS_ASSERT_EQUALS(afl::bits::bitPop32(0),     0U);
+    TS_ASSERT_EQUALS(afl::bits::bitPop32(1),     1U);
+    TS_ASSERT_EQUALS(afl::bits::bitPop32(17),    2U);
+    TS_ASSERT_EQUALS(afl::bits::bitPop32(128),   1U);
+    TS_ASSERT_EQUALS(afl::bits::bitPop32(129),   2U);
+    TS_ASSERT_EQUALS(afl::bits::bitPop32(255),   8U);
+    TS_ASSERT_EQUALS(afl::bits::bitPop32(256),   1U);
+    TS_ASSERT_EQUALS(afl::bits::bitPop32(32768), 1U);
+    TS_ASSERT_EQUALS(afl::bits::bitPop32(65535), 16U);
+    TS_ASSERT_EQUALS(afl::bits::bitPop32(65536), 1U);
+    TS_ASSERT_EQUALS(afl::bits::bitPop32(0xFFFFFFFE), 31U);
+    TS_ASSERT_EQUALS(afl::bits::bitPop32(0xFFFFFFFF), 32U);
+
+    TS_ASSERT_EQUALS(afl::bits::bitPop64(0),     0U);
+    TS_ASSERT_EQUALS(afl::bits::bitPop64(1),     1U);
+    TS_ASSERT_EQUALS(afl::bits::bitPop64(17),    2U);
+    TS_ASSERT_EQUALS(afl::bits::bitPop64(128),   1U);
+    TS_ASSERT_EQUALS(afl::bits::bitPop64(129),   2U);
+    TS_ASSERT_EQUALS(afl::bits::bitPop64(255),   8U);
+    TS_ASSERT_EQUALS(afl::bits::bitPop64(256),   1U);
+    TS_ASSERT_EQUALS(afl::bits::bitPop64(32768), 1U);
+    TS_ASSERT_EQUALS(afl::bits::bitPop64(65535), 16U);
+    TS_ASSERT_EQUALS(afl::bits::bitPop64(65536), 1U);
+    TS_ASSERT_EQUALS(afl::bits::bitPop64(0xFFFFFFFE), 31U);
+    TS_ASSERT_EQUALS(afl::bits::bitPop64(0xFFFFFFFF), 32U);
+    TS_ASSERT_EQUALS(afl::bits::bitPop64(0x8000000000000000ULL), 1U);
+    TS_ASSERT_EQUALS(afl::bits::bitPop64(0xFFFFFFFFFFFFFFFFULL), 64U);
+
+    TS_ASSERT_EQUALS(afl::bits::bitPop(uint8_t(255U)), 8U);
+    TS_ASSERT_EQUALS(afl::bits::bitPop(uint16_t(65535U)), 16U);
+    TS_ASSERT_EQUALS(afl::bits::bitPop(uint32_t(0xFFFFFFFFU)), 32U);
+    TS_ASSERT_EQUALS(afl::bits::bitPop(uint64_t(0xFFFFFFFFFFFFFFFFULL)), 64U);
+}
+

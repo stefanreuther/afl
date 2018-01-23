@@ -8,6 +8,7 @@ dialog
 doxy_docs
 emacs.dsk
 env
+hash
 httpserver
 ls
 respclient

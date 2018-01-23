@@ -12,6 +12,7 @@
 #include "afl/except/fileformatexception.hpp"
 #include "afl/io/directoryentry.hpp"
 #include "afl/io/filemapping.hpp"
+#include "afl/io/inflatetransform.hpp"
 
 namespace {
     const uint8_t SAMPLE_ZIP[] = {
@@ -215,7 +216,7 @@ TestIoArchiveZipReader::testReadMembers()
     }
 
     // Read member "test.log"
-    {
+    if (afl::io::InflateTransform::isAvailable()) {
         afl::base::Ref<afl::io::Stream> in(testee->openFile("test.log", afl::io::FileSystem::OpenRead));
         afl::io::InternalStream out;
         out.copyFrom(*in);
@@ -299,7 +300,9 @@ TestIoArchiveZipReader::testMeta()
     TS_ASSERT_EQUALS(entry->getFileSize(), sizeof(TEST_LOG));
     TS_ASSERT_EQUALS(&*entry->openContainingDirectory(), &*testee);
     TS_ASSERT_THROWS(entry->openDirectory(), afl::except::FileProblemException);
-    TS_ASSERT(entry->openFile(afl::io::FileSystem::OpenRead)->createVirtualMapping()->get().equalContent(TEST_LOG));
+    if (afl::io::InflateTransform::isAvailable()) {
+        TS_ASSERT(entry->openFile(afl::io::FileSystem::OpenRead)->createVirtualMapping()->get().equalContent(TEST_LOG));
+    }
 
     TS_ASSERT(!content->getNextElement(entry));
 }

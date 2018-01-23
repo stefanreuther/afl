@@ -11,6 +11,7 @@ class TestIoJsonParser : public CxxTest::TestSuite {
  public:
     void testKeywords();
     void testErrors();
+    void testDuplicateHashKey();
 
     void testString();
     void testInteger();

@@ -42,8 +42,9 @@ class afl::io::MultiplexableStream::ControlNode : public afl::base::RefCounted {
         Must be called with m_mutex held.
         Performs all necessary checks and decides whether a stateful operation can be performed on the master stream.
         \param ch The child
+        \param wantSetPos Set to true if the next operation will be a setPos()
         \return Stream to perform the requested operation on. Null if operation cannot be performed. */
-    Stream* activateChild(Child* ch);
+    Stream* activateChild(Child* ch, bool wantSetPos);
 
     /** Get parent.
         Must be called with m_mutex held.
@@ -136,7 +137,7 @@ afl::io::MultiplexableStream::ControlNode::removeParent()
 }
 
 afl::io::Stream*
-afl::io::MultiplexableStream::ControlNode::activateChild(Child* ch)
+afl::io::MultiplexableStream::ControlNode::activateChild(Child* ch, bool wantSetPos)
 {
     if (m_parent != 0) {
         if (ch != m_activeChild) {
@@ -145,7 +146,7 @@ afl::io::MultiplexableStream::ControlNode::activateChild(Child* ch)
                 m_activeChild->m_posIfInactive = m_parent->getPos();
                 m_activeChild = 0;
             }
-            if (ch != 0) {
+            if (ch != 0 && !wantSetPos) {
                 m_parent->setPos(ch->m_posIfInactive);
             }
 
@@ -188,7 +189,7 @@ size_t
 afl::io::MultiplexableStream::Child::read(Bytes_t m)
 {
     afl::sys::MutexGuard g(m_controlNode->m_mutex);
-    if (Stream* w = m_controlNode->activateChild(this)) {
+    if (Stream* w = m_controlNode->activateChild(this, false)) {
         return w->read(m);
     } else {
         return 0;
@@ -199,7 +200,7 @@ size_t
 afl::io::MultiplexableStream::Child::write(ConstBytes_t m)
 {
     afl::sys::MutexGuard g(m_controlNode->m_mutex);
-    if (Stream* w = m_controlNode->activateChild(this)) {
+    if (Stream* w = m_controlNode->activateChild(this, false)) {
         return w->write(m);
     } else {
         return 0;
@@ -219,7 +220,7 @@ void
 afl::io::MultiplexableStream::Child::setPos(FileSize_t pos)
 {
     afl::sys::MutexGuard g(m_controlNode->m_mutex);
-    if (Stream* w = m_controlNode->activateChild(this)) {
+    if (Stream* w = m_controlNode->activateChild(this, true)) {
         w->setPos(pos);
     }
 }
@@ -228,7 +229,7 @@ afl::io::MultiplexableStream::Child::FileSize_t
 afl::io::MultiplexableStream::Child::getPos()
 {
     afl::sys::MutexGuard g(m_controlNode->m_mutex);
-    if (Stream* w = m_controlNode->activateChild(this)) {
+    if (Stream* w = m_controlNode->activateChild(this, false)) {
         return w->getPos();
     } else {
         return 0;
@@ -278,7 +279,7 @@ afl::base::Ptr<afl::io::FileMapping>
 afl::io::MultiplexableStream::Child::createFileMapping(FileSize_t limit)
 {
     afl::sys::MutexGuard g(m_controlNode->m_mutex);
-    if (Stream* w = m_controlNode->activateChild(this)) {
+    if (Stream* w = m_controlNode->activateChild(this, false)) {
         return w->createFileMapping(limit);
     } else {
         return 0;

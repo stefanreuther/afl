@@ -1,9 +1,8 @@
 /**
-  *  \file u/mock/commandhandlermock.cpp
-  *  \class CommandHandlerMock
+  *  \file afl/test/commandhandler.cpp
   */
 
-#include "u/mock/commandhandlermock.hpp"
+#include "afl/test/commandhandler.hpp"
 #include "afl/data/visitor.hpp"
 #include "afl/string/format.hpp"
 
@@ -34,16 +33,17 @@ namespace {
      private:
         String_t& m_result;
     };
-}    
+}
 
-CommandHandlerMock::CommandHandlerMock()
+afl::test::CommandHandler::CommandHandler(const Assert& a)
+    : m_assert(a)
 { }
 
-CommandHandlerMock::Value_t*
-CommandHandlerMock::call(const Segment_t& command)
+afl::net::CommandHandler::Value_t*
+afl::test::CommandHandler::call(const Segment_t& command)
 {
     // Verify command by stringifying it
-    TS_ASSERT(!m_parameters.empty());
+    m_assert.check("call: need pending call", !m_queue.empty());
     String_t s;
     for (size_t i = 0, n = command.size(); i < n; ++i) {
         if (i != 0) {
@@ -51,27 +51,34 @@ CommandHandlerMock::call(const Segment_t& command)
         }
         Stringifier(s).visit(command[i]);
     }
-    TS_ASSERT_EQUALS(s, m_parameters.front());
-    m_parameters.pop_front();
-                
-    TS_ASSERT(!m_results.empty());
+    m_assert.checkEqual("call", s, m_queue.front());
+    m_queue.pop_front();
+
+    m_assert.check("call: must have result", !m_results.empty());
     return m_results.extractFront();
 }
 
 void
-CommandHandlerMock::callVoid(const Segment_t& command)
+afl::test::CommandHandler::callVoid(const Segment_t& command)
 {
     delete call(command);
 }
 
 void
-CommandHandlerMock::addParameterList(const String_t& list)
+afl::test::CommandHandler::expectCall(const String_t& list)
 {
-    m_parameters.push_back(list);
+    m_queue.push_back(list);
 }
 
 void
-CommandHandlerMock::addNewResult(Value_t* value)
+afl::test::CommandHandler::provideNewResult(Value_t* value)
 {
     m_results.pushBackNew(value);
+}
+
+void
+afl::test::CommandHandler::checkFinish()
+{
+    m_assert.check("checkFinish: must have no more pending calls", m_queue.empty());
+    m_assert.check("checkFinish: must have no more pending returns", m_results.empty());
 }

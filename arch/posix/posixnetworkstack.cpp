@@ -11,23 +11,21 @@
 
 #include <cstring>
 #include <cstdio>
-#include <sys/select.h>         // select
-#include <sys/time.h>           // struct timeval
 #include <sys/types.h>          // socklen_t
 #include <sys/socket.h>         // everything sockets
 #include <arpa/inet.h>
 #include <fcntl.h>              // fcntl
 #include <netdb.h>              // getaddrinfo
 #include <errno.h>              // errno
-#include "afl/except/filesystemexception.hpp"
-#include "afl/sys/error.hpp"
-#include "afl/string/messages.hpp"
-#include "arch/posix/posixfiledescriptor.hpp"
-#include "afl/sys/mutexguard.hpp"
-#include "arch/posix/posixcontrollerimpl.hpp"
-#include "arch/controller.hpp"
-#include "afl/net/acceptoperation.hpp"
 #include "afl/async/notifier.hpp"
+#include "afl/except/filesystemexception.hpp"
+#include "afl/net/acceptoperation.hpp"
+#include "afl/string/messages.hpp"
+#include "afl/sys/error.hpp"
+#include "afl/sys/mutexguard.hpp"
+#include "arch/controller.hpp"
+#include "arch/posix/posixcontrollerimpl.hpp"
+#include "arch/posix/posixfiledescriptor.hpp"
 
 /*
  *  Utilities
@@ -74,7 +72,7 @@ namespace {
         hints.ai_socktype = SOCK_STREAM;
         int ai = ::getaddrinfo(name.getName().c_str(), name.getService().c_str(), &hints, &result);
         if (ai != 0) {
-            throw afl::except::FileProblemException(name.getService(), gai_strerror(ai));
+            throw afl::except::FileProblemException(name.toString(), gai_strerror(ai));
         }
 
         // Make a socket
@@ -106,9 +104,9 @@ namespace {
         // Anything found?
         if (sock < 0) {
             if (errorCode == 0) {
-                throw afl::except::FileProblemException(name.getService(), afl::string::Messages::networkNameNotFound());
+                throw afl::except::FileProblemException(name.toString(), afl::string::Messages::networkNameNotFound());
             } else {
-                throw afl::except::FileSystemException(name.getService(), afl::sys::Error(errorCode));
+                throw afl::except::FileSystemException(name.toString(), afl::sys::Error(errorCode));
             }
         }
         return sock;
@@ -241,6 +239,7 @@ arch::posix::PosixNetworkStack::Listener::accept(afl::sys::Timeout_t timeout)
         int data = ::accept(m_fd, 0, 0);
         if (data >= 0) {
             ::fcntl(data, F_SETFL, O_NONBLOCK);
+            ::fcntl(data, F_SETFD, FD_CLOEXEC);
             return new Socket(data, m_name);
         }
     }
@@ -259,11 +258,9 @@ arch::posix::PosixNetworkStack::Listener::acceptAsync(afl::async::Controller& ct
 {
     afl::sys::MutexGuard g(m_mutex);
     arch::posix::PosixControllerImpl& pi = ctl.getImplementation();
-    if (m_pendingAccepts.empty()) {
-        // FIXME: this is wrong! must always add to controller!
-        pi.addRequest(*this, m_fd, true);
-    }
+
     op.setController(&ctl);
+    pi.addRequest(*this, op, m_fd, true);
     m_pendingAccepts.pushBack(&op);
 }
 
@@ -273,6 +270,7 @@ arch::posix::PosixNetworkStack::Listener::cancel(afl::async::Controller& ctl, af
     afl::sys::MutexGuard g(m_mutex);
     m_pendingAccepts.remove(&op);
     ctl.revertPost(op);
+    ctl.getImplementation().removeRequest(op);
 
     // If the operation already has a result, discard that so it doesn't hang around longer than needed.
     static_cast<afl::net::AcceptOperation&>(op).setResult(0);
@@ -287,6 +285,7 @@ arch::posix::PosixNetworkStack::Listener::handleReadReady()
         int data = ::accept(m_fd, 0, 0);
         if (data >= 0) {
             ::fcntl(data, F_SETFL, O_NONBLOCK);
+            ::fcntl(data, F_SETFD, FD_CLOEXEC);
             op->setResult(new Socket(data, m_name));
             op->getNotifier().notify(*op);
             m_pendingAccepts.extractFront();

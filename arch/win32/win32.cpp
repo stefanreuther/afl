@@ -126,7 +126,18 @@ arch::win32::getShellFolder(int csidl)
     }
 }
 
-
+// Zero-terminate an unicode string.
+bool
+arch::win32::terminateUnicode(WStr& str)
+{
+    for (size_t i = 0, n = str.size(); i < n; ++i) {
+        if (str[i] == L'\0') {
+            return false;
+        }
+    }
+    str.push_back(L'\0');
+    return true;
+}
 
 #else
 int g_variableToMakeWin32ObjectFileNotEmpty;

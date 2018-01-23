@@ -29,8 +29,8 @@ namespace arch { namespace win32 { namespace {
             WStr wInfo, wTitle;
             convertToUnicode(wInfo, afl::string::toMemory(info));
             convertToUnicode(wTitle, afl::string::toMemory(title));
-            wInfo.push_back(L'\0');
-            wTitle.push_back(L'\0');
+            terminateUnicode(wInfo);
+            terminateUnicode(wTitle);
             return MessageBoxW(NULL, &wInfo[0], &wTitle[0], flags);
         } else {
             String_t aInfo = convertToANSI(afl::string::toMemory(info));

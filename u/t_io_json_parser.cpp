@@ -380,3 +380,57 @@ TestIoJsonParser::testErrors()
     TS_ASSERT_THROWS(parseString("\"\\uf"), afl::except::FileTooShortException);
     TS_ASSERT_THROWS(parseString("\"\\u0x10"), afl::except::FileFormatException);
 }
+
+/** Test duplicate keys in a hash.
+    Must reliably pick the last value. */
+void
+TestIoJsonParser::testDuplicateHashKey()
+{
+    // Regular case
+    {
+        std::auto_ptr<afl::data::Value> result(parseString("{\"qa\":1,\"qa\":2}"));
+        TS_ASSERT(dynamic_cast<afl::data::HashValue*>(result.get()) != 0);
+        afl::base::Ref<afl::data::Hash> hash(dynamic_cast<afl::data::HashValue*>(result.get())->getValue());
+        TS_ASSERT(&hash.get() != 0);
+        TS_ASSERT_EQUALS(hash->getValues().size(), 1U);
+        TS_ASSERT_EQUALS(hash->getKeys().getNumNames(), 1U);
+        TS_ASSERT(dynamic_cast<afl::data::IntegerValue*>(hash->get("qa")) != 0);
+        TS_ASSERT_EQUALS(dynamic_cast<afl::data::IntegerValue*>(hash->get("qa"))->getValue(), 2);
+    }
+
+    // Replace, not consecutive
+    {
+        std::auto_ptr<afl::data::Value> result(parseString("{\"qa\":[1,\"x\"],\"qb\":99, \"qa\":2}"));
+        TS_ASSERT(dynamic_cast<afl::data::HashValue*>(result.get()) != 0);
+        afl::base::Ref<afl::data::Hash> hash(dynamic_cast<afl::data::HashValue*>(result.get())->getValue());
+        TS_ASSERT(&hash.get() != 0);
+        TS_ASSERT_EQUALS(hash->getValues().size(), 2U);
+        TS_ASSERT_EQUALS(hash->getKeys().getNumNames(), 2U);
+        TS_ASSERT(dynamic_cast<afl::data::IntegerValue*>(hash->get("qa")) != 0);
+        TS_ASSERT_EQUALS(dynamic_cast<afl::data::IntegerValue*>(hash->get("qa"))->getValue(), 2);
+        TS_ASSERT(dynamic_cast<afl::data::IntegerValue*>(hash->get("qb")) != 0);
+        TS_ASSERT_EQUALS(dynamic_cast<afl::data::IntegerValue*>(hash->get("qb"))->getValue(), 99);
+    }
+
+    // Replace by different type case
+    {
+        std::auto_ptr<afl::data::Value> result(parseString("{\"qa\":[1,\"x\"],\"qa\":2}"));
+        TS_ASSERT(dynamic_cast<afl::data::HashValue*>(result.get()) != 0);
+        afl::base::Ref<afl::data::Hash> hash(dynamic_cast<afl::data::HashValue*>(result.get())->getValue());
+        TS_ASSERT(&hash.get() != 0);
+        TS_ASSERT_EQUALS(hash->getValues().size(), 1U);
+        TS_ASSERT_EQUALS(hash->getKeys().getNumNames(), 1U);
+        TS_ASSERT(dynamic_cast<afl::data::IntegerValue*>(hash->get("qa")) != 0);
+        TS_ASSERT_EQUALS(dynamic_cast<afl::data::IntegerValue*>(hash->get("qa"))->getValue(), 2);
+    }
+
+    // Replace by null
+    {
+        std::auto_ptr<afl::data::Value> result(parseString("{\"qa\":\"x\",\"qa\":null}"));
+        TS_ASSERT(dynamic_cast<afl::data::HashValue*>(result.get()) != 0);
+        afl::base::Ref<afl::data::Hash> hash(dynamic_cast<afl::data::HashValue*>(result.get())->getValue());
+        TS_ASSERT(&hash.get() != 0);
+        TS_ASSERT(hash->get("qa") == 0);
+    }
+}
+

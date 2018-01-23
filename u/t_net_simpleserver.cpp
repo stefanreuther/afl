@@ -24,7 +24,8 @@ namespace {
     class Handler : public afl::net::ProtocolHandler {
      public:
         Handler()
-            : m_sent(true)
+            : m_buffer(),
+              m_sent(true)
             { }
 
         virtual void getOperation(Operation& op)
@@ -81,9 +82,10 @@ TestNetSimpleServer::testIt()
     // Therefore, create it on the heap and let it live forever.
     afl::net::Name name("localhost", uint16_t(std::rand() % 30000 + 20000));
 
-    afl::net::SimpleServer* pServer(new afl::net::SimpleServer(stack.listen(name, 10), *new Factory()));
-    afl::sys::Thread* pThread(new afl::sys::Thread("SimpleServer", *pServer));
-    pThread->start();
+    Factory f;
+    afl::net::SimpleServer server(stack.listen(name, 10), f);
+    afl::sys::Thread thread("SimpleServer", server);
+    thread.start();
 
     // Perform one stupid connection with no data transfer
     {
@@ -116,6 +118,9 @@ TestNetSimpleServer::testIt()
         TS_ASSERT_EQUALS(rx.getNumReceivedBytes(), sizeof(send1));
         TS_ASSERT(rx.getReceivedBytes().equalContent(send1));
 
+        // Request stop
+        server.stop();
+
         // Send shutdown
         static const uint8_t send2[] = "q";
         tx.setData(send2);
@@ -127,4 +132,6 @@ TestNetSimpleServer::testIt()
         TS_ASSERT(socket->receive(ctl, rx, 500));
         TS_ASSERT_EQUALS(rx.getNumReceivedBytes(), 0U);
     }
+
+    thread.join();
 }

@@ -6,7 +6,7 @@
 #include "afl/async/semaphore.hpp"
 
 #include "u/t_async.hpp"
-#include "afl/base/runnable.hpp"
+#include "afl/base/stoppable.hpp"
 #include "afl/sys/thread.hpp"
 #include "afl/async/operation.hpp"
 #include "afl/async/controller.hpp"
@@ -20,7 +20,7 @@ namespace {
     };
 
     // A semaphore relay thread
-    class Relay : public afl::base::Runnable {
+    class Relay : public afl::base::Stoppable {
      public:
         Relay(Three& t)
             : m_three(t)
@@ -44,6 +44,8 @@ namespace {
                     }
                 }
             }
+        void stop()
+            { }
      private:
         Three& m_three;
         };

@@ -158,6 +158,18 @@ namespace afl { namespace base {
         template<size_t N>
         T (*eatN())[N];
 
+        /** Read first elements into another buffer.
+            If this buffer contains at least enough data to fill \c out,
+            copies the data, reduces this buffer's size, and returns true.
+            Otherwise, makes this buffer empty and returns false.
+
+            This is a similar semantic as fullRead() for a stream: give me that complete buffer, or fail.
+            However, it will not produce a partial output buffer.
+
+            \param out Target buffer
+            \return true on success */
+        bool fullRead(Memory<typename afl::tmp::StripCV<T>::Type> out);
+
         /** Last element access.
             \param n Element index (0=last, 1=second-last, etc.)
             \return pointer to desired element, 0 if that does not exist */
@@ -210,6 +222,16 @@ namespace afl { namespace base {
             \return Number of elements preceding the first instance of elem. */
         size_t find(const T& elem) const;
 
+        /** Find sequence.
+            Returns the number of elements equal to the given element; thus, the index of the first element that differs.
+            In particular, if no element differing from \c elem was not found, returns size().
+            Idioms:
+            - trim(find(N)): initial sequence consisting of elements equal to \c N
+            - subrange(find(N)): sequence starting at the first instance different to \c N
+            \param elem Element to skip
+            \return Number of elements equal to elem. */
+        size_t findNot(const T& elem) const;
+
         /** Find value from a list (strpbrk).
             Returns the number of elements preceding the first instance of an element from the given set.
             In particular, if no such element was found, returns size().
@@ -243,7 +265,7 @@ namespace afl { namespace base {
 
      private:
         Memory(T* ptr, size_t size);
-        
+
         T* m_ptr;
         size_t m_size;
     };
@@ -598,6 +620,19 @@ inline T
     return result;
 }
 
+template<typename T>
+bool
+afl::base::Memory<T>::fullRead(Memory<typename afl::tmp::StripCV<T>::Type> out)
+{
+    if (size() >= out.size()) {
+        out.copyFrom(split(out.size()));
+        return true;
+    } else {
+        reset();
+        return false;
+    }
+}
+
 // Last element access.
 template<typename T>
 T*
@@ -691,6 +726,18 @@ size_t
 afl::base::Memory<T>::find(const T& elem) const
 {
     return detail::MemoryTraits<T>::find(m_ptr, m_size, elem);
+}
+
+// Find sequence.
+template<typename T>
+size_t
+afl::base::Memory<T>::findNot(const T& elem) const
+{
+    size_t count = 0;
+    while (count < m_size && m_ptr[count] == elem) {
+        ++count;
+    }
+    return count;
 }
 
 // Find value from a list (strpbrk).

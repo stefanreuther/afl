@@ -145,15 +145,17 @@ arch::win32::Win32Environment::getEnvironmentVariable(const String_t& name)
         // Unicode version
         WStr uniName;
         convertToUnicode(uniName, afl::string::toMemory(name));
-        uniName.push_back(L'\0');
-
-        DWORD n = GetEnvironmentVariableW(&uniName[0], 0, 0);
-        if (n != 0) {
-            WStr value(n+1);
-            value.resize(GetEnvironmentVariableW(&uniName[0], &value[0], value.size()));
-            return convertFromUnicode(value);
-        } else {
+        if (!terminateUnicode(uniName)) {
             return String_t();
+        } else {
+            DWORD n = GetEnvironmentVariableW(&uniName[0], 0, 0);
+            if (n != 0) {
+                WStr value(n+1);
+                value.resize(GetEnvironmentVariableW(&uniName[0], &value[0], value.size()));
+                return convertFromUnicode(value);
+            } else {
+                return String_t();
+            }
         }
     } else {
         // ANSI version

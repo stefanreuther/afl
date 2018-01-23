@@ -6,14 +6,14 @@
 #include "afl/sys/thread.hpp"
 
 #include "u/t_sys.hpp"
-#include "afl/base/runnable.hpp"
+#include "afl/base/stoppable.hpp"
 #include "afl/sys/time.hpp"
 
 /** Simple test. */
 void
 TestSysThread::testIt()
 {
-    class MyRunnable : public afl::base::Runnable {
+    class MyRunnable : public afl::base::Stoppable {
      public:
         MyRunnable()
             : m_value(false)
@@ -22,6 +22,8 @@ TestSysThread::testIt()
             { m_value = true; }
         bool get()
             { return m_value; }
+        void stop()
+            { }
      private:
         bool m_value;
     };

@@ -75,6 +75,11 @@ class TestBaseGrowableMemory : public CxxTest::TestSuite {
     void testDuplicate();
 };
 
+class TestBaseInlineMemory : public CxxTest::TestSuite {
+ public:
+    void testIt();
+};
+
 class TestBaseInlineOptional : public CxxTest::TestSuite {
  public:
     void testIt();
@@ -91,6 +96,9 @@ class TestBaseMemory : public CxxTest::TestSuite {
     void testObject();
     void testFind();
     void testNothing();
+    void testFullRead();
+    void testFindNot();
+    void testCopy();
 };
 
 class TestBaseObservable : public CxxTest::TestSuite {
@@ -112,6 +120,8 @@ class TestBasePtr : public CxxTest::TestSuite {
     void testObj();
     void testRefCountedObj();
     void testDerivation();
+    void testCopyDestructor();
+    void testAssignDestructor();
 };
 
 class TestBaseRef : public CxxTest::TestSuite {
@@ -161,6 +171,11 @@ class TestBaseSignalHandler : public CxxTest::TestSuite {
 class TestBaseStaticAssert : public CxxTest::TestSuite {
  public:
     void testIt();
+};
+
+class TestBaseStoppable : public CxxTest::TestSuite {
+ public:
+    void testInterface();
 };
 
 class TestBaseTypes : public CxxTest::TestSuite {

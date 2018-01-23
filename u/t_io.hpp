@@ -110,6 +110,12 @@ class TestIoInternalStream : public CxxTest::TestSuite {
     void testOverflow();
     void testZero();
     void testName();
+    void testReadOnly();
+};
+
+class TestIoInternalTextWriter : public CxxTest::TestSuite {
+ public:
+    void testIt();
 };
 
 class TestIoLimitedDataSink : public CxxTest::TestSuite {
@@ -144,6 +150,7 @@ class TestIoMultiplexableStream : public CxxTest::TestSuite {
  public:
     void testAccess();
     void testLife();
+    void testSeek();
 };
 
 class TestIoNullFileSystem : public CxxTest::TestSuite {
@@ -211,6 +218,12 @@ class TestIoTransformReaderStream : public CxxTest::TestSuite {
  public:
     void testIt();
     void testExtra();
+    void testPosition();
+};
+
+class TestIoUnchangeableDirectoryEntry : public CxxTest::TestSuite {
+ public:
+    void testIt();
 };
 
 #endif

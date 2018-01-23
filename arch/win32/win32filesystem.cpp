@@ -65,19 +65,22 @@ arch::win32::Win32FileSystem::getAbsolutePathName(FileName_t name)
         // Unicode version
         WStr tmp;
         convertToUnicode(tmp, afl::string::toMemory(name));
-        tmp.push_back(L'\0');
-
-        wchar_t* tmpp;
-        wchar_t tmpc;
-        int charsNeeded = GetFullPathNameW(&tmp[0], 0, &tmpc, &tmpp);
-        if (charsNeeded < 2) {
-            // Failure, do the best we can do
+        if (!terminateUnicode(tmp)) {
+            // Failure
             return getCanonicalPathName(name);
         } else {
-            // okay, use Win32 function to do it:
-            WStr buffer(charsNeeded+1);
-            GetFullPathNameW(&tmp[0], charsNeeded, &buffer.front(), &tmpp);
-            return convertFromUnicode(afl::base::Memory<const wchar_t>::unsafeCreate(&buffer[0], buffer.size()-1));
+            wchar_t* tmpp;
+            wchar_t tmpc;
+            int charsNeeded = GetFullPathNameW(&tmp[0], 0, &tmpc, &tmpp);
+            if (charsNeeded < 2) {
+                // Failure, do the best we can do
+                return getCanonicalPathName(name);
+            } else {
+                // okay, use Win32 function to do it:
+                WStr buffer(charsNeeded+1);
+                GetFullPathNameW(&tmp[0], charsNeeded, &buffer.front(), &tmpp);
+                return convertFromUnicode(afl::base::Memory<const wchar_t>::unsafeCreate(&buffer[0], buffer.size()-1));
+            }
         }
     } else {
         // ANSI version

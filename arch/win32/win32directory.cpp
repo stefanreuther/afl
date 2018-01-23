@@ -121,7 +121,9 @@ arch::win32::Win32Directory::Entry::updateInfo(uint32_t requested)
             // Convert name
             WStr wname;
             convertToUnicode(wname, afl::string::toMemory(getPathName()));
-            wname.push_back(L'\0');
+            if (!terminateUnicode(wname)) {
+                throw afl::except::FileProblemException(getPathName(), afl::string::Messages::invalidFileName());
+            }
 
             // Do syscall
             WIN32_FIND_DATAW data;
@@ -162,8 +164,12 @@ arch::win32::Win32Directory::Entry::doRename(String_t newName)
         WStr uniOldName, uniNewName;
         convertToUnicode(uniOldName, afl::string::toMemory(utfOldName));
         convertToUnicode(uniNewName, afl::string::toMemory(utfNewName));
-        uniOldName.push_back(L'\0');
-        uniNewName.push_back(L'\0');
+        if (!terminateUnicode(uniOldName)) {
+            throw afl::except::FileProblemException(utfOldName, afl::string::Messages::invalidFileName());
+        }
+        if (!terminateUnicode(uniNewName)) {
+            throw afl::except::FileProblemException(utfNewName, afl::string::Messages::invalidFileName());
+        }
         success = MoveFileW(&uniOldName[0], &uniNewName[0]);
     } else {
         success = MoveFileA(convertToANSI(afl::string::toMemory(utfOldName)).c_str(), convertToANSI(afl::string::toMemory(utfNewName)).c_str());
@@ -184,7 +190,9 @@ arch::win32::Win32Directory::Entry::doErase()
     if (hasUnicodeSupport()) {
         WStr wname;
         convertToUnicode(wname, afl::string::toMemory(utfName));
-        wname.push_back(L'\0');
+        if (!terminateUnicode(wname)) {
+            throw afl::except::FileProblemException(utfName, afl::string::Messages::invalidFileName());
+        }
         if (GetFileAttributesW(&wname[0]) & FILE_ATTRIBUTE_DIRECTORY) {
             success = RemoveDirectoryW(&wname[0]);
         } else {
@@ -211,7 +219,9 @@ arch::win32::Win32Directory::Entry::doCreateAsDirectory()
     if (hasUnicodeSupport()) {
         WStr wname;
         convertToUnicode(wname, afl::string::toMemory(utfName));
-        wname.push_back(L'\0');
+        if (!terminateUnicode(wname)) {
+            throw afl::except::FileProblemException(utfName, afl::string::Messages::invalidFileName());
+        }
         success = CreateDirectoryW(&wname[0], 0);
     } else {
         String_t aname = convertToANSI(afl::string::toMemory(utfName));
@@ -264,7 +274,9 @@ arch::win32::Win32Directory::EnumW::EnumW(afl::base::Ref<Win32Directory> dir)
 {
     WStr wname;
     convertToUnicode(wname, afl::string::toMemory(Win32FileSystem().makePathName(dir->getDirectoryName(), "*")));
-    wname.push_back('\0');
+    if (!terminateUnicode(wname)) {
+        throw afl::except::FileProblemException(dir->getDirectoryName(), afl::string::Messages::invalidFileName());
+    }
 
     m_handle = FindFirstFileW(&wname[0], &m_data);
     if (m_handle == INVALID_HANDLE_VALUE) {

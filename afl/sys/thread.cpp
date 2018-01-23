@@ -5,11 +5,11 @@
 
 #include <cassert>
 #include "afl/sys/thread.hpp"
+#include "afl/string/translator.hpp"
 #include "afl/sys/mutexguard.hpp"
 #include "arch/thread.hpp"
-#include "afl/string/translator.hpp"
 
-afl::sys::Thread::Thread(const char* name, afl::base::Runnable& r)
+afl::sys::Thread::Thread(const char* name, afl::base::Stoppable& r)
     : m_stateMutex(),
       m_state(NotStarted),
       m_runnable(r),
@@ -17,7 +17,7 @@ afl::sys::Thread::Thread(const char* name, afl::base::Runnable& r)
       m_pImpl(new Impl(this))
 { }
 
-afl::sys::Thread::Thread(const String_t& name, afl::base::Runnable& r)
+afl::sys::Thread::Thread(const String_t& name, afl::base::Stoppable& r)
     : m_stateMutex(),
       m_state(NotStarted),
       m_runnable(r),
@@ -27,7 +27,15 @@ afl::sys::Thread::Thread(const String_t& name, afl::base::Runnable& r)
 
 afl::sys::Thread::~Thread()
 {
-    join();
+    bool needStop;
+    {
+        MutexGuard g(m_stateMutex);
+        needStop = (m_state == Started);
+    }
+    if (needStop) {
+        m_runnable.stop();
+        join();
+    }
     delete m_pImpl;
 }
 

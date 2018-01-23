@@ -131,6 +131,38 @@ afl::net::HeaderField::getSecondaryValue(const String_t& name, String_t& value, 
     return h.m_result;
 }
 
+bool
+afl::net::HeaderField::getAddressValue(String_t& result) const
+{
+    // Parse away "()" comments
+    String_t parsed = getPrimaryValue();
+
+    // Now we have either "realname <add@ress>" or "add@ress" format.
+    String_t::size_type n = parsed.find('<');
+    String_t::size_type p;
+    if (n != String_t::npos && (p = parsed.find('>', n+1)) != String_t::npos) {
+        // angle-brackets format
+        parsed.erase(p);
+        parsed.erase(0, n+1);
+    } else {
+        // not angle brackets. Might still contain a "," if it is an address
+        // list, so remove that.
+        n = parsed.find(',');
+        if (n != String_t::npos) {
+            parsed.erase(n);
+        }
+    }
+
+    // Final checks
+    parsed = afl::string::strTrim(parsed);
+    if (parsed.find('@') == String_t::npos || parsed.find_first_of(" \t") != String_t::npos) {
+        return false;
+    } else {
+        result = parsed;
+        return true;
+    }
+}
+
 void
 afl::net::HeaderField::enumerateSecondaryValues(HeaderConsumer& consumer, int mode) const
 {

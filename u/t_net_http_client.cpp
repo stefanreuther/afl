@@ -52,7 +52,7 @@ TestNetHttpClient::testStupidServer()
 
     // Create a server that serves N requests
     static const int NUM_REQUESTS = 20;
-    class Server : public afl::base::Runnable {
+    class Server : public afl::base::Stoppable {
      public:
         Server(afl::net::Listener& listener)
             : m_listener(listener)
@@ -96,6 +96,8 @@ TestNetHttpClient::testStupidServer()
                     }
                 }
             }
+        void stop()
+            { }
      private:
         afl::net::Listener& m_listener;
     };
@@ -181,7 +183,7 @@ TestNetHttpClient::testShutdown()
     afl::base::Ref<afl::net::Listener> listener = ns.listen(name, 10);
 
     // Create a server that serves N requests
-    class Server : public afl::base::Runnable {
+    class Server : public afl::base::Stoppable {
      public:
         Server(afl::net::Listener& listener,
                afl::sys::Semaphore& step)
@@ -196,6 +198,8 @@ TestNetHttpClient::testShutdown()
                 // Wait, then close the connection
                 m_step.wait();
             }
+        void stop()
+            { }
      private:
         afl::net::Listener& m_listener;
         afl::sys::Semaphore& m_step;

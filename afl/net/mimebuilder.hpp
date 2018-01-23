@@ -70,7 +70,7 @@ namespace afl { namespace net {
         size_t getTotalSize() const;
 
         /** Write this entity onto a stream. */
-        void write(afl::io::DataSink& out, bool escapeDots);
+        void write(afl::io::DataSink& out, bool escapeDots) const;
 
         /** Removes everything before the first boundary.
             Effectively, that's all the headers plus the blank line separating headers from body.

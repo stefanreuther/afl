@@ -8,23 +8,25 @@
 
 #include <iostream>
 #include <cstring>
+#include "afl/base/deleter.hpp"
+#include "afl/io/filesystem.hpp"
 #include "afl/net/http/client.hpp"
 #include "afl/net/http/clientconnection.hpp"
 #include "afl/net/http/clientconnectionprovider.hpp"
 #include "afl/net/http/clientresponse.hpp"
+#include "afl/net/http/cookiejar.hpp"
 #include "afl/net/http/defaultconnectionprovider.hpp"
 #include "afl/net/http/downloadlistener.hpp"
 #include "afl/net/http/manager.hpp"
 #include "afl/net/networkstack.hpp"
+#include "afl/net/securenetworkstack.hpp"
 #include "afl/net/socket.hpp"
+#include "afl/net/tunnel/tunnelablenetworkstack.hpp"
 #include "afl/net/url.hpp"
 #include "afl/string/messages.hpp"
+#include "afl/sys/environment.hpp"
 #include "afl/sys/semaphore.hpp"
 #include "afl/sys/thread.hpp"
-#include "afl/base/deleter.hpp"
-#include "afl/net/http/cookiejar.hpp"
-#include "afl/io/filesystem.hpp"
-#include "afl/net/securenetworkstack.hpp"
 
 namespace http = afl::net::http;
 
@@ -114,12 +116,21 @@ int main(int /*argc*/, char** argv)
     http::Client client;
     afl::sys::Thread clientThread("HTTP Client", client);
 
+    // Proxy
+    afl::net::tunnel::TunnelableNetworkStack net(afl::net::NetworkStack::getInstance());
+    String_t proxy = afl::sys::Environment::getInstance(argv).getEnvironmentVariable("PROXY");
+    if (!proxy.empty()) {
+        if (!net.add(proxy)) {
+            std::cerr << "invalid PROXY setting has been ignored\n";
+        }
+    }
+
     // Let's play it simple: if the first URL is a https URL, do SSL; otherwise don't.
     if (argv[1] != 0 && std::strncmp(argv[1], "https:", 6) == 0) {
-        static afl::net::SecureNetworkStack snsInstance(afl::net::NetworkStack::getInstance());
+        static afl::net::SecureNetworkStack snsInstance(net);
         client.setNewConnectionProvider(new afl::net::http::DefaultConnectionProvider(client, snsInstance, "https"));
     } else {
-        client.setNewConnectionProvider(new afl::net::http::DefaultConnectionProvider(client));
+        client.setNewConnectionProvider(new afl::net::http::DefaultConnectionProvider(client, net, "http"));
     }
     clientThread.start();
 

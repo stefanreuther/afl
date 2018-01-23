@@ -14,6 +14,8 @@
 #include "afl/io/resp/writer.hpp"
 #include "afl/net/networkstack.hpp"
 #include "afl/sys/mutexguard.hpp"
+#include "afl/io/internalsink.hpp"
+#include "afl/sys/thread.hpp"
 
 // Constructor.
 afl::net::resp::Client::Client(NetworkStack& stack, const Name& name)
@@ -54,18 +56,14 @@ afl::net::resp::Client::call(const Segment_t& command)
         if (m_mode == Never) {
             throw;
         }
-        connect();
+        reconnect();
         sendCommand(command);
     }
 
-    // If we are configured to reconnect once, this was our request. Disable reconnect.
-    if (m_mode == Once) {
-        m_mode = Never;
-    }
-
     // Read response
+    afl::net::resp::Client::Value_t* result;
     try {
-        return readResponse();
+        result = readResponse();
     }
     catch (afl::except::RemoteErrorException&) {
         throw;
@@ -74,10 +72,17 @@ afl::net::resp::Client::call(const Segment_t& command)
         if (m_mode == Never) {
             throw;
         }
-        connect();
+        reconnect();
         sendCommand(command);
-        return readResponse();
+        result = readResponse();
     }
+
+    // If we are configured to reconnect once, this was our request. Disable reconnect.
+    if (m_mode == Once) {
+        m_mode = Never;
+    }
+
+    return result;
 }
 
 // Call, without result.
@@ -100,10 +105,16 @@ afl::net::resp::Client::setReconnectMode(Mode mode)
 void
 afl::net::resp::Client::sendCommand(const Segment_t& command)
 {
-    afl::async::CommunicationSink comSink(m_controller, m_socket);
-    afl::io::BufferedSink sink(comSink);
+    // Format into an InternalSink.
+    // This is the same that resp::ProtocolHandler does.
+    // It allows us to send the whole request in one transaction, which is required to get reliable performance.
+    // (Sending as two transactions will often get a 40 ms penalty/late ack.)
+    afl::io::InternalSink sink;
     afl::io::resp::Writer(sink).visitSegment(command);
-    sink.flush();
+
+    // Send that
+    afl::base::ConstBytes_t data(sink.getContent());
+    afl::async::CommunicationSink(m_controller, m_socket).handleData(data);
 }
 
 // Read a response.
@@ -143,4 +154,25 @@ afl::net::resp::Client::connect()
     // Use a timeout of 10000. It hangs forever on Windows otherwise.
     // FIXME: make this configurable (or figure out why Windows hangs here).
     m_socket = m_stack.connect(m_name, 10000).asPtr();
+}
+
+void
+afl::net::resp::Client::reconnect()
+{
+    // This is copied from c2ng server::Application::createClient.
+    // FIXME: make this behaviour configurable.
+    int i = 15;
+    while (1) {
+        --i;
+        try {
+            connect();
+            break;
+        }
+        catch (std::exception& e) {
+            if (i == 0) {
+                throw;
+            }
+            afl::sys::Thread::sleep(i < 5 ? 1000 : 100);
+        }
+    }
 }

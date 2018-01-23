@@ -194,3 +194,72 @@ TestChecksumsSHA1::testPBKDF2()
         TS_ASSERT_SAME_DATA(out, expect, 16);
     }
 }
+
+/** Hash tests from RFC 6234. */
+void
+TestChecksumsSHA1::test6234()
+{
+    static const TestCase cases[] = {
+        { "abc", 1,
+          { 0xA9, 0x99, 0x3E, 0x36, 0x47, 0x06, 0x81, 0x6A, 0xBA, 0x3E, 0x25, 0x71, 0x78, 0x50, 0xC2, 0x6C, 0x9C, 0xD0, 0xD8, 0x9D } },
+        { "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq", 1,
+          { 0x84, 0x98, 0x3E, 0x44, 0x1C, 0x3B, 0xD2, 0x6E, 0xBA, 0xAE, 0x4A, 0xA1, 0xF9, 0x51, 0x29, 0xE5, 0xE5, 0x46, 0x70, 0xF1 } },
+        { "a", 1000000,
+          { 0x34, 0xAA, 0x97, 0x3C, 0xD4, 0xC4, 0xDA, 0xA4, 0xF6, 0x1E, 0xEB, 0x2B, 0xDB, 0xAD, 0x27, 0x31, 0x65, 0x34, 0x01, 0x6F } },
+        { "0123456701234567012345670123456701234567012345670123456701234567", 10,
+          { 0xDE, 0xA3, 0x56, 0xA2, 0xCD, 0xDD, 0x90, 0xC7, 0xA7, 0xEC, 0xED, 0xC5, 0xEB, 0xB5, 0x63, 0x93, 0x4F, 0x46, 0x04, 0x52 } },
+        { "\x5e", 1,
+          { 0x5E, 0x6F, 0x80, 0xA3, 0x4A, 0x97, 0x98, 0xCA, 0xFC, 0x6A, 0x5D, 0xB9, 0x6C, 0xC5, 0x7B, 0xA4, 0xC4, 0xDB, 0x59, 0xC2 } },
+        { "\x9a\x7d\xfd\xf1\xec\xea\xd0\x6e\xd6\x46\xaa\x55\xfe\x75\x71\x46", 1,
+          { 0x82, 0xAB, 0xFF, 0x66, 0x05, 0xDB, 0xE1, 0xC1, 0x7D, 0xEF, 0x12, 0xA3, 0x94, 0xFA, 0x22, 0xA8, 0x2B, 0x54, 0x4A, 0x35 } },
+    };
+
+
+    for (size_t i = 0; i < countof(cases); ++i) {
+        // Compute the hash
+        afl::checksums::SHA1 cc;
+        for (size_t j = 0; j < cases[i].m_repeat; ++j) {
+            cc.add(afl::string::toBytes(cases[i].m_string));
+        }
+
+        uint8_t buffer[64];
+        TS_ASSERT(cc.getHash(buffer).equalContent(cases[i].m_expect));
+    }
+}
+
+/** HMAC tests from RFC 6234. */
+void
+TestChecksumsSHA1::test6234HMAC()
+{
+    afl::checksums::SHA1 cc;
+
+    // 1
+    cc.computeHMAC(afl::string::toBytes("\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b"),
+                   afl::string::toBytes("\x48\x69\x20\x54\x68\x65\x72\x65"));
+    TS_ASSERT_EQUALS(cc.getHashAsHexString(), "b617318655057264e28bc0b6fb378c8ef146be00");
+
+    // 2
+    cc.computeHMAC(afl::string::toBytes("\x4a\x65\x66\x65"),
+                   afl::string::toBytes("\x77\x68\x61\x74\x20\x64\x6f\x20\x79\x61\x20\x77\x61\x6e\x74"
+                                        "\x20\x66\x6f\x72\x20\x6e\x6f\x74\x68\x69\x6e\x67\x3f"));
+    TS_ASSERT_EQUALS(cc.getHashAsHexString(), "effcdf6ae5eb2fa2d27416d5f184df9c259a7c79");
+
+    // 3
+    cc.computeHMAC(afl::string::toBytes("\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
+                                        "\xaa\xaa\xaa\xaa\xaa"),
+                   afl::string::toBytes("\xdd\xdd\xdd\xdd\xdd\xdd\xdd\xdd\xdd\xdd\xdd\xdd\xdd\xdd\xdd"
+                                        "\xdd\xdd\xdd\xdd\xdd\xdd\xdd\xdd\xdd\xdd\xdd\xdd\xdd\xdd\xdd"
+                                        "\xdd\xdd\xdd\xdd\xdd\xdd\xdd\xdd\xdd\xdd\xdd\xdd\xdd\xdd\xdd"
+                                        "\xdd\xdd\xdd\xdd\xdd"));
+    TS_ASSERT_EQUALS(cc.getHashAsHexString(), "125d7342b9ac11cd91a39af48aa17b4f63f175d3");
+
+    // 4
+    cc.computeHMAC(afl::string::toBytes("\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f"
+                                        "\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19"),
+                   afl::string::toBytes("\xcd\xcd\xcd\xcd\xcd\xcd\xcd\xcd\xcd\xcd\xcd\xcd\xcd\xcd\xcd"
+                                        "\xcd\xcd\xcd\xcd\xcd\xcd\xcd\xcd\xcd\xcd\xcd\xcd\xcd\xcd\xcd"
+                                        "\xcd\xcd\xcd\xcd\xcd\xcd\xcd\xcd\xcd\xcd\xcd\xcd\xcd\xcd\xcd"
+                                        "\xcd\xcd\xcd\xcd\xcd"));
+    TS_ASSERT_EQUALS(cc.getHashAsHexString(), "4c9007f4026250c6bc8414f9bf50c86c2d7235da");
+}
+

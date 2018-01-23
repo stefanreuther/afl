@@ -55,6 +55,35 @@ namespace afl { namespace bits {
         \return reversed value */
     uint64_t bitReverse64(uint64_t v) throw();
 
+    /** Population (bit count), 8 bits.
+        \param v Value
+        \return Number of bits set in value */
+    size_t bitPop8(uint8_t v) throw();
+
+    /** Population (bit count), 16 bits.
+        \param v Value
+        \return Number of bits set in value */
+    size_t bitPop16(uint16_t v) throw();
+
+    /** Population (bit count), 32 bits.
+        \param v Value
+        \return Number of bits set in value */
+    size_t bitPop32(uint32_t v) throw();
+
+    /** Population (bit count), 64 bits.
+        \param v Value
+        \return Number of bits set in value */
+    size_t bitPop64(uint64_t v) throw();
+
+    /** Population (bit count).
+        This automatically selects the matching bit width.
+        \param v Value
+        \return Number of bits set in value */
+    size_t bitPop(uint8_t v) throw();
+    size_t bitPop(uint16_t v) throw();
+    size_t bitPop(uint32_t v) throw();
+    size_t bitPop(uint64_t v) throw();
+
 } }
 
 
@@ -65,5 +94,28 @@ afl::bits::isPowerOfTwo(T i) throw()
     return (i & (i-1)) == 0;
 }
 
+inline size_t
+afl::bits::bitPop(uint8_t v)  throw()
+{
+    return bitPop8(v);
+}
+
+inline size_t
+afl::bits::bitPop(uint16_t v) throw()
+{
+    return bitPop16(v);
+}
+
+inline size_t
+afl::bits::bitPop(uint32_t v) throw()
+{
+    return bitPop32(v);
+}
+
+inline size_t
+afl::bits::bitPop(uint64_t v) throw()
+{
+    return bitPop64(v);
+}
 
 #endif

@@ -11,15 +11,16 @@
   */
 
 #include <iostream>
-#include "afl/sys/environment.hpp"
 #include "afl/base/ptr.hpp"
 #include "afl/net/name.hpp"
-#include "afl/net/redis/internaldatabase.hpp"
-#include "afl/net/simpleserver.hpp"
 #include "afl/net/networkstack.hpp"
 #include "afl/net/protocolhandlerfactory.hpp"
+#include "afl/net/redis/internaldatabase.hpp"
 #include "afl/net/resp/protocolhandler.hpp"
 #include "afl/net/server.hpp"
+#include "afl/net/simpleserver.hpp"
+#include "afl/net/tunnel/tunnelablenetworkstack.hpp"
+#include "afl/sys/environment.hpp"
 #include "afl/sys/loglistener.hpp"
 
 namespace {
@@ -78,17 +79,26 @@ int main(int /*argc*/, char** argv)
         return 1;
     }
 
+    // Proxy
+    afl::net::tunnel::TunnelableNetworkStack net(afl::net::NetworkStack::getInstance());
+    String_t proxy = afl::sys::Environment::getInstance(argv).getEnvironmentVariable("PROXY");
+    if (!proxy.empty()) {
+        if (!net.add(proxy)) {
+            std::cerr << "invalid PROXY setting has been ignored\n";
+        }
+    }
+
     // Do it!
     try {
         afl::net::redis::InternalDatabase idb;
         MyProtocolHandlerFactory factory(idb);
         MyLogger logger;
         if (multi) {
-            afl::net::Server server(afl::net::NetworkStack::getInstance().listen(name, 10), factory);
+            afl::net::Server server(net.listen(name, 10), factory);
             server.log().addListener(logger);
             server.run();
         } else {
-            afl::net::SimpleServer server(afl::net::NetworkStack::getInstance().listen(name, 10), factory);
+            afl::net::SimpleServer server(net.listen(name, 10), factory);
             server.run();
         }
     }

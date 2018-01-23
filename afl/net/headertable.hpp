@@ -41,6 +41,10 @@ namespace afl { namespace net {
             \param field HeaderField containing name and value */
         void add(const HeaderField& field);
 
+        /** Clear.
+            Discards all content and invalidates all pointers. */
+        void clear();
+
         /** Get header by name.
             If there are multiple headers of the same name, returns the first one.
             If there is none, returns null.

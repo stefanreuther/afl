@@ -219,7 +219,9 @@ arch::win32::Win32Root::Enum::next()
                 DWORD a, b, c, d;
                 const char* driveName = &m_driveList[m_driveListIndex];
                 if (GetDiskFreeSpace(driveName, &a, &b, &c, &d)) {
-                    m_currentEntry = new Entry(m_dir, driveName, driveName, Entry::tRoot, Entry::FileFlags_t());
+                    // Note that the type is "tDirectory", not "tRoot".
+                    // "tRoot" is reserved for the actual root that has no parent.
+                    m_currentEntry = new Entry(m_dir, driveName, driveName, Entry::tDirectory, Entry::FileFlags_t());
                     found = true;
                 }
                 m_driveListIndex += std::strlen(driveName)+1;

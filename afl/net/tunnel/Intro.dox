@@ -1,0 +1,12 @@
+/** \file afl/net/tunnel/Intro.dox
+    \brief Namespace afl::net::tunnel */
+
+/** \namespace afl::net::tunnel
+    \brief Tunneling
+
+    This namespace contains classes for tunneling protocols.
+    Tunneling protocols allow "remote-control" of a network stack
+    (unlike a mere proxy which only proxies an application protocol).
+
+    Entry points:
+    - afl::net::tunnel::TunnelableNetworkStack */

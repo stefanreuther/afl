@@ -277,9 +277,6 @@ afl::net::redis::InternalDatabase::call(const Segment_t& command)
     // Protect it
     afl::sys::MutexGuard g(m_mutex);
 
-    // Value factory, for reference
-    afl::data::DefaultValueFactory factory;
-
     // Read the command
     afl::data::SegmentView v(command);
     String_t verb;
@@ -289,6 +286,28 @@ afl::net::redis::InternalDatabase::call(const Segment_t& command)
     verb = afl::string::strUCase(verb);
 
     // Placeholder for generic args
+    try {
+        return execute(verb, v);
+    }
+    catch (std::runtime_error& e) {
+        throw std::runtime_error(afl::string::Format("%s [verb: %s]", e.what(), verb));
+    }
+}
+
+// CommandHandler: call, without value return.
+void
+afl::net::redis::InternalDatabase::callVoid(const Segment_t& command)
+{
+    // Minimum implementation
+    delete call(command);
+}
+
+afl::net::redis::InternalDatabase::Value_t*
+afl::net::redis::InternalDatabase::execute(const String_t& verb, afl::data::SegmentView v)
+{
+    // Value factory, for reference
+    afl::data::DefaultValueFactory factory;
+
     String_t keyArg;
     String_t fieldArg;
     String_t stringArg;
@@ -496,6 +515,24 @@ afl::net::redis::InternalDatabase::call(const Segment_t& command)
             result = int32_t(hk->m_hash.size());
         }
         return factory.createInteger(result);
+    } else if (verb == "HMGET") {
+        // HMGET key field field...
+        checkArgumentCountAtLeast(v, 1);
+        v.eat(keyArg);
+
+        Segment_t result;
+        if (Hash* hk = get<Hash>(keyArg)) {
+            while (v.size() > 0) {
+                v.eat(fieldArg);
+                std::map<String_t, String_t>::const_iterator it = hk->m_hash.find(fieldArg);
+                if (it != hk->m_hash.end()) {
+                    result.pushBackString(it->second);
+                } else {
+                    result.pushBack(0);
+                }
+            }
+        }
+        return factory.createVector(result);
     } else if (verb == "HMSET") {
         // HMSET key field value...
         if ((v.size() % 2) != 1) {
@@ -1022,14 +1059,6 @@ afl::net::redis::InternalDatabase::call(const Segment_t& command)
         fail(INVALID_COMMAND);
         return 0;
     }
-}
-
-// CommandHandler: call, without value return.
-void
-afl::net::redis::InternalDatabase::callVoid(const Segment_t& command)
-{
-    // Minimum implementation
-    delete call(command);
 }
 
 template<typename T>

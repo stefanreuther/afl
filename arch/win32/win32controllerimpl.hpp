@@ -29,6 +29,7 @@ namespace arch { namespace win32 {
         void finish();
 
         void addRequest(WaitRequest& req, HANDLE h);
+        void removeRequest(WaitRequest& req, HANDLE h);
 
      private:
         HANDLE m_event;

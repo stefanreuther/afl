@@ -207,3 +207,72 @@ TestBasePtr::testDerivation()
     pd11 = pb.cast<Derived1>();
     TS_ASSERT_EQUALS(pd11.get(), (Derived1*) 0);
 }
+
+namespace {
+    class CopyDestructor {
+     public:
+        CopyDestructor(afl::base::Ptr<CopyDestructor>& ref)
+            : m_ref(ref)
+            { }
+        ~CopyDestructor()
+            {
+                afl::base::Ptr<CopyDestructor> copy = m_ref;
+            }
+     private:
+        afl::base::Ptr<CopyDestructor>& m_ref;
+    };
+}
+
+/** Test copying the pointer in the destructor.
+    The wrong implementation of the destructor (decRef) will cause infinite recursion.
+
+    See https://www.reddit.com/r/cpp/comments/79ak5d/a_bug_in_stdshared_ptr/ */
+void
+TestBasePtr::testCopyDestructor()
+{
+    // Variant 1
+    {
+        afl::base::Ptr<CopyDestructor> p(new CopyDestructor(p));
+    }
+
+    // Variant 2
+    {
+        afl::base::Ptr<CopyDestructor> p(new CopyDestructor(p));
+        p.reset();
+    }
+}
+
+namespace {
+    class AssignDestructor {
+     public:
+        AssignDestructor(afl::base::Ptr<AssignDestructor>* p)
+            : m_p(p)
+            { }
+        ~AssignDestructor()
+            {
+                if (m_p) {
+                    *m_p = new AssignDestructor(0);
+                }
+            }
+     private:
+        afl::base::Ptr<AssignDestructor>* m_p;
+    };
+}
+
+/** Test re-assigning the pointer in the destructor.
+    This is a variation of testCopyDestructor(). */
+void
+TestBasePtr::testAssignDestructor()
+{
+    // Variant 1
+    {
+        afl::base::Ptr<AssignDestructor> p(new AssignDestructor(&p));
+    }
+
+    // Variant 2
+    {
+        afl::base::Ptr<AssignDestructor> p(new AssignDestructor(&p));
+        p.reset();
+    }
+}
+

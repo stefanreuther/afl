@@ -23,7 +23,7 @@ namespace afl { namespace net { namespace resp {
     /** Client for a RESP based protocol (redis).
 
         A Client can be used by multiple threads and serializes accesses accordingly.
-        However, the application protocol may require external synchronisation for statefule multi-command sequences.
+        However, the application protocol may require external synchronisation for stateful multi-command sequences.
 
         resp::Client is a CommandHandler.
         Each command is sent to the server encoded as an array (multi-bulk).
@@ -71,6 +71,7 @@ namespace afl { namespace net { namespace resp {
         void sendCommand(const Segment_t& command);
         afl::data::Value* readResponse();
         void connect();
+        void reconnect();
     };
 
 } } }

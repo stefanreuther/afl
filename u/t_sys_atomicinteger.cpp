@@ -6,7 +6,7 @@
 #include "afl/sys/atomicinteger.hpp"
 
 #include "u/t_sys.hpp"
-#include "afl/base/runnable.hpp"
+#include "afl/base/stoppable.hpp"
 #include "afl/sys/thread.hpp"
 
 /** Test basic operations. */
@@ -54,7 +54,7 @@ TestSysAtomicInteger::testParallelIncrement()
     static const uint32_t LIMIT = 1000000;
 
     // Content for a thread
-    class MyRunner : public afl::base::Runnable {
+    class MyRunner : public afl::base::Stoppable {
      public:
         MyRunner(afl::sys::AtomicInteger& ai)
             : m_ai(ai)
@@ -65,6 +65,8 @@ TestSysAtomicInteger::testParallelIncrement()
                     ++m_ai;
                 }
             }
+        void stop()
+            { }
      private:
         afl::sys::AtomicInteger& m_ai;
     };
@@ -92,7 +94,7 @@ TestSysAtomicInteger::testParallelReplace()
     static const uint32_t LIMIT = 100000;
 
     // Content for a thread
-    class MyRunner : public afl::base::Runnable {
+    class MyRunner : public afl::base::Stoppable {
      public:
         MyRunner(afl::sys::AtomicInteger& ai)
             : m_ai(ai)
@@ -106,6 +108,8 @@ TestSysAtomicInteger::testParallelReplace()
                     } while (!m_ai.replaceIfEqual(n, n+1));
                 }
             }
+        void stop()
+            { }
      private:
         afl::sys::AtomicInteger& m_ai;
     };

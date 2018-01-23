@@ -1,0 +1,7 @@
+/** \file afl/io/xml/Intro.dox
+    \brief Namespace afl::io::xml */
+
+/** \namespace afl::io::xml
+    \brief XML
+
+    This namespace contains classes for dealing with XML. */

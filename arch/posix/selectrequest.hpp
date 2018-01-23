@@ -7,7 +7,7 @@
 
 namespace arch { namespace posix {
 
-    /** A request to select().
+    /** A request to poll().
         This is the callback. */
     class SelectRequest {
      public:

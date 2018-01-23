@@ -286,19 +286,19 @@ TestStringFormat::testStream()
 {
     using afl::string::Format;
 
-    // Constructor operation
-    {
-        std::stringstream ss;
-        ss << "hi " << Format("a%db", 10) << " ho";
-        TS_ASSERT_EQUALS(ss.str(), "hi a10b ho");
-    }
+    // // Constructor operation
+    // {
+    //     std::stringstream ss;
+    //     ss << "hi " << Format("a%db", 10) << " ho";
+    //     TS_ASSERT_EQUALS(ss.str(), "hi a10b ho");
+    // }
 
-    // This one has wrong associativity!
-    {
-        std::stringstream ss;
-        ss << "hi " << Format("a%db") << 10 << " ho";
-        TS_ASSERT_EQUALS(ss.str(), "hi a<invalid>b10 ho");
-    }
+    // // This one has wrong associativity!
+    // {
+    //     std::stringstream ss;
+    //     ss << "hi " << Format("a%db") << 10 << " ho";
+    //     TS_ASSERT_EQUALS(ss.str(), "hi a<invalid>b10 ho");
+    // }
 
     // Inserter operation
     {

@@ -26,10 +26,11 @@ namespace afl { namespace bits {
  
         \param T array element descriptor
         \param out [out] data array
-        \param in [in] byte array */
+        \param in [in] byte array
+        \param defaultValue [in] default value to place in destination array for insufficient input */
     template<typename T>
     void
-    unpackArray(afl::base::Memory<typename T::Word_t> out, afl::base::ConstBytes_t in)
+    unpackArray(afl::base::Memory<typename T::Word_t> out, afl::base::ConstBytes_t in, const typename T::Word_t defaultValue = typename T::Word_t())
     {
         typedef typename T::Word_t Word_t;
         typedef typename T::Bytes_t Bytes_t;
@@ -37,7 +38,7 @@ namespace afl { namespace bits {
             if (const Bytes_t* srcEle = in.template eatN<sizeof(Bytes_t)>()) {
                 *destEle = T::unpack(*srcEle);
             } else {
-                *destEle = Word_t();
+                *destEle = defaultValue;
             }
         }
     }

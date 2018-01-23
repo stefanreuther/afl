@@ -13,7 +13,7 @@
 #include "afl/async/operationlist.hpp"
 #include "afl/async/receiveoperation.hpp"
 #include "afl/async/sendoperation.hpp"
-#include "afl/base/runnable.hpp"
+#include "afl/base/stoppable.hpp"
 #include "afl/except/unsupportedexception.hpp"
 #include "afl/net/name.hpp"
 #include "afl/net/securesocket.hpp"
@@ -294,7 +294,7 @@ TestNetSecureContext::testConnect()
 
         // Convert both sockets to encrypted and verify that we can connect them.
         // We need a second thread for that.
-        class ServerRunnable : public afl::base::Runnable {
+        class ServerRunnable : public afl::base::Stoppable {
          public:
             ServerRunnable(Ref<afl::net::SecureContext> pContext, Ref<Socket> socket)
                 : m_pContext(pContext),
@@ -305,6 +305,8 @@ TestNetSecureContext::testConnect()
                     Controller ctl;
                     m_socket.reset(*m_pContext->wrapServer(ctl, m_socket));
                 }
+            void stop()
+                { }
          private:
             Ref<afl::net::SecureContext> m_pContext;
             Ref<Socket> m_socket;
@@ -342,7 +344,7 @@ TestNetSecureContext::testTransfer1()
 
         // Convert both sockets to encrypted and verify that we can connect and send data.
         // We need a second thread for that.
-        class ServerRunnable : public afl::base::Runnable {
+        class ServerRunnable : public afl::base::Stoppable {
          public:
             ServerRunnable(Ref<afl::net::SecureContext> pContext, Ref<Socket> socket)
                 : m_pContext(pContext),
@@ -360,6 +362,8 @@ TestNetSecureContext::testTransfer1()
                     TS_ASSERT(result);
                     TS_ASSERT_EQUALS(op.getNumSentBytes(), 3U);
                 }
+            void stop()
+                { }
          private:
             Ref<afl::net::SecureContext> m_pContext;
             Ref<Socket> m_socket;
@@ -408,7 +412,7 @@ TestNetSecureContext::testTransfer2()
 
         // Convert both sockets to encrypted and verify that we can connect and send data.
         // We need a second thread for that.
-        class ServerRunnable : public afl::base::Runnable {
+        class ServerRunnable : public afl::base::Stoppable {
          public:
             ServerRunnable(Ref<afl::net::SecureContext> pContext, Ref<Socket> socket)
                 : m_pContext(pContext),
@@ -431,6 +435,8 @@ TestNetSecureContext::testTransfer2()
                     TS_ASSERT(result);
                     TS_ASSERT_EQUALS(op2.getNumSentBytes(), 3U);
                 }
+            void stop()
+                { }
          private:
             Ref<afl::net::SecureContext> m_pContext;
             Ref<Socket> m_socket;

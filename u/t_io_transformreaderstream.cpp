@@ -101,3 +101,43 @@ TestIoTransformReaderStream::testExtra()
     testee.createFileMapping(10);
     testee.flush();
 }
+
+/** Test position behaviour.
+    There used to be a bug in TransformReaderStream to return wrong positions
+    when a read operation was built from multiple transform() invocations. */
+void
+TestIoTransformReaderStream::testPosition()
+{
+    // A test transformation that produces single bytes.
+    class Tester : public afl::io::Transform {
+     public:
+        virtual void transform(afl::base::ConstBytes_t& in, afl::base::Bytes_t& out)
+            {
+                if (in.size() > 0 && out.size() > 0) {
+                    out.trim(1);
+                    out.copyFrom(in.split(1));
+                } else {
+                    out.trim(0);
+                }
+            }
+        virtual void flush()
+            { }
+    };
+
+    // Create a stream
+    Tester t;
+    afl::io::ConstMemoryStream ms(afl::string::toBytes("hello"));
+    afl::io::TransformReaderStream testee(ms, t);
+
+    // Initial position must be 0
+    TS_ASSERT_EQUALS(testee.getPos(), 0U);
+
+    // Read the content
+    uint8_t data[10];
+    size_t n = testee.read(data);
+    TS_ASSERT_EQUALS(n, 5U);
+
+    // Final position must be 5
+    TS_ASSERT_EQUALS(testee.getPos(), 5U);
+}
+

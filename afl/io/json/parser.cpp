@@ -193,6 +193,11 @@ afl::io::json::Parser::parseHash()
         // Read content
         while (1) {
             // Member name
+            // Note: if this finds a duplicate key, it will replace the existing value.
+            // RfC 4627 says there SHOULD not be duplicate keys, which some authors seem to interpret as a permission to do it anyway.
+            // Reliably picking the last element seems to be a good compromise: https://esdiscuss.org/topic/json-duplicate-keys
+            // Picking a different element across different JSON parsers can be a security problem
+            // (https://justi.cz/security/2017/11/14/couchdb-rce-npm.html).
             parseChar('"');
             afl::data::NameMap::Index_t index = names.addMaybe(parseString());
 

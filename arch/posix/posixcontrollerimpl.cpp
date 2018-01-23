@@ -6,12 +6,14 @@
 #if TARGET_OS_POSIX
 #include <unistd.h>
 #include <fcntl.h>
-#include <sys/select.h>         // select
 #include <errno.h>
 #include <signal.h>
+#include <poll.h>
 #include "arch/posix/posixcontrollerimpl.hpp"
 #include "afl/except/systemexception.hpp"
 #include "afl/sys/error.hpp"
+#include "afl/sys/mutexguard.hpp"
+#include "arch/posix/posixfiledescriptor.hpp"
 #include "arch/posix/selectrequest.hpp"
 
 namespace {
@@ -20,8 +22,11 @@ namespace {
 
 arch::posix::PosixControllerImpl::PosixControllerImpl()
     : m_mode(NotWaiting),
+      m_modeMutex(),
       m_sem(0),
-      m_requests()
+      m_cancelState(Idle),
+      m_requests(),
+      m_pollfds()
 {
     // SIGPIPE will kill us so we must disable it.
     if (!g_beenHere) {
@@ -33,6 +38,8 @@ arch::posix::PosixControllerImpl::PosixControllerImpl()
     }
     ::fcntl(m_fds[0], F_SETFL, O_NONBLOCK);
     ::fcntl(m_fds[1], F_SETFL, O_NONBLOCK);
+    ::fcntl(m_fds[0], F_SETFD, FD_CLOEXEC);
+    ::fcntl(m_fds[1], F_SETFD, FD_CLOEXEC);
 }
 
 arch::posix::PosixControllerImpl::~PosixControllerImpl()
@@ -44,67 +51,78 @@ arch::posix::PosixControllerImpl::~PosixControllerImpl()
 void
 arch::posix::PosixControllerImpl::wait(afl::sys::Timeout_t timeout)
 {
-    if (m_mode == WaitingForFileDescriptor) {
+    if (getMode() == WaitingForFileDescriptor) {
         // Expensive wait using file descriptors
-        fd_set readSet;
-        fd_set writeSet;
-        FD_ZERO(&readSet);
-        FD_ZERO(&writeSet);
-        FD_SET(m_fds[0], &readSet);
-        int max = m_fds[0];
+        m_pollfds.resize(1 + m_requests.size());
+        m_pollfds[0].fd = m_fds[0];
+        m_pollfds[0].events = POLLIN;
+        m_pollfds[0].revents = 0;
 
         // Add all requests
+        size_t i = 1;
         for (std::list<Request>::iterator it = m_requests.begin(); it != m_requests.end(); ++it) {
-            if (it->m_read) {
-                FD_SET(it->m_fd, &readSet);
-            } else {
-                FD_SET(it->m_fd, &writeSet);
-            }
-            if (it->m_fd > max) {
-                max = it->m_fd;
-            }
+            m_pollfds[i].fd = it->m_fd;
+            m_pollfds[i].events = it->m_read ? POLLIN : POLLOUT;
+            m_pollfds[i].revents = 0;
+            ++i;
         }
 
         // Prepare timeout
-        struct timeval tv;
-        struct timeval* ptv;
-        if (timeout == afl::sys::INFINITE_TIMEOUT) {
-            ptv = 0;
-        } else {
-            tv.tv_sec = timeout / 1000;
-            tv.tv_usec = (timeout % 1000) * 1000;
-            ptv = &tv;
-        }
+        int convertedTimeout = PosixFileDescriptor::convertTimeout(timeout);
 
         // Wait
-        int n = ::select(max+1, &readSet, &writeSet, 0, ptv);
+        int n = ::poll(&m_pollfds[0], m_pollfds.size(), convertedTimeout);
         if (n > 0) {
             // Drain "wake me" pipe
-            if (FD_ISSET(m_fds[0], &readSet)) {
+            if (m_pollfds[0].revents != 0) {
                 char tmp[32];
                 while (::read(m_fds[0], tmp, sizeof(tmp)) > 0) {
                     /* nix */
                 }
             }
 
-            // Since I'm out of the select now, there's no need for externals to poke me.
-            m_mode = NotWaiting;
+            // Since I'm out of the poll() now, there's no need for externals to poke me.
+            setMode(NotWaiting);
+
+            // Block cancellations in case handleReadReady/handleWriteReady calls removeRequest.
+            if (m_cancelState == Idle) {
+                m_cancelState = Blocked;
+            }
 
             // Check waiters
             std::list<Request>::iterator it = m_requests.begin();
+            i = 1;
             while (it != m_requests.end()) {
-                bool done = (it->m_read
-                             ? FD_ISSET(it->m_fd, &readSet)  && it->m_pSelectRequest->handleReadReady()
-                             : FD_ISSET(it->m_fd, &writeSet) && it->m_pSelectRequest->handleWriteReady());
+                bool done = (m_pollfds[i].revents != 0
+                             && (it->m_read
+                                 ? it->m_pSelectRequest->handleReadReady()
+                                 : it->m_pSelectRequest->handleWriteReady()));
                 if (done) {
                     it = m_requests.erase(it);
                 } else {
                     ++it;
                 }
+                ++i;
             }
 
-            // I might enter the select again, tell others that I might need a kick.
-            m_mode = WaitingForFileDescriptor;
+            // Perform deferred cancellations
+            if (m_cancelState == Dirty) {
+                std::list<Request>::iterator it = m_requests.begin();
+                while (it != m_requests.end()) {
+                    if (it->m_cancelled) {
+                        it = m_requests.erase(it);
+                    } else {
+                        ++it;
+                    }
+                }
+            }
+            m_cancelState = Idle;
+
+            // I might enter the poll() again, tell others that I might need a kick.
+            // 20171124: I don't think that is needed (anymore?), it is set in prepare().
+            // m_mode = WaitingForFileDescriptor;
+        } else {
+            setMode(NotWaiting);
         }
     } else {
         // Cheap wait using semaphores
@@ -115,7 +133,7 @@ arch::posix::PosixControllerImpl::wait(afl::sys::Timeout_t timeout)
 void
 arch::posix::PosixControllerImpl::wake()
 {
-    switch (m_mode) {
+    switch (getMode()) {
      case NotWaiting:
         // Nothing to do, other side does not wait
         break;
@@ -141,22 +159,52 @@ void
 arch::posix::PosixControllerImpl::prepare()
 {
     if (m_requests.empty()) {
-        m_mode = WaitingForSemaphore;
+        setMode(WaitingForSemaphore);
     } else {
-        m_mode = WaitingForFileDescriptor;
+        setMode(WaitingForFileDescriptor);
     }
 }
 
 void
 arch::posix::PosixControllerImpl::finish()
 {
-    m_mode = NotWaiting;
+    setMode(NotWaiting);
 }
 
 void
-arch::posix::PosixControllerImpl::addRequest(SelectRequest& req, int fd, bool read)
+arch::posix::PosixControllerImpl::addRequest(SelectRequest& req, afl::async::Operation& op, int fd, bool read)
 {
-    m_requests.push_back(Request(req, fd, read));
+    m_requests.push_back(Request(req, op, fd, read));
+}
+
+void
+arch::posix::PosixControllerImpl::removeRequest(afl::async::Operation& op)
+{
+    for (std::list<Request>::iterator it = m_requests.begin(); it != m_requests.end(); ++it) {
+        if (it->m_pOperation == &op && !it->m_cancelled) {
+            if (m_cancelState == Idle) {
+                m_requests.erase(it);
+            } else {
+                it->m_cancelled = true;
+                m_cancelState = Dirty;
+            }
+            break;
+        }
+    }
+}
+
+inline void
+arch::posix::PosixControllerImpl::setMode(Mode m)
+{
+    afl::sys::MutexGuard g(m_modeMutex);
+    m_mode = m;
+}
+
+inline arch::posix::PosixControllerImpl::Mode
+arch::posix::PosixControllerImpl::getMode()
+{
+    afl::sys::MutexGuard g(m_modeMutex);
+    return m_mode;
 }
 #else
 int g_variableToMakePosixControllerImplObjectFileNotEmpty;

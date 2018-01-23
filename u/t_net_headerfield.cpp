@@ -111,3 +111,33 @@ TestNetHeaderField::testNoPrimary()
     TS_ASSERT(f.getSecondaryValue("layout", tmp, f.NoPrimary));
     TS_ASSERT_EQUALS(tmp, "2");
 }
+
+/** Test getAddressValue(). */
+void
+TestNetHeaderField::testAddress()
+{
+    String_t tmp;
+
+    // Valid forms
+    TS_ASSERT(afl::net::HeaderField("From", "user@host").getAddressValue(tmp));
+    TS_ASSERT_EQUALS(tmp, "user@host");
+
+    TS_ASSERT(afl::net::HeaderField("From", "  a@b.c (A. B)  ").getAddressValue(tmp));
+    TS_ASSERT_EQUALS(tmp, "a@b.c");
+
+    TS_ASSERT(afl::net::HeaderField("From", "A. B <x@y.z>").getAddressValue(tmp));
+    TS_ASSERT_EQUALS(tmp, "x@y.z");
+
+    // Borderline valid: multiple elements. Will return first element.
+    TS_ASSERT(afl::net::HeaderField("From", "a@b, c@d").getAddressValue(tmp));
+    TS_ASSERT_EQUALS(tmp, "a@b");
+    TS_ASSERT(afl::net::HeaderField("From", "e@f (g), c@d (y)").getAddressValue(tmp));
+    TS_ASSERT_EQUALS(tmp, "e@f");
+    TS_ASSERT(afl::net::HeaderField("From", "a <a@b>, c <c@d>").getAddressValue(tmp));
+    TS_ASSERT_EQUALS(tmp, "a@b");
+
+    // Invalid
+    TS_ASSERT(!afl::net::HeaderField("From", "q").getAddressValue(tmp));
+    TS_ASSERT(!afl::net::HeaderField("From", "a b@c").getAddressValue(tmp));
+}
+

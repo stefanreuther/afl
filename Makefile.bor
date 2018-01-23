@@ -3,12 +3,26 @@
 #
 
 ALL_TARGETS = afl.lib date.exe dialog.exe ls.exe chatserver.exe wget.exe \
-    secureio.exe respclient.exe respserver.exe httpserver.exe env.exe \
-    unzip.exe testsuite.exe
-OBJECTS_afl = afl/string/win32filenames.obj afl/net/mimebuilder.obj \
-    afl/net/nullnetworkstack.obj afl/charset/hexencoding.obj \
-    afl/string/hex.obj afl/sys/parsedtime.obj afl/net/nullcommandhandler.obj \
-    arch/posix/posixcwd.obj afl/net/server.obj afl/sys/commandlineparser.obj \
+    hash.exe secureio.exe respclient.exe respserver.exe httpserver.exe \
+    env.exe unzip.exe testsuite.exe
+OBJECTS_afl = afl/test/commandhandler1.obj afl/test/callreceiver.obj \
+    afl/test/networkstack1.obj afl/test/socket.obj afl/test/assert.obj \
+    afl/checksums/sha512.obj afl/checksums/sha384.obj \
+    afl/checksums/sha224.obj afl/checksums/sha256.obj \
+    afl/checksums/sha2core.obj afl/net/tunnel/tunnelablenetworkstack.obj \
+    afl/net/tunnel/socks5networkstack.obj afl/async/communicationobject.obj \
+    afl/net/tunnel/socks4networkstack.obj afl/net/tunnel/socketwrapper.obj \
+    afl/net/smtp/client3.obj afl/net/smtp/mailrequest.obj \
+    afl/net/interact.obj afl/net/line/simplequery.obj \
+    afl/net/line/client1.obj afl/net/line/protocolhandler1.obj \
+    afl/io/internaltextwriter.obj arch/win32/win32interrupt.obj \
+    arch/posix/posixinterrupt.obj afl/async/interrupt.obj \
+    afl/io/unchangeabledirectoryentry.obj afl/net/mimeparser.obj \
+    afl/io/archive/tarreader.obj afl/string/win32filenames.obj \
+    afl/net/mimebuilder.obj afl/net/nullnetworkstack.obj \
+    afl/charset/hexencoding.obj afl/string/hex.obj afl/sys/parsedtime.obj \
+    afl/net/nullcommandhandler.obj arch/posix/posixcwd.obj \
+    afl/net/server.obj afl/sys/commandlineparser.obj \
     afl/except/commandlineexception.obj arch/posix/posixdialog.obj \
     arch/win32/win32dialog.obj afl/sys/dialog.obj afl/base/baseweaklink.obj \
     afl/base/weaktarget.obj afl/io/transformreaderstream.obj \
@@ -30,7 +44,7 @@ OBJECTS_afl = afl/string/win32filenames.obj afl/net/mimebuilder.obj \
     afl/net/http/pageresponse.obj afl/net/http/pagerequest.obj \
     afl/net/http/pagedispatcher.obj afl/net/http/errorresponse.obj \
     afl/net/http/request.obj afl/net/http/protocolhandler.obj \
-    afl/net/commandhandler.obj afl/net/resp/protocolhandler1.obj \
+    afl/net/commandhandler.obj afl/net/resp/protocolhandler2.obj \
     afl/net/redis/internaldatabase.obj afl/data/segmentview.obj \
     afl/net/redis/stringsetoperation.obj \
     afl/net/redis/integersetoperation.obj afl/net/redis/stringsetkey.obj \
@@ -41,7 +55,7 @@ OBJECTS_afl = afl/string/win32filenames.obj afl/net/mimebuilder.obj \
     afl/net/redis/integerfield.obj afl/net/redis/field.obj \
     afl/net/redis/hashkey.obj afl/net/redis/stringkey.obj \
     afl/net/redis/integerkey.obj afl/net/redis/key.obj \
-    afl/async/communicationsink.obj afl/net/resp/client1.obj \
+    afl/async/communicationsink.obj afl/net/resp/client2.obj \
     afl/io/internalsink.obj afl/io/bufferedsink.obj afl/data/errorvalue.obj \
     afl/io/transformdatasink.obj afl/io/inflatetransform.obj \
     arch/win32/win32root.obj arch/win32/win32directory.obj \
@@ -112,15 +126,30 @@ LIBS = $(CONFIG_AFL_LIBS)
 OBJECTS_date = app/date.obj
 OBJECTS_dialog = app/dialog1.obj
 OBJECTS_env = app/env.obj
+OBJECTS_hash = app/hash2.obj
 OBJECTS_httpserver = app/httpserver.obj
 OBJECTS_ls = app/ls.obj
 OBJECTS_respclient = app/respclient.obj
 OBJECTS_respserver = app/respserver.obj
 OBJECTS_secureio = app/secureio.obj
-OBJECTS_testsuite = u/t_string_win32filenames.obj u/t_net_reconnectable.obj \
-    u/t_net_mimebuilder.obj u/t_net_nullnetworkstack.obj \
-    u/t_charset_hexencoding.obj u/t_string_hex.obj \
-    u/t_net_nullcommandhandler.obj u/t_net_server.obj \
+OBJECTS_testsuite = u/t_base_stoppable.obj u/t_base_inlinememory.obj \
+    u/t_test_commandhandler.obj u/t_test_callreceiver.obj \
+    u/t_test_networkstack.obj u/t_test_socket.obj u/t_test_assert.obj \
+    u/t_checksums_sha512.obj u/t_checksums_sha384.obj \
+    u/t_checksums_sha256.obj u/t_checksums_sha224.obj \
+    u/t_net_tunnel_tunnelablenetworkstack.obj \
+    u/t_net_tunnel_socks5networkstack.obj u/t_net_tunnel_socketwrapper.obj \
+    u/t_net_tunnel_socks4networkstack.obj u/t_net_smtp_configuration.obj \
+    u/t_net_smtp_mailrequest.obj u/t_net_interact.obj \
+    u/t_net_line_simplequery.obj u/t_net_line_client.obj \
+    u/t_net_line_protocolhandler.obj u/t_net_line_linehandler.obj \
+    u/t_net_line_linesink.obj u/t_io_internaltextwriter.obj \
+    u/t_async_interrupt.obj u/t_async_interruptoperation.obj \
+    u/t_io_unchangeabledirectoryentry.obj u/t_net_mimeparser.obj \
+    u/t_io_archive_tarreader.obj u/t_string_win32filenames.obj \
+    u/t_net_reconnectable.obj u/t_net_mimebuilder.obj \
+    u/t_net_nullnetworkstack.obj u/t_charset_hexencoding.obj \
+    u/t_string_hex.obj u/t_net_nullcommandhandler.obj u/t_net_server.obj \
     u/t_base_observable.obj u/t_sys_dialog.obj u/t_base_weaklink.obj \
     u/t_base_baseweaklink.obj u/t_base_weaktarget.obj \
     u/t_io_transformreaderstream.obj u/t_io_json_parser_testsuite.obj \
@@ -129,11 +158,10 @@ OBJECTS_testsuite = u/t_string_win32filenames.obj u/t_net_reconnectable.obj \
     u/t_io_msexpandtransform.obj u/t_net_redis_sortoperation.obj \
     u/t_net_redis_stringsetkey.obj u/t_net_redis_integersetkey.obj \
     u/t_net_redis_subtree.obj u/t_net_redis_key.obj \
-    u/t_net_redis_stringkey.obj u/mock/commandhandlermock.obj \
-    u/t_net_redis_integerkey.obj u/t_io_nullfilesystem.obj \
-    u/t_string_posixfilenames.obj u/t_net_http_client.obj \
-    u/t_net_parameterencoder.obj u/t_io_nulltextwriter.obj \
-    u/t_io_textreader.obj u/t_io_textwriter.obj \
+    u/t_net_redis_stringkey.obj u/t_net_redis_integerkey.obj \
+    u/t_io_nullfilesystem.obj u/t_string_posixfilenames.obj \
+    u/t_net_http_client.obj u/t_net_parameterencoder.obj \
+    u/t_io_nulltextwriter.obj u/t_io_textreader.obj u/t_io_textwriter.obj \
     u/t_except_assertionfailedexception.obj \
     u/t_sys_longcommandlineparser.obj u/t_string_proxytranslator.obj \
     u/t_sys_standardcommandlineparser.obj u/t_sys_commandlineparser.obj \
@@ -235,7 +263,7 @@ CXXTESTDIR = $(CONFIG_AFL_CXXTESTDIR)
 
 include config.mk
 
-.PHONY: all clean distclean afl date dialog ls chatserver wget secureio \
+.PHONY: all clean distclean afl date dialog ls chatserver wget hash secureio \
     respclient respserver httpserver env unzip testsuite
 
 .SUFFIXES: .cpp .obj .s
@@ -256,6 +284,9 @@ dialog.exe: $(OBJECTS_dialog) afl.lib $(LIBDEPEND)
 
 env.exe: $(OBJECTS_env) afl.lib $(LIBDEPEND)
 	$(CXX) $(LDFLAGS) $(LINKFLAGS_afl) -eenv.exe $(OBJECTS_env) afl.lib $(LIBS)
+
+hash.exe: $(OBJECTS_hash) afl.lib $(LIBDEPEND)
+	$(CXX) $(LDFLAGS) $(LINKFLAGS_afl) -ehash.exe $(OBJECTS_hash) afl.lib $(LIBS)
 
 httpserver.exe: $(OBJECTS_httpserver) afl.lib $(LIBDEPEND)
 	$(CXX) $(LDFLAGS) $(LINKFLAGS_afl) -ehttpserver.exe $(OBJECTS_httpserver) afl.lib $(LIBS)
@@ -301,17 +332,35 @@ afl/io/resp/writer1.obj: afl/io/resp/writer.cpp
 afl/io/resp/writer1.s: afl/io/resp/writer.cpp
 	$(CXX) $(CXXFLAGS) -oafl/io/resp/writer1.s -S afl/io/resp/writer.cpp
 
-afl/net/resp/client1.obj: afl/net/resp/client.cpp
-	$(CXX) $(CXXFLAGS) -oafl/net/resp/client1.obj -c afl/net/resp/client.cpp
+afl/net/line/client1.obj: afl/net/line/client.cpp
+	$(CXX) $(CXXFLAGS) -oafl/net/line/client1.obj -c afl/net/line/client.cpp
 
-afl/net/resp/client1.s: afl/net/resp/client.cpp
-	$(CXX) $(CXXFLAGS) -oafl/net/resp/client1.s -S afl/net/resp/client.cpp
+afl/net/line/client1.s: afl/net/line/client.cpp
+	$(CXX) $(CXXFLAGS) -oafl/net/line/client1.s -S afl/net/line/client.cpp
 
-afl/net/resp/protocolhandler1.obj: afl/net/resp/protocolhandler.cpp
-	$(CXX) $(CXXFLAGS) -oafl/net/resp/protocolhandler1.obj -c afl/net/resp/protocolhandler.cpp
+afl/net/line/protocolhandler1.obj: afl/net/line/protocolhandler.cpp
+	$(CXX) $(CXXFLAGS) -oafl/net/line/protocolhandler1.obj -c afl/net/line/protocolhandler.cpp
 
-afl/net/resp/protocolhandler1.s: afl/net/resp/protocolhandler.cpp
-	$(CXX) $(CXXFLAGS) -oafl/net/resp/protocolhandler1.s -S afl/net/resp/protocolhandler.cpp
+afl/net/line/protocolhandler1.s: afl/net/line/protocolhandler.cpp
+	$(CXX) $(CXXFLAGS) -oafl/net/line/protocolhandler1.s -S afl/net/line/protocolhandler.cpp
+
+afl/net/resp/client2.obj: afl/net/resp/client.cpp
+	$(CXX) $(CXXFLAGS) -oafl/net/resp/client2.obj -c afl/net/resp/client.cpp
+
+afl/net/resp/client2.s: afl/net/resp/client.cpp
+	$(CXX) $(CXXFLAGS) -oafl/net/resp/client2.s -S afl/net/resp/client.cpp
+
+afl/net/resp/protocolhandler2.obj: afl/net/resp/protocolhandler.cpp
+	$(CXX) $(CXXFLAGS) -oafl/net/resp/protocolhandler2.obj -c afl/net/resp/protocolhandler.cpp
+
+afl/net/resp/protocolhandler2.s: afl/net/resp/protocolhandler.cpp
+	$(CXX) $(CXXFLAGS) -oafl/net/resp/protocolhandler2.s -S afl/net/resp/protocolhandler.cpp
+
+afl/net/smtp/client3.obj: afl/net/smtp/client.cpp
+	$(CXX) $(CXXFLAGS) -oafl/net/smtp/client3.obj -c afl/net/smtp/client.cpp
+
+afl/net/smtp/client3.s: afl/net/smtp/client.cpp
+	$(CXX) $(CXXFLAGS) -oafl/net/smtp/client3.s -S afl/net/smtp/client.cpp
 
 afl/sys/mutex1.obj: afl/sys/mutex.cpp
 	$(CXX) $(CXXFLAGS) -oafl/sys/mutex1.obj -c afl/sys/mutex.cpp
@@ -325,11 +374,29 @@ afl/sys/semaphore1.obj: afl/sys/semaphore.cpp
 afl/sys/semaphore1.s: afl/sys/semaphore.cpp
 	$(CXX) $(CXXFLAGS) -oafl/sys/semaphore1.s -S afl/sys/semaphore.cpp
 
+afl/test/commandhandler1.obj: afl/test/commandhandler.cpp
+	$(CXX) $(CXXFLAGS) -oafl/test/commandhandler1.obj -c afl/test/commandhandler.cpp
+
+afl/test/commandhandler1.s: afl/test/commandhandler.cpp
+	$(CXX) $(CXXFLAGS) -oafl/test/commandhandler1.s -S afl/test/commandhandler.cpp
+
+afl/test/networkstack1.obj: afl/test/networkstack.cpp
+	$(CXX) $(CXXFLAGS) -oafl/test/networkstack1.obj -c afl/test/networkstack.cpp
+
+afl/test/networkstack1.s: afl/test/networkstack.cpp
+	$(CXX) $(CXXFLAGS) -oafl/test/networkstack1.s -S afl/test/networkstack.cpp
+
 app/dialog1.obj: app/dialog.cpp
 	$(CXX) $(CXXFLAGS) -oapp/dialog1.obj -c app/dialog.cpp
 
 app/dialog1.s: app/dialog.cpp
 	$(CXX) $(CXXFLAGS) -oapp/dialog1.s -S app/dialog.cpp
+
+app/hash2.obj: app/hash.cpp
+	$(CXX) $(CXXFLAGS) -oapp/hash2.obj -c app/hash.cpp
+
+app/hash2.s: app/hash.cpp
+	$(CXX) $(CXXFLAGS) -oapp/hash2.s -S app/hash.cpp
 
 chatserver: chatserver.exe
 
@@ -340,6 +407,7 @@ clean:
 	$(RM) $(OBJECTS_ls)
 	$(RM) $(OBJECTS_chatserver)
 	$(RM) $(OBJECTS_wget)
+	$(RM) $(OBJECTS_hash)
 	$(RM) $(OBJECTS_secureio)
 	$(RM) $(OBJECTS_respclient)
 	$(RM) $(OBJECTS_respserver)
@@ -360,6 +428,7 @@ distclean: clean
 	$(RM) ls.exe
 	$(RM) chatserver.exe
 	$(RM) wget.exe
+	$(RM) hash.exe
 	$(RM) secureio.exe
 	$(RM) respclient.exe
 	$(RM) respserver.exe
@@ -369,6 +438,8 @@ distclean: clean
 	$(RM) testsuite.exe
 
 env: env.exe
+
+hash: hash.exe
 
 httpserver: httpserver.exe
 
@@ -399,12 +470,6 @@ testsuite.obj: testsuite.cpp
 testsuite.s: testsuite.cpp
 	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -U_CXXTEST_HAVE_EH -U_CXXTEST_HAVE_STD -O0 -otestsuite.s -S testsuite.cpp
 
-u/mock/commandhandlermock.obj: u/mock/commandhandlermock.cpp
-	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/mock/commandhandlermock.obj -c u/mock/commandhandlermock.cpp
-
-u/mock/commandhandlermock.s: u/mock/commandhandlermock.cpp
-	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/mock/commandhandlermock.s -S u/mock/commandhandlermock.cpp
-
 u/t_async_cancelable.obj: u/t_async_cancelable.cpp
 	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_async_cancelable.obj -c u/t_async_cancelable.cpp
 
@@ -434,6 +499,18 @@ u/t_async_controller.obj: u/t_async_controller.cpp
 
 u/t_async_controller.s: u/t_async_controller.cpp
 	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_async_controller.s -S u/t_async_controller.cpp
+
+u/t_async_interrupt.obj: u/t_async_interrupt.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_async_interrupt.obj -c u/t_async_interrupt.cpp
+
+u/t_async_interrupt.s: u/t_async_interrupt.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_async_interrupt.s -S u/t_async_interrupt.cpp
+
+u/t_async_interruptoperation.obj: u/t_async_interruptoperation.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_async_interruptoperation.obj -c u/t_async_interruptoperation.cpp
+
+u/t_async_interruptoperation.s: u/t_async_interruptoperation.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_async_interruptoperation.s -S u/t_async_interruptoperation.cpp
 
 u/t_async_messageexchange.obj: u/t_async_messageexchange.cpp
 	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_async_messageexchange.obj -c u/t_async_messageexchange.cpp
@@ -549,6 +626,12 @@ u/t_base_growablememory.obj: u/t_base_growablememory.cpp
 u/t_base_growablememory.s: u/t_base_growablememory.cpp
 	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_base_growablememory.s -S u/t_base_growablememory.cpp
 
+u/t_base_inlinememory.obj: u/t_base_inlinememory.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_base_inlinememory.obj -c u/t_base_inlinememory.cpp
+
+u/t_base_inlinememory.s: u/t_base_inlinememory.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_base_inlinememory.s -S u/t_base_inlinememory.cpp
+
 u/t_base_inlineoptional.obj: u/t_base_inlineoptional.cpp
 	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_base_inlineoptional.obj -c u/t_base_inlineoptional.cpp
 
@@ -620,6 +703,12 @@ u/t_base_staticassert.obj: u/t_base_staticassert.cpp
 
 u/t_base_staticassert.s: u/t_base_staticassert.cpp
 	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_base_staticassert.s -S u/t_base_staticassert.cpp
+
+u/t_base_stoppable.obj: u/t_base_stoppable.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_base_stoppable.obj -c u/t_base_stoppable.cpp
+
+u/t_base_stoppable.s: u/t_base_stoppable.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_base_stoppable.s -S u/t_base_stoppable.cpp
 
 u/t_base_types.obj: u/t_base_types.cpp
 	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_base_types.obj -c u/t_base_types.cpp
@@ -891,6 +980,30 @@ u/t_checksums_sha1.obj: u/t_checksums_sha1.cpp
 u/t_checksums_sha1.s: u/t_checksums_sha1.cpp
 	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_checksums_sha1.s -S u/t_checksums_sha1.cpp
 
+u/t_checksums_sha224.obj: u/t_checksums_sha224.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_checksums_sha224.obj -c u/t_checksums_sha224.cpp
+
+u/t_checksums_sha224.s: u/t_checksums_sha224.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_checksums_sha224.s -S u/t_checksums_sha224.cpp
+
+u/t_checksums_sha256.obj: u/t_checksums_sha256.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_checksums_sha256.obj -c u/t_checksums_sha256.cpp
+
+u/t_checksums_sha256.s: u/t_checksums_sha256.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_checksums_sha256.s -S u/t_checksums_sha256.cpp
+
+u/t_checksums_sha384.obj: u/t_checksums_sha384.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_checksums_sha384.obj -c u/t_checksums_sha384.cpp
+
+u/t_checksums_sha384.s: u/t_checksums_sha384.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_checksums_sha384.s -S u/t_checksums_sha384.cpp
+
+u/t_checksums_sha512.obj: u/t_checksums_sha512.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_checksums_sha512.obj -c u/t_checksums_sha512.cpp
+
+u/t_checksums_sha512.s: u/t_checksums_sha512.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_checksums_sha512.s -S u/t_checksums_sha512.cpp
+
 u/t_container_dereferencingiterator.obj: \
     u/t_container_dereferencingiterator.cpp
 	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_container_dereferencingiterator.obj -c u/t_container_dereferencingiterator.cpp
@@ -1099,6 +1212,12 @@ u/t_functional_unaryfunction.obj: u/t_functional_unaryfunction.cpp
 u/t_functional_unaryfunction.s: u/t_functional_unaryfunction.cpp
 	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_functional_unaryfunction.s -S u/t_functional_unaryfunction.cpp
 
+u/t_io_archive_tarreader.obj: u/t_io_archive_tarreader.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_io_archive_tarreader.obj -c u/t_io_archive_tarreader.cpp
+
+u/t_io_archive_tarreader.s: u/t_io_archive_tarreader.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_io_archive_tarreader.s -S u/t_io_archive_tarreader.cpp
+
 u/t_io_archive_zipreader.obj: u/t_io_archive_zipreader.cpp
 	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_io_archive_zipreader.obj -c u/t_io_archive_zipreader.cpp
 
@@ -1194,6 +1313,12 @@ u/t_io_internalstream.obj: u/t_io_internalstream.cpp
 
 u/t_io_internalstream.s: u/t_io_internalstream.cpp
 	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_io_internalstream.s -S u/t_io_internalstream.cpp
+
+u/t_io_internaltextwriter.obj: u/t_io_internaltextwriter.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_io_internaltextwriter.obj -c u/t_io_internaltextwriter.cpp
+
+u/t_io_internaltextwriter.s: u/t_io_internaltextwriter.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_io_internaltextwriter.s -S u/t_io_internaltextwriter.cpp
 
 u/t_io_json_parser.obj: u/t_io_json_parser.cpp
 	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_io_json_parser.obj -c u/t_io_json_parser.cpp
@@ -1326,6 +1451,12 @@ u/t_io_transformreaderstream.obj: u/t_io_transformreaderstream.cpp
 
 u/t_io_transformreaderstream.s: u/t_io_transformreaderstream.cpp
 	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_io_transformreaderstream.s -S u/t_io_transformreaderstream.cpp
+
+u/t_io_unchangeabledirectoryentry.obj: u/t_io_unchangeabledirectoryentry.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_io_unchangeabledirectoryentry.obj -c u/t_io_unchangeabledirectoryentry.cpp
+
+u/t_io_unchangeabledirectoryentry.s: u/t_io_unchangeabledirectoryentry.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_io_unchangeabledirectoryentry.s -S u/t_io_unchangeabledirectoryentry.cpp
 
 u/t_io_xml_basereader.obj: u/t_io_xml_basereader.cpp
 	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_io_xml_basereader.obj -c u/t_io_xml_basereader.cpp
@@ -1505,6 +1636,42 @@ u/t_net_http_response.obj: u/t_net_http_response.cpp
 u/t_net_http_response.s: u/t_net_http_response.cpp
 	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_net_http_response.s -S u/t_net_http_response.cpp
 
+u/t_net_interact.obj: u/t_net_interact.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_net_interact.obj -c u/t_net_interact.cpp
+
+u/t_net_interact.s: u/t_net_interact.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_net_interact.s -S u/t_net_interact.cpp
+
+u/t_net_line_client.obj: u/t_net_line_client.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_net_line_client.obj -c u/t_net_line_client.cpp
+
+u/t_net_line_client.s: u/t_net_line_client.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_net_line_client.s -S u/t_net_line_client.cpp
+
+u/t_net_line_linehandler.obj: u/t_net_line_linehandler.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_net_line_linehandler.obj -c u/t_net_line_linehandler.cpp
+
+u/t_net_line_linehandler.s: u/t_net_line_linehandler.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_net_line_linehandler.s -S u/t_net_line_linehandler.cpp
+
+u/t_net_line_linesink.obj: u/t_net_line_linesink.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_net_line_linesink.obj -c u/t_net_line_linesink.cpp
+
+u/t_net_line_linesink.s: u/t_net_line_linesink.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_net_line_linesink.s -S u/t_net_line_linesink.cpp
+
+u/t_net_line_protocolhandler.obj: u/t_net_line_protocolhandler.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_net_line_protocolhandler.obj -c u/t_net_line_protocolhandler.cpp
+
+u/t_net_line_protocolhandler.s: u/t_net_line_protocolhandler.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_net_line_protocolhandler.s -S u/t_net_line_protocolhandler.cpp
+
+u/t_net_line_simplequery.obj: u/t_net_line_simplequery.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_net_line_simplequery.obj -c u/t_net_line_simplequery.cpp
+
+u/t_net_line_simplequery.s: u/t_net_line_simplequery.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_net_line_simplequery.s -S u/t_net_line_simplequery.cpp
+
 u/t_net_listener.obj: u/t_net_listener.cpp
 	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_net_listener.obj -c u/t_net_listener.cpp
 
@@ -1516,6 +1683,12 @@ u/t_net_mimebuilder.obj: u/t_net_mimebuilder.cpp
 
 u/t_net_mimebuilder.s: u/t_net_mimebuilder.cpp
 	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_net_mimebuilder.s -S u/t_net_mimebuilder.cpp
+
+u/t_net_mimeparser.obj: u/t_net_mimeparser.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_net_mimeparser.obj -c u/t_net_mimeparser.cpp
+
+u/t_net_mimeparser.s: u/t_net_mimeparser.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_net_mimeparser.s -S u/t_net_mimeparser.cpp
 
 u/t_net_name.obj: u/t_net_name.cpp
 	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_net_name.obj -c u/t_net_name.cpp
@@ -1655,11 +1828,49 @@ u/t_net_simpleserver.obj: u/t_net_simpleserver.cpp
 u/t_net_simpleserver.s: u/t_net_simpleserver.cpp
 	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_net_simpleserver.s -S u/t_net_simpleserver.cpp
 
+u/t_net_smtp_configuration.obj: u/t_net_smtp_configuration.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_net_smtp_configuration.obj -c u/t_net_smtp_configuration.cpp
+
+u/t_net_smtp_configuration.s: u/t_net_smtp_configuration.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_net_smtp_configuration.s -S u/t_net_smtp_configuration.cpp
+
+u/t_net_smtp_mailrequest.obj: u/t_net_smtp_mailrequest.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_net_smtp_mailrequest.obj -c u/t_net_smtp_mailrequest.cpp
+
+u/t_net_smtp_mailrequest.s: u/t_net_smtp_mailrequest.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_net_smtp_mailrequest.s -S u/t_net_smtp_mailrequest.cpp
+
 u/t_net_socket.obj: u/t_net_socket.cpp
 	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_net_socket.obj -c u/t_net_socket.cpp
 
 u/t_net_socket.s: u/t_net_socket.cpp
 	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_net_socket.s -S u/t_net_socket.cpp
+
+u/t_net_tunnel_socketwrapper.obj: u/t_net_tunnel_socketwrapper.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_net_tunnel_socketwrapper.obj -c u/t_net_tunnel_socketwrapper.cpp
+
+u/t_net_tunnel_socketwrapper.s: u/t_net_tunnel_socketwrapper.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_net_tunnel_socketwrapper.s -S u/t_net_tunnel_socketwrapper.cpp
+
+u/t_net_tunnel_socks4networkstack.obj: u/t_net_tunnel_socks4networkstack.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_net_tunnel_socks4networkstack.obj -c u/t_net_tunnel_socks4networkstack.cpp
+
+u/t_net_tunnel_socks4networkstack.s: u/t_net_tunnel_socks4networkstack.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_net_tunnel_socks4networkstack.s -S u/t_net_tunnel_socks4networkstack.cpp
+
+u/t_net_tunnel_socks5networkstack.obj: u/t_net_tunnel_socks5networkstack.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_net_tunnel_socks5networkstack.obj -c u/t_net_tunnel_socks5networkstack.cpp
+
+u/t_net_tunnel_socks5networkstack.s: u/t_net_tunnel_socks5networkstack.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_net_tunnel_socks5networkstack.s -S u/t_net_tunnel_socks5networkstack.cpp
+
+u/t_net_tunnel_tunnelablenetworkstack.obj: \
+    u/t_net_tunnel_tunnelablenetworkstack.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_net_tunnel_tunnelablenetworkstack.obj -c u/t_net_tunnel_tunnelablenetworkstack.cpp
+
+u/t_net_tunnel_tunnelablenetworkstack.s: \
+    u/t_net_tunnel_tunnelablenetworkstack.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_net_tunnel_tunnelablenetworkstack.s -S u/t_net_tunnel_tunnelablenetworkstack.cpp
 
 u/t_net_url.obj: u/t_net_url.cpp
 	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_net_url.obj -c u/t_net_url.cpp
@@ -1858,6 +2069,36 @@ u/t_sys_types.obj: u/t_sys_types.cpp
 
 u/t_sys_types.s: u/t_sys_types.cpp
 	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_sys_types.s -S u/t_sys_types.cpp
+
+u/t_test_assert.obj: u/t_test_assert.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_test_assert.obj -c u/t_test_assert.cpp
+
+u/t_test_assert.s: u/t_test_assert.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_test_assert.s -S u/t_test_assert.cpp
+
+u/t_test_callreceiver.obj: u/t_test_callreceiver.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_test_callreceiver.obj -c u/t_test_callreceiver.cpp
+
+u/t_test_callreceiver.s: u/t_test_callreceiver.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_test_callreceiver.s -S u/t_test_callreceiver.cpp
+
+u/t_test_commandhandler.obj: u/t_test_commandhandler.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_test_commandhandler.obj -c u/t_test_commandhandler.cpp
+
+u/t_test_commandhandler.s: u/t_test_commandhandler.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_test_commandhandler.s -S u/t_test_commandhandler.cpp
+
+u/t_test_networkstack.obj: u/t_test_networkstack.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_test_networkstack.obj -c u/t_test_networkstack.cpp
+
+u/t_test_networkstack.s: u/t_test_networkstack.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_test_networkstack.s -S u/t_test_networkstack.cpp
+
+u/t_test_socket.obj: u/t_test_socket.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_test_socket.obj -c u/t_test_socket.cpp
+
+u/t_test_socket.s: u/t_test_socket.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_test_socket.s -S u/t_test_socket.cpp
 
 u/t_tmp_copycv.obj: u/t_tmp_copycv.cpp
 	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_tmp_copycv.obj -c u/t_tmp_copycv.cpp

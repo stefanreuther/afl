@@ -8,12 +8,12 @@
 #include <memory>
 #include "afl/async/operation.hpp"
 #include "afl/async/semaphore.hpp"
-#include "afl/base/runnable.hpp"
+#include "afl/base/stoppable.hpp"
+#include "afl/base/uncopyable.hpp"
 #include "afl/container/ptrvector.hpp"
 #include "afl/net/http/clientrequest.hpp"
 #include "afl/net/name.hpp"
 #include "afl/sys/mutex.hpp"
-#include "afl/base/uncopyable.hpp"
 
 namespace afl { namespace net { namespace http {
 
@@ -32,7 +32,7 @@ namespace afl { namespace net { namespace http {
         ClientRequest::handleFailure() or ClientRequest::handleSuccess() call.
         Because the server owns the ClientRequest objects,
         they must synchronize with their caller using some external means of communication. */
-    class Client : public afl::base::Runnable, private afl::base::Uncopyable {
+    class Client : public afl::base::Stoppable, private afl::base::Uncopyable {
      public:
         /** Constructor.
             The object will not be usable until you set the connection provider,
@@ -81,12 +81,12 @@ namespace afl { namespace net { namespace http {
         void setNewConnectionProvider(ClientConnectionProvider* provider);
 
         /** Thread entry point. */
-        void run();
+        virtual void run();
 
         /** Request stop.
             Causes the main loop to exit, so you can join() the thread.
             Can be called from any thread. */
-        void stop();
+        virtual void stop();
 
         /** Cancel requests for a given target.
             This function cancels all outstanding requests.

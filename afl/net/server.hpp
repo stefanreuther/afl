@@ -5,10 +5,10 @@
 #ifndef AFL_AFL_NET_SERVER_HPP
 #define AFL_AFL_NET_SERVER_HPP
 
-#include "afl/base/runnable.hpp"
-#include "afl/base/ref.hpp"
 #include "afl/async/controller.hpp"
 #include "afl/async/semaphore.hpp"
+#include "afl/base/ref.hpp"
+#include "afl/base/stoppable.hpp"
 #include "afl/container/ptrvector.hpp"
 #include "afl/sys/log.hpp"
 
@@ -34,7 +34,7 @@ namespace afl { namespace net {
         - call Server::stop
         - call Thread::join
         - destroy everything */
-    class Server : public afl::base::Runnable {
+    class Server : public afl::base::Stoppable {
      public:
         /** Constructor.
             \param listener Listener
@@ -51,7 +51,7 @@ namespace afl { namespace net {
         /** Stop this server.
             Can be called from any thread.
             Will cause run() to exit. */
-        void stop();
+        virtual void stop();
 
         /** Set name of log channel.
             Must be called before run() starts. */

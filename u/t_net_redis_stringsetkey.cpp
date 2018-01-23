@@ -15,46 +15,46 @@
 #include "afl/net/redis/internaldatabase.hpp"
 #include "afl/net/redis/sortoperation.hpp"
 #include "afl/net/redis/stringsetoperation.hpp"
-#include "u/mock/commandhandlermock.hpp"
+#include "afl/test/commandhandler.hpp"
 
 /** Test against the mock. */
 void
 TestNetRedisStringSetKey::testMock()
 {
-    CommandHandlerMock mock;
+    afl::test::CommandHandler mock("testMock");
     afl::net::redis::StringSetKey testee(mock, "ss");
 
     // SetKey: size, empty
-    mock.addParameterList("SCARD, ss");
-    mock.addNewResult(new afl::data::IntegerValue(3));
+    mock.expectCall("SCARD, ss");
+    mock.provideNewResult(new afl::data::IntegerValue(3));
     int32_t n = testee.size();
     TS_ASSERT_EQUALS(n, 3);
 
-    mock.addParameterList("SCARD, ss");
-    mock.addNewResult(new afl::data::IntegerValue(3));
+    mock.expectCall("SCARD, ss");
+    mock.provideNewResult(new afl::data::IntegerValue(3));
     bool ok = testee.empty();
     TS_ASSERT(!ok);
 
     // add
-    mock.addParameterList("SADD, ss, foo");
-    mock.addNewResult(new afl::data::IntegerValue(1));
+    mock.expectCall("SADD, ss, foo");
+    mock.provideNewResult(new afl::data::IntegerValue(1));
     ok = testee.add("foo");
     TS_ASSERT(ok);
 
     // remove
-    mock.addParameterList("SREM, ss, bar");
-    mock.addNewResult(new afl::data::IntegerValue(0));
+    mock.expectCall("SREM, ss, bar");
+    mock.provideNewResult(new afl::data::IntegerValue(0));
     ok = testee.remove("bar");
     TS_ASSERT(!ok);
 
     // getAll
-    mock.addParameterList("SMEMBERS, ss");
+    mock.expectCall("SMEMBERS, ss");
 
     afl::base::Ref<afl::data::Vector> vec(afl::data::Vector::create());
     vec->pushBackNew(new afl::data::StringValue("foo"));
     vec->pushBackNew(new afl::data::StringValue("baz"));
     vec->pushBackNew(new afl::data::StringValue("qux"));
-    mock.addNewResult(new afl::data::VectorValue(vec));
+    mock.provideNewResult(new afl::data::VectorValue(vec));
 
     afl::data::StringList_t list;
     testee.getAll(list);
@@ -64,14 +64,14 @@ TestNetRedisStringSetKey::testMock()
     TS_ASSERT_EQUALS(list[2], "qux");
 
     // contains
-    mock.addParameterList("SISMEMBER, ss, baz");
-    mock.addNewResult(new afl::data::IntegerValue(1));
+    mock.expectCall("SISMEMBER, ss, baz");
+    mock.provideNewResult(new afl::data::IntegerValue(1));
     ok = testee.contains("baz");
     TS_ASSERT(ok);
 
     // moveTo
-    mock.addParameterList("SMOVE, ss, os, baz");
-    mock.addNewResult(new afl::data::IntegerValue(1));
+    mock.expectCall("SMOVE, ss, os, baz");
+    mock.provideNewResult(new afl::data::IntegerValue(1));
     ok = testee.moveTo("baz", afl::net::redis::StringSetKey(mock, "os"));
     TS_ASSERT(ok);
 
@@ -81,26 +81,26 @@ TestNetRedisStringSetKey::testMock()
      */
 
     // getRandom
-    mock.addParameterList("SRANDMEMBER, ss");
-    mock.addNewResult(new afl::data::StringValue("qux"));
+    mock.expectCall("SRANDMEMBER, ss");
+    mock.provideNewResult(new afl::data::StringValue("qux"));
     String_t s = testee.getRandom();
     TS_ASSERT_EQUALS(s, "qux");
 
     // extractRandom
-    mock.addParameterList("SPOP, ss");
-    mock.addNewResult(new afl::data::StringValue("qux"));
+    mock.expectCall("SPOP, ss");
+    mock.provideNewResult(new afl::data::StringValue("qux"));
     s = testee.extractRandom();
     TS_ASSERT_EQUALS(s, "qux");
 
     // sort
-    mock.addParameterList("SORT, ss");
+    mock.expectCall("SORT, ss");
 
     vec.reset(*afl::data::Vector::create());
     vec->pushBackNew(new afl::data::StringValue("alpha"));
     vec->pushBackNew(new afl::data::StringValue("bravo"));
     vec->pushBackNew(new afl::data::StringValue("charlie"));
     vec->pushBackNew(new afl::data::StringValue("delta"));
-    mock.addNewResult(new afl::data::VectorValue(vec));
+    mock.provideNewResult(new afl::data::VectorValue(vec));
 
     list.clear();
     testee.sort().getResult(list);
@@ -111,20 +111,20 @@ TestNetRedisStringSetKey::testMock()
     TS_ASSERT_EQUALS(list[3], "delta");
 
     // remove
-    mock.addParameterList("DEL, ss");
-    mock.addNewResult(new afl::data::IntegerValue(1));
+    mock.expectCall("DEL, ss");
+    mock.provideNewResult(new afl::data::IntegerValue(1));
     testee.remove();
 
     // copyTo
-    mock.addParameterList("SINTERSTORE, ts, ss");
-    mock.addNewResult(0);
+    mock.expectCall("SINTERSTORE, ts, ss");
+    mock.provideNewResult(0);
     testee.copyTo(afl::net::redis::StringSetKey(mock, "ts"));
 
     // intersect
-    mock.addParameterList("SINTER, ss, ts, us");
+    mock.expectCall("SINTER, ss, ts, us");
     vec.reset(*afl::data::Vector::create());
     vec->pushBackNew(new afl::data::StringValue("res"));
-    mock.addNewResult(new afl::data::VectorValue(vec));
+    mock.provideNewResult(new afl::data::VectorValue(vec));
 
     list.clear();
     testee.intersect(afl::net::redis::StringSetKey(mock, "ts"))
@@ -134,8 +134,8 @@ TestNetRedisStringSetKey::testMock()
     TS_ASSERT_EQUALS(list[0], "res");
 
     // union
-    mock.addParameterList("SUNION, ss, ts, us");
-    mock.addNewResult(new afl::data::VectorValue(vec));
+    mock.expectCall("SUNION, ss, ts, us");
+    mock.provideNewResult(new afl::data::VectorValue(vec));
 
     list.clear();
     testee.merge(afl::net::redis::StringSetKey(mock, "ts"))
@@ -145,8 +145,8 @@ TestNetRedisStringSetKey::testMock()
     TS_ASSERT_EQUALS(list[0], "res");
 
     // difference
-    mock.addParameterList("SDIFF, ss, ts, us");
-    mock.addNewResult(new afl::data::VectorValue(vec));
+    mock.expectCall("SDIFF, ss, ts, us");
+    mock.provideNewResult(new afl::data::VectorValue(vec));
 
     list.clear();
     testee.remove(afl::net::redis::StringSetKey(mock, "ts"))

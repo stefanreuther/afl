@@ -8,34 +8,34 @@
 #include "t_net_redis.hpp"
 #include "afl/data/integervalue.hpp"
 #include "afl/net/redis/internaldatabase.hpp"
-#include "u/mock/commandhandlermock.hpp"
+#include "afl/test/commandhandler.hpp"
 
 /** Test IntegerKey against the mock. */
 void
 TestNetRedisIntegerKey::testMock()
 {
-    CommandHandlerMock mock;
+    afl::test::CommandHandler mock("testMock");
     afl::net::redis::IntegerKey testee(mock, "k");
     int32_t n;
 
     // Get/set
-    mock.addParameterList("SET, k, 3");
-    mock.addNewResult(0);
-    mock.addParameterList("GET, k");
-    mock.addNewResult(new afl::data::IntegerValue(3));
+    mock.expectCall("SET, k, 3");
+    mock.provideNewResult(0);
+    mock.expectCall("GET, k");
+    mock.provideNewResult(new afl::data::IntegerValue(3));
     testee.set(3);
     n = testee.get();
     TS_ASSERT_EQUALS(n, 3);
 
     // Increment/decrement
-    mock.addParameterList("DECR, k");
-    mock.addNewResult(new afl::data::IntegerValue(2));
-    mock.addParameterList("INCR, k");
-    mock.addNewResult(new afl::data::IntegerValue(3));
-    mock.addParameterList("INCRBY, k, 5");
-    mock.addNewResult(new afl::data::IntegerValue(8));
-    mock.addParameterList("DECRBY, k, 2");
-    mock.addNewResult(new afl::data::IntegerValue(6));
+    mock.expectCall("DECR, k");
+    mock.provideNewResult(new afl::data::IntegerValue(2));
+    mock.expectCall("INCR, k");
+    mock.provideNewResult(new afl::data::IntegerValue(3));
+    mock.expectCall("INCRBY, k, 5");
+    mock.provideNewResult(new afl::data::IntegerValue(8));
+    mock.expectCall("DECRBY, k, 2");
+    mock.provideNewResult(new afl::data::IntegerValue(6));
     n = --testee;
     TS_ASSERT_EQUALS(n, 2);
     n = ++testee;
@@ -46,14 +46,14 @@ TestNetRedisIntegerKey::testMock()
     TS_ASSERT_EQUALS(n, 6);
 
     // Getset
-    mock.addParameterList("GETSET, k, 4");
-    mock.addNewResult(new afl::data::IntegerValue(6));
+    mock.expectCall("GETSET, k, 4");
+    mock.provideNewResult(new afl::data::IntegerValue(6));
     n = testee.replaceBy(4);
     TS_ASSERT_EQUALS(n, 6);
 
     // setnx
-    mock.addParameterList("SETNX, k, 3");
-    mock.addNewResult(new afl::data::IntegerValue(0));
+    mock.expectCall("SETNX, k, 3");
+    mock.provideNewResult(new afl::data::IntegerValue(0));
     TS_ASSERT(!testee.setUnique(3));
 }
 

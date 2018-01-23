@@ -5,7 +5,7 @@
 #ifndef AFL_AFL_NET_HTTP_DEFAULTCONNECTIONPROVIDER_HPP
 #define AFL_AFL_NET_HTTP_DEFAULTCONNECTIONPROVIDER_HPP
 
-#include "afl/base/runnable.hpp"
+#include "afl/base/stoppable.hpp"
 #include "afl/base/uncopyable.hpp"
 #include "afl/net/http/clientconnectionprovider.hpp"
 #include "afl/net/networkstack.hpp"
@@ -22,7 +22,7 @@ namespace afl { namespace net { namespace http {
         It supports creating connections for a single URL scheme ("http").
         It works in a background thread which is started upon construction, and deleted upon destruction. */
     class DefaultConnectionProvider : public ClientConnectionProvider,
-                                      private afl::base::Runnable,
+                                      private afl::base::Stoppable,
                                       private afl::base::Uncopyable
     {
      public:
@@ -42,7 +42,8 @@ namespace afl { namespace net { namespace http {
 
      private:
         // Thread:
-        void run();
+        virtual void run();
+        virtual void stop();
 
         // Integration:
         Client& m_client;
@@ -50,10 +51,12 @@ namespace afl { namespace net { namespace http {
         const String_t m_scheme;
 
         // Work:
-        afl::sys::Thread m_thread;
         afl::sys::Semaphore m_wake;
         afl::sys::Mutex m_mutex;
         bool m_stop;
+
+        // Thread: must be last
+        afl::sys::Thread m_thread;
     };
 
 } } }

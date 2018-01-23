@@ -6,7 +6,7 @@
 #include "afl/async/messageexchange.hpp"
 
 #include "u/t_async.hpp"
-#include "afl/base/runnable.hpp"
+#include "afl/base/stoppable.hpp"
 #include "afl/async/controller.hpp"
 #include "afl/sys/thread.hpp"
 #include "afl/async/semaphore.hpp"
@@ -15,7 +15,7 @@ namespace {
     const size_t LIMIT = 10;
 
     /** Helper class for testing. */
-    class RelayTester : public afl::base::Runnable {
+    class RelayTester : public afl::base::Stoppable {
      public:
         RelayTester(afl::async::MessageExchange& mx)
             : m_sem(),

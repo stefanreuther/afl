@@ -11,7 +11,7 @@
 #include "afl/async/controller.hpp"
 #include "afl/async/messageexchange.hpp"
 #include "afl/async/sendoperation.hpp"
-#include "afl/base/runnable.hpp"
+#include "afl/base/stoppable.hpp"
 #include "afl/net/acceptoperation.hpp"
 #include "afl/net/name.hpp"
 #include "afl/net/networkstack.hpp"
@@ -40,7 +40,7 @@ TestNetListener::testListen()
 void
 TestNetListener::testAsync()
 {
-    class Helper : public afl::base::Runnable {
+    class Helper : public afl::base::Stoppable {
      public:
         Helper()
             : m_out()
@@ -76,6 +76,8 @@ TestNetListener::testAsync()
                     }
                 }
             }
+        void stop()
+            { }
 
         char m_portNr[10];
         afl::async::MessageExchange m_out;

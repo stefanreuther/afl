@@ -13,7 +13,7 @@
 #include "afl/async/controller.hpp"
 #include "afl/async/messageexchange.hpp"
 #include "afl/base/ptr.hpp"
-#include "afl/base/runnable.hpp"
+#include "afl/base/stoppable.hpp"
 #include "afl/net/listener.hpp"
 #include "afl/net/name.hpp"
 #include "afl/net/networkstack.hpp"
@@ -78,15 +78,15 @@ void
 TestAsyncCommunicationSink::testMX()
 {
     // Server half
-    class Server : public afl::base::Runnable {
+    class Server : public afl::base::Stoppable {
      public:
         Server(afl::base::Ptr<afl::async::MessageExchange> pmx)
             : m_pmx(pmx)
             { }
         void run()
-            {
-                testReader(m_pmx);
-            }
+            { testReader(m_pmx); }
+        void stop()
+            { }
      private:
         afl::base::Ptr<afl::async::MessageExchange> m_pmx;
     };
@@ -110,7 +110,7 @@ void
 TestAsyncCommunicationSink::testSocket()
 {
     // Server half, this time with sockets
-    class Server : public afl::base::Runnable {
+    class Server : public afl::base::Stoppable {
      public:
         Server(afl::base::Ref<afl::net::Listener> pListener)
             : m_pListener(pListener)
@@ -120,6 +120,8 @@ TestAsyncCommunicationSink::testSocket()
                 afl::base::Ptr<afl::net::Socket> socket = m_pListener->accept();
                 testReader(socket);
             }
+        void stop()
+            { }
      private:
         afl::base::Ref<afl::net::Listener> m_pListener;
     };

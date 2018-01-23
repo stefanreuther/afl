@@ -56,6 +56,36 @@ class TestChecksumsSHA1 : public CxxTest::TestSuite {
     void testSuite();
     void testSpeed();
     void testPBKDF2();
+    void test6234();
+    void test6234HMAC();
+};
+
+class TestChecksumsSHA224 : public CxxTest::TestSuite {
+ public:
+    void testBasic();
+    void test6234();
+    void test6234HMAC();
+};
+
+class TestChecksumsSHA256 : public CxxTest::TestSuite {
+ public:
+    void testBasic();
+    void test6234();
+    void test6234HMAC();
+};
+
+class TestChecksumsSHA384 : public CxxTest::TestSuite {
+ public:
+    void testBasic();
+    void test6234();
+    void test6234HMAC();
+};
+
+class TestChecksumsSHA512 : public CxxTest::TestSuite {
+ public:
+    void testBasic();
+    void test6234();
+    void test6234HMAC();
 };
 
 #endif

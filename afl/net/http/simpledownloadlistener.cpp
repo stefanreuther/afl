@@ -7,8 +7,6 @@
 #include "afl/net/http/clientresponse.hpp"
 #include "afl/net/http/client.hpp"
 
-#include <stdio.h>
-
 afl::net::http::SimpleDownloadListener::SimpleDownloadListener()
     : m_semaphore(0),
       m_sizeLimit(-1),

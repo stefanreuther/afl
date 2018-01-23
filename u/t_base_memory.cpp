@@ -297,3 +297,117 @@ TestBaseMemory::testNothing()
     ml = bar;
     TS_ASSERT(!ml.empty());
 }
+
+/** Test fullRead(). */
+void
+TestBaseMemory::testFullRead()
+{
+    static const uint8_t in[] = {1,2,3,4,5};
+    afl::base::Memory<const uint8_t> testee(in);
+
+    // Read first part
+    uint8_t out[2];
+    bool ok = testee.fullRead(out);
+    TS_ASSERT(ok);
+    TS_ASSERT_EQUALS(out[0], 1);
+    TS_ASSERT_EQUALS(out[1], 2);
+    TS_ASSERT_EQUALS(testee.size(), 3U);
+
+    // Read second part
+    ok = testee.fullRead(out);
+    TS_ASSERT(ok);
+    TS_ASSERT_EQUALS(out[0], 3);
+    TS_ASSERT_EQUALS(out[1], 4);
+    TS_ASSERT_EQUALS(testee.size(), 1U);
+
+    // No complete part remains; reading returns an error and keeps output unchanged
+    ok = testee.fullRead(out);
+    TS_ASSERT(!ok);
+    TS_ASSERT_EQUALS(out[0], 3);
+    TS_ASSERT_EQUALS(out[1], 4);
+    TS_ASSERT_EQUALS(testee.size(), 0U);
+
+    // Still no result
+    ok = testee.fullRead(out);
+    TS_ASSERT(!ok);
+}
+
+/** Test findNot(). */
+void
+TestBaseMemory::testFindNot()
+{
+    // Normal
+    static const uint8_t a[] = {1,1,2,3};
+    afl::base::Memory<const uint8_t> ta(a);
+    TS_ASSERT_EQUALS(ta.findNot(1), 2U);
+    TS_ASSERT_EQUALS(ta.findNot(3), 0U);
+
+    // Empty
+    afl::base::Memory<const uint8_t> tb;
+    TS_ASSERT_EQUALS(tb.findNot(1), 0U);
+    TS_ASSERT_EQUALS(tb.findNot(3), 0U);
+
+    // Mismatch
+    static const uint8_t c[] = {1,1,1,1,1,1};
+    afl::base::Memory<const uint8_t> tc(c);
+    TS_ASSERT_EQUALS(tc.findNot(1), 6U);
+    TS_ASSERT_EQUALS(tc.findNot(3), 0U);
+}
+
+/** Test copy(). */
+void
+TestBaseMemory::testCopy()
+{
+    uint8_t bytes[] = {1,2,3,4,5,6,7};
+    afl::base::Memory<uint8_t> t1(bytes);
+
+    std::string strings[] = {"1","2","3","4","5","6","7"};
+    afl::base::Memory<std::string> t2(strings);
+
+    uint32_t words[] = {1,2,3,4,5,6,7};
+    afl::base::Memory<uint32_t> t3(words);
+
+    // Copy 1,2 to 6,7
+    //   1,2,3,4,5,1,2
+    t1.subrange(5,2).copyFrom(t1);
+    t2.subrange(5,2).copyFrom(t2);
+    t3.subrange(5,2).copyFrom(t3);
+
+    // Copy 1,2,3,4 to 3,4,5,6
+    //   1,2,1,2,3,4,2
+    t1.subrange(2,4).copyFrom(t1);
+    t2.subrange(2,4).copyFrom(t2);
+    t3.subrange(2,4).copyFrom(t3);
+
+    // Copy 4,5(now 2,3) to 1,2
+    //   2,3,1,2,3,4,2
+    t1.subrange(0,2).copyFrom(t1.subrange(3,2));
+    t2.subrange(0,2).copyFrom(t2.subrange(3,2));
+    t3.subrange(0,2).copyFrom(t3.subrange(3,2));
+
+    // Verify
+    TS_ASSERT_EQUALS(bytes[0], 2);
+    TS_ASSERT_EQUALS(bytes[1], 3);
+    TS_ASSERT_EQUALS(bytes[2], 1);
+    TS_ASSERT_EQUALS(bytes[3], 2);
+    TS_ASSERT_EQUALS(bytes[4], 3);
+    TS_ASSERT_EQUALS(bytes[5], 4);
+    TS_ASSERT_EQUALS(bytes[6], 2);
+
+    TS_ASSERT_EQUALS(strings[0], "2");
+    TS_ASSERT_EQUALS(strings[1], "3");
+    TS_ASSERT_EQUALS(strings[2], "1");
+    TS_ASSERT_EQUALS(strings[3], "2");
+    TS_ASSERT_EQUALS(strings[4], "3");
+    TS_ASSERT_EQUALS(strings[5], "4");
+    TS_ASSERT_EQUALS(strings[6], "2");
+
+    TS_ASSERT_EQUALS(words[0], 2U);
+    TS_ASSERT_EQUALS(words[1], 3U);
+    TS_ASSERT_EQUALS(words[2], 1U);
+    TS_ASSERT_EQUALS(words[3], 2U);
+    TS_ASSERT_EQUALS(words[4], 3U);
+    TS_ASSERT_EQUALS(words[5], 4U);
+    TS_ASSERT_EQUALS(words[6], 2U);
+}
+

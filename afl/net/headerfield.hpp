@@ -79,6 +79,14 @@ namespace afl { namespace net {
             \retval false field has not been found, %value is unchanged */
         bool getSecondaryValue(const String_t& name, String_t& value, int mode = 0) const;
 
+        /** Get address value of this header field.
+            This is intended to parse "From" headers.
+            It accepts "add@ress (Name)", "add@ress", "Name <add@ress>" formats.
+            \param result [out] Result goes here
+            \retval true Address parsed successfully
+            \retval false No address found */
+        bool getAddressValue(String_t& result) const;
+
         /** Enumerate secondary values.
             If the header field has a complex value, such as "text/html; charset=UTF-8",
             enumerates all secondary fields.

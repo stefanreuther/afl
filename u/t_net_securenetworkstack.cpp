@@ -7,18 +7,18 @@
 #include "afl/net/securenetworkstack.hpp"
 
 #include "u/t_net.hpp"
-#include "afl/net/networkstack.hpp"
-#include "afl/net/name.hpp"
-#include "afl/net/socket.hpp"
+#include "afl/async/receiveoperation.hpp"
+#include "afl/async/sendoperation.hpp"
 #include "afl/base/ptr.hpp"
+#include "afl/base/stoppable.hpp"
+#include "afl/base/types.hpp"
 #include "afl/except/fileproblemexception.hpp"
 #include "afl/except/unsupportedexception.hpp"
-#include "afl/base/types.hpp"
+#include "afl/net/name.hpp"
+#include "afl/net/networkstack.hpp"
 #include "afl/net/securecontext.hpp"
-#include "afl/base/runnable.hpp"
+#include "afl/net/socket.hpp"
 #include "afl/sys/thread.hpp"
-#include "afl/async/sendoperation.hpp"
-#include "afl/async/receiveoperation.hpp"
 
 namespace {
     using afl::net::SecureContext;
@@ -130,7 +130,7 @@ TestNetSecureNetworkStack::testTransfer()
         Ref<afl::net::Listener> listener(sns.listen(name, 10));
 
         // A thread to do the connecting
-        class ClientRunnable : public afl::base::Runnable {
+        class ClientRunnable : public afl::base::Stoppable {
          public:
             ClientRunnable(const Name& name)
                 : m_name(name)
@@ -152,6 +152,8 @@ TestNetSecureNetworkStack::testTransfer()
                     TS_ASSERT(result);
                     TS_ASSERT_EQUALS(op.getNumSentBytes(), 2U);
                 }
+            void stop()
+                { }
          private:
             Name m_name;
         };

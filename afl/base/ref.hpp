@@ -173,6 +173,9 @@ template<typename T>
 inline void
 afl::base::Ref<T>::decRef()
 {
+    // Note: Ptr<> protects against assignment in the destructor.
+    // This cannot be implemented in Ref<>.
+    // Whereas Ptr<> just falls back to assigning null, Ref<> cannot do that.
     if (--static_cast<RefCounted*>(m_ptr)->refCounter() == 0) {
         delete m_ptr;
     }

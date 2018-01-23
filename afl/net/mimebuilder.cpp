@@ -166,7 +166,7 @@ afl::net::MimeBuilder::getTotalSize() const
 }
 
 void
-afl::net::MimeBuilder::write(afl::io::DataSink& out, bool escapeDots)
+afl::net::MimeBuilder::write(afl::io::DataSink& out, bool escapeDots) const
 {
     static const uint8_t dot[] = {'.'};
     for (std::list<Element>::const_iterator i = m_Content.begin(); i != m_Content.end(); ++i) {

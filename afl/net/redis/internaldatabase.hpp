@@ -60,6 +60,12 @@ namespace afl { namespace net { namespace redis {
         typedef afl::container::PtrMap<String_t, Key> Data_t;
         Data_t m_data;
 
+        /** Execute command.
+            Factored out for simplicity.
+            \param verb Command verb
+            \param v Remaining arguments */
+        Value_t* execute(const String_t& verb, afl::data::SegmentView v);
+
         /** Get key, given a type.
             \param name Key
             \return Pointer to given type if found, null if not found

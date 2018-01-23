@@ -19,6 +19,7 @@
 #include "afl/string/format.hpp"
 #include "afl/sys/time.hpp"
 #include "afl/net/name.hpp"
+#include "afl/sys/thread.hpp"
 
 namespace {
     /* Minimum timeout.
@@ -91,7 +92,7 @@ struct afl::net::Server::ConnectionState {
 
 // Constructor.
 afl::net::Server::Server(afl::base::Ref<Listener> listener, ProtocolHandlerFactory& factory)
-    : Runnable(),
+    : Stoppable(),
       m_listener(listener),
       m_factory(factory),
       m_stopSignal(0),
@@ -116,6 +117,14 @@ afl::net::Server::run()
     startStop(ctl, stopState);
     startListen(ctl, listenerState);
 
+    /* Error mitigation: if the network stack goes into a state where accept immediately fails, we don't want to run in circles.
+       Therefore, we count successive errors, and sleep upon a given limit to free the CPU. This will stall all active connections.
+       However, since we expect this to happen only on terminal conditions (e.g. network stack is down or does not support accept),
+       we expect this to not be a problem. */
+    int errorCounter = 0;
+    const int ERROR_LIMIT = 10;
+    const int32_t ERROR_SLEEP = 3000;
+
     while (1) {
         afl::async::Operation* op = ctl.wait(findTimeout(connections, afl::sys::Time::getTickCounter()));
         if (op == 0) {
@@ -132,11 +141,18 @@ afl::net::Server::run()
                     logException(connections[i]->socketName, "timer", UNKNOWN_EXCEPTION);
                 }
             }
+            errorCounter = 0;
         } else if (op == &listenerState.operation) {
             // New connection
             if (listenerState.operation.getResult().get() == 0) {
                 // Error case: acceptAsync returned but did not create a socket?
                 m_log.write(afl::sys::Log::Error, m_logName, "accept failed");
+
+                ++errorCounter;
+                if (errorCounter >= ERROR_LIMIT) {
+                    afl::sys::Thread::sleep(ERROR_SLEEP);
+                    errorCounter = 0;
+                }
             } else {
                 // Success case: create a new ProtocolHandler and ConnectionState
                 String_t name = listenerState.operation.getResult()->getPeerName().toString();
@@ -152,6 +168,7 @@ afl::net::Server::run()
                 catch (...) {
                     logException(name, "accept", UNKNOWN_EXCEPTION);
                 }
+                errorCounter = 0;
             }
 
             // Wait for next connection
@@ -174,6 +191,7 @@ afl::net::Server::run()
                     logException(connections[i]->socketName, "I/O", UNKNOWN_EXCEPTION);
                 }
             }
+            errorCounter = 0;
         }
 
         // Process closing

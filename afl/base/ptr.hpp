@@ -203,7 +203,11 @@ template<typename T>
 inline
 afl::base::Ptr<T>::~Ptr()
 {
-    decRef();
+    // decRef calls the user-defined destructor, which may modify the pointer again.
+    // Hence, loop until we're really empty. See the testAssignDestructor test.
+    while (m_ref != 0) {
+        decRef();
+    }
 }
 
 
@@ -244,8 +248,6 @@ inline void
 afl::base::Ptr<T>::reset()
 {
     decRef();
-    m_ptr = 0;
-    m_ref = 0;
 }
 
 template<typename T>
@@ -332,9 +334,17 @@ template<typename T>
 inline void
 afl::base::Ptr<T>::decRef()
 {
-    if (m_ref) {
-        if (--*m_ref == 0) {
-            delete m_ptr;
+    // Save the Ptr instance variables locally and reset the state.
+    // This way, a possible user-defined destructor sees a consistent state.
+    T* p = m_ptr;
+    afl::sys::AtomicInteger* ref = m_ref;
+    m_ptr = 0;
+    m_ref = 0;
+
+    // Destructor work
+    if (ref) {
+        if (--*ref == 0) {
+            delete p;
         }
     }
 }

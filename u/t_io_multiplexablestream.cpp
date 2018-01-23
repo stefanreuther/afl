@@ -92,3 +92,35 @@ TestIoMultiplexableStream::testLife()
         }
     }
 }
+
+/** Test setPos() behaviour.
+    If the first operation on a new stream is setPos(), only one setPos() call should be done. */
+void
+TestIoMultiplexableStream::testSeek()
+{
+    class Tester : public afl::io::MultiplexableStream {
+     public:
+        virtual size_t read(Bytes_t /*m*/)
+            { throw std::runtime_error("unexpected"); }
+        virtual size_t write(ConstBytes_t /*m*/)
+            { throw std::runtime_error("unexpected"); }
+        virtual void flush()
+            { throw std::runtime_error("unexpected"); }
+        virtual void setPos(FileSize_t pos)
+            { TS_ASSERT_EQUALS(pos, 23U); }
+        virtual FileSize_t getPos()
+            { return 42; }
+        virtual FileSize_t getSize()
+            { throw std::runtime_error("unexpected"); }
+        virtual uint32_t getCapabilities()
+            { return 0; }
+        virtual String_t getName()
+            { return "<name>"; }
+        virtual afl::base::Ptr<afl::io::FileMapping> createFileMapping(FileSize_t /*limit*/)
+            { throw std::runtime_error("unexpected"); }
+    };
+    Tester t;
+    afl::base::Ref<afl::io::Stream> child(t.createChild());
+    child->setPos(23);
+}
+

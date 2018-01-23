@@ -19,26 +19,16 @@ afl::net::http::DefaultConnectionProvider::DefaultConnectionProvider(Client& cli
     : m_client(client),
       m_networkStack(stack),
       m_scheme(scheme),
-      m_thread("HTTP Connection Provider", *this),
       m_wake(0),
       m_mutex(),
-      m_stop(false)
+      m_stop(false),
+      m_thread("HTTP Connection Provider", *this)
 {
     m_thread.start();
 }
 
 afl::net::http::DefaultConnectionProvider::~DefaultConnectionProvider()
-{
-    // Tell thread to stop
-    {
-        afl::sys::MutexGuard g(m_mutex);
-        m_stop = true;
-    }
-    m_wake.post();
-
-    // Stop it
-    m_thread.join();
-}
+{ }
 
 void
 afl::net::http::DefaultConnectionProvider::requestNewConnection()
@@ -91,4 +81,14 @@ afl::net::http::DefaultConnectionProvider::run()
             }
         }
     }
+}
+
+void
+afl::net::http::DefaultConnectionProvider::stop()
+{
+    {
+        afl::sys::MutexGuard g(m_mutex);
+        m_stop = true;
+    }
+    m_wake.post();
 }

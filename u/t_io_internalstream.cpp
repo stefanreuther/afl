@@ -96,3 +96,33 @@ TestIoInternalStream::testName()
     testee.setName("hi");
     TS_ASSERT_EQUALS(testee.getName(), "hi");
 }
+
+/** Test setWritePermission(). */
+void
+TestIoInternalStream::testReadOnly()
+{
+    afl::io::InternalStream testee;
+
+    // Write
+    static const uint8_t data[] = {1,2,3};
+    testee.write(data);
+    TS_ASSERT_EQUALS(testee.getPos(), 3U);
+    TS_ASSERT_EQUALS(testee.getSize(), 3U);
+    TS_ASSERT(testee.getContent().equalContent(data));
+
+    // Write-protect
+    testee.setWritePermission(false);
+
+    // Verify
+    TS_ASSERT_EQUALS(testee.getCapabilities(), afl::io::Stream::CanRead | afl::io::Stream::CanSeek);
+    TS_ASSERT_THROWS(testee.write(data), afl::except::FileProblemException);
+    TS_ASSERT_EQUALS(testee.getPos(), 3U);
+    TS_ASSERT_EQUALS(testee.getSize(), 3U);
+
+    // Read
+    testee.setPos(0);
+    uint8_t data2[sizeof(data)];
+    TS_ASSERT_EQUALS(testee.read(data2), sizeof(data2));
+    TS_ASSERT_SAME_DATA(data, data2, sizeof(data2));
+}
+

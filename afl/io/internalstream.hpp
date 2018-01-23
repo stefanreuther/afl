@@ -15,7 +15,9 @@ namespace afl { namespace io {
         Implements a virtual file that can be read and written.
         Internally, the file is represented as a GrowableBytes_t.
 
-        When written, the file grows as needed. */
+        When written, the file grows as needed.
+        Writing can be disabled, making this class suitable as a "I give you this memory buffer to read from" stream
+        that internally manages the memory it contains (unlike ConstMemoryStream). */
     class InternalStream : public MultiplexableStream {
      public:
         /** Constructor.
@@ -47,10 +49,15 @@ namespace afl { namespace io {
             \return Handle to the content of the stream. */
         ConstBytes_t getContent() const;
 
+        /** Set write permission.
+            \param allowWrite true to allow writing. This is the default. */
+        void setWritePermission(bool allowWrite);
+
      private:
         String_t m_name;
         afl::base::GrowableBytes_t m_data;
         size_t m_pos;
+        bool m_allowWrite;
     };
 
 } }

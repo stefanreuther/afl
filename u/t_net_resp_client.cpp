@@ -11,7 +11,7 @@
 #include "afl/async/controller.hpp"
 #include "afl/base/ptr.hpp"
 #include "afl/base/ref.hpp"
-#include "afl/base/runnable.hpp"
+#include "afl/base/stoppable.hpp"
 #include "afl/data/defaultvaluefactory.hpp"
 #include "afl/data/errorvalue.hpp"
 #include "afl/data/integervalue.hpp"
@@ -29,7 +29,7 @@
 
 namespace {
     using afl::base::Ref;
-    class ReconnectTester : public afl::base::Runnable {
+    class ReconnectTester : public afl::base::Stoppable {
      public:
         ReconnectTester(Ref<afl::net::Listener> listener, bool readByte)
             : m_listener(listener),
@@ -100,7 +100,7 @@ namespace {
 void
 TestNetRespClient::testIt()
 {
-    class Tester : public afl::base::Runnable {
+    class Tester : public afl::base::Stoppable {
      public:
         Tester(Ref<afl::net::Listener> listener)
             : m_listener(listener),
@@ -133,6 +133,9 @@ TestNetRespClient::testIt()
                     TS_ASSERT_THROWS_NOTHING(io.fullWrite(afl::string::toBytes(m_out)));
                 }
             }
+
+        void stop()
+            { }
 
         void setData(String_t in, String_t out)
             {
@@ -269,7 +272,7 @@ TestNetRespClient::testNoConnect()
 void
 TestNetRespClient::testError()
 {
-    class ErrorTester : public afl::base::Runnable {
+    class ErrorTester : public afl::base::Stoppable {
      public:
         ErrorTester(Ref<afl::net::Listener> listener)
             : m_listener(listener.asPtr())

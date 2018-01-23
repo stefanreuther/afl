@@ -6,18 +6,18 @@
 #include "afl/net/redis/subtree.hpp"
 
 #include "t_net_redis.hpp"
-#include "u/mock/commandhandlermock.hpp"
 #include "afl/base/ptr.hpp"
+#include "afl/data/stringvalue.hpp"
 #include "afl/data/vector.hpp"
 #include "afl/data/vectorvalue.hpp"
-#include "afl/data/stringvalue.hpp"
 #include "afl/net/redis/internaldatabase.hpp"
+#include "afl/test/commandhandler.hpp"
 
 /** Test local operations (which do not have network communication). */
 void
 TestNetRedisSubtree::testLocal()
 {
-    CommandHandlerMock mock;
+    afl::test::CommandHandler mock("testLocal");
     afl::net::redis::Subtree tree(mock, "x:");
 
     // Local
@@ -47,14 +47,14 @@ TestNetRedisSubtree::testKeys()
 {
     // Test against the mock
     {
-        CommandHandlerMock mock;
-        mock.addParameterList("KEYS, tree:*");
+        afl::test::CommandHandler mock("testKeys");
+        mock.expectCall("KEYS, tree:*");
 
         afl::base::Ref<afl::data::Vector> vec(afl::data::Vector::create());
         vec->pushBackNew(new afl::data::StringValue("tree:a"));
         vec->pushBackNew(new afl::data::StringValue("tree:x:y"));
         vec->pushBackNew(new afl::data::StringValue("tree:z"));
-        mock.addNewResult(new afl::data::VectorValue(vec));
+        mock.provideNewResult(new afl::data::VectorValue(vec));
 
         afl::data::StringList_t list;
         afl::net::redis::Subtree(mock, "tree:").getKeyNames(list);
