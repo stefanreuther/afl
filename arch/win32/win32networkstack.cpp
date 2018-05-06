@@ -31,6 +31,7 @@
 #include "arch/controller.hpp"   // afl::async::Controller + Implementation
 #include "afl/net/acceptoperation.hpp"
 #include "afl/async/notifier.hpp"
+#include "afl/string/parse.hpp"
 
 /*
  *  Utilities
@@ -40,7 +41,7 @@ namespace {
     // Win32 does not have socklen_t, so give it one.
     typedef int socklen_t;
 
-    // Helper to create sockets using getaddrinfo
+    // Helper to create sockets
     class SocketFactory {
      public:
         virtual ~SocketFactory();
@@ -71,13 +72,102 @@ namespace {
     };
     bool waitReady(SOCKET fd, afl::sys::Timeout_t timeout, WaitMode mode);
 
+    /*
+     *  Access to name service
+     *
+     *  getaddrinfo is not available until Windows XP (Winsock 2.2).
+     *  We therefore load them from the DLL if we can.
+     */
 
-    /***************************** SocketFactory *****************************/
+    typedef int (WSAAPI *getaddrinfo_t)(PCSTR, PCSTR, const addrinfo*, addrinfo**);
+    typedef void (WSAAPI *freeaddrinfo_t)(addrinfo*);
 
-    inline SocketFactory::~SocketFactory()
+    // Helper to access name resolver
+    class Resolver {
+     public:
+        virtual ~Resolver() { }
+        virtual SOCKET toName(SocketFactory& f, const afl::net::Name& name) = 0;
+    };
+
+    // Legacy connector: using gethostbyname
+    class LegacyResolver : public Resolver {
+     public:
+        LegacyResolver(afl::sys::Mutex& mtx);
+        SOCKET toName(SocketFactory& f, const afl::net::Name& name);
+     private:
+        afl::sys::Mutex& m_mutex;
+    };
+
+    // Modern connector: using getaddrinfo
+    class ModernResolver : public Resolver {
+     public:
+        ModernResolver(getaddrinfo_t gai, freeaddrinfo_t fai);
+        SOCKET toName(SocketFactory& f, const afl::net::Name& name);
+     private:
+        getaddrinfo_t m_getAddrInfo;
+        freeaddrinfo_t m_freeAddrInfo;
+    };
+
+    /*
+     *  LegacyResolver
+     */
+    LegacyResolver::LegacyResolver(afl::sys::Mutex& mtx)
+        : m_mutex(mtx)
     { }
 
-    SOCKET SocketFactory::toName(const afl::net::Name& name)
+    SOCKET LegacyResolver::toName(SocketFactory& f, const afl::net::Name& name)
+    {
+        // Must guard lookup requests because they use static data
+        struct sockaddr_in in;
+        {
+            afl::sys::MutexGuard g(m_mutex);
+
+            // Look up host
+            struct hostent* h = ::gethostbyname(name.getName().c_str());
+            if (h == 0) {
+                throw afl::except::FileProblemException(name.toString(), afl::string::Messages::networkNameNotFound());
+            }
+
+            // Look up port
+            short port = 0;
+            if (!afl::string::strToInteger(name.getService(), port)) {
+                throw afl::except::FileProblemException(name.toString(), afl::string::Messages::networkNameNotFound());
+            }
+
+            // Convert to sockaddr_in
+            size_t sz = size_t(h->h_length);
+            if (sz > sizeof(in.sin_addr)) {
+                throw afl::except::FileProblemException(name.toString(), afl::string::Messages::unsupportedFeature());
+            }
+            ::memcpy(&in.sin_addr, h->h_addr_list[0], sz);
+            in.sin_family = AF_INET;
+            in.sin_port = ::htons(port);
+        }
+
+        // Make a socket
+        SOCKET sock = ::socket(AF_INET, SOCK_STREAM, 0);
+        if (sock == INVALID_SOCKET) {
+            throw afl::except::FileSystemException(name.toString(), afl::sys::Error(GetLastError()));
+        }
+
+        // Check whether this socket is good for us.
+        DWORD errorCode = f.process(sock, (sockaddr*)&in, sizeof(in));
+        if (errorCode != 0) {
+            throw afl::except::FileSystemException(name.toString(), afl::sys::Error(errorCode));
+        }
+
+        return sock;
+    }
+
+    /*
+     *  ModernResolver
+     */
+    ModernResolver::ModernResolver(getaddrinfo_t gai, freeaddrinfo_t fai)
+        : m_getAddrInfo(gai),
+          m_freeAddrInfo(fai)
+    { }
+
+    SOCKET ModernResolver::toName(SocketFactory& f, const afl::net::Name& name)
     {
         // Where do we want to connect?
         // FIXME: these functions are documented to take ANSI, We give them UTF-8.
@@ -87,7 +177,7 @@ namespace {
         std::memset(&hints, 0, sizeof(hints));
 
         hints.ai_socktype = SOCK_STREAM;
-        DWORD ai = ::getaddrinfo(name.getName().c_str(), name.getService().c_str(), &hints, &result);
+        DWORD ai = m_getAddrInfo(name.getName().c_str(), name.getService().c_str(), &hints, &result);
         if (ai != 0) {
             throw afl::except::FileSystemException(name.toString(), afl::sys::Error(ai));
         }
@@ -99,7 +189,7 @@ namespace {
             sock = ::socket(p->ai_family, p->ai_socktype, p->ai_protocol);
             if (sock != INVALID_SOCKET) {
                 // Check whether this socket is good for us.
-                errorCode = process(sock, p->ai_addr, p->ai_addrlen);
+                errorCode = f.process(sock, p->ai_addr, p->ai_addrlen);
                 if (errorCode == 0) {
                     break;
                 }
@@ -112,7 +202,7 @@ namespace {
 
         // Clean up
         if (result != 0) {
-            ::freeaddrinfo(result);
+            m_freeAddrInfo(result);
         }
 
         // Anything found?
@@ -124,6 +214,42 @@ namespace {
             }
         }
         return sock;
+    }
+
+    // Get current Resolver instance.
+    Resolver& getResolver()
+    {
+        // Mutex to make sure only one thread attempts to set the pResolver variable.
+        // That mutex is also used later on for the LegacyResolver, if required.
+        static afl::sys::Mutex mtx;
+        afl::sys::MutexGuard g(mtx);
+
+        // Check for have getaddrinfo/freeaddrinfo in Winsock DLL
+        static Resolver* pResolver = 0;
+        if (pResolver == 0) {
+            HMODULE ws2DLL = LoadLibrary("ws2_32.dll");
+            getaddrinfo_t gai = ws2DLL ? (getaddrinfo_t) GetProcAddress(ws2DLL, "getaddrinfo") : 0;
+            freeaddrinfo_t fai = ws2DLL ? (freeaddrinfo_t) GetProcAddress(ws2DLL, "freeaddrinfo") : 0;
+            if (gai != 0 && fai != 0) {
+                static ModernResolver mc(gai, fai);
+                pResolver = &mc;
+            } else {
+                static LegacyResolver lc(mtx);
+                pResolver = &lc;
+            }
+        }
+
+        return *pResolver;
+    }
+
+    /***************************** SocketFactory *****************************/
+
+    inline SocketFactory::~SocketFactory()
+    { }
+
+    SOCKET SocketFactory::toName(const afl::net::Name& name)
+    {
+        return getResolver().toName(*this, name);
     }
 
     /******************************** Connect ********************************/

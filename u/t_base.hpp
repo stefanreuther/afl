@@ -118,6 +118,7 @@ class TestBasePtr : public CxxTest::TestSuite {
  public:
     void testInt();
     void testObj();
+    void testConstObj();
     void testRefCountedObj();
     void testDerivation();
     void testCopyDestructor();
@@ -129,6 +130,7 @@ class TestBaseRef : public CxxTest::TestSuite {
     void testObj();
     void testDerived();
     void testPtr();
+    void testConstObj();
 };
 
 class TestBaseRefCounted : public CxxTest::TestSuite {

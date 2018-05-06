@@ -1,3 +1,5 @@
+-include afl/test/translator1.d
+-include afl/net/http/cgihandler.d
 -include afl/test/commandhandler1.d
 -include afl/test/callreceiver.d
 -include afl/test/networkstack1.d
@@ -253,6 +255,7 @@
 -include app/httpserver.d
 -include app/env.d
 -include app/unzip.d
+-include u/t_test_translator.d
 -include u/t_base_stoppable.d
 -include u/t_base_inlinememory.d
 -include u/t_test_commandhandler.d

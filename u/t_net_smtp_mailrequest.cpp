@@ -9,6 +9,7 @@
 #include "afl/net/line/linesink.hpp"
 #include "afl/except/fileproblemexception.hpp"
 #include "afl/except/remoteerrorexception.hpp"
+#include "afl/sys/log.hpp"
 
 namespace {
    class LineSinkMock : public afl::net::line::LineSink {
@@ -36,12 +37,13 @@ void
 TestNetSmtpMailRequest::testSimple()
 {
     // Testee
+    afl::sys::Log log;
     afl::net::smtp::Configuration config("h", "f@ro.m");
     const String_t to[] = {"t@o"};
     afl::net::smtp::MailRequest testee(config, to, afl::string::toBytes("From: body@from\r\n"
                                                                         "To: body@to\r\n"
                                                                         "\r\n"
-                                                                        "Content\r\n"));
+                                                                        "Content\r\n"), log);
 
     // Operate
     LineSinkMock mock;
@@ -80,8 +82,9 @@ void
 TestNetSmtpMailRequest::testNoReceiver()
 {
     // Testee
+    afl::sys::Log log;
     afl::net::smtp::Configuration config("h", "f@ro.m");
-    afl::net::smtp::MailRequest testee(config, afl::base::Nothing, afl::string::toBytes("egal"));
+    afl::net::smtp::MailRequest testee(config, afl::base::Nothing, afl::string::toBytes("egal"), log);
 
     // Operate
     LineSinkMock mock;
@@ -100,12 +103,13 @@ void
 TestNetSmtpMailRequest::testVariant()
 {
     // Testee
+    afl::sys::Log log;
     afl::net::smtp::Configuration config("h", "f@ro.m");
     const String_t to[] = {"tx@one","tx@two","tx@three"};
     afl::net::smtp::MailRequest testee(config, to, afl::string::toBytes("From: body@from\r\n"
                                                                         "To: body@to\r\n"
                                                                         "\r\n"
-                                                                        "Content"));
+                                                                        "Content"), log);
 
     // Operate
     LineSinkMock mock;
@@ -151,12 +155,13 @@ void
 TestNetSmtpMailRequest::testClose()
 {
     // Testee
+    afl::sys::Log log;
     afl::net::smtp::Configuration config("h", "f@ro.m");
     const String_t to[] = {"t@o"};
     afl::net::smtp::MailRequest testee(config, to, afl::string::toBytes("From: body@from\r\n"
                                                                         "To: body@to\r\n"
                                                                         "\r\n"
-                                                                        "Content\r\n"));
+                                                                        "Content\r\n"), log);
 
     // Operate
     LineSinkMock mock;
@@ -179,8 +184,9 @@ void
 TestNetSmtpMailRequest::testMultilineGreeting()
 {
     // Testee
+    afl::sys::Log log;
     afl::net::smtp::Configuration config("h", "f@ro.m");
-    afl::net::smtp::MailRequest testee(config, afl::base::Nothing, afl::string::toBytes("egal"));
+    afl::net::smtp::MailRequest testee(config, afl::base::Nothing, afl::string::toBytes("egal"), log);
 
     // Operate
     LineSinkMock mock;
@@ -207,8 +213,9 @@ void
 TestNetSmtpMailRequest::testPrematureClose()
 {
     // Testee
+    afl::sys::Log log;
     afl::net::smtp::Configuration config("h", "f@ro.m");
-    afl::net::smtp::MailRequest testee(config, afl::base::Nothing, afl::string::toBytes("egal"));
+    afl::net::smtp::MailRequest testee(config, afl::base::Nothing, afl::string::toBytes("egal"), log);
 
     // Operate
     LineSinkMock mock;
@@ -228,9 +235,10 @@ void
 TestNetSmtpMailRequest::testErrorResponse()
 {
     // Testee
+    afl::sys::Log log;
     afl::net::smtp::Configuration config("h", "f@ro.m");
     const String_t to[] = {"t"};
-    afl::net::smtp::MailRequest testee(config, to, afl::string::toBytes("egal"));
+    afl::net::smtp::MailRequest testee(config, to, afl::string::toBytes("egal"), log);
 
     // Operate
     LineSinkMock mock;

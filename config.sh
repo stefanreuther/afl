@@ -64,7 +64,7 @@ conf_log_result "$CXXFLAGS"
 
 # Find archiver
 conf_log_start "Looking for archiver..."
-conf_var_set AR "${AR:-ar}"
+conf_var_set AR "${AR:-${CROSS_COMPILE}ar}"
 conf_run $AR cr __tmp.a || conf_log_die "Does not work."
 rm -f __tmp.a
 conf_log_result "$AR"

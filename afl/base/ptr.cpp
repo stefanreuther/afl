@@ -9,10 +9,10 @@
 #include "afl/sys/mutexguard.hpp"
 
 afl::sys::AtomicInteger*
-afl::base::detail::getReferenceCount(void* p)
+afl::base::detail::getReferenceCount(const void* p)
 {
     static afl::sys::Mutex mtx;
-    static afl::container::PtrMap<void*, afl::sys::AtomicInteger> data;
+    static afl::container::PtrMap<const void*, afl::sys::AtomicInteger> data;
 
     afl::sys::MutexGuard g(mtx);
     afl::sys::AtomicInteger* result = data[p];

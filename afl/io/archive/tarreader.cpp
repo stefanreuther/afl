@@ -94,7 +94,7 @@ namespace {
         while (amount > 0) {
             afl::base::Bytes_t bytes(buffer);
             if (amount < bytes.size()) {
-                bytes.trim(amount);
+                bytes.trim(static_cast<size_t>(amount));
             }
             size_t n = s.read(bytes);
             if (n == 0) {

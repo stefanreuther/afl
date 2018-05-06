@@ -48,7 +48,9 @@ namespace {
 /*
  *  Win32 Version
  */
-# define NOMINMAX
+# ifndef NOMINMAX
+#  define NOMINMAX
+# endif
 # include <windows.h>
 # include <string.h>
 # include <stdio.h>

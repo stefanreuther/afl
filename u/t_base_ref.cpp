@@ -116,3 +116,17 @@ TestBaseRef::testPtr()
     }
     TS_ASSERT_EQUALS(RefCountedObj::live, 0);
 }
+
+/** Test use of const objects. */
+void
+TestBaseRef::testConstObj()
+{
+    TS_ASSERT_EQUALS(RefCountedObj::live, 0);
+    {
+        const RefCountedObj* p = new RefCountedObj(12);
+        afl::base::Ref<const RefCountedObj> pi(*p);
+        TS_ASSERT_EQUALS(RefCountedObj::live, 1);
+        TS_ASSERT_EQUALS(pi->n, 12);
+    }
+    TS_ASSERT_EQUALS(RefCountedObj::live, 0);
+}

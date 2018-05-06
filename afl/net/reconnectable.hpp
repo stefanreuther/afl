@@ -29,15 +29,14 @@ namespace afl { namespace net {
             Always
         };
 
+        /** Protected destructor.
+            Reconnectable cannot serve as a base class for pointers. */
+        virtual ~Reconnectable()
+            { }
+
         /** Set reconnect mode.
             \param mode New mode. The default is implementation-defined. */
         virtual void setReconnectMode(Mode mode) = 0;
-
-     protected:
-        /** Protected destructor.
-            Reconnectable cannot serve as a base class for pointers. */
-        ~Reconnectable()
-            { }
     };
 
 } }

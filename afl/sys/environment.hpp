@@ -37,6 +37,10 @@ namespace afl { namespace sys {
             \see getCommandLine */
         typedef afl::base::Enumerator<String_t> CommandLine_t;
 
+        /** Virtual destructor. */
+        virtual ~Environment()
+            { }
+
         /** Get command line.
             Returns the command line in UTF-8 format.
             \return Enumerator listing all command line arguments (not including the program name) */

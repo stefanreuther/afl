@@ -8,6 +8,7 @@
 #include "afl/base/memory.hpp"
 #include "afl/net/line/linehandler.hpp"
 #include "afl/net/smtp/configuration.hpp"
+#include "afl/sys/loglistener.hpp"
 
 namespace afl { namespace net { namespace smtp {
 
@@ -28,10 +29,12 @@ namespace afl { namespace net { namespace smtp {
                            and lines starting with dots must have them doubled.
                            Mail content produced by MimeBuilder will fulfill these criteria.
                            If the final CRLF is missing, MailRequest will add one, possibly causing the perceived content to change.
-                           If the content contains non-escaped dots, this will probably violate the protocol and fail. */
+                           If the content contains non-escaped dots, this will probably violate the protocol and fail.
+            \param log     Logger */
         MailRequest(const Configuration& config,
                     afl::base::Memory<const String_t> to,
-                    afl::base::ConstBytes_t content);
+                    afl::base::ConstBytes_t content,
+                    afl::sys::LogListener& log);
 
         /** Destructor. */
         ~MailRequest();
@@ -56,6 +59,9 @@ namespace afl { namespace net { namespace smtp {
         afl::base::ConstBytes_t m_content;
         afl::base::Memory<const String_t> m_to;
         State m_state;
+        afl::sys::LogListener& m_log;
+
+        void sendLine(const String_t& line, afl::net::line::LineSink& response);
     };
 
 } } }

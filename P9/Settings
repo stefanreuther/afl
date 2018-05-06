@@ -28,7 +28,7 @@ LIBDEPEND = $(CONFIG_AFL_LIBDEPEND)
 AR = $(CONFIG_AFL_AR)
 
 # "rm" tool
-RM = rm
+RM = rm -f
 
 # A program to execute a compiled program. Empty for native execution, but could be something like a simulator.
 RUN = $(CONFIG_AFL_RUN)
@@ -48,7 +48,9 @@ PROJ_AUTO += afl:afl/*pp testsuite:u/*pp
 ##  Main Library
 ##
 TARGETS += afl
-FILES_afl = afl/base/stoppable.hpp afl/base/inlinememory.hpp \
+FILES_afl = afl/test/translator.cpp afl/test/translator.hpp \
+    afl/net/http/cgihandler.cpp afl/net/http/cgihandler.hpp \
+    afl/base/stoppable.hpp afl/base/inlinememory.hpp \
     afl/test/commandhandler.cpp afl/test/commandhandler.hpp \
     afl/test/callreceiver.cpp afl/test/callreceiver.hpp \
     afl/test/networkstack.cpp afl/test/networkstack.hpp afl/test/socket.cpp \
@@ -380,12 +382,12 @@ DEPEND_unzip = afl
 ##  Testsuite
 ##
 TARGETS += testsuite
-FILES_testsuite = u/t_base_stoppable.cpp u/t_base_inlinememory.cpp \
-    u/t_test_commandhandler.cpp u/t_test_callreceiver.cpp \
-    u/t_test_networkstack.cpp u/t_test_socket.cpp u/t_test_assert.cpp \
-    u/t_test.hpp u/t_checksums_sha512.cpp u/t_checksums_sha384.cpp \
-    u/t_checksums_sha256.cpp u/t_checksums_sha224.cpp \
-    u/t_net_tunnel_tunnelablenetworkstack.cpp \
+FILES_testsuite = u/t_test_translator.cpp u/t_base_stoppable.cpp \
+    u/t_base_inlinememory.cpp u/t_test_commandhandler.cpp \
+    u/t_test_callreceiver.cpp u/t_test_networkstack.cpp u/t_test_socket.cpp \
+    u/t_test_assert.cpp u/t_test.hpp u/t_checksums_sha512.cpp \
+    u/t_checksums_sha384.cpp u/t_checksums_sha256.cpp \
+    u/t_checksums_sha224.cpp u/t_net_tunnel_tunnelablenetworkstack.cpp \
     u/t_net_tunnel_socks5networkstack.cpp u/t_net_tunnel_socketwrapper.cpp \
     u/t_net_tunnel_socks4networkstack.cpp u/t_net_tunnel.hpp \
     u/t_net_smtp_configuration.cpp u/t_net_smtp_mailrequest.cpp \

@@ -88,6 +88,20 @@ TestBasePtr::testObj()
     TS_ASSERT_EQUALS(Obj::live, 0);
 }
 
+/** Test pointer to const object type. */
+void
+TestBasePtr::testConstObj()
+{
+    TS_ASSERT_EQUALS(Obj::live, 0);
+    {
+        const Obj* p = new Obj(77);
+        afl::base::Ptr<const Obj> pi = p;
+        TS_ASSERT_EQUALS(Obj::live, 1);
+        TS_ASSERT_EQUALS(pi->n, 77);
+    }
+    TS_ASSERT_EQUALS(Obj::live, 0);
+}
+
 /*
  *  Pointer to RefCounted object type
  */

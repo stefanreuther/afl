@@ -19,8 +19,8 @@ namespace {
         \retval false return error to caller */
     bool parsePostValidate(const char* c, const char* end, String_t::size_type& pos, bool refuseNegative)
     {
-        // Check error
-        if (errno == ERANGE) {
+        // Check error: explicit range error reported, or nothing parsed at all
+        if (errno == ERANGE || c == end) {
             pos = 0;
             return false;
         }

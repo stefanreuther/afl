@@ -24,14 +24,20 @@
 #include "afl/net/line/linesink.hpp"
 #include "afl/string/messages.hpp"
 
+namespace {
+    const char* LOG_NAME = "smtp";
+}
+
 // Constructor.
 afl::net::smtp::MailRequest::MailRequest(const Configuration& config,
                                          afl::base::Memory<const String_t> to,
-                                         afl::base::ConstBytes_t content)
+                                         afl::base::ConstBytes_t content,
+                                         afl::sys::LogListener& log)
     : m_config(config),
       m_content(content),
       m_to(to),
-      m_state(Greeting_2)
+      m_state(Greeting_2),
+      m_log(log)
 {
     // If the content ends in \r\n (which it should), remove that to avoid it getting doubled.
     const uint8_t* p;
@@ -60,6 +66,7 @@ afl::net::smtp::MailRequest::handleLine(const String_t& line, afl::net::line::Li
     if (line.size() >= 4 && line[3] != '-') {
         // It's a line that looks like the final line of a reply
         char expected = '?';
+        m_log.write(afl::sys::LogListener::Trace, LOG_NAME, "> " + line);
         switch (m_state) {
          case Greeting_2:
          case Hello_2:
@@ -82,39 +89,39 @@ afl::net::smtp::MailRequest::handleLine(const String_t& line, afl::net::line::Li
          case Greeting_2:       // receive greeting, "2xx", then send HELO
             if (m_to.empty()) {
                 // Error case, no recipient given
-                response.handleLine("QUIT");
+                sendLine("QUIT", response);
                 m_state = Quit_2;
             } else {
-                response.handleLine("HELO " + m_config.hello);
+                sendLine("HELO " + m_config.hello, response);
                 m_state = Hello_2;
             }
             break;
 
          case Hello_2:          // receive HELO response, "2xx", then send MAIL FROM
-            response.handleLine("MAIL FROM:<" + m_config.from + ">");
+            sendLine("MAIL FROM:<" + m_config.from + ">", response);
             m_state = From_2;
             break;
 
          case From_2:           // receive MAIL FROM or RCPT TO response, "2xx", then send RCPT TO
-            response.handleLine("RCPT TO:<" + *m_to.eat() + ">");
+            sendLine("RCPT TO:<" + *m_to.eat() + ">", response);
             if (m_to.empty()) {
                 m_state = Recipient_2;
             }
             break;
 
          case Recipient_2:      // receive final RCPT TO response, "2xx", then send DATA
-            response.handleLine("DATA");
+            sendLine("DATA", response);
             m_state = Data_3;
             break;
 
          case Data_3:           // receive DATA response, "3xx", then send content
             response.handleLine(afl::string::fromBytes(m_content));
-            response.handleLine(".");
+            sendLine(".", response);
             m_state = Content_2;
             break;
 
          case Content_2:        // receive content response, "2xx", then send quit
-            response.handleLine("QUIT");
+            sendLine("QUIT", response);
             m_state = Quit_2;
             break;
 
@@ -141,4 +148,11 @@ afl::net::smtp::MailRequest::handleConnectionClose()
      case Quit_2:
         break;
     }
+}
+
+void
+afl::net::smtp::MailRequest::sendLine(const String_t& line, afl::net::line::LineSink& response)
+{
+    m_log.write(afl::sys::LogListener::Trace, LOG_NAME, "< " + line);
+    response.handleLine(line);
 }

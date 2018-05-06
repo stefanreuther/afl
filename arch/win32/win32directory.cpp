@@ -236,6 +236,7 @@ void
 arch::win32::Win32Directory::Entry::doSetFlag(FileFlag flag, bool value)
 {
     // FIXME: changing the "hidden" bit is actually supported
+    (void) value;
     switch (flag) {
      case Hidden:
      case Link:

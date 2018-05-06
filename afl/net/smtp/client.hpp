@@ -12,6 +12,7 @@
 #include "afl/net/smtp/client.hpp"
 #include "afl/net/smtp/configuration.hpp"
 #include "afl/string/string.hpp"
+#include "afl/sys/log.hpp"
 
 namespace afl { namespace net { namespace smtp {
 
@@ -47,10 +48,15 @@ namespace afl { namespace net { namespace smtp {
             \throw afl::except::FileSystemException network error */
         void send(afl::base::Memory<const String_t> to, const MimeBuilder& content);
 
+        /** Access logger.
+            You can attach your own logger or listener here to receive logs of the SMTP dialogs. */
+        afl::sys::Log& log();
+
      private:
         NetworkStack& m_networkStack;
         Name m_name;
         Configuration m_config;
+        afl::sys::Log m_log;
     };
 
 } } }

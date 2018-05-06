@@ -1,3 +1,28 @@
+2018-04-15  Stefan Reuther  <streu@gmx.de>
+
+	* arch/win32/win32networkstack.cpp: add support for systems without getaddrinfo (UNTESTED)
+
+2018-04-08  Stefan Reuther  <streu@gmx.de>
+
+	* afl/test/translator.cpp: new
+
+2018-03-01  Stefan Reuther  <streu@gmx.de>
+
+	* afl/base/ptr.hpp, afl/base/ref.hpp: allow use with 'const T'
+
+2018-02-04  Stefan Reuther  <streu@gmx.de>
+
+	* afl/net/smtp/client.cpp, afl/net/smtp/client.hpp: add ability to log SMTP dialog
+	* afl/net/smtp/mailrequest.cpp, afl/net/smtp/mailrequest.hpp: add ability to log SMTP dialog [INCOMPATIBLE]
+
+2018-01-28  Stefan Reuther  <streu@gmx.de>
+
+	* afl/string/parse.cpp: 'stringToInteger(" ")' should return error
+
+2018-01-24  Stefan Reuther  <streu@gmx.de>
+
+	* afl/net/http/cgihandler.hpp: new
+
 2018-01-07  Stefan Reuther  <streu@gmx.de>
 
 	* afl/base/memory.hpp (findNot): new

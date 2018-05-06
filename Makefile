@@ -4,7 +4,8 @@
 
 ALL_TARGETS = libafl.a date dialog ls chatserver wget hash secureio \
     respclient respserver httpserver env unzip testsuite
-OBJECTS_afl = afl/test/commandhandler1.o afl/test/callreceiver.o \
+OBJECTS_afl = afl/test/translator1.o afl/net/http/cgihandler.o \
+    afl/test/commandhandler1.o afl/test/callreceiver.o \
     afl/test/networkstack1.o afl/test/socket.o afl/test/assert.o \
     afl/checksums/sha512.o afl/checksums/sha384.o afl/checksums/sha224.o \
     afl/checksums/sha256.o afl/checksums/sha2core.o \
@@ -123,11 +124,12 @@ OBJECTS_ls = app/ls.o
 OBJECTS_respclient = app/respclient.o
 OBJECTS_respserver = app/respserver.o
 OBJECTS_secureio = app/secureio.o
-OBJECTS_testsuite = u/t_base_stoppable.o u/t_base_inlinememory.o \
-    u/t_test_commandhandler.o u/t_test_callreceiver.o \
-    u/t_test_networkstack.o u/t_test_socket.o u/t_test_assert.o \
-    u/t_checksums_sha512.o u/t_checksums_sha384.o u/t_checksums_sha256.o \
-    u/t_checksums_sha224.o u/t_net_tunnel_tunnelablenetworkstack.o \
+OBJECTS_testsuite = u/t_test_translator.o u/t_base_stoppable.o \
+    u/t_base_inlinememory.o u/t_test_commandhandler.o \
+    u/t_test_callreceiver.o u/t_test_networkstack.o u/t_test_socket.o \
+    u/t_test_assert.o u/t_checksums_sha512.o u/t_checksums_sha384.o \
+    u/t_checksums_sha256.o u/t_checksums_sha224.o \
+    u/t_net_tunnel_tunnelablenetworkstack.o \
     u/t_net_tunnel_socks5networkstack.o u/t_net_tunnel_socketwrapper.o \
     u/t_net_tunnel_socks4networkstack.o u/t_net_smtp_configuration.o \
     u/t_net_smtp_mailrequest.o u/t_net_interact.o u/t_net_line_simplequery.o \
@@ -235,7 +237,7 @@ OBJECTS_testsuite = u/t_base_stoppable.o u/t_base_inlinememory.o \
 OBJECTS_unzip = app/unzip.o
 OBJECTS_wget = app/wget.o
 CXXFLAGS = $(CONFIG_AFL_CXXFLAGS) -I. -DTARGET_OS_POSIX -MMD
-RM = rm
+RM = rm -f
 RUN = $(CONFIG_AFL_RUN)
 HEADERS_testsuite = u/t_*.hpp
 PERL = $(CONFIG_AFL_PERL)
@@ -430,6 +432,16 @@ afl/test/networkstack1.o: afl/test/networkstack.cpp
 
 afl/test/networkstack1.s: afl/test/networkstack.cpp
 	$(CXX) $(CXXFLAGS) -o afl/test/networkstack1.s -S afl/test/networkstack.cpp
+
+afl/test/translator1.lo: afl/test/translator.cpp
+	$(CXX) -fPIC $(CXXFLAGS) -o afl/test/translator1.lo -c afl/test/translator.cpp
+
+afl/test/translator1.o: afl/test/translator.cpp
+	@echo "        Compiling afl/test/translator.cpp..."
+	@$(CXX) $(CXXFLAGS) -o afl/test/translator1.o -c afl/test/translator.cpp
+
+afl/test/translator1.s: afl/test/translator.cpp
+	$(CXX) $(CXXFLAGS) -o afl/test/translator1.s -S afl/test/translator.cpp
 
 app/dialog1.lo: app/dialog.cpp
 	$(CXX) -fPIC $(CXXFLAGS) -o app/dialog1.lo -c app/dialog.cpp
@@ -3224,6 +3236,16 @@ u/t_test_socket.o: u/t_test_socket.cpp
 
 u/t_test_socket.s: u/t_test_socket.cpp
 	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_test_socket.s -S u/t_test_socket.cpp
+
+u/t_test_translator.lo: u/t_test_translator.cpp
+	$(CXX) -fPIC $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_test_translator.lo -c u/t_test_translator.cpp
+
+u/t_test_translator.o: u/t_test_translator.cpp
+	@echo "        Compiling u/t_test_translator.cpp..."
+	@$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_test_translator.o -c u/t_test_translator.cpp
+
+u/t_test_translator.s: u/t_test_translator.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_test_translator.s -S u/t_test_translator.cpp
 
 u/t_tmp_copycv.lo: u/t_tmp_copycv.cpp
 	$(CXX) -fPIC $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_tmp_copycv.lo -c u/t_tmp_copycv.cpp

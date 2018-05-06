@@ -5,7 +5,9 @@
 #ifndef AFL_ARCH_WIN32_WIN32STREAM_HPP
 #define AFL_ARCH_WIN32_WIN32STREAM_HPP
 
-#define NOMINMAX
+#ifndef NOMINMAX
+# define NOMINMAX
+#endif
 #include <windows.h>
 #include "afl/io/multiplexablestream.hpp"
 #include "afl/io/filesystem.hpp"

@@ -11,8 +11,8 @@
 namespace afl { namespace base {
 
     namespace detail {
-        afl::sys::AtomicInteger* getReferenceCount(void*);
-        afl::sys::AtomicInteger* getReferenceCount(afl::base::RefCounted*);
+        afl::sys::AtomicInteger* getReferenceCount(const void*);
+        afl::sys::AtomicInteger* getReferenceCount(const afl::base::RefCounted*);
     }
 
     template<typename T> class Ref;
@@ -151,7 +151,7 @@ namespace afl { namespace base {
 } }
 
 inline afl::sys::AtomicInteger*
-afl::base::detail::getReferenceCount(afl::base::RefCounted* p)
+afl::base::detail::getReferenceCount(const afl::base::RefCounted* p)
 {
     return &p->refCounter();
 }

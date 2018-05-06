@@ -47,4 +47,9 @@ class TestTestSocket : public CxxTest::TestSuite {
     void testFailure();
 };
 
+class TestTestTranslator : public CxxTest::TestSuite {
+ public:
+    void testIt();
+};
+
 #endif

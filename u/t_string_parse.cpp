@@ -42,6 +42,10 @@ TestStringParse::testStrToInt()
     TS_ASSERT(strToInteger(e.substr(0, pos), res));
     TS_ASSERT_EQUALS(res, 99);
 
+    // Border cases
+    TS_ASSERT(!strToInteger("", res));
+    TS_ASSERT(!strToInteger(" ", res));
+
     // Now with overflow checking
     String_t f = "240";
     int8_t i8 = 0;
@@ -105,6 +109,10 @@ TestStringParse::testStrToLL()
 
     TS_ASSERT(!strToInteger("99999999999999999999999999999999", u64));
     TS_ASSERT(!strToInteger("99999999999999999999999999999999", i64));
+
+    // Border cases
+    TS_ASSERT(!strToInteger("", ll));
+    TS_ASSERT(!strToInteger(" ", ll));
 }
 
 /** Test strToFloat. */

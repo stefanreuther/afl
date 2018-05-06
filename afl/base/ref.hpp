@@ -125,7 +125,7 @@ inline void
 afl::base::Ref<T>::reset(T& obj)
 {
     // Increment their reference counter
-    ++static_cast<RefCounted&>(obj).refCounter();
+    ++static_cast<const RefCounted&>(obj).refCounter();
 
     // Decrement our reference counter
     decRef();
@@ -159,14 +159,14 @@ template<typename T>
 inline afl::base::Ptr<T>
 afl::base::Ref<T>::asPtr() const
 {
-    return Ptr<T>(m_ptr, &static_cast<RefCounted*>(m_ptr)->refCounter());
+    return Ptr<T>(m_ptr, &static_cast<const RefCounted*>(m_ptr)->refCounter());
 }
 
 template<typename T>
 inline void
 afl::base::Ref<T>::incRef()
 {
-    ++static_cast<RefCounted*>(m_ptr)->refCounter();
+    ++static_cast<const RefCounted*>(m_ptr)->refCounter();
 }
 
 template<typename T>
@@ -176,7 +176,7 @@ afl::base::Ref<T>::decRef()
     // Note: Ptr<> protects against assignment in the destructor.
     // This cannot be implemented in Ref<>.
     // Whereas Ptr<> just falls back to assigning null, Ref<> cannot do that.
-    if (--static_cast<RefCounted*>(m_ptr)->refCounter() == 0) {
+    if (--static_cast<const RefCounted*>(m_ptr)->refCounter() == 0) {
         delete m_ptr;
     }
 }
