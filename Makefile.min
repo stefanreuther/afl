@@ -127,8 +127,8 @@ OBJECTS_ls = app/ls.o
 OBJECTS_respclient = app/respclient.o
 OBJECTS_respserver = app/respserver.o
 OBJECTS_secureio = app/secureio.o
-OBJECTS_testsuite = u/t_test_translator.o u/t_base_stoppable.o \
-    u/t_base_inlinememory.o u/t_test_commandhandler.o \
+OBJECTS_testsuite = u/t_net_redis_integerfield.o u/t_test_translator.o \
+    u/t_base_stoppable.o u/t_base_inlinememory.o u/t_test_commandhandler.o \
     u/t_test_callreceiver.o u/t_test_networkstack.o u/t_test_socket.o \
     u/t_test_assert.o u/t_checksums_sha512.o u/t_checksums_sha384.o \
     u/t_checksums_sha256.o u/t_checksums_sha224.o \
@@ -1751,6 +1751,12 @@ u/t_net_reconnectable.o: u/t_net_reconnectable.cpp
 
 u/t_net_reconnectable.s: u/t_net_reconnectable.cpp
 	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_net_reconnectable.s -S u/t_net_reconnectable.cpp
+
+u/t_net_redis_integerfield.o: u/t_net_redis_integerfield.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_net_redis_integerfield.o -c u/t_net_redis_integerfield.cpp
+
+u/t_net_redis_integerfield.s: u/t_net_redis_integerfield.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_net_redis_integerfield.s -S u/t_net_redis_integerfield.cpp
 
 u/t_net_redis_integerkey.o: u/t_net_redis_integerkey.cpp
 	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -o u/t_net_redis_integerkey.o -c u/t_net_redis_integerkey.cpp

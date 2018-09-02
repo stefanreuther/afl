@@ -6,6 +6,7 @@
 #define AFL_AFL_NET_REDIS_INTEGERKEY_HPP
 
 #include "afl/net/redis/key.hpp"
+#include "afl/base/optional.hpp"
 
 namespace afl { namespace net { namespace redis {
 
@@ -34,7 +35,11 @@ namespace afl { namespace net { namespace redis {
 
         /** Get current value (GET).
             \return value */
-        int32_t get();
+        int32_t get() const;
+
+        /** Get current value if it exists (GET).
+            \return value (Nothing if it is not set) */
+        afl::base::Optional<int32_t> getOptional() const;
 
         /** Replace with a new value (GETSET).
             Returns the old value.

@@ -7,6 +7,12 @@
 
 #include <cxxtest/TestSuite.h>
 
+class TestNetRedisIntegerField : public CxxTest::TestSuite {
+ public:
+    void testMock();
+    void testInternal();
+};
+
 class TestNetRedisIntegerKey : public CxxTest::TestSuite {
  public:
     void testMock();

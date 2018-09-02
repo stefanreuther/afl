@@ -32,6 +32,9 @@ class TestIoXmlReader : public CxxTest::TestSuite {
     void testUtf16BE();
     void testText();
     void testQuote();
+    void testSeek();
+    void testSeek2();
+    void testPosUtf16();
 };
 
 #endif

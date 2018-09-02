@@ -95,7 +95,7 @@ namespace afl { namespace data {
             Returns the smallest possible number such that operator[] for this value
             and all greater ones will yield null (=unused or unallocated elements).
             \return number of elements */
-        Index_t getNumUsedSlots();
+        Index_t getNumUsedSlots() const;
 
 
         /*

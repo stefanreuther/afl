@@ -255,6 +255,7 @@
 -include app/httpserver.d
 -include app/env.d
 -include app/unzip.d
+-include u/t_net_redis_integerfield.d
 -include u/t_test_translator.d
 -include u/t_base_stoppable.d
 -include u/t_base_inlinememory.d

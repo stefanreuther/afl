@@ -382,12 +382,13 @@ DEPEND_unzip = afl
 ##  Testsuite
 ##
 TARGETS += testsuite
-FILES_testsuite = u/t_test_translator.cpp u/t_base_stoppable.cpp \
-    u/t_base_inlinememory.cpp u/t_test_commandhandler.cpp \
-    u/t_test_callreceiver.cpp u/t_test_networkstack.cpp u/t_test_socket.cpp \
-    u/t_test_assert.cpp u/t_test.hpp u/t_checksums_sha512.cpp \
-    u/t_checksums_sha384.cpp u/t_checksums_sha256.cpp \
-    u/t_checksums_sha224.cpp u/t_net_tunnel_tunnelablenetworkstack.cpp \
+FILES_testsuite = u/t_net_redis_integerfield.cpp u/t_test_translator.cpp \
+    u/t_base_stoppable.cpp u/t_base_inlinememory.cpp \
+    u/t_test_commandhandler.cpp u/t_test_callreceiver.cpp \
+    u/t_test_networkstack.cpp u/t_test_socket.cpp u/t_test_assert.cpp \
+    u/t_test.hpp u/t_checksums_sha512.cpp u/t_checksums_sha384.cpp \
+    u/t_checksums_sha256.cpp u/t_checksums_sha224.cpp \
+    u/t_net_tunnel_tunnelablenetworkstack.cpp \
     u/t_net_tunnel_socks5networkstack.cpp u/t_net_tunnel_socketwrapper.cpp \
     u/t_net_tunnel_socks4networkstack.cpp u/t_net_tunnel.hpp \
     u/t_net_smtp_configuration.cpp u/t_net_smtp_mailrequest.cpp \

@@ -34,6 +34,11 @@ namespace afl { namespace net { namespace http {
         /** Destructor. */
         virtual ~ProtocolHandler();
 
+        /** Set maximum length pf a request header.
+            This is an approximate size, for DoS protection.
+            \param size New size */
+        void setMaxRequestHeaderLength(size_t size);
+
         // ProtocolHandler:
         virtual void getOperation(Operation& op);
         virtual void advanceTime(afl::sys::Timeout_t msecs);
@@ -64,6 +69,12 @@ namespace afl { namespace net { namespace http {
             We have determined where to route the request, and this is the target.
             Actual data goes into m_responseSink. */
         std::auto_ptr<Response> m_response;
+
+        /** Current number of bytes in request header. */
+        size_t m_requestHeaderLength;
+
+        /** Maximum number of bytes in request header (DoS protection). */
+        size_t m_maxRequestHeaderLength;
 
         /** Currently-receiving response, data sink.
             This parses the request body delimiters and drives m_response. */

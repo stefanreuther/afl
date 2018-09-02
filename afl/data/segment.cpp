@@ -109,7 +109,7 @@ afl::data::Segment::size() const
 }
 
 afl::data::Segment::Index_t
-afl::data::Segment::getNumUsedSlots()
+afl::data::Segment::getNumUsedSlots() const
 {
     Index_t result = m_content.size();
     while (result > 0 && m_content[result-1] == 0) {

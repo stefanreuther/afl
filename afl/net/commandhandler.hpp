@@ -10,6 +10,7 @@
 #include "afl/data/segment.hpp"
 #include "afl/base/types.hpp"
 #include "afl/string/string.hpp"
+#include "afl/base/optional.hpp"
 
 namespace afl { namespace net {
 
@@ -68,6 +69,16 @@ namespace afl { namespace net {
             \throw afl::except::InvalidDataException The remote end sent invalid data (protocol error).
             \return result */
         int32_t callInt(const Segment_t& command);
+
+        /** Invoke a command, returning an optional integer value.
+            The result of the call is interpreted as an integer.
+            If the value does not exist (null), Nothing is returned.
+            If it exists but cannot be converted, an afl::except::InvalidDataException is signalled.
+            \param command Command and arguments as a list of values.
+            \throw afl::except::RemoteErrorException The remote end signalled an error.
+            \throw afl::except::InvalidDataException The remote end sent invalid data (protocol error).
+            \return result */
+        afl::base::Optional<int32_t> callOptionalInt(const Segment_t& command);
 
         /** Invoke a command, returning a string value.
             The result of the call is interpreted as a string.

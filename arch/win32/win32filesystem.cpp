@@ -78,8 +78,8 @@ arch::win32::Win32FileSystem::getAbsolutePathName(FileName_t name)
             } else {
                 // okay, use Win32 function to do it:
                 WStr buffer(charsNeeded+1);
-                GetFullPathNameW(&tmp[0], charsNeeded, &buffer.front(), &tmpp);
-                return convertFromUnicode(afl::base::Memory<const wchar_t>::unsafeCreate(&buffer[0], buffer.size()-1));
+                int charsProduced = GetFullPathNameW(&tmp[0], charsNeeded+1, &buffer.front(), &tmpp);
+                return convertFromUnicode(afl::base::Memory<const wchar_t>::unsafeCreate(&buffer[0], charsProduced));
             }
         }
     } else {
@@ -95,8 +95,8 @@ arch::win32::Win32FileSystem::getAbsolutePathName(FileName_t name)
         } else {
             // okay, use Win32 function to do it:
             std::vector<char> buffer(charsNeeded+1);
-            GetFullPathNameA(tmp.c_str(), charsNeeded, &buffer.front(), &tmpp);
-            return convertFromANSI(afl::base::Memory<const char>::unsafeCreate(&buffer[0], buffer.size()-1));
+            int charsProduced = GetFullPathNameA(tmp.c_str(), charsNeeded+1, &buffer.front(), &tmpp);
+            return convertFromANSI(afl::base::Memory<const char>::unsafeCreate(&buffer[0], charsProduced));
         }
     }
 }

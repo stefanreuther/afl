@@ -31,6 +31,7 @@ class TestTestCommandHandler : public CxxTest::TestSuite {
     void testFailNoResult();
     void testFailOutstandingCommand();
     void testFailOutstandingResult();
+    void testParameterTypes();
 };
 
 class TestTestNetworkStack : public CxxTest::TestSuite {

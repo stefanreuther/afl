@@ -17,6 +17,7 @@
 namespace {
     const int32_t RECEIVE_TIMEOUT = 30000;
     const int32_t SEND_TIMEOUT = 30000;
+    const size_t MAX_REQUEST_HEADER_LENGTH = 32768;
 }
 
 // Constructor.
@@ -25,6 +26,8 @@ afl::net::http::ProtocolHandler::ProtocolHandler(Dispatcher& dispatcher)
       m_state(ReadingRequest),
       m_request(new Request()),
       m_response(),
+      m_requestHeaderLength(0),
+      m_maxRequestHeaderLength(MAX_REQUEST_HEADER_LENGTH),
       m_responseSink(),
       m_responseKeepalive(false),
       m_finishedResponses()
@@ -66,6 +69,7 @@ afl::net::http::ProtocolHandler::handleData(afl::base::ConstBytes_t bytes)
 {
     while (!bytes.empty() && m_state != Close) {
         if (m_state == ReadingRequest) {
+            size_t originalSize = bytes.size();
             if (m_request->handleData(bytes)) {
                 // I have read the complete request. Digest it.
                 // - Save the keepalive flag to override the Response if needed.
@@ -107,7 +111,18 @@ afl::net::http::ProtocolHandler::handleData(afl::base::ConstBytes_t bytes)
                 }
 
                 m_request.reset(new Request());
+                m_requestHeaderLength = 0;
                 m_state = ReadingData;
+            } else {
+                // Request ate the complete buffer. Validate length.
+                size_t remainingSize = m_maxRequestHeaderLength - m_requestHeaderLength;
+                if (originalSize >= remainingSize) {
+                    // This caused the size to be exceeded - fail it.
+                    // FIXME: log it
+                    m_state = Close;
+                } else {
+                    m_requestHeaderLength += originalSize;
+                }
             }
         }
         if (m_state == ReadingData) {

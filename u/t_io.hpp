@@ -41,6 +41,8 @@ class TestIoDeflateTransform : public CxxTest::TestSuite {
 
 class TestIoDirectory : public CxxTest::TestSuite {
  public:
+    void testDirectoryAccess2();
+    void testParent();
     void setUp();
     void tearDown();
 

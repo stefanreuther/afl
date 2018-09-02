@@ -6,6 +6,7 @@
 #define AFL_AFL_NET_REDIS_INTEGERFIELD_HPP
 
 #include "afl/net/redis/field.hpp"
+#include "afl/base/optional.hpp"
 
 namespace afl { namespace net { namespace redis {
 
@@ -50,8 +51,12 @@ namespace afl { namespace net { namespace redis {
         bool set(int32_t value);
 
         /** Get current value (HGET).
-            \return value */
+            \return value (0 if it is not set) */
         int32_t get() const;
+
+        /** Get current value if it exists (HGET).
+            \return value (Nothing if it is not set) */
+        afl::base::Optional<int32_t> getOptional() const;
     };
 
 } } }

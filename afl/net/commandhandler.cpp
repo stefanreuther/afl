@@ -10,8 +10,18 @@
 int32_t
 afl::net::CommandHandler::callInt(const afl::data::Segment& command)
 {
+    return callOptionalInt(command).orElse(0);
+}
+
+afl::base::Optional<int32_t>
+afl::net::CommandHandler::callOptionalInt(const Segment_t& command)
+{
     std::auto_ptr<Value_t> result(call(command));
-    return afl::data::Access(result.get()).toInteger();
+    if (result.get() == 0) {
+        return afl::base::Nothing;
+    } else {
+        return afl::data::Access(result.get()).toInteger();
+    }
 }
 
 String_t

@@ -1,3 +1,31 @@
+2018-09-01  Stefan Reuther  <streu@gmx.de>
+
+	* arch/win32/win32filesystem.cpp (getAbsolutePathName): fix off-by-one error causing the final '\0' to be included in the result
+
+2018-08-12  Stefan Reuther  <streu@gmx.de>
+
+	* afl/net/http/protocolhandler.cpp: allow limiting header size (anti-DoS)
+
+2018-07-08  Stefan Reuther  <streu@gmx.de>
+
+	* afl/string/string.cpp (strCaseCompare): optimize (2-3x faster)
+
+2018-07-01  Stefan Reuther  <streu@gmx.de>
+
+	* afl/base/growablememory.hpp (appendN): return handle to appended elements
+
+2018-06-25  Stefan Reuther  <streu@gmx.de>
+
+	* afl/io/xml/reader.cpp: add codepage support (INCOMPATIBLE)
+
+2018-06-24  Stefan Reuther  <streu@gmx.de>
+
+	* afl/io/xml/reader.cpp (setPos, getTagPos): add support for seeking
+
+2018-05-20  Stefan Reuther  <streu@gmx.de>
+
+	* afl/net/redis/integerfield.cpp, afl/net/redis/integerkey.cpp (getOptional): new
+
 2018-04-15  Stefan Reuther  <streu@gmx.de>
 
 	* arch/win32/win32networkstack.cpp: add support for systems without getaddrinfo (UNTESTED)

@@ -29,9 +29,16 @@ afl::net::redis::IntegerKey::operator-=(int32_t val)
 
 // Get current value (GET).
 int32_t
-afl::net::redis::IntegerKey::get()
+afl::net::redis::IntegerKey::get() const
 {
-    return getHandler().callInt(Segment().pushBackString("GET").pushBackString(getName()));
+    return getOptional().orElse(0);
+}
+
+// Get current value (GET).
+afl::base::Optional<int32_t>
+afl::net::redis::IntegerKey::getOptional() const
+{
+    return getHandler().callOptionalInt(Segment().pushBackString("GET").pushBackString(getName()));
 }
 
 // Replace with a new value (GETSET).

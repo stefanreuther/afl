@@ -26,4 +26,9 @@ TestTestAssert::testIt()
     TS_ASSERT_THROWS(t.checkEqual("hi", 1, 9L), afl::except::AssertionFailedException);
     TS_ASSERT_THROWS(t.checkEqual("hi", "a", String_t("b")), afl::except::AssertionFailedException);
     TS_ASSERT_THROWS(t.checkEqualContent("hi", afl::string::toMemory("azy"), afl::string::toMemory("axy")), afl::except::AssertionFailedException);
+    TS_ASSERT_THROWS(t.checkEqualContent("hi", afl::string::toMemory("hjk"), afl::string::toMemory("hj")), afl::except::AssertionFailedException);
+
+    // Constructor variants
+    TS_ASSERT_THROWS(afl::test::Assert(String_t("s1")).check("hi", false), afl::except::AssertionFailedException);
+    TS_ASSERT_THROWS(afl::test::Assert("s1").check("hi", false), afl::except::AssertionFailedException);
 }

@@ -73,6 +73,7 @@ class TestBaseGrowableMemory : public CxxTest::TestSuite {
     void testConversion();
     void testVectorContent();
     void testDuplicate();
+    void testAppend();
 };
 
 class TestBaseInlineMemory : public CxxTest::TestSuite {

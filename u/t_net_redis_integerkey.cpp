@@ -55,6 +55,27 @@ TestNetRedisIntegerKey::testMock()
     mock.expectCall("SETNX, k, 3");
     mock.provideNewResult(new afl::data::IntegerValue(0));
     TS_ASSERT(!testee.setUnique(3));
+
+    // getOptional
+    mock.expectCall("GET, k");
+    mock.provideNewResult(0);
+    TS_ASSERT_EQUALS(testee.getOptional().orElse(99), 99);
+    mock.expectCall("GET, k");
+    mock.provideNewResult(new afl::data::IntegerValue(0));
+    TS_ASSERT_EQUALS(testee.getOptional().orElse(99), 0);
+    mock.expectCall("GET, k");
+    mock.provideNewResult(new afl::data::IntegerValue(7));
+    TS_ASSERT_EQUALS(testee.getOptional().orElse(99), 7);
+
+    mock.expectCall("GET, k");
+    mock.provideNewResult(0);
+    TS_ASSERT_EQUALS(testee.get(), 0);
+    mock.expectCall("GET, k");
+    mock.provideNewResult(new afl::data::IntegerValue(0));
+    TS_ASSERT_EQUALS(testee.get(), 0);
+    mock.expectCall("GET, k");
+    mock.provideNewResult(new afl::data::IntegerValue(7));
+    TS_ASSERT_EQUALS(testee.get(), 7);
 }
 
 /** Test IntegerKey against the InternalDatabase. */

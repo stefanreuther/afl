@@ -61,8 +61,15 @@ afl::net::redis::IntegerField::set(int32_t value)
 int32_t
 afl::net::redis::IntegerField::get() const
 {
-    return getHash().getHandler().callInt(Segment()
-                                          .pushBackString("HGET")
-                                          .pushBackString(getHash().getName())
-                                          .pushBackString(getName()));
+    return getOptional().orElse(0);
+}
+
+// Get current value if it exists (HGET).
+afl::base::Optional<int32_t>
+afl::net::redis::IntegerField::getOptional() const
+{
+    return getHash().getHandler().callOptionalInt(Segment()
+                                                  .pushBackString("HGET")
+                                                  .pushBackString(getHash().getName())
+                                                  .pushBackString(getName()));
 }

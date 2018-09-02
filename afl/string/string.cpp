@@ -92,6 +92,7 @@ afl::string::fromBytes(afl::base::ConstBytes_t mem)
 int
 afl::string::strCaseCompare(ConstStringMemory_t a, ConstStringMemory_t b)
 {
+#if 0
     while (1) {
         const char* pa = a.eat();
         const char* pb = b.eat();
@@ -117,6 +118,27 @@ afl::string::strCaseCompare(ConstStringMemory_t a, ConstStringMemory_t b)
             }
         }
     }
+#else
+    /* Slightly less idiomatic version.
+       In c2ng, time for MovementPredictor test is dominated by strCaseCompare() (used for configuration access).
+       This version reduces overall time for that test by 20% (19->15s). */
+    size_t commonLength = std::min(a.size(), b.size());
+    for (size_t i = 0; i < commonLength; ++i) {
+        char ca = a.unsafeData()[i];
+        char cb = b.unsafeData()[i];
+        if (ca != cb) {
+            int diff = charToUpper(ca) - charToUpper(cb);
+            if (diff != 0) {
+                return diff;
+            }
+        }
+    }
+    return (a.size() < b.size()
+            ? -1
+            : a.size() == b.size()
+            ? 0
+            : +1);
+#endif
 }
 
 // Compare (C version)

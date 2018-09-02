@@ -153,6 +153,7 @@ namespace {
         // Check whether this socket is good for us.
         DWORD errorCode = f.process(sock, (sockaddr*)&in, sizeof(in));
         if (errorCode != 0) {
+            ::closesocket(sock);
             throw afl::except::FileSystemException(name.toString(), afl::sys::Error(errorCode));
         }
 

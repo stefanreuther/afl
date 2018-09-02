@@ -133,10 +133,11 @@ OBJECTS_ls = app/ls.obj
 OBJECTS_respclient = app/respclient.obj
 OBJECTS_respserver = app/respserver.obj
 OBJECTS_secureio = app/secureio.obj
-OBJECTS_testsuite = u/t_test_translator.obj u/t_base_stoppable.obj \
-    u/t_base_inlinememory.obj u/t_test_commandhandler.obj \
-    u/t_test_callreceiver.obj u/t_test_networkstack.obj u/t_test_socket.obj \
-    u/t_test_assert.obj u/t_checksums_sha512.obj u/t_checksums_sha384.obj \
+OBJECTS_testsuite = u/t_net_redis_integerfield.obj u/t_test_translator.obj \
+    u/t_base_stoppable.obj u/t_base_inlinememory.obj \
+    u/t_test_commandhandler.obj u/t_test_callreceiver.obj \
+    u/t_test_networkstack.obj u/t_test_socket.obj u/t_test_assert.obj \
+    u/t_checksums_sha512.obj u/t_checksums_sha384.obj \
     u/t_checksums_sha256.obj u/t_checksums_sha224.obj \
     u/t_net_tunnel_tunnelablenetworkstack.obj \
     u/t_net_tunnel_socks5networkstack.obj u/t_net_tunnel_socketwrapper.obj \
@@ -1744,6 +1745,12 @@ u/t_net_reconnectable.obj: u/t_net_reconnectable.cpp
 
 u/t_net_reconnectable.s: u/t_net_reconnectable.cpp
 	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_net_reconnectable.s -S u/t_net_reconnectable.cpp
+
+u/t_net_redis_integerfield.obj: u/t_net_redis_integerfield.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_net_redis_integerfield.obj -c u/t_net_redis_integerfield.cpp
+
+u/t_net_redis_integerfield.s: u/t_net_redis_integerfield.cpp
+	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_net_redis_integerfield.s -S u/t_net_redis_integerfield.cpp
 
 u/t_net_redis_integerkey.obj: u/t_net_redis_integerkey.cpp
 	$(CXX) $(CXXFLAGS) -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g -ou/t_net_redis_integerkey.obj -c u/t_net_redis_integerkey.cpp

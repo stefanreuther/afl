@@ -23,6 +23,10 @@ namespace afl { namespace charset {
         /** Destructor. */
         virtual ~CodepageCharset();
 
+        /** Access codepage.
+            \return codepage */
+        const Codepage& get() const;
+
         // Charset:
         virtual afl::base::GrowableBytes_t encode(afl::string::ConstStringMemory_t in);
         virtual String_t decode(afl::base::ConstBytes_t in);
@@ -43,5 +47,10 @@ inline afl::charset::CodepageCharset::CodepageCharset(const Codepage& cp)
     : Charset(),
       m_codepage(cp)
 { }
+
+inline const afl::charset::Codepage& afl::charset::CodepageCharset::get() const
+{
+    return m_codepage;
+}
 
 #endif

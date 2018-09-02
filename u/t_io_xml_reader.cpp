@@ -9,6 +9,7 @@
 #include "u/t_io_xml.hpp"
 #include "afl/io/constmemorystream.hpp"
 #include "afl/io/xml/defaultentityhandler.hpp"
+#include "afl/charset/defaultcharsetfactory.hpp"
 
 using afl::io::xml::DefaultEntityHandler;
 
@@ -86,6 +87,7 @@ namespace {
 void
 TestIoXmlReader::testUtf8()
 {
+    afl::charset::DefaultCharsetFactory cf;
     {
         afl::io::ConstMemoryStream ms(afl::string::toBytes("<?xml version='1.0'?>\n"
                                                            "\n"
@@ -94,7 +96,7 @@ TestIoXmlReader::testUtf8()
                                                            "  < / bar >\n"
                                                            "  <text id=1>\xc2\x80</text>\n"
                                                            "</foo>\n"));
-        afl::io::xml::Reader xr(ms, DefaultEntityHandler::getInstance());
+        afl::io::xml::Reader xr(ms, DefaultEntityHandler::getInstance(), cf);
         testBasicDocument(xr, "testUtf8 (implicit)");
     }
 
@@ -104,7 +106,7 @@ TestIoXmlReader::testUtf8()
                                                            "\n"
                                                            "<text id=1>\xc2\x80</text>\n"));
 
-        Reader xr(ms, DefaultEntityHandler::getInstance());
+        Reader xr(ms, DefaultEntityHandler::getInstance(), cf);
         Reader::Token t;
 
         t = xr.readNext();
@@ -150,148 +152,154 @@ TestIoXmlReader::testUtf8()
 void
 TestIoXmlReader::testLatin1()
 {
-//     MemoryStream ms("<?xml version='1.0' encoding='iso-8859-1'?>\n"
-//                     "\n"
-//                     "<foo>\n"
-//                     "  < bar zot >\n"
-//                     "  < / bar >\n"
-//                     "  <text id=1>\xc2\x80</text>\n"
-//                     "</foo>\n");
-//     XmlReader xr(ms);
-//     XmlReader::Token t;
+    using afl::io::xml::Reader;
 
-//     t = xr.readNext();
-//     TS_ASSERT_EQUALS(t, XmlReader::PIStart);
-//     TS_ASSERT_EQUALS(xr.getTag(), "xml");
+    afl::charset::DefaultCharsetFactory cf;
+    afl::io::ConstMemoryStream ms(afl::string::toBytes("<?xml version='1.0' encoding='iso-8859-1'?>\n"
+                                                       "\n"
+                                                       "<foo>\n"
+                                                       "  < bar zot >\n"
+                                                       "  < / bar >\n"
+                                                       "  <text id=1>\xc2\x80</text>\n"
+                                                       "</foo>\n"));
+    Reader xr(ms, DefaultEntityHandler::getInstance(), cf);
+    Reader::Token t;
 
-//     t = xr.readNext();
-//     TS_ASSERT_EQUALS(t, XmlReader::PIAttribute);
-//     TS_ASSERT_EQUALS(xr.getName(), "version");
-//     TS_ASSERT_EQUALS(xr.getValue(), "1.0");
-//     TS_ASSERT_EQUALS(xr.getTag(), "xml");
+    t = xr.readNext();
+    TS_ASSERT_EQUALS(t, Reader::PIStart);
+    TS_ASSERT_EQUALS(xr.getTag(), "xml");
 
-//     t = xr.readNext();
-//     TS_ASSERT_EQUALS(t, XmlReader::PIAttribute);
-//     TS_ASSERT_EQUALS(xr.getName(), "encoding");
-//     TS_ASSERT_EQUALS(xr.getValue(), "iso-8859-1");
-//     TS_ASSERT_EQUALS(xr.getTag(), "xml");
+    t = xr.readNext();
+    TS_ASSERT_EQUALS(t, Reader::PIAttribute);
+    TS_ASSERT_EQUALS(xr.getName(), "version");
+    TS_ASSERT_EQUALS(xr.getValue(), "1.0");
+    TS_ASSERT_EQUALS(xr.getTag(), "xml");
 
-//     t = xr.readNext();
-//     TS_ASSERT_EQUALS(t, XmlReader::TagStart);
-//     TS_ASSERT_EQUALS(xr.getTag(), "foo");
+    t = xr.readNext();
+    TS_ASSERT_EQUALS(t, Reader::PIAttribute);
+    TS_ASSERT_EQUALS(xr.getName(), "encoding");
+    TS_ASSERT_EQUALS(xr.getValue(), "iso-8859-1");
+    TS_ASSERT_EQUALS(xr.getTag(), "xml");
 
-//     t = xr.readNext();
-//     TS_ASSERT_EQUALS(t, XmlReader::TagStart);
-//     TS_ASSERT_EQUALS(xr.getTag(), "bar");
+    t = xr.readNext();
+    TS_ASSERT_EQUALS(t, Reader::TagStart);
+    TS_ASSERT_EQUALS(xr.getTag(), "foo");
 
-//     t = xr.readNext();
-//     TS_ASSERT_EQUALS(t, XmlReader::TagAttribute);
-//     TS_ASSERT_EQUALS(xr.getTag(), "bar");
-//     TS_ASSERT_EQUALS(xr.getName(), "zot");
-//     TS_ASSERT_EQUALS(xr.getValue(), "zot");
+    t = xr.readNext();
+    TS_ASSERT_EQUALS(t, Reader::TagStart);
+    TS_ASSERT_EQUALS(xr.getTag(), "bar");
 
-//     t = xr.readNext();
-//     TS_ASSERT_EQUALS(t, XmlReader::TagEnd);
-//     TS_ASSERT_EQUALS(xr.getTag(), "bar");
+    t = xr.readNext();
+    TS_ASSERT_EQUALS(t, Reader::TagAttribute);
+    TS_ASSERT_EQUALS(xr.getTag(), "bar");
+    TS_ASSERT_EQUALS(xr.getName(), "zot");
+    TS_ASSERT_EQUALS(xr.getValue(), "zot");
 
-//     t = xr.readNext();
-//     TS_ASSERT_EQUALS(t, XmlReader::TagStart);
-//     TS_ASSERT_EQUALS(xr.getTag(), "text");
+    t = xr.readNext();
+    TS_ASSERT_EQUALS(t, Reader::TagEnd);
+    TS_ASSERT_EQUALS(xr.getTag(), "bar");
 
-//     t = xr.readNext();
-//     TS_ASSERT_EQUALS(t, XmlReader::TagAttribute);
-//     TS_ASSERT_EQUALS(xr.getTag(), "text");
-//     TS_ASSERT_EQUALS(xr.getName(), "id");
-//     TS_ASSERT_EQUALS(xr.getValue(), "1");
+    t = xr.readNext();
+    TS_ASSERT_EQUALS(t, Reader::TagStart);
+    TS_ASSERT_EQUALS(xr.getTag(), "text");
 
-//     t = xr.readNext();
-//     TS_ASSERT_EQUALS(t, XmlReader::Text);
-//     TS_ASSERT_EQUALS(xr.getValue(), "\xc3\x82\xc2\x80");
+    t = xr.readNext();
+    TS_ASSERT_EQUALS(t, Reader::TagAttribute);
+    TS_ASSERT_EQUALS(xr.getTag(), "text");
+    TS_ASSERT_EQUALS(xr.getName(), "id");
+    TS_ASSERT_EQUALS(xr.getValue(), "1");
 
-//     t = xr.readNext();
-//     TS_ASSERT_EQUALS(t, XmlReader::TagEnd);
-//     TS_ASSERT_EQUALS(xr.getTag(), "text");
+    t = xr.readNext();
+    TS_ASSERT_EQUALS(t, Reader::Text);
+    TS_ASSERT_EQUALS(xr.getValue(), "\xc3\x82\xc2\x80");
 
-//     t = xr.readNext();
-//     TS_ASSERT_EQUALS(t, XmlReader::TagEnd);
-//     TS_ASSERT_EQUALS(xr.getTag(), "foo");
+    t = xr.readNext();
+    TS_ASSERT_EQUALS(t, Reader::TagEnd);
+    TS_ASSERT_EQUALS(xr.getTag(), "text");
 
-//     t = xr.readNext();
-//     TS_ASSERT_EQUALS(t, XmlReader::Eof);
+    t = xr.readNext();
+    TS_ASSERT_EQUALS(t, Reader::TagEnd);
+    TS_ASSERT_EQUALS(xr.getTag(), "foo");
+
+    t = xr.readNext();
+    TS_ASSERT_EQUALS(t, Reader::Eof);
 }
 
 /** Test document in KOI8-R. */
 void
 TestIoXmlReader::testKOI8R()
 {
-//     MemoryStream ms("<?xml version='1.0' encoding='koi8r'?>\n"
-//                     "\n"
-//                     "<foo>\n"
-//                     "  < bar zot >\n"
-//                     "  < / bar >\n"
-//                     "  <text id=1>\xc2\x80</text>\n"
-//                     "</foo>\n");
-//     XmlReader xr(ms);
-//     XmlReader::Token t;
+    using afl::io::xml::Reader;
 
-//     t = xr.readNext();
-//     TS_ASSERT_EQUALS(t, XmlReader::PIStart);
-//     TS_ASSERT_EQUALS(xr.getTag(), "xml");
+    afl::charset::DefaultCharsetFactory cf;
+    afl::io::ConstMemoryStream ms(afl::string::toBytes("<?xml version='1.0' encoding='koi8r'?>\n"
+                                                       "\n"
+                                                       "<foo>\n"
+                                                       "  < bar zot >\n"
+                                                       "  < / bar >\n"
+                                                       "  <text id=1>\xc2\x80</text>\n"
+                                                       "</foo>\n"));
+    Reader xr(ms, DefaultEntityHandler::getInstance(), cf);
+    Reader::Token t;
 
-//     t = xr.readNext();
-//     TS_ASSERT_EQUALS(t, XmlReader::PIAttribute);
-//     TS_ASSERT_EQUALS(xr.getName(), "version");
-//     TS_ASSERT_EQUALS(xr.getValue(), "1.0");
-//     TS_ASSERT_EQUALS(xr.getTag(), "xml");
+    t = xr.readNext();
+    TS_ASSERT_EQUALS(t, Reader::PIStart);
+    TS_ASSERT_EQUALS(xr.getTag(), "xml");
 
-//     t = xr.readNext();
-//     TS_ASSERT_EQUALS(t, XmlReader::PIAttribute);
-//     TS_ASSERT_EQUALS(xr.getName(), "encoding");
-//     TS_ASSERT_EQUALS(xr.getValue(), "koi8r");
-//     TS_ASSERT_EQUALS(xr.getTag(), "xml");
+    t = xr.readNext();
+    TS_ASSERT_EQUALS(t, Reader::PIAttribute);
+    TS_ASSERT_EQUALS(xr.getName(), "version");
+    TS_ASSERT_EQUALS(xr.getValue(), "1.0");
+    TS_ASSERT_EQUALS(xr.getTag(), "xml");
 
-//     t = xr.readNext();
-//     TS_ASSERT_EQUALS(t, XmlReader::TagStart);
-//     TS_ASSERT_EQUALS(xr.getTag(), "foo");
+    t = xr.readNext();
+    TS_ASSERT_EQUALS(t, Reader::PIAttribute);
+    TS_ASSERT_EQUALS(xr.getName(), "encoding");
+    TS_ASSERT_EQUALS(xr.getValue(), "koi8r");
+    TS_ASSERT_EQUALS(xr.getTag(), "xml");
 
-//     t = xr.readNext();
-//     TS_ASSERT_EQUALS(t, XmlReader::TagStart);
-//     TS_ASSERT_EQUALS(xr.getTag(), "bar");
+    t = xr.readNext();
+    TS_ASSERT_EQUALS(t, Reader::TagStart);
+    TS_ASSERT_EQUALS(xr.getTag(), "foo");
 
-//     t = xr.readNext();
-//     TS_ASSERT_EQUALS(t, XmlReader::TagAttribute);
-//     TS_ASSERT_EQUALS(xr.getTag(), "bar");
-//     TS_ASSERT_EQUALS(xr.getName(), "zot");
-//     TS_ASSERT_EQUALS(xr.getValue(), "zot");
+    t = xr.readNext();
+    TS_ASSERT_EQUALS(t, Reader::TagStart);
+    TS_ASSERT_EQUALS(xr.getTag(), "bar");
 
-//     t = xr.readNext();
-//     TS_ASSERT_EQUALS(t, XmlReader::TagEnd);
-//     TS_ASSERT_EQUALS(xr.getTag(), "bar");
+    t = xr.readNext();
+    TS_ASSERT_EQUALS(t, Reader::TagAttribute);
+    TS_ASSERT_EQUALS(xr.getTag(), "bar");
+    TS_ASSERT_EQUALS(xr.getName(), "zot");
+    TS_ASSERT_EQUALS(xr.getValue(), "zot");
 
-//     t = xr.readNext();
-//     TS_ASSERT_EQUALS(t, XmlReader::TagStart);
-//     TS_ASSERT_EQUALS(xr.getTag(), "text");
+    t = xr.readNext();
+    TS_ASSERT_EQUALS(t, Reader::TagEnd);
+    TS_ASSERT_EQUALS(xr.getTag(), "bar");
 
-//     t = xr.readNext();
-//     TS_ASSERT_EQUALS(t, XmlReader::TagAttribute);
-//     TS_ASSERT_EQUALS(xr.getTag(), "text");
-//     TS_ASSERT_EQUALS(xr.getName(), "id");
-//     TS_ASSERT_EQUALS(xr.getValue(), "1");
+    t = xr.readNext();
+    TS_ASSERT_EQUALS(t, Reader::TagStart);
+    TS_ASSERT_EQUALS(xr.getTag(), "text");
 
-//     t = xr.readNext();
-//     TS_ASSERT_EQUALS(t, XmlReader::Text);
-//     TS_ASSERT_EQUALS(xr.getValue(), "\xD0\xB1\xE2\x94\x80");
+    t = xr.readNext();
+    TS_ASSERT_EQUALS(t, Reader::TagAttribute);
+    TS_ASSERT_EQUALS(xr.getTag(), "text");
+    TS_ASSERT_EQUALS(xr.getName(), "id");
+    TS_ASSERT_EQUALS(xr.getValue(), "1");
 
-//     t = xr.readNext();
-//     TS_ASSERT_EQUALS(t, XmlReader::TagEnd);
-//     TS_ASSERT_EQUALS(xr.getTag(), "text");
+    t = xr.readNext();
+    TS_ASSERT_EQUALS(t, Reader::Text);
+    TS_ASSERT_EQUALS(xr.getValue(), "\xD0\xB1\xE2\x94\x80");
 
-//     t = xr.readNext();
-//     TS_ASSERT_EQUALS(t, XmlReader::TagEnd);
-//     TS_ASSERT_EQUALS(xr.getTag(), "foo");
+    t = xr.readNext();
+    TS_ASSERT_EQUALS(t, Reader::TagEnd);
+    TS_ASSERT_EQUALS(xr.getTag(), "text");
 
-//     t = xr.readNext();
-//     TS_ASSERT_EQUALS(t, XmlReader::Eof);
+    t = xr.readNext();
+    TS_ASSERT_EQUALS(t, Reader::TagEnd);
+    TS_ASSERT_EQUALS(xr.getTag(), "foo");
+
+    t = xr.readNext();
+    TS_ASSERT_EQUALS(t, Reader::Eof);
 }
 
 /** Test document in UTF16-LE. */
@@ -304,7 +312,8 @@ TestIoXmlReader::testUtf16LE()
         b += '\0';
     }
     afl::io::ConstMemoryStream ms(afl::string::toBytes(b));
-    afl::io::xml::Reader xr(ms, DefaultEntityHandler::getInstance());
+    afl::charset::DefaultCharsetFactory cf;
+    afl::io::xml::Reader xr(ms, DefaultEntityHandler::getInstance(), cf);
     testBasicDocument(xr, "testUtf16LE");
 }
 
@@ -318,7 +327,8 @@ TestIoXmlReader::testUtf16BE()
         b += TEST_DOCUMENT[i];
     }
     afl::io::ConstMemoryStream ms(afl::string::toBytes(b));
-    afl::io::xml::Reader xr(ms, DefaultEntityHandler::getInstance());
+    afl::charset::DefaultCharsetFactory cf;
+    afl::io::xml::Reader xr(ms, DefaultEntityHandler::getInstance(), cf);
     testBasicDocument(xr, "testUtf16BE");
 }
 
@@ -343,7 +353,8 @@ TestIoXmlReader::testText()
                                                        "&#65;&#x61;\n"
                                                        "&#160;\n"
                                                        "&#xa0;\n"));
-    afl::io::xml::Reader xr(ms, DefaultEntityHandler::getInstance());
+    afl::charset::DefaultCharsetFactory cf;
+    afl::io::xml::Reader xr(ms, DefaultEntityHandler::getInstance(), cf);
     afl::io::xml::Reader::Token t;
     String_t result;
     while ((t = xr.readNext()) != xr.Eof) {
@@ -371,7 +382,8 @@ void
 TestIoXmlReader::testQuote()
 {
     afl::io::ConstMemoryStream ms(afl::string::toBytes("<foo a=\"bla('x')>blub\" />"));
-    afl::io::xml::Reader xr(ms, DefaultEntityHandler::getInstance());
+    afl::charset::DefaultCharsetFactory cf;
+    afl::io::xml::Reader xr(ms, DefaultEntityHandler::getInstance(), cf);
     afl::io::xml::Reader::Token t;
     t = xr.readNext();
     TS_ASSERT_EQUALS(t, xr.TagStart);
@@ -390,3 +402,116 @@ TestIoXmlReader::testQuote()
     t = xr.readNext();
     TS_ASSERT_EQUALS(t, xr.Eof);
 }
+
+/** Test seeking.
+    Tests that parsing can properly be resumed. */
+void
+TestIoXmlReader::testSeek()
+{
+    afl::io::ConstMemoryStream ms(afl::string::toBytes("<foo a=\"\xc2\x80\">\xc2\x90"));
+    afl::charset::DefaultCharsetFactory cf;
+    afl::io::xml::Reader xr(ms, DefaultEntityHandler::getInstance(), cf);
+
+    // Read everything into vectors
+    std::vector<afl::io::xml::Reader::Token> tokens;
+    std::vector<std::string> tags;
+    std::vector<std::string> names;
+    std::vector<std::string> values;
+    std::vector<afl::io::Stream::FileSize_t> positions;
+
+    afl::io::xml::Reader::Token t;
+    while ((t = xr.readNext()) != xr.Eof) {
+        tokens.push_back(t);
+        tags.push_back(xr.getTag());
+        names.push_back(xr.getName());
+        values.push_back(xr.getValue());
+        positions.push_back(xr.getPos());
+    }
+
+    // Must be three elements: "<foo", "a=...", content.
+    TS_ASSERT_EQUALS(tokens.size(), 3U);
+
+    // Verify reading single tokens in turn
+    for (size_t i = 0; i < tokens.size(); ++i) {
+        if (tokens[i] != xr.TagAttribute) {
+            xr.setPos(positions[i]);
+            t = xr.readNext();
+            TS_ASSERT_EQUALS(t, tokens[i]);
+            if (i > 0) {
+                TS_ASSERT_EQUALS(xr.getTag(), tags[i]);
+                TS_ASSERT_EQUALS(xr.getName(), names[i]);
+                TS_ASSERT_EQUALS(xr.getValue(), values[i]);
+            }
+            TS_ASSERT_EQUALS(xr.getPos(), positions[i]);
+        }
+    }
+
+    // Verify reading multiple tokens in turn
+    for (size_t i = 0; i < tokens.size(); ++i) {
+        if (tokens[i] != xr.TagAttribute) {
+            xr.setPos(positions[i]);
+            for (size_t j = i; j < tokens.size(); ++j) {
+                t = xr.readNext();
+                TS_ASSERT_EQUALS(t, tokens[j]);
+                if (j > 0) {
+                    TS_ASSERT_EQUALS(xr.getTag(), tags[j]);
+                    TS_ASSERT_EQUALS(xr.getName(), names[j]);
+                    TS_ASSERT_EQUALS(xr.getValue(), values[j]);
+                }
+                TS_ASSERT_EQUALS(xr.getPos(), positions[j]);
+            }
+            TS_ASSERT_EQUALS(xr.readNext(), xr.Eof);
+        }
+    }
+}
+
+/** Test seeking.
+    Tests that parsing can properly be resumed if parsing did not start at the beginning of a file. */
+void
+TestIoXmlReader::testSeek2()
+{
+    afl::charset::DefaultCharsetFactory cf;
+    afl::io::ConstMemoryStream ms(afl::string::toBytes("   <foo>"));
+    ms.setPos(3);
+
+    afl::io::xml::Reader xr(ms, DefaultEntityHandler::getInstance(), cf);
+    TS_ASSERT_EQUALS(xr.readNext(), xr.TagStart);
+    TS_ASSERT_EQUALS(xr.getPos(), 3U);
+    TS_ASSERT_EQUALS(xr.getTag(), "foo");
+
+    xr.setPos(3);
+    TS_ASSERT_EQUALS(xr.readNext(), xr.TagStart);
+    TS_ASSERT_EQUALS(xr.getPos(), 3U);
+    TS_ASSERT_EQUALS(xr.getTag(), "foo");
+}
+
+/** Test position handling in UTF-16. */
+void
+TestIoXmlReader::testPosUtf16()
+{
+    static const uint8_t DOC[] = { '<',0,'a',0,'1',0,'>',0,'<',0,'b',0,'2',0,'>',0,0,4 };
+    afl::charset::DefaultCharsetFactory cf;
+    afl::io::ConstMemoryStream ms(DOC);
+    afl::io::xml::Reader xr(ms, DefaultEntityHandler::getInstance(), cf);
+
+    TS_ASSERT_EQUALS(xr.readNext(), xr.TagStart);
+    TS_ASSERT_EQUALS(xr.getTag(), "a1");
+    TS_ASSERT_EQUALS(xr.getPos(), 0U);
+
+    TS_ASSERT_EQUALS(xr.readNext(), xr.TagStart);
+    TS_ASSERT_EQUALS(xr.getTag(), "b2");
+    TS_ASSERT_EQUALS(xr.getPos(), 8U);
+
+    TS_ASSERT_EQUALS(xr.readNext(), xr.Text);
+    TS_ASSERT_EQUALS(xr.getValue(), "\xD0\x80");
+    TS_ASSERT_EQUALS(xr.getPos(), 16U);
+
+    TS_ASSERT_EQUALS(xr.readNext(), xr.Eof);
+
+    // Seek and retry
+    xr.setPos(8);
+    TS_ASSERT_EQUALS(xr.readNext(), xr.TagStart);
+    TS_ASSERT_EQUALS(xr.getTag(), "b2");
+    TS_ASSERT_EQUALS(xr.getPos(), 8U);
+}
+

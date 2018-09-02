@@ -14,6 +14,7 @@ void
 TestCharsetCodepageCharset::testIt()
 {
     afl::charset::CodepageCharset ccs(afl::charset::g_codepage437);
+    TS_ASSERT_EQUALS(&ccs.get(), &afl::charset::g_codepage437);
 
     // Trivial cases
     TS_ASSERT_EQUALS(afl::string::fromBytes(ccs.encode(afl::string::ConstStringMemory_t())), "");

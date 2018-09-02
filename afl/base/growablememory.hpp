@@ -186,8 +186,9 @@ namespace afl { namespace base {
         /** Append item, replicated.
             This may reallocate the container and invalidate all pointers and descriptors obtained from it.
             \param what  item to append
-            \param count number of times to append that item. */
-        void appendN(T what, size_t count);
+            \param count number of times to append that item.
+            \return Handle to appended elements */
+        Memory<T> appendN(T what, size_t count);
 
         /** Swap containers.
             \param other other container */
@@ -473,7 +474,7 @@ afl::base::GrowableMemory<T>::append(T what)
 
 // Append item, replicated.
 template<typename T>
-void
+afl::base::Memory<T>
 afl::base::GrowableMemory<T>::appendN(T what, size_t count)
 {
     if (count != 0) {
@@ -483,6 +484,9 @@ afl::base::GrowableMemory<T>::appendN(T what, size_t count)
         reserve(m_size + count);
         detail::MemoryTraits<T>::fill(&m_data[m_size], what, count);
         m_size += count;
+        return Memory<T>::unsafeCreate(&m_data[m_size - count], count);
+    } else {
+        return Memory<T>();
     }
 }
 

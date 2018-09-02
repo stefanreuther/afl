@@ -15,6 +15,7 @@
 #include "afl/io/xml/reader.hpp"
 #include "afl/charset/utf8.hpp"
 #include "afl/io/xml/entityhandler.hpp"
+#include "afl/charset/codepage.hpp"
 
 namespace {
     // Options/character classes for Reader::readCharacterSequence:
@@ -32,7 +33,7 @@ namespace {
 }
 
 // Constructor.
-afl::io::xml::Reader::Reader(Stream& stream, EntityHandler& entityHandler)
+afl::io::xml::Reader::Reader(Stream& stream, EntityHandler& entityHandler, afl::charset::CharsetFactory& charsetFactory)
     : m_stream(stream),
       m_entityHandler(entityHandler),
       m_whitespaceMode(TrimWS),
@@ -40,15 +41,20 @@ afl::io::xml::Reader::Reader(Stream& stream, EntityHandler& entityHandler)
       m_tag(),
       m_name(),
       m_value(),
+      m_tagPos(0),
 
       m_buffer(),
+      m_bufferPos(0),
 
       m_encoding(Utf8),
+      m_codepage(),
+      m_charsetFactory(charsetFactory),
       m_unicodeHandler(),
-      // codepage(),
       m_haveCurrentCharacter(false),
-      m_currentCharacter(0)
+      m_currentCharacter(0),
+      m_charPos(0)
 {
+    m_bufferPos = m_stream.getPos();
     refillBuffer();
     detectEncoding();
     readNextChar();
@@ -110,6 +116,25 @@ afl::io::xml::Reader::setWhitespaceMode(WhitespaceMode mode)
     m_whitespaceMode = mode;
 }
 
+afl::io::Stream::FileSize_t
+afl::io::xml::Reader::getPos() const
+{
+    return m_tagPos;
+}
+
+void
+afl::io::xml::Reader::setPos(Stream::FileSize_t pos)
+{
+    m_stream.setPos(pos);
+    m_bufferPos = pos;
+    m_tagPos    = pos;
+    m_charPos   = pos;
+    m_state     = Main;
+    m_buffer.reset();
+    readNextChar();
+}
+
+
 /*
  *  Private Methods
  */
@@ -124,6 +149,7 @@ afl::io::xml::Reader::readNextToken()
     }
 
     // Regular processing
+    m_tagPos = m_charPos;
     switch (m_state) {
      case Main:
         if (m_currentCharacter == '<') {
@@ -282,14 +308,19 @@ afl::io::xml::Reader::readNextToken()
                 // already interpreting this as a 16-bits-per-character file, and have not
                 // yet seen another encoding name).
                 if ((m_encoding == Utf8 || m_encoding == Codepage) && m_tag == "xml" && m_name == "encoding") {
-                    // if (CharacterSet::isCharsetNameUtf8(m_value)) {
-                    //     // UTF-8.
-                    m_encoding = Utf8;
-                    // } else {
-                    //     // Codepage. Unsupported codepages are mapped to default (=latin1).
-                    //     m_encoding = Codepage;
-                    //     codepage = CharacterSet::getCharsetByName(m_value);
-                    // }
+                    // FIXME: because we manually assemble characters, and need some control about where in the file the characters appear,
+                    // we need an ugly type switch here. Doing this nicely needs better interfaces than Charset currently has.
+                    std::auto_ptr<afl::charset::Charset> p(m_charsetFactory.createCharset(m_value));
+                    if (afl::charset::CodepageCharset* pCC = dynamic_cast<afl::charset::CodepageCharset*>(p.get())) {
+                        // It's a codepage.
+                        p.release();
+                        m_codepage.reset(pCC);
+                        m_encoding = Codepage;
+                    } else {
+                        // Unsupported. Treat as UTF-8.
+                        m_codepage.reset();
+                        m_encoding = Utf8;
+                    }
                 }
 
                 return PIAttribute;
@@ -307,18 +338,21 @@ void
 afl::io::xml::Reader::readNextChar()
 {
     uint8_t a, b, c;
+    m_charPos = m_bufferPos;
     switch (m_encoding) {
      case Codepage:
-        // Right now, fall through to UTF-8 case; we'll do codepages later
-        // a = readByte();
-        // if (a >= 0) {
-        //     // Valid character
-        //     m_currentCharacter = codepage.getUnicode(a);
-        // } else {
-        //     // End of file
-        //     m_currentCharacter = a;
-        // }
-        // break;
+        if (!readByte(a)) {
+            m_haveCurrentCharacter = false;
+        } else {
+            // Remap character through codepage
+            if (a >= 0x80 && m_codepage.get() != 0) {
+                m_currentCharacter = m_codepage->get().m_characters[a - 0x80];
+            } else {
+                m_currentCharacter = a;
+            }
+            m_haveCurrentCharacter = true;
+        }
+        break;
 
      case Utf8:
         if (!readByte(a)) {
@@ -381,6 +415,7 @@ afl::io::xml::Reader::readByte(uint8_t& out)
     if (pc == 0) {
         return false;
     } else {
+        ++m_bufferPos;
         out = *pc;
         return true;
     }

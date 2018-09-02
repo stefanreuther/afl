@@ -17,6 +17,7 @@
 namespace {
     const char FILE_NAME1[] = "__file01.dat";
     const char FILE_NAME2[] = "__file02.dat";
+    const char DIR_NAME[] = "__dir03";
 
     /* Validate that a file exists / does not exist. */
     void validateFile(afl::io::Directory& dir, const char* fileName, bool mustExist)
@@ -237,3 +238,42 @@ TestIoDirectory::testDirectoryAccess()
     validateFile(*dir, FILE_NAME2, false);
 }
 
+/** Test directory access: subdirectories. */
+void
+TestIoDirectory::testDirectoryAccess2()
+{
+    afl::io::FileSystem& fs = afl::io::FileSystem::getInstance();
+    afl::base::Ref<afl::io::Directory> dir = fs.openDirectory(fs.getWorkingDirectoryName());
+    TS_ASSERT(&dir.get() != 0);
+
+    // Create a directory
+    TS_ASSERT_THROWS_NOTHING(dir->getDirectoryEntryByName(DIR_NAME)->createAsDirectory());
+
+    // Try opening it; verify content (must be empty)
+    {
+        afl::base::Ref<afl::io::Directory> subdir = dir->openDirectory(DIR_NAME);
+        afl::base::Ref<afl::base::Enumerator<afl::base::Ptr<afl::io::DirectoryEntry> > > content = subdir->getDirectoryEntries();
+        afl::base::Ptr<afl::io::DirectoryEntry> tmp;
+        TS_ASSERT_EQUALS(content->getNextElement(tmp), false);
+    }
+
+    // Remove it
+    TS_ASSERT_EQUALS(dir->eraseNT(DIR_NAME), true);
+}
+
+/** Test parent access.
+    Using parents to go up must terminate. */
+void
+TestIoDirectory::testParent()
+{
+    afl::io::FileSystem& fs = afl::io::FileSystem::getInstance();
+    afl::base::Ptr<afl::io::Directory> dir = fs.openDirectory(fs.getWorkingDirectoryName()).asPtr();
+    TS_ASSERT(dir.get() != 0);
+
+    int level = 0;
+    while (dir.get() != 0) {
+        ++level;
+        TS_ASSERT(level < 100);
+        dir = dir->getParentDirectory();
+    }
+}

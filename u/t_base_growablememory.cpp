@@ -193,3 +193,16 @@ TestBaseGrowableMemory::testDuplicate()
         TS_ASSERT_EQUALS(*vec.at(i), stuff[i % 5]);
     }
 }
+
+/** Test appendN(). */
+void
+TestBaseGrowableMemory::testAppend()
+{
+    afl::base::GrowableMemory<char> vec;
+    vec.appendN('a', 3).fill('b');
+    TS_ASSERT_EQUALS(vec.appendN('x', 2).size(), 2U);
+    TS_ASSERT_EQUALS(vec.appendN('y', 0).size(), 0U);
+    vec.appendN('c', 5).fill('d');
+    TS_ASSERT_EQUALS(vec.size(), 10U);
+    TS_ASSERT(vec.equalContent(afl::base::Memory<const char>::unsafeCreate("bbbxxddddd", 10)));
+}
