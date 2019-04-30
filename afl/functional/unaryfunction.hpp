@@ -6,6 +6,7 @@
 #define AFL_AFL_FUNCTIONAL_UNARYFUNCTION_HPP
 
 #include "afl/base/optional.hpp"
+#include "afl/base/deletable.hpp"
 
 namespace afl { namespace functional {
 
@@ -15,7 +16,7 @@ namespace afl { namespace functional {
         \param A input (parameter, domain) of the function
         \param B output (result, codomain) of the function */
     template<typename A, typename B>
-    class UnaryFunction {
+    class UnaryFunction : public afl::base::Deletable {
      public:
         /** Implementation of the function.
             \param a input

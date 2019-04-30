@@ -119,14 +119,22 @@ namespace afl { namespace string {
 
         /** Construct formatter object with no parameters.
             Use operator<< to add parameters.
-            \param fmt format string */
+            \param fmt format string. Must out-live the Format object. */
         Format(const char* fmt)
             : m_formatString(fmt),
               m_numArgs(0)
             { }
 
+        /** Construct formatter object with no parameters.
+            Use operator<< to add parameters.
+            \param fmt format string. Must out-live the Format object. */
+        Format(const String_t& fmt)
+            : m_formatString(fmt.c_str()),
+              m_numArgs(0)
+            { }
+
         /** Construct formatter object with one parameter.
-            \param fmt format string
+            \param fmt format string. Must out-live the Format object.
             \param arg first argument */
         template<typename A>
         Format(const char* fmt, const A& arg)
@@ -137,8 +145,21 @@ namespace afl { namespace string {
                 m_args[0].m_pFunction = &FormatTraits<A>::format;
             }
 
+
+        /** Construct formatter object with one parameter.
+            \param fmt format string. Must out-live the Format object.
+            \param arg first argument */
+        template<typename A>
+        Format(const String_t& fmt, const A& arg)
+            : m_formatString(fmt.c_str()),
+              m_numArgs(1)
+            {
+                FormatTraits<A>::store(m_args[0].m_data, arg);
+                m_args[0].m_pFunction = &FormatTraits<A>::format;
+            }
+
         /** Construct formatter object with two parameters.
-            \param fmt format string
+            \param fmt format string. Must out-live the Format object.
             \param a first argument
             \param b second argument */
         template<typename A, typename B>
@@ -152,8 +173,23 @@ namespace afl { namespace string {
                 m_args[1].m_pFunction = &FormatTraits<B>::format;
             }
 
+        /** Construct formatter object with two parameters.
+            \param fmt format string. Must out-live the Format object.
+            \param a first argument
+            \param b second argument */
+        template<typename A, typename B>
+        Format(const String_t& fmt, const A& a, const B& b)
+            : m_formatString(fmt.c_str()),
+              m_numArgs(2)
+            {
+                FormatTraits<A>::store(m_args[0].m_data, a);
+                m_args[0].m_pFunction = &FormatTraits<A>::format;
+                FormatTraits<B>::store(m_args[1].m_data, b);
+                m_args[1].m_pFunction = &FormatTraits<B>::format;
+            }
+
         /** Construct formatter object with three parameters.
-            \param fmt format string
+            \param fmt format string. Must out-live the Format object.
             \param a first argument
             \param b second argument
             \param c third argument */
@@ -170,8 +206,26 @@ namespace afl { namespace string {
                 m_args[2].m_pFunction = &FormatTraits<C>::format;
             }
 
+        /** Construct formatter object with three parameters.
+            \param fmt format string. Must out-live the Format object.
+            \param a first argument
+            \param b second argument
+            \param c third argument */
+        template<typename A, typename B, typename C>
+        Format(const String_t& fmt, const A& a, const B& b, const C& c)
+            : m_formatString(fmt.c_str()),
+              m_numArgs(3)
+            {
+                FormatTraits<A>::store(m_args[0].m_data, a);
+                m_args[0].m_pFunction = &FormatTraits<A>::format;
+                FormatTraits<B>::store(m_args[1].m_data, b);
+                m_args[1].m_pFunction = &FormatTraits<B>::format;
+                FormatTraits<C>::store(m_args[2].m_data, c);
+                m_args[2].m_pFunction = &FormatTraits<C>::format;
+            }
+
         /** Construct formatter object with four parameters.
-            \param fmt format string
+            \param fmt format string. Must out-live the Format object.
             \param a first argument
             \param b second argument
             \param c third argument
@@ -179,6 +233,27 @@ namespace afl { namespace string {
         template<typename A, typename B, typename C, typename D>
         Format(const char* fmt, const A& a, const B& b, const C& c, const D& d)
             : m_formatString(fmt),
+              m_numArgs(4)
+            {
+                FormatTraits<A>::store(m_args[0].m_data, a);
+                m_args[0].m_pFunction = &FormatTraits<A>::format;
+                FormatTraits<B>::store(m_args[1].m_data, b);
+                m_args[1].m_pFunction = &FormatTraits<B>::format;
+                FormatTraits<C>::store(m_args[2].m_data, c);
+                m_args[2].m_pFunction = &FormatTraits<C>::format;
+                FormatTraits<D>::store(m_args[3].m_data, d);
+                m_args[3].m_pFunction = &FormatTraits<D>::format;
+            }
+
+        /** Construct formatter object with four parameters.
+            \param fmt format string. Must out-live the Format object.
+            \param a first argument
+            \param b second argument
+            \param c third argument
+            \param d fourth argument */
+        template<typename A, typename B, typename C, typename D>
+        Format(const String_t& fmt, const A& a, const B& b, const C& c, const D& d)
+            : m_formatString(fmt.c_str()),
               m_numArgs(4)
             {
                 FormatTraits<A>::store(m_args[0].m_data, a);

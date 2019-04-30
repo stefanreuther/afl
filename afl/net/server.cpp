@@ -343,6 +343,11 @@ afl::net::Server::handleConnectionEvent(afl::async::Controller& ctl, ConnectionS
                 state.handler->advanceTime(afl::sys::Time::getTickCounter() - state.startTime);
                 state.state = ConnectionState::Idle;
                 startConnection(ctl, state);
+            } else if (state.sendOperation.getNumSentBytes() == 0) {
+                // Could not send anything, i.e. other end closed connection (or other failure)
+                state.handler->handleConnectionClose();
+                state.state = ConnectionState::Closing;
+                m_closeSignal = true;
             } else {
                 // Successful but incomplete send.
                 // Remember sent bytes in phOperation.m_dataToSend so we can report that on timeout.

@@ -83,6 +83,8 @@ TestSysEnvironment::testInterface()
             { return String_t(); }
         virtual String_t getInstallationDirectoryName()
             { return String_t(); }
+        virtual afl::string::LanguageCode getUserLanguage()
+            { return afl::string::LanguageCode(); }
         virtual afl::base::Ref<afl::io::TextWriter> attachTextWriter(Channel /*ch*/)
             { throw std::runtime_error("no ref"); }
         virtual afl::base::Ref<afl::io::TextReader> attachTextReader(Channel /*ch*/)

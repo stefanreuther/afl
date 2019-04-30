@@ -49,7 +49,7 @@ namespace {
     };
 
 
-    
+
     /* Console implementation for POSIX.
        This is a stripped-down version of TextFile, with BOM-snooping removed and charset conversion hardcoded to convertExternalToUtf8.
        It must also keep the stream alive (Ptr<>). */
@@ -278,6 +278,24 @@ arch::posix::PosixEnvironment::getInstallationDirectoryName()
     } else {
         // Fallback
         return ".";
+    }
+}
+
+afl::string::LanguageCode
+arch::posix::PosixEnvironment::getUserLanguage()
+{
+    const char* lang = std::getenv("LC_ALL");
+    if (lang == 0) {
+        lang = std::getenv("LC_MESSAGES");
+    }
+    if (lang == 0) {
+        lang = std::getenv("LANG");
+    }
+
+    if (lang != 0) {
+        return convertExternalToUtf8(afl::string::toMemory(lang));
+    } else {
+        return afl::string::LanguageCode();
     }
 }
 

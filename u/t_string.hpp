@@ -53,6 +53,13 @@ class TestStringHex : public CxxTest::TestSuite {
     void testIt();
 };
 
+class TestStringLanguageCode : public CxxTest::TestSuite {
+ public:
+    void testBasic();
+    void testGeneralize();
+    void testIsSameOrMoreGeneral();
+};
+
 class TestStringMessages : public CxxTest::TestSuite {
  public:
     void testIt();

@@ -7,13 +7,25 @@
 #include "afl/string/nulltranslator.hpp"
 
 String_t
-afl::string::Translator::translateString(const char* ntbs)
+afl::string::Translator::translateString(const char* ntbs) const
 {
     return translate(toMemory(ntbs));
 }
 
 String_t
-afl::string::Translator::translateString(const String_t& str)
+afl::string::Translator::translateString(const String_t& str) const
+{
+    return translate(toMemory(str));
+}
+
+String_t
+afl::string::Translator::get(String_t a) const
+{
+    return translate(toMemory(a));
+}
+
+String_t
+afl::string::Translator::operator()(const char* str) const
 {
     return translate(toMemory(str));
 }

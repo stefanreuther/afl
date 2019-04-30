@@ -14,7 +14,7 @@ TestStringProxyTranslator::testIt()
 {
     class Parenizor : public afl::string::Translator {
      public:
-        String_t translate(afl::string::ConstStringMemory_t mem)
+        String_t translate(afl::string::ConstStringMemory_t mem) const
             { return "(" + afl::string::fromMemory(mem) + ")"; }
     };
     Parenizor p;

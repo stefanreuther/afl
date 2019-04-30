@@ -12,6 +12,7 @@ int main(int, char** argv)
     std::cout << "Settings directory: " << env.getSettingsDirectoryName("env") << "\n"
               << "Installation directory: " << env.getInstallationDirectoryName() << "\n"
               << "PATH environment: " << env.getEnvironmentVariable("PATH") << "\n"
+              << "Language: " << env.getUserLanguage().get() << "\n"
               << "Command line:\n";
 
     afl::base::Ref<afl::sys::Environment::CommandLine_t> cmdl = env.getCommandLine();

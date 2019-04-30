@@ -46,7 +46,7 @@ afl::sys::StandardCommandLineParser::getNext(bool& option, String_t& text)
         return false;
     }
 
-    // '' or '-' always are options
+    // '' or '-' always are nonoptions
     if (m_currentValue.empty() || m_currentValue == "-") {
         text = m_currentValue;
         option = false;

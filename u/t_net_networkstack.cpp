@@ -30,3 +30,13 @@ TestNetNetworkStack::testConnect()
     }
     TS_ASSERT(ok);
 }
+
+/** Test connect/listen with a bad name. */
+void
+TestNetNetworkStack::testBadName()
+{
+    afl::net::NetworkStack& ns = afl::net::NetworkStack::getInstance();
+    TS_ASSERT_THROWS(ns.connect(afl::net::Name(String_t("a\0b", 3), "80")),          afl::except::FileProblemException);
+    TS_ASSERT_THROWS(ns.connect(afl::net::Name("localhost", String_t("8\0""0", 3))), afl::except::FileProblemException);
+}
+

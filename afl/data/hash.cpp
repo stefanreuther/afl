@@ -30,7 +30,7 @@ afl::data::Hash::~Hash()
 { }
 
 void
-afl::data::Hash::set(const String_t& key, Value* value)
+afl::data::Hash::set(const String_t& key, const Value* value)
 {
     setNew(key, Value::cloneOf(value));
 }

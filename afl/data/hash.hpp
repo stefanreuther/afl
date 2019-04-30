@@ -53,7 +53,7 @@ namespace afl { namespace data {
             The value will be cloned.
             \param key Key to access
             \param value Value to set */
-        void set(const String_t& key, Value* value);
+        void set(const String_t& key, const Value* value);
 
         /** Set element by key.
             Ownership for the value will be taken over by the Hash; if an exception is thrown, it is deleted.

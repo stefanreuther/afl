@@ -19,7 +19,7 @@ namespace afl { namespace string {
         explicit ProxyTranslator(Translator& other);
 
         // Translator:
-        virtual String_t translate(afl::string::ConstStringMemory_t in);
+        virtual String_t translate(afl::string::ConstStringMemory_t in) const;
 
      private:
         Translator& m_other;

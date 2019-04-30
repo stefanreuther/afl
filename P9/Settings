@@ -1,46 +1,14 @@
 # -*- makefile -*-
 #
-#  Project Root
+#  Project Variables
+#
+#  This used to generate Makefiles. We now use the Accidental Build
+#  System (Rules.pl, Make.pl). This file remains to store just the
+#  file lists because I happen to have a nice IDE integration for
+#  that.
 #
 
-##
-##  Configuration
-##
-
-# Path to cxxtest
-CXXTESTDIR = $(CONFIG_AFL_CXXTESTDIR)
-
-# Path to perl executable
-PERL = $(CONFIG_AFL_PERL)
-
-# C++ compiler and flags
-CXX = $(CONFIG_AFL_CXX)
-CXXFLAGS = $(CONFIG_AFL_CXXFLAGS) -I.
-
-# Libraries and linker flags
-LIBS = $(CONFIG_AFL_LIBS)
-LDFLAGS = $(CONFIG_AFL_LDFLAGS)
-
-# Additional dependencies that trigger a relink
-LIBDEPEND = $(CONFIG_AFL_LIBDEPEND)
-
-# Librarian
-AR = $(CONFIG_AFL_AR)
-
-# "rm" tool
-RM = rm -f
-
-# A program to execute a compiled program. Empty for native execution, but could be something like a simulator.
-RUN = $(CONFIG_AFL_RUN)
-
-include config.mk
-
-# This defines the Makefiles we want to make:
-GENERATE = Makefile Makefile.bor Makefile.min
-INCLUDE_Makefile = Rules-unix.mak Settings-unix.mak
-INCLUDE_Makefile.bor = Rules-win32.mak Settings-win32.mak
-INCLUDE_Makefile.min = Rules-mingw.mak Settings-mingw.mak
-
+GENERATE =
 PROJ_AUTO += afl:afl/*pp testsuite:u/*pp
 
 
@@ -48,19 +16,26 @@ PROJ_AUTO += afl:afl/*pp testsuite:u/*pp
 ##  Main Library
 ##
 TARGETS += afl
-FILES_afl = afl/test/translator.cpp afl/test/translator.hpp \
-    afl/net/http/cgihandler.cpp afl/net/http/cgihandler.hpp \
-    afl/base/stoppable.hpp afl/base/inlinememory.hpp \
-    afl/test/commandhandler.cpp afl/test/commandhandler.hpp \
-    afl/test/callreceiver.cpp afl/test/callreceiver.hpp \
-    afl/test/networkstack.cpp afl/test/networkstack.hpp afl/test/socket.cpp \
-    afl/test/socket.hpp afl/test/assert.cpp afl/test/assert.hpp \
-    afl/checksums/sha512.cpp afl/checksums/sha512.hpp \
-    afl/checksums/sha384.cpp afl/checksums/sha384.hpp \
-    afl/checksums/sha224.hpp afl/checksums/sha224.cpp \
-    afl/checksums/sha256.cpp afl/checksums/sha256.hpp \
-    afl/checksums/sha2core.cpp afl/checksums/sha2core.hpp \
-    afl/net/tunnel/tunnelablenetworkstack.cpp \
+FILES_afl = afl/except/assertionfailedexception.hpp afl/base/uncopyable.hpp \
+    afl/base/deletable.hpp afl/string/languagecode.cpp \
+    afl/string/languagecode.hpp afl/io/xml/nodereader.cpp \
+    afl/io/xml/nodereader.hpp afl/io/xml/parser.cpp afl/io/xml/parser.hpp \
+    afl/io/xml/tagnode.cpp afl/io/xml/pinode.cpp afl/io/xml/textnode.cpp \
+    afl/io/xml/visitor.cpp afl/io/xml/visitor.hpp afl/io/xml/textnode.hpp \
+    afl/io/xml/pinode.hpp afl/io/xml/tagnode.hpp afl/io/xml/node.hpp \
+    afl/base/nullenumerator.hpp afl/test/translator.cpp \
+    afl/test/translator.hpp afl/net/http/cgihandler.cpp \
+    afl/net/http/cgihandler.hpp afl/base/stoppable.hpp \
+    afl/base/inlinememory.hpp afl/test/commandhandler.cpp \
+    afl/test/commandhandler.hpp afl/test/callreceiver.cpp \
+    afl/test/callreceiver.hpp afl/test/networkstack.cpp \
+    afl/test/networkstack.hpp afl/test/socket.cpp afl/test/socket.hpp \
+    afl/test/assert.cpp afl/test/assert.hpp afl/checksums/sha512.cpp \
+    afl/checksums/sha512.hpp afl/checksums/sha384.cpp \
+    afl/checksums/sha384.hpp afl/checksums/sha224.hpp \
+    afl/checksums/sha224.cpp afl/checksums/sha256.cpp \
+    afl/checksums/sha256.hpp afl/checksums/sha2core.cpp \
+    afl/checksums/sha2core.hpp afl/net/tunnel/tunnelablenetworkstack.cpp \
     afl/net/tunnel/tunnelablenetworkstack.hpp \
     afl/net/tunnel/socks5networkstack.cpp \
     afl/net/tunnel/socks5networkstack.hpp afl/async/communicationobject.cpp \
@@ -382,8 +357,11 @@ DEPEND_unzip = afl
 ##  Testsuite
 ##
 TARGETS += testsuite
-FILES_testsuite = u/t_net_redis_integerfield.cpp u/t_test_translator.cpp \
-    u/t_base_stoppable.cpp u/t_base_inlinememory.cpp \
+FILES_testsuite = u/t_string_languagecode.cpp u/t_io_xml_nodereader.cpp \
+    u/t_io_xml_parser.cpp u/t_io_xml_pinode.cpp u/t_io_xml_tagnode.cpp \
+    u/t_io_xml_textnode.cpp u/t_io_xml_node.cpp u/t_io_xml_visitor.cpp \
+    u/t_base_nullenumerator.cpp u/t_net_redis_integerfield.cpp \
+    u/t_test_translator.cpp u/t_base_stoppable.cpp u/t_base_inlinememory.cpp \
     u/t_test_commandhandler.cpp u/t_test_callreceiver.cpp \
     u/t_test_networkstack.cpp u/t_test_socket.cpp u/t_test_assert.cpp \
     u/t_test.hpp u/t_checksums_sha512.cpp u/t_checksums_sha384.cpp \
@@ -437,7 +415,7 @@ FILES_testsuite = u/t_net_redis_integerfield.cpp u/t_test_translator.cpp \
     u/t_async_communicationsink.cpp u/t_io_bufferedsink.cpp \
     u/t_io_internalsink.cpp u/t_data_stringlist.cpp u/t_data_integerlist.cpp \
     u/t_data_errorvalue.cpp u/t_io_transformdatasink.cpp \
-    u/t_io_inflatetransform.cpp u/t_io_transform.cpp testsuite.cpp \
+    u/t_io_inflatetransform.cpp u/t_io_transform.cpp \
     u/t_base.hpp u/t_base_memory.cpp u/t_container.hpp \
     u/t_container_ptrvector.cpp u/t_sys.hpp u/t_sys_mutex.cpp \
     u/t_sys_thread.cpp u/t_base_runnable.cpp u/t_base_deletable.cpp \
@@ -511,24 +489,3 @@ FILES_testsuite = u/t_net_redis_integerfield.cpp u/t_test_translator.cpp \
     u/t_bits_uint64be.cpp u/t_base_optional.cpp
 TYPE_testsuite = app
 DEPEND_testsuite = afl
-
-HEADERS_testsuite = u/t_*.hpp
-
-test: $(OUTPUT_testsuite)
-	@echo "        Running testsuite..."
-	@$(RUN) ./$(OUTPUT_testsuite)
-
-testsuite.cpp: $(HEADERS_testsuite)
-	@echo "        Generating test driver..."
-	@$(PERL) $(CXXTESTDIR)/cxxtestgen.pl --gui=TestController --have-eh --error-printer -o $@ $(HEADERS_testsuite)
-
-distclean: 
-	$(RM) testsuite.cpp
-
-# Must rename some object files because ar only looks at basenames.
-PROJ_UNIQUE_STEMS = 1
-
-# We must define _CXXTEST_HAVE_EH and _CXXTEST_HAVE_STD for test cases,
-# but not for testsuite.cpp, where cxxtest automatically defines it.
-CXXFLAGS_$(FILES_testsuite) +:= -I$(CXXTESTDIR) -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g
-CXXFLAGS_testsuite.cpp +:= -U_CXXTEST_HAVE_EH -U_CXXTEST_HAVE_STD -O0

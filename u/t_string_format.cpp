@@ -23,6 +23,14 @@ TestStringFormat::testConv()
         String_t s = Format("foo%d", 42);
         TS_ASSERT_EQUALS(s, "foo42");
     }
+    {
+        String_t s = Format(String_t("foo%d")) << 42;
+        TS_ASSERT_EQUALS(s, "foo42");
+    }
+    {
+        String_t s = Format(String_t("foo%d"), 42);
+        TS_ASSERT_EQUALS(s, "foo42");
+    }
 
     // We have up to 4 args in the constructor
     {
@@ -35,6 +43,18 @@ TestStringFormat::testConv()
     }
     {
         String_t s = Format("%d-%d-%d-%d", 1, 2U, "3", '\4');
+        TS_ASSERT_EQUALS(s, "1-2-3-4");
+    }
+    {
+        String_t s = Format(String_t("%d-%d"), 1, 2U);
+        TS_ASSERT_EQUALS(s, "1-2");
+    }
+    {
+        String_t s = Format(String_t("%d-%d-%d"), 1, 2U, "3");
+        TS_ASSERT_EQUALS(s, "1-2-3");
+    }
+    {
+        String_t s = Format(String_t("%d-%d-%d-%d"), 1, 2U, "3", '\4');
         TS_ASSERT_EQUALS(s, "1-2-3-4");
     }
 }

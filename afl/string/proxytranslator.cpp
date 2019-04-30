@@ -10,7 +10,7 @@ afl::string::ProxyTranslator::ProxyTranslator(Translator& other)
 { }
 
 String_t
-afl::string::ProxyTranslator::translate(afl::string::ConstStringMemory_t in)
+afl::string::ProxyTranslator::translate(afl::string::ConstStringMemory_t in) const
 {
     return m_other.translate(in);
 }

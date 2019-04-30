@@ -102,6 +102,11 @@ class TestBaseMemory : public CxxTest::TestSuite {
     void testCopy();
 };
 
+class TestBaseNullEnumerator : public CxxTest::TestSuite {
+ public:
+    void testIt();
+};
+
 class TestBaseObservable : public CxxTest::TestSuite {
  public:
     void testIt();

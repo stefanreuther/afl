@@ -23,6 +23,28 @@ class TestIoXmlEntityHandler : public CxxTest::TestSuite {
     void testIt();
 };
 
+class TestIoXmlNode : public CxxTest::TestSuite {
+ public:
+    void testInterface();
+};
+
+class TestIoXmlNodeReader : public CxxTest::TestSuite {
+ public:
+    void testSimple();
+    void testEmpty();
+    void testWhitespaceMode();
+};
+
+class TestIoXmlPINode : public CxxTest::TestSuite {
+ public:
+    void testIt();
+};
+
+class TestIoXmlParser : public CxxTest::TestSuite {
+ public:
+    void testIt();
+};
+
 class TestIoXmlReader : public CxxTest::TestSuite {
  public:
     void testUtf8();
@@ -35,6 +57,27 @@ class TestIoXmlReader : public CxxTest::TestSuite {
     void testSeek();
     void testSeek2();
     void testPosUtf16();
+    void testComment();
+    void testWhitespaceMode();
+    void testWhitespaceModeSingle();
+    void testWhitespaceModeAll();
+};
+
+class TestIoXmlTagNode : public CxxTest::TestSuite {
+ public:
+    void testIt();
+    void testChildren();
+};
+
+class TestIoXmlTextNode : public CxxTest::TestSuite {
+ public:
+    void testIt();
+    void testVisit();
+};
+
+class TestIoXmlVisitor : public CxxTest::TestSuite {
+ public:
+    void testInterface();
 };
 
 #endif

@@ -162,10 +162,15 @@ arch::win32::Win32Stream::init(afl::io::FileSystem::FileName_t name, afl::io::Fi
     if (hasUnicodeSupport()) {
         WStr uniName;
         convertToUnicode(uniName, afl::string::toMemory(name));
-        uniName.push_back(L'\0');
+        if (!terminateUnicode(uniName)) {
+            throw afl::except::FileProblemException(name, afl::string::Messages::invalidFileName());
+        }
         m_handle = ::CreateFileW(&uniName[0], desiredAccess, shareMode, 0, creationDistribution, FILE_ATTRIBUTE_NORMAL, 0);
     } else {
         String_t ansiName = convertToANSI(afl::string::toMemory(name));
+        if (ansiName.find('\0') != String_t::npos) {
+            throw afl::except::FileProblemException(name, afl::string::Messages::invalidFileName());
+        }
         m_handle = ::CreateFileA(ansiName.c_str(), desiredAccess, shareMode, 0, creationDistribution, FILE_ATTRIBUTE_NORMAL, 0);
     }
 

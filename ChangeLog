@@ -1,3 +1,52 @@
+2019-04-22  Stefan Reuther  <streu@gmx.de>
+
+	* scripts/coverage_optimize.pl: added
+
+2019-04-18  Stefan Reuther  <streu@gmx.de>
+
+	* afl/data/hash.cpp (set): add missing 'const'
+
+2019-04-13  Stefan Reuther  <streu@gmx.de>
+
+	* afl/net/http/manager.cpp: quick-and-dirty "https" URL support
+	* afl/net/server.cpp: handle send errors
+
+2019-01-03  Stefan Reuther  <streu@gmx.de>
+
+	* Rules.pl: new build system
+
+2018-12-15  Stefan Reuther  <streu@gmx.de>
+
+	* afl/string/languagecode.hpp: new
+	* arch/posix/posixnetworkstack.cpp: handle (=reject) zero-terminated names
+	* arch/win32/win32directory.cpp: handle (=reject) zero-terminated names
+	* arch/win32/win32environment.cpp: handle (=reject) zero-terminated names
+	* arch/win32/win32networkstack.cpp: handle (=reject) zero-terminated names
+	* arch/win32/win32stream.cpp: handle (=reject) zero-terminated names
+
+2018-12-06  Stefan Reuther  <streu@gmx.de>
+
+	* afl/io/xml/nodereader.cpp, afl/io/xml/nodereader.hpp: new
+
+2018-12-04  Stefan Reuther  <streu@gmx.de>
+
+	* afl/io/xml/node.hpp: new (simple DOM)
+	* afl/io/xml/parser.cpp, afl/io/xml/parser.hpp: new
+	* afl/io/xml/pinode.cpp, afl/io/xml/pinode.hpp: new
+	* afl/io/xml/tagnode.cpp, afl/io/xml/tagnode.hpp: new
+	* afl/io/xml/textnode.cpp, afl/io/xml/textnode.hpp: new
+	* afl/io/xml/visitor.cpp, afl/io/xml/visitor.hpp: new
+
+2018-09-07  Stefan Reuther  <streu@gmx.de>
+
+	* afl/bits/smallset.hpp (set): new
+
+2018-09-03  Stefan Reuther  <streu@gmx.de>
+
+	* afl/string/format.hpp: add 'String_t' signatures
+	* afl/string/translator.hpp: derive from UnaryFunction
+	* afl/base/nullenumerator.hpp: new
+
 2018-09-01  Stefan Reuther  <streu@gmx.de>
 
 	* arch/win32/win32filesystem.cpp (getAbsolutePathName): fix off-by-one error causing the final '\0' to be included in the result

@@ -7,11 +7,12 @@
 
 #include "afl/base/enumerator.hpp"
 #include "afl/base/ptr.hpp"
-#include "afl/string/string.hpp"
-#include "afl/io/textwriter.hpp"
-#include "afl/io/textreader.hpp"
-#include "afl/io/stream.hpp"
 #include "afl/base/ref.hpp"
+#include "afl/io/stream.hpp"
+#include "afl/io/textreader.hpp"
+#include "afl/io/textwriter.hpp"
+#include "afl/string/languagecode.hpp"
+#include "afl/string/string.hpp"
 
 namespace afl { namespace sys {
 
@@ -81,6 +82,15 @@ namespace afl { namespace sys {
 
             \return result folder name in UTF-8. */
         virtual String_t getInstallationDirectoryName() = 0;
+
+        /** Get current user language.
+
+            POSIX: returns the LC_MESSAGES locale name from the environment, if available.
+
+            Win32: returns the current language name.
+
+            \return language code */
+        virtual afl::string::LanguageCode getUserLanguage() = 0;
 
         /** Attach standard I/O channel as TextWriter.
             This can be used to get a textual handle to standard output or standard error.

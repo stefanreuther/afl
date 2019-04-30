@@ -18,51 +18,53 @@ namespace afl { namespace io { namespace xml {
 
         This is a simple tokenizer.
         It does not produce a DOM.
-        Users use readNext() to read a token, and then call getTag(), getName(), getValue() to examine it. */
+        Users use readNext() to read a token, and then call getTag(), getName(), getValue() to examine it.
+
+        To produce a DOM, see Parser. */
     class BaseReader : public afl::base::Deletable {
      public:
         /** Token type. */
         enum Token {
             /** End of file. */
             Eof,
-            
+
             /** Starting tag.
                 Reports an opening tag.
                 - getTag(): tag name */
             TagStart,
-            
+
             /** Tag attribute.
                 Reports an attribute of a tag, immediately after TagStart.
                 - getTag(): tag name
                 - getName(): attribute name
                 - getValue(): attribute value */
             TagAttribute,
-            
+
             /** Tag end.
                 Reports and end (closing) tag.
                 - getTag(): tag name */
             TagEnd,
-            
+
             /** Processing instruction start.
                 Reports the start of a processing instruction.
                 - getTag(): instruction name */
             PIStart,
-            
+
             /** Processing instruction attribute.
                 Reports a processing instruction attribute, directly after PIStart.
                 - getTag(): instruction name
                 - getName(): attribute name
                 - getValue(): attribute value */
             PIAttribute,
-            
+
             /** Comment.
                 No further data. */
             Comment,
-            
+
             /** Text.
                 - getValue(): the text */
             Text,
-            
+
             /** Null.
                 Internal use. */
             Null,

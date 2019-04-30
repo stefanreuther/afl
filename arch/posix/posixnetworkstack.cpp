@@ -64,6 +64,11 @@ namespace {
 
     int SocketFactory::toName(const afl::net::Name& name)
     {
+        // Reject names with null bytes
+        if (name.getName().find('\0') != String_t::npos || name.getService().find('\0') != String_t::npos) {
+            throw afl::except::FileProblemException(name.toString(), afl::string::Messages::networkNameNotFound());
+        }
+
         // Where do we want to connect?
         struct addrinfo hints;
         struct addrinfo* result;

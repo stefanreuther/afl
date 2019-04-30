@@ -15,6 +15,13 @@
 
 namespace afl { namespace net { namespace http { namespace {
 
+    Name defaultGetScheme(const Url& url)
+    {
+        return url.getScheme() == "https"
+            ? url.getName("443")
+            : url.getName("80");
+    }
+
     // FIXME: for testability, it makes sense to move this class elsewhere when it's done.
     class ManagedGetRequest : public ClientRequest {
      public:
@@ -29,7 +36,7 @@ namespace afl { namespace net { namespace http { namespace {
 
         virtual Name getName() const
             {
-                return m_url.getName("80");
+                return defaultGetScheme(m_url);
             }
 
         virtual String_t getScheme() const
@@ -123,7 +130,7 @@ namespace afl { namespace net { namespace http { namespace {
 
         virtual Name getName() const
             {
-                return m_url.getName("80");
+                return defaultGetScheme(m_url);
             }
 
         virtual String_t getScheme() const

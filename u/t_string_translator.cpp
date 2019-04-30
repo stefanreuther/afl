@@ -21,5 +21,8 @@ TestStringTranslator::testIt()
     TS_ASSERT(tx != 0);
 
     // We know that the underlying instance is a NullTranslator, so exercise that:
-    TS_ASSERT_EQUALS(tx->translateString("foo"), "foo");
+    TS_ASSERT_EQUALS(tx->translateString         ("foo"),  "foo");
+    TS_ASSERT_EQUALS(tx->translateString(String_t("foo")), "foo");
+    TS_ASSERT_EQUALS((*tx)                       ("foo"),  "foo");
+    TS_ASSERT_EQUALS((*tx)              (String_t("foo")), "foo");
 }

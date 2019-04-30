@@ -27,7 +27,7 @@ namespace afl { namespace test {
         ~Translator();
 
         // Translator:
-        virtual String_t translate(afl::string::ConstStringMemory_t in);
+        virtual String_t translate(afl::string::ConstStringMemory_t in) const;
 
      private:
         String_t m_open;

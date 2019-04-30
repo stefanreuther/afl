@@ -17,6 +17,7 @@ namespace arch { namespace win32 {
         virtual String_t getEnvironmentVariable(const String_t& name);
         virtual String_t getSettingsDirectoryName(const String_t& appName);
         virtual String_t getInstallationDirectoryName();
+        virtual afl::string::LanguageCode getUserLanguage();
         virtual afl::base::Ref<afl::io::TextWriter> attachTextWriter(Channel ch);
         virtual afl::base::Ref<afl::io::TextReader> attachTextReader(Channel ch);
         virtual afl::base::Ref<afl::io::Stream> attachStream(Channel ch);

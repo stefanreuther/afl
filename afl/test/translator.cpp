@@ -17,7 +17,7 @@ afl::test::Translator::~Translator()
 { }
 
 String_t
-afl::test::Translator::translate(afl::string::ConstStringMemory_t in)
+afl::test::Translator::translate(afl::string::ConstStringMemory_t in) const
 {
     return m_open + afl::string::fromMemory(in) + m_close;
 }

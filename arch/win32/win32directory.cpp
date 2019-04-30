@@ -19,6 +19,17 @@
 #include "afl/string/messages.hpp"
 #include "afl/sys/error.hpp"
 
+namespace {
+    String_t convertFileNameToANSI(String_t utfName)
+    {
+        String_t result = arch::win32::convertToANSI(afl::string::toMemory(utfName));
+        if (result.find('\0') != String_t::npos) {
+            throw afl::except::FileProblemException(utfName, afl::string::Messages::invalidFileName());
+        }
+        return result;
+    }
+}
+
 /** DirectoryEntry implementation for Win32. */
 class arch::win32::Win32Directory::Entry : public afl::io::DirectoryEntry {
  public:
@@ -136,7 +147,7 @@ arch::win32::Win32Directory::Entry::updateInfo(uint32_t requested)
             }
         } else {
             // Convert name
-            String_t aname = convertToANSI(afl::string::toMemory(getPathName()));
+            String_t aname = convertFileNameToANSI(getPathName());
 
             // Query kernel
             WIN32_FIND_DATAA data;
@@ -172,7 +183,7 @@ arch::win32::Win32Directory::Entry::doRename(String_t newName)
         }
         success = MoveFileW(&uniOldName[0], &uniNewName[0]);
     } else {
-        success = MoveFileA(convertToANSI(afl::string::toMemory(utfOldName)).c_str(), convertToANSI(afl::string::toMemory(utfNewName)).c_str());
+        success = MoveFileA(convertFileNameToANSI(utfOldName).c_str(), convertFileNameToANSI(utfNewName).c_str());
     }
     if (!success) {
         throw afl::except::FileSystemException(utfOldName, afl::sys::Error::current());
@@ -199,7 +210,7 @@ arch::win32::Win32Directory::Entry::doErase()
             success = DeleteFileW(&wname[0]);
         }
     } else {
-        String_t aname = convertToANSI(afl::string::toMemory(utfName));
+        String_t aname = convertFileNameToANSI(utfName);
         if (GetFileAttributesA(aname.c_str()) & FILE_ATTRIBUTE_DIRECTORY) {
             success = RemoveDirectoryA(aname.c_str());
         } else {
@@ -224,7 +235,7 @@ arch::win32::Win32Directory::Entry::doCreateAsDirectory()
         }
         success = CreateDirectoryW(&wname[0], 0);
     } else {
-        String_t aname = convertToANSI(afl::string::toMemory(utfName));
+        String_t aname = convertFileNameToANSI(utfName);
         success = CreateDirectoryA(aname.c_str(), 0);
     }
     if (!success) {
@@ -342,7 +353,7 @@ arch::win32::Win32Directory::EnumA::EnumA(afl::base::Ref<Win32Directory> dir)
       m_handle(INVALID_HANDLE_VALUE),
       m_currentEntry()
 {
-    String_t aname = convertToANSI(afl::string::toMemory(Win32FileSystem().makePathName(dir->getDirectoryName(), "*")));
+    String_t aname = convertFileNameToANSI(Win32FileSystem().makePathName(dir->getDirectoryName(), "*"));
 
     m_handle = FindFirstFileA(aname.c_str(), &m_data);
     if (m_handle == INVALID_HANDLE_VALUE) {

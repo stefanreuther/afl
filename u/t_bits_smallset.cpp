@@ -60,4 +60,15 @@ TestBitsSmallSet::testIt()
     TS_ASSERT(!(s1 - s2).empty());
 
     TS_ASSERT_EQUALS((n - s2), s1);
+
+    Num_set x;
+    x.set(Two, true);
+    x.set(Three, false);
+    TS_ASSERT_EQUALS(x.contains(Two), true);
+    TS_ASSERT_EQUALS(x.contains(Three), false);
+
+    x.set(Two, false);
+    x.set(Three, true);
+    TS_ASSERT_EQUALS(x.contains(Two), false);
+    TS_ASSERT_EQUALS(x.contains(Three), true);
 }

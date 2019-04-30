@@ -110,6 +110,7 @@ class TestNetName : public CxxTest::TestSuite {
 class TestNetNetworkStack : public CxxTest::TestSuite {
  public:
     void testConnect();
+    void testBadName();
 };
 
 class TestNetProtocolHandler : public CxxTest::TestSuite {

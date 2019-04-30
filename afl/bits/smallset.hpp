@@ -30,130 +30,105 @@ namespace afl { namespace bits {
             { }
 
         /** Construct unit set. */
-        explicit
-        SmallSet(T t)
+        explicit SmallSet(T t)
             : m_rep(Rep_t(1) << t)
             { }
 
         /** Add an element. */
-        SmallSet&
-        operator |= (T t)
+        SmallSet& operator |= (T t)
             { m_rep |= (Rep_t(1) << t); return *this; }
 
         /** Add a set. */
-        SmallSet&
-        operator |= (SmallSet other)
+        SmallSet& operator |= (SmallSet other)
             { m_rep |= other.m_rep; return *this; }
 
         /** Set union (set plus single element). */
-        SmallSet
-        operator | (T t) const
+        SmallSet operator | (T t) const
             { return SmallSet<T>(*this) |= t; }
 
         /** Set union. */
-        SmallSet
-        operator | (SmallSet other) const
+        SmallSet operator | (SmallSet other) const
             { return SmallSet<T>(*this) |= other; }
 
         /** Add an element (alternate name). */
-        SmallSet&
-        operator += (T t)
+        SmallSet& operator += (T t)
             { m_rep |= (Rep_t(1) << t); return *this; }
 
         /** Add a set (alternate name). */
-        SmallSet&
-        operator += (SmallSet other)
+        SmallSet& operator += (SmallSet other)
             { m_rep |= other.m_rep; return *this; }
 
         /** Set union (set plus single element, alternate name). */
-        SmallSet
-        operator + (T t) const
+        SmallSet operator + (T t) const
             { return SmallSet<T>(*this) |= t; }
 
         /** Set union (alternate name). */
-        SmallSet
-        operator + (SmallSet other) const
+        SmallSet operator + (SmallSet other) const
             { return SmallSet<T>(*this) |= other; }
 
         /** Remove an element. */
-        SmallSet&
-        operator -= (T t)
+        SmallSet& operator -= (T t)
             { m_rep &= ~(Rep_t(1) << t); return *this; }
 
         /** Remove a set. */
-        SmallSet&
-        operator -= (SmallSet other)
+        SmallSet& operator -= (SmallSet other)
             { m_rep &= ~other.m_rep; return *this; }
 
         /** Set difference (set minus single element). */
-        SmallSet
-        operator - (T t) const
+        SmallSet operator - (T t) const
             { return SmallSet<T>(*this) -= t; }
 
         /** Set difference. */
-        SmallSet
-        operator - (SmallSet other) const
+        SmallSet operator - (SmallSet other) const
             { return SmallSet<T>(*this) -= other; }
 
         /** Conjunction (intersection). */
-        SmallSet&
-        operator &= (SmallSet other)
+        SmallSet& operator &= (SmallSet other)
             { m_rep &= other.m_rep; return *this; }
 
         /** Conjuction (intersection). */
-        SmallSet
-        operator & (SmallSet other) const
+        SmallSet operator & (SmallSet other) const
             { return SmallSet<T>(*this) &= other; }
 
         /** Toggle an element (symmetric difference). */
-        SmallSet&
-        operator ^= (T t)
+        SmallSet& operator ^= (T t)
             { m_rep ^= (Rep_t(1) << t); return *this; }
 
         /** Toggle elements from other set (symmetric difference). */
-        SmallSet&
-        operator ^= (SmallSet other)
+        SmallSet& operator ^= (SmallSet other)
             { m_rep ^= other.m_rep; return *this; }
 
         /** Symmetric set difference. */
-        SmallSet
-        operator ^ (T t) const
+        SmallSet operator ^ (T t) const
             { return SmallSet<T>(*this) ^= t; }
 
         /** Symmetric set difference. */
-        SmallSet
-        operator ^ (SmallSet other) const
+        SmallSet operator ^ (SmallSet other) const
             { return SmallSet<T>(*this) ^= other; }
 
         /** Test whether element is in. */
-        bool
-        contains(T t) const
+        bool contains(T t) const
             { return (m_rep & (Rep_t(1) << t)) != 0; }
 
         /** Test whether this set contains all elements from the other one. */
-        bool
-        contains(SmallSet other) const
+        bool contains(SmallSet other) const
             { return (other.m_rep & ~m_rep) == 0; }
 
         /** Test whether this set contains any of the elements from the
             other one. */
-        bool
-        containsAnyOf(SmallSet other) const
+        bool containsAnyOf(SmallSet other) const
             { return (m_rep & other.m_rep) != 0; }
 
         /** Test whether this set is empty. */
-        bool
-        empty() const
+        bool empty() const
             { return m_rep == 0; }
 
         /** Clear this set. \post empty() */
-        void
-        clear()
+        void clear()
             { m_rep = 0; }
 
         /** Check whether this set contains at most one element. */
-        bool
-        isUnitSet() const
+        bool isUnitSet() const
             { return (m_rep & (m_rep-1)) == 0; }
 
         /** Static constructor: construct a set which contains all objects
@@ -171,36 +146,31 @@ namespace afl { namespace bits {
             }
 
         /** Compare for equality. */
-        bool
-        operator==(SmallSet other) const
+        bool operator==(SmallSet other) const
             {
                 return m_rep == other.m_rep;
             }
 
         /** Compare for equality to unit set. */
-        bool
-        operator==(T t) const
+        bool operator==(T t) const
             {
                 return m_rep == Rep_t(1) << t;
             }
 
         /** Compare for inequality. */
-        bool
-        operator!=(SmallSet other) const
+        bool operator!=(SmallSet other) const
             {
                 return m_rep != other.m_rep;
             }
 
         /** Compare for inequality to unit set. */
-        bool
-        operator!=(T t) const
+        bool operator!=(T t) const
             {
                 return m_rep != Rep_t(1) << t;
             }
 
         /** True iff set is non-empty. Shortcut for !empty(). */
-        bool
-        nonempty() const
+        bool nonempty() const
             {
                 return m_rep != 0;
             }
@@ -209,6 +179,21 @@ namespace afl { namespace bits {
             a.contains(x) iff (a.toInteger() & (1 << x)) != 0 */
         Rep_t toInteger() const
             { return m_rep; }
+
+        /** Set bit to a value.
+            \param t Element
+            \param flag true to add element, false to remove
+            \return *this
+            \post contains(t) == flag */
+        SmallSet& set(T t, bool flag)
+            {
+                if (flag) {
+                    (*this) += t;
+                } else {
+                    (*this) -= t;
+                }
+                return *this;
+            }
 
         /** Create set from integer. Each set bit in \c v translates into
             a set element. */

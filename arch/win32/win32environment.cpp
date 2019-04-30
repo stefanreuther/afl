@@ -160,13 +160,17 @@ arch::win32::Win32Environment::getEnvironmentVariable(const String_t& name)
     } else {
         // ANSI version
         String_t ansiName(convertToANSI(afl::string::toMemory(name)));
-        DWORD n = GetEnvironmentVariableA(ansiName.c_str(), 0, 0);
-        if (n != 0) {
-            std::vector<char> value(n+1);
-            value.resize(GetEnvironmentVariableA(ansiName.c_str(), &value[0], value.size()));
-            return convertFromANSI(value);
-        } else {
+        if (ansiName.find('\0') != String_t::npos) {
             return String_t();
+        } else {
+            DWORD n = GetEnvironmentVariableA(ansiName.c_str(), 0, 0);
+            if (n != 0) {
+                std::vector<char> value(n+1);
+                value.resize(GetEnvironmentVariableA(ansiName.c_str(), &value[0], value.size()));
+                return convertFromANSI(value);
+            } else {
+                return String_t();
+            }
         }
     }
 }
@@ -205,6 +209,25 @@ arch::win32::Win32Environment::getInstallationDirectoryName()
         } else {
             return String_t();
         }
+    }
+}
+
+afl::string::LanguageCode
+arch::win32::Win32Environment::getUserLanguage()
+{
+    /* GetLocaleInfo is available on all Win32 versions.
+       It produces a 3-character code.
+       A list of these codes for a precise mapping is hard to come by these days.
+       However, since they are built from ISO-639-2 codes, they are guaranteed to start with a 2-letter language code.
+       We therefore just return that code.
+       The location code (DEU -> de_DE, DEA -> de_AT, DES -> de_CH) is lost,
+       but for now we do not need that precision. */
+    char buffer[10];
+    int n = GetLocaleInfo(LOCALE_USER_DEFAULT, LOCALE_SABBREVLANGNAME, buffer, sizeof buffer);
+    if (n < 2) {
+        return afl::string::LanguageCode();
+    } else {
+        return afl::string::LanguageCode(afl::string::strLCase(String_t(buffer, 2)));
     }
 }
 

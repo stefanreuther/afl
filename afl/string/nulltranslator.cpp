@@ -12,7 +12,7 @@ afl::string::NullTranslator::~NullTranslator()
 { }
 
 String_t
-afl::string::NullTranslator::translate(afl::string::ConstStringMemory_t in)
+afl::string::NullTranslator::translate(afl::string::ConstStringMemory_t in) const
 {
     return fromMemory(in);
 }

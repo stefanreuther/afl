@@ -515,3 +515,125 @@ TestIoXmlReader::testPosUtf16()
     TS_ASSERT_EQUALS(xr.getPos(), 8U);
 }
 
+/** Test comment handling. */
+void
+TestIoXmlReader::testComment()
+{
+    afl::io::ConstMemoryStream ms(afl::string::toBytes("<!-- Hi --><foo>A<!-- ho -->B</foo>"));
+    afl::charset::DefaultCharsetFactory cf;
+    afl::io::xml::Reader xr(ms, DefaultEntityHandler::getInstance(), cf);
+    TS_ASSERT_EQUALS(xr.readNext(), xr.Comment);
+
+    TS_ASSERT_EQUALS(xr.readNext(), xr.TagStart);
+    TS_ASSERT_EQUALS(xr.getTag(), "foo");
+
+    TS_ASSERT_EQUALS(xr.readNext(), xr.Text);
+    TS_ASSERT_EQUALS(xr.getValue(), "A");
+
+    TS_ASSERT_EQUALS(xr.readNext(), xr.Comment);
+
+    TS_ASSERT_EQUALS(xr.readNext(), xr.Text);
+    TS_ASSERT_EQUALS(xr.getValue(), "B");
+
+    TS_ASSERT_EQUALS(xr.readNext(), xr.TagEnd);
+    TS_ASSERT_EQUALS(xr.getTag(), "foo");
+
+    TS_ASSERT_EQUALS(xr.readNext(), xr.Eof);
+}
+
+/** Test whitespace mode handling: TrimWS. */
+void
+TestIoXmlReader::testWhitespaceMode()
+{
+    // Default configuration: trim whitespace
+    afl::io::ConstMemoryStream ms(afl::string::toBytes("<a>\n <b>X</b>\n</a>"));
+    afl::charset::DefaultCharsetFactory cf;
+    afl::io::xml::Reader xr(ms, DefaultEntityHandler::getInstance(), cf);
+
+    TS_ASSERT_EQUALS(xr.getWhitespaceMode(), xr.TrimWS);
+
+    TS_ASSERT_EQUALS(xr.readNext(), xr.TagStart);
+    TS_ASSERT_EQUALS(xr.getTag(), "a");
+
+    TS_ASSERT_EQUALS(xr.readNext(), xr.TagStart);
+    TS_ASSERT_EQUALS(xr.getTag(), "b");
+
+    TS_ASSERT_EQUALS(xr.readNext(), xr.Text);
+    TS_ASSERT_EQUALS(xr.getValue(), "X");
+
+    TS_ASSERT_EQUALS(xr.readNext(), xr.TagEnd);
+    TS_ASSERT_EQUALS(xr.getTag(), "b");
+
+    TS_ASSERT_EQUALS(xr.readNext(), xr.TagEnd);
+    TS_ASSERT_EQUALS(xr.getTag(), "a");
+
+    TS_ASSERT_EQUALS(xr.readNext(), xr.Eof);
+}
+
+/** Test whitespace mode handling: SingleWS. */
+void
+TestIoXmlReader::testWhitespaceModeSingle()
+{
+    afl::io::ConstMemoryStream ms(afl::string::toBytes("<a>\n <b>X</b>\n</a>"));
+    afl::charset::DefaultCharsetFactory cf;
+    afl::io::xml::Reader xr(ms, DefaultEntityHandler::getInstance(), cf);
+    xr.setWhitespaceMode(xr.SingleWS);
+
+    TS_ASSERT_EQUALS(xr.readNext(), xr.TagStart);
+    TS_ASSERT_EQUALS(xr.getTag(), "a");
+
+    TS_ASSERT_EQUALS(xr.readNext(), xr.Text);
+    TS_ASSERT_EQUALS(xr.getValue(), " ");
+
+    TS_ASSERT_EQUALS(xr.readNext(), xr.TagStart);
+    TS_ASSERT_EQUALS(xr.getTag(), "b");
+
+    TS_ASSERT_EQUALS(xr.readNext(), xr.Text);
+    TS_ASSERT_EQUALS(xr.getValue(), "X");
+
+    TS_ASSERT_EQUALS(xr.readNext(), xr.TagEnd);
+    TS_ASSERT_EQUALS(xr.getTag(), "b");
+
+    TS_ASSERT_EQUALS(xr.readNext(), xr.Text);
+    TS_ASSERT_EQUALS(xr.getValue(), " ");
+
+    TS_ASSERT_EQUALS(xr.readNext(), xr.TagEnd);
+    TS_ASSERT_EQUALS(xr.getTag(), "a");
+
+    TS_ASSERT_EQUALS(xr.readNext(), xr.Eof);
+}
+
+
+/** Test whitespace mode handling: AllWS. */
+void
+TestIoXmlReader::testWhitespaceModeAll()
+{
+    afl::io::ConstMemoryStream ms(afl::string::toBytes("<a>\n <b>X</b>\n</a>"));
+    afl::charset::DefaultCharsetFactory cf;
+    afl::io::xml::Reader xr(ms, DefaultEntityHandler::getInstance(), cf);
+    xr.setWhitespaceMode(xr.AllWS);
+
+    TS_ASSERT_EQUALS(xr.readNext(), xr.TagStart);
+    TS_ASSERT_EQUALS(xr.getTag(), "a");
+
+    TS_ASSERT_EQUALS(xr.readNext(), xr.Text);
+    TS_ASSERT_EQUALS(xr.getValue(), "\n ");
+
+    TS_ASSERT_EQUALS(xr.readNext(), xr.TagStart);
+    TS_ASSERT_EQUALS(xr.getTag(), "b");
+
+    TS_ASSERT_EQUALS(xr.readNext(), xr.Text);
+    TS_ASSERT_EQUALS(xr.getValue(), "X");
+
+    TS_ASSERT_EQUALS(xr.readNext(), xr.TagEnd);
+    TS_ASSERT_EQUALS(xr.getTag(), "b");
+
+    TS_ASSERT_EQUALS(xr.readNext(), xr.Text);
+    TS_ASSERT_EQUALS(xr.getValue(), "\n");
+
+    TS_ASSERT_EQUALS(xr.readNext(), xr.TagEnd);
+    TS_ASSERT_EQUALS(xr.getTag(), "a");
+
+    TS_ASSERT_EQUALS(xr.readNext(), xr.Eof);
+}
+
