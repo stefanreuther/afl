@@ -1,3 +1,11 @@
+2019-08-23  Stefan Reuther  <streu@gmx.de>
+
+	* afl/charset/asciitransliterator.cpp, afl/charset/asciitransliterator.hpp: new
+
+2019-08-20  Stefan Reuther  <streu@gmx.de>
+
+	* afl/base/memory.hpp (fromSingleObject): new
+
 2019-04-22  Stefan Reuther  <streu@gmx.de>
 
 	* scripts/coverage_optimize.pl: added

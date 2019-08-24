@@ -8,7 +8,7 @@
 #  that.
 #
 
-GENERATE =
+GENERATE = 
 PROJ_AUTO += afl:afl/*pp testsuite:u/*pp
 
 
@@ -16,7 +16,9 @@ PROJ_AUTO += afl:afl/*pp testsuite:u/*pp
 ##  Main Library
 ##
 TARGETS += afl
-FILES_afl = afl/except/assertionfailedexception.hpp afl/base/uncopyable.hpp \
+FILES_afl = afl/charset/asciitransliterator.cpp \
+    afl/charset/asciitransliterator.hpp \
+    afl/except/assertionfailedexception.hpp afl/base/uncopyable.hpp \
     afl/base/deletable.hpp afl/string/languagecode.cpp \
     afl/string/languagecode.hpp afl/io/xml/nodereader.cpp \
     afl/io/xml/nodereader.hpp afl/io/xml/parser.cpp afl/io/xml/parser.hpp \
@@ -357,7 +359,8 @@ DEPEND_unzip = afl
 ##  Testsuite
 ##
 TARGETS += testsuite
-FILES_testsuite = u/t_string_languagecode.cpp u/t_io_xml_nodereader.cpp \
+FILES_testsuite = u/t_charset_asciitransliterator.cpp \
+    u/t_string_languagecode.cpp u/t_io_xml_nodereader.cpp \
     u/t_io_xml_parser.cpp u/t_io_xml_pinode.cpp u/t_io_xml_tagnode.cpp \
     u/t_io_xml_textnode.cpp u/t_io_xml_node.cpp u/t_io_xml_visitor.cpp \
     u/t_base_nullenumerator.cpp u/t_net_redis_integerfield.cpp \
@@ -415,12 +418,11 @@ FILES_testsuite = u/t_string_languagecode.cpp u/t_io_xml_nodereader.cpp \
     u/t_async_communicationsink.cpp u/t_io_bufferedsink.cpp \
     u/t_io_internalsink.cpp u/t_data_stringlist.cpp u/t_data_integerlist.cpp \
     u/t_data_errorvalue.cpp u/t_io_transformdatasink.cpp \
-    u/t_io_inflatetransform.cpp u/t_io_transform.cpp \
-    u/t_base.hpp u/t_base_memory.cpp u/t_container.hpp \
-    u/t_container_ptrvector.cpp u/t_sys.hpp u/t_sys_mutex.cpp \
-    u/t_sys_thread.cpp u/t_base_runnable.cpp u/t_base_deletable.cpp \
-    u/t_sys_mutexguard.cpp u/t_sys_semaphore.cpp u/t_base_deleter.cpp \
-    u/t_container_ptrmap.cpp u/t_base_enumerator.cpp \
+    u/t_io_inflatetransform.cpp u/t_io_transform.cpp u/t_base.hpp \
+    u/t_base_memory.cpp u/t_container.hpp u/t_container_ptrvector.cpp \
+    u/t_sys.hpp u/t_sys_mutex.cpp u/t_sys_thread.cpp u/t_base_runnable.cpp \
+    u/t_base_deletable.cpp u/t_sys_mutexguard.cpp u/t_sys_semaphore.cpp \
+    u/t_base_deleter.cpp u/t_container_ptrmap.cpp u/t_base_enumerator.cpp \
     u/t_container_ptrmultilist.cpp u/t_container_ptrmultilistbase.cpp \
     u/t_tmp_ifthenelse.cpp u/t_base_staticassert.cpp u/t_tmp.hpp \
     u/t_base_closure.cpp u/t_base_clonableref.cpp u/t_base_signalhandler.cpp \

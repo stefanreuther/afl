@@ -22,6 +22,14 @@ namespace {
             afl::base::Memory<T> two(array);
             TS_ASSERT(!two.empty());
             TS_ASSERT_EQUALS(two.size(), 2U);
+            TS_ASSERT_EQUALS(two.unsafeData(), &array[0]);
+
+            // Construct from single object
+            T obj;
+            afl::base::Memory<T> one(afl::base::Memory<T>::fromSingleObject(obj));
+            TS_ASSERT(!one.empty());
+            TS_ASSERT_EQUALS(one.size(), 1U);
+            TS_ASSERT_EQUALS(one.unsafeData(), &obj);
 
             // Basic checks
             TS_ASSERT(!two.equalContent(blank));

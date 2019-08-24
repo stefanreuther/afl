@@ -7,6 +7,12 @@
 
 #include <cxxtest/TestSuite.h>
 
+class TestCharsetAsciiTransliterator : public CxxTest::TestSuite {
+ public:
+    void testSimple();
+    void testCoverage();
+};
+
 class TestCharsetBase64 : public CxxTest::TestSuite {
  public:
     void testIt();

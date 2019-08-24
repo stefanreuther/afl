@@ -60,6 +60,11 @@ namespace afl { namespace base {
             \param vec vector */
         Memory(const std::vector<typename afl::tmp::StripCV<T>::Type>& vec);
 
+        /** Construct from single object.
+            \param obj Object
+            \return descriptor for single object */
+        static Memory fromSingleObject(T& obj);
+
         /** Check emptiness.
             \return true iff this descriptor is empty (default constructed, size zero). */
         bool empty() const;
@@ -447,6 +452,14 @@ afl::base::Memory<T>::Memory(Memory<U> other)
     // We must therefore make sure the base types are the same.
     // The simplest is to compare 'T**' and 'U**', which will fail to compile if they are not equal.
     (void) (static_cast<typename afl::tmp::StripCV<T>::Type**>(0) == static_cast<typename afl::tmp::StripCV<U>::Type**>(0));
+}
+
+template<typename T>
+inline
+afl::base::Memory<T>
+afl::base::Memory<T>::fromSingleObject(T& obj)
+{
+    return Memory(&obj, 1);
 }
 
 template<typename T>
