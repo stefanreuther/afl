@@ -4,6 +4,7 @@
   */
 
 #include <sstream>
+#include <cmath>
 #include "afl/string/format.hpp"
 
 #include "u/t_string.hpp"
@@ -235,6 +236,10 @@ TestStringFormat::testFP()
     TS_ASSERT_EQUALS(String_t(Format("%.1f", 0.003003003)), "0.0");
     TS_ASSERT_EQUALS(String_t(Format("%.1f", 0.99)), "1.0");
     TS_ASSERT_EQUALS(String_t(Format("%.1f", 99.99)), "100.0");
+
+    // Nonfinite
+    TS_ASSERT_EQUALS(String_t(Format("%.1f", std::exp(100000))), "Inf");
+    TS_ASSERT_EQUALS(String_t(Format("%.1f", -std::exp(100000))), "-Inf");
 }
 
 /** Test that strings formatted as integers set flags. */

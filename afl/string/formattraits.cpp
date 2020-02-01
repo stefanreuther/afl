@@ -214,92 +214,102 @@ String_t
 afl::string::formatToString(const long double& val, FormatState& state)
 {
     bool negative = (val < 0);
-    bool trim     = false;
     long double c = val;
     if (negative) {
         c = -c;
     }
 
-    // figure out format to use
-    size_t pre = state.hasFlag(FormatState::PrecisionFlag) ? state.getPrecision() : 6;
-    char typ = state.getCode();
-    if (typ == 'g' || typ == 'G') {
-        if (pre == 0 || size_t(int(pre)) != pre) {
-            pre = 1;
-        }
-        if (c < 1.0E-4 || c > ipow(10, int(pre))) {
-            typ = (typ == 'g' ? 'e' : 'E');
-        }
-        trim = !state.hasFlag(FormatState::AlternateFlag);
-    }
-
-    // figure out exponent
-    int expon;
-    String_t rv = getDigits(c, expon);
-
-    if (typ == 'e' || typ == 'E') {
-        // First, round to requested precision
-        roundString(rv, pre, expon, false);
-        rv.insert(1, 1, '.');
-        if (trim) {
-            trimZeroes(rv);
-        }
-
-        if (expon || !trim) {
-            rv.append(1, typ);
-
-            // Format the exponent
-            FormatState fuFlags;
-            fuFlags.setCode('d');
-            fuFlags.setWidth(3);      // 2 digits + sign
-            fuFlags.setFlag(FormatState::SignFlag);
-            fuFlags.setFlag(FormatState::ZeroPadFlag);
-            if (state.hasFlag(FormatState::GroupFlag)) {
-                fuFlags.setFlag(FormatState::GroupFlag);
-            }
-
-            FormatUnion fuExp;
-            FormatTraits<int>::store(fuExp, expon);
-            rv += FormatTraits<int>::format(fuExp, fuFlags);
-        }
+    // special cases for special values
+    String_t rv;
+    if (std::isnan(c)) {
+        // NaN
+        rv = "NaN";
+    } else if (std::isinf(c)) {
+        // Infinity
+        rv = "Inf";
     } else {
-        // Non-exponential format
-        if (expon >= 0) {
-            if (rv.length() < pre + size_t(expon)) {
-                rv.append(pre + expon - rv.length(), '0');
+        // figure out format to use
+        bool trim = false;
+        size_t pre = state.hasFlag(FormatState::PrecisionFlag) ? state.getPrecision() : 6;
+        char typ = state.getCode();
+        if (typ == 'g' || typ == 'G') {
+            if (pre == 0 || size_t(int(pre)) != pre) {
+                pre = 1;
             }
-            roundString(rv, pre + expon, expon, true);
-            if (pre > 0) {
-                rv.insert(expon+1, 1, '.');
-                if (trim) {
-                    trimZeroes(rv);
-                }
+            if (c < 1.0E-4 || c > ipow(10, int(pre))) {
+                typ = (typ == 'g' ? 'e' : 'E');
             }
-        } else {
-            if (expon < 0) {
-                rv.insert(String_t::size_type(0), -expon, '0');
-                expon = 0;
-                roundString(rv, pre + expon, expon, false);
-            } else {
-                roundString(rv, pre + expon, expon, true);
-            }
+            trim = !state.hasFlag(FormatState::AlternateFlag);
+        }
+
+        // figure out exponent
+        int expon;
+        rv = getDigits(c, expon);
+
+        if (typ == 'e' || typ == 'E') {
+            // First, round to requested precision
+            roundString(rv, pre, expon, false);
             rv.insert(1, 1, '.');
             if (trim) {
                 trimZeroes(rv);
             }
-        }
-    }
 
-    // zeropad
-    if (state.hasFlag(FormatState::ZeroPadFlag)) {
-        size_t n = state.getWidth();
-        if (negative || state.hasFlag(FormatState::BlankFlag) || state.hasFlag(FormatState::SignFlag)) {
-            if (n > 0) {
-                --n;
+            if (expon || !trim) {
+                rv.append(1, typ);
+
+                // Format the exponent
+                FormatState fuFlags;
+                fuFlags.setCode('d');
+                fuFlags.setWidth(3);      // 2 digits + sign
+                fuFlags.setFlag(FormatState::SignFlag);
+                fuFlags.setFlag(FormatState::ZeroPadFlag);
+                if (state.hasFlag(FormatState::GroupFlag)) {
+                    fuFlags.setFlag(FormatState::GroupFlag);
+                }
+
+                FormatUnion fuExp;
+                FormatTraits<int>::store(fuExp, expon);
+                rv += FormatTraits<int>::format(fuExp, fuFlags);
+            }
+        } else {
+            // Non-exponential format
+            if (expon >= 0) {
+                if (rv.length() < pre + size_t(expon)) {
+                    rv.append(pre + expon - rv.length(), '0');
+                }
+                roundString(rv, pre + expon, expon, true);
+                if (pre > 0) {
+                    rv.insert(expon+1, 1, '.');
+                    if (trim) {
+                        trimZeroes(rv);
+                    }
+                }
+            } else {
+                if (expon < 0) {
+                    rv.insert(String_t::size_type(0), -expon, '0');
+                    expon = 0;
+                    roundString(rv, pre + expon, expon, false);
+                } else {
+                    roundString(rv, pre + expon, expon, true);
+                }
+                rv.insert(1, 1, '.');
+                if (trim) {
+                    trimZeroes(rv);
+                }
             }
         }
-        if (n > 0 && rv.length() < n) {
-            rv.insert(String_t::size_type(0), n - rv.length(), '0');
+
+        // zeropad
+        if (state.hasFlag(FormatState::ZeroPadFlag)) {
+            size_t n = state.getWidth();
+            if (negative || state.hasFlag(FormatState::BlankFlag) || state.hasFlag(FormatState::SignFlag)) {
+                if (n > 0) {
+                    --n;
+                }
+            }
+            if (n > 0 && rv.length() < n) {
+                rv.insert(String_t::size_type(0), n - rv.length(), '0');
+            }
         }
     }
 

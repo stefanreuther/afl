@@ -1,3 +1,7 @@
+2019-10-08  Stefan Reuther  <streu@gmx.de>
+
+	* afl/string/formattraits.cpp: add formatting for Inf, NaN
+
 2019-08-23  Stefan Reuther  <streu@gmx.de>
 
 	* afl/charset/asciitransliterator.cpp, afl/charset/asciitransliterator.hpp: new
