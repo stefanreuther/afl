@@ -37,6 +37,9 @@ afl::string::Win32FileNames::makePathName(FileName_t path, FileName_t name) cons
     if (isAbsolutePathName(name) || (name.size() >= 2 && name[1] == ':') || (name.size() > 0 && (name[0] == '/' || name[0] == '\\'))) {
         // absolute ("c:/foo"), drive-relative ("c:foo"), or root-relative ("\foo")
         return name;
+    } else if (path == ".") {
+        // This is intended to make makePathName(getDirectoryName(x), getFileName(x)) == x in the trivial case
+        return name;
     } else {
         // relative
         if (path.size() != 0 && !isPathSeparator(path[path.size()-1])) {

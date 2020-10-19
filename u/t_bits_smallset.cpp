@@ -72,3 +72,28 @@ TestBitsSmallSet::testIt()
     TS_ASSERT_EQUALS(x.contains(Two), false);
     TS_ASSERT_EQUALS(x.contains(Three), true);
 }
+
+/** Test cardinality-related functions (take, size). */
+void
+TestBitsSmallSet::testCard()
+{
+    afl::bits::SmallSet<int> a = afl::bits::SmallSet<int>::fromInteger(0x35);
+    TS_ASSERT_EQUALS(a.size(), 4U);
+
+    afl::bits::SmallSet<int> b = a.take(3);
+    TS_ASSERT_EQUALS(a.size(), 1U);
+    TS_ASSERT_EQUALS(b.size(), 3U);
+    TS_ASSERT_EQUALS(a.toInteger(), 0x20U);
+    TS_ASSERT_EQUALS(b.toInteger(), 0x15U);
+}
+
+/** Test size() for various representations. */
+void
+TestBitsSmallSet::testRepSize()
+{
+    TS_ASSERT_EQUALS((afl::bits::SmallSet<int,uint8_t>::fromInteger(0x81).size()), 2U);
+    TS_ASSERT_EQUALS((afl::bits::SmallSet<int,uint16_t>::fromInteger(0x8001).size()), 2U);
+    TS_ASSERT_EQUALS((afl::bits::SmallSet<int,uint32_t>::fromInteger(0x80000001UL).size()), 2U);
+    TS_ASSERT_EQUALS((afl::bits::SmallSet<int,uint64_t>::fromInteger(0x8000000000000001ULL).size()), 2U);
+}
+

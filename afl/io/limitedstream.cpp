@@ -112,11 +112,7 @@ afl::io::LimitedStream::getPos()
 afl::io::LimitedStream::FileSize_t
 afl::io::LimitedStream::getSize()
 {
-    if (hasPosition()) {
-        return m_position;
-    } else {
-        return nil;
-    }
+    return m_length;
 }
 
 uint32_t

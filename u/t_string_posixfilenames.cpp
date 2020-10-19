@@ -55,6 +55,8 @@ TestStringPosixFileNames::testMakePath()
     TS_ASSERT_EQUALS(p.makePathName("a/", "/foo"), "/foo");
 
     TS_ASSERT_EQUALS(p.makePathName("/", "../foo"), "/../foo");
+
+    TS_ASSERT_EQUALS(p.makePathName(".", "x.txt"), "x.txt");
 }
 
 /** Test PosixFileNames::getCanonicalPathName. */

@@ -16,6 +16,7 @@
 #include "afl/sys/environment.hpp"
 #include "afl/io/inflatetransform.hpp"
 #include "afl/io/transformreaderstream.hpp"
+#include "afl/io/archive/arreader.hpp"
 
 using afl::base::Ptr;
 using afl::base::Ref;
@@ -39,6 +40,8 @@ namespace {
             return afl::io::archive::ZipReader::open(FileSystem::getInstance().openFile(arg, FileSystem::OpenRead), 0);
         } else if (endsWith(arg, ".tar")) {
             return afl::io::archive::TarReader::open(FileSystem::getInstance().openFile(arg, FileSystem::OpenRead), 0);
+        } else if (endsWith(arg, ".a")) {
+            return afl::io::archive::ArReader::open(FileSystem::getInstance().openFile(arg, FileSystem::OpenRead));
         } else if (endsWith(arg, ".tar.gz") || endsWith(arg, ".tgz")) {
             class InflateReader : private afl::io::InflateTransform,
                                   private Ref<afl::io::Stream>,

@@ -351,7 +351,7 @@ afl::io::archive::ZipReader::ZipDeflatedMember::getName()
 afl::io::Stream::FileSize_t
 afl::io::archive::ZipReader::ZipDeflatedMember::getSize()
 {
-    return -1;
+    return FileSize_t(-1);
 }
 
 afl::io::Stream::FileSize_t

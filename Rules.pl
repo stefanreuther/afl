@@ -35,7 +35,8 @@ if ($V{TARGET} =~ /POSIX/i) {
 # Libraries
 find_directory('CXXTESTDIR',
                files =>[qw(cxxtest/TestSuite.h cxxtestgen.pl)],
-               guess => [glob('../cxxtest* ../../cxxtest* ../../../cxxtest*')]);
+               guess => [glob('../cxxtest* ../../cxxtest* ../../../cxxtest*')],
+               allow_missing => 1);
 find_library('WITH_OPENSSL',
              libs => '-lssl -lcrypto',
              program => "#include \"openssl/ssl.h\"\nint main() { TLSv1_client_method(); }\n",

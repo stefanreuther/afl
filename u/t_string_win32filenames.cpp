@@ -76,6 +76,8 @@ TestStringWin32FileNames::testMakePath()
     TS_ASSERT_EQUALS(p.makePathName("a", "/"), "/");
     TS_ASSERT_EQUALS(p.makePathName("a", "\\"), "\\");
     TS_ASSERT_EQUALS(p.makePathName("a/", "/foo"), "/foo");
+
+    TS_ASSERT_EQUALS(p.makePathName(".", "f.txt"), "f.txt");
 }
 
 /** Test getCanonicalPathName(). */

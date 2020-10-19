@@ -74,6 +74,8 @@ class TestBitsRotate : public CxxTest::TestSuite {
 class TestBitsSmallSet : public CxxTest::TestSuite {
  public:
     void testIt();
+    void testCard();
+    void testRepSize();
 };
 
 class TestBitsUInt8 : public CxxTest::TestSuite {

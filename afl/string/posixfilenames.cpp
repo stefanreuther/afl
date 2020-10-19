@@ -23,9 +23,11 @@ afl::string::PosixFileNames::isPathSeparator(char c) const
 afl::string::PosixFileNames::FileName_t
 afl::string::PosixFileNames::makePathName(FileName_t path, FileName_t name) const
 {
-    // Note: unlike the PCC2 version of this function,
-    // this is not guaranteed to return a canonical name.
+    // Note: unlike the PCC2 version of this function, this is not guaranteed to return a canonical name.
     if (isAbsolutePathName(name)) {
+        return name;
+    } else if (path == ".") {
+        // This is intended to make makePathName(getDirectoryName(x), getFileName(x)) == x in the trivial case
         return name;
     } else {
         if (path.size() != 0 && !isPathSeparator(path[path.size()-1])) {

@@ -6,6 +6,7 @@
 #define AFL_AFL_BITS_SMALLSET_HPP
 
 #include "afl/base/types.hpp"
+#include "afl/bits/bits.hpp"
 
 namespace afl { namespace bits {
 
@@ -133,8 +134,7 @@ namespace afl { namespace bits {
 
         /** Static constructor: construct a set which contains all objects
             from T(0) up to and including T(t) */
-        static SmallSet
-        allUpTo(T t)
+        static SmallSet allUpTo(T t)
             {
                 // This wording allows constructing all values without overflow:
                 //   1 << t       get one 1 bit and 't' 0 bits
@@ -195,10 +195,34 @@ namespace afl { namespace bits {
                 return *this;
             }
 
+        /** Take n elements.
+            Returns a set containing the first n elements of this set (fewer if there are not as many), removing them from this.
+            \param n Number of elements
+            \return Taken elements. */
+        SmallSet take(size_t n)
+            {
+                Rep_t mask = 1;
+                Rep_t result = 0;
+                while (m_rep != 0 && n != 0) {
+                    if ((m_rep & mask) != 0) {
+                        result |= mask;
+                        m_rep &= ~mask;
+                        --n;
+                    }
+                    mask <<= 1;
+                }
+                return SmallSet(result, true);
+            }
+
+        /** Get number of bits set in this set.
+            \return Number of bits */
+        size_t size() const
+            { return bitPop(m_rep); }
+
         /** Create set from integer. Each set bit in \c v translates into
             a set element. */
         static SmallSet fromInteger(Rep_t v)
-            { return SmallSet<T>(v, true); }
+            { return SmallSet(v, true); }
 
      private:
         Rep_t m_rep;

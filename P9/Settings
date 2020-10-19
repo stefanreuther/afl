@@ -16,7 +16,8 @@ PROJ_AUTO += afl:afl/*pp testsuite:u/*pp
 ##  Main Library
 ##
 TARGETS += afl
-FILES_afl = afl/charset/asciitransliterator.cpp \
+FILES_afl = arch/textfile.hpp afl/io/archive/arreader.cpp \
+    afl/io/archive/arreader.hpp afl/charset/asciitransliterator.cpp \
     afl/charset/asciitransliterator.hpp \
     afl/except/assertionfailedexception.hpp afl/base/uncopyable.hpp \
     afl/base/deletable.hpp afl/string/languagecode.cpp \
@@ -359,12 +360,13 @@ DEPEND_unzip = afl
 ##  Testsuite
 ##
 TARGETS += testsuite
-FILES_testsuite = u/t_charset_asciitransliterator.cpp \
-    u/t_string_languagecode.cpp u/t_io_xml_nodereader.cpp \
-    u/t_io_xml_parser.cpp u/t_io_xml_pinode.cpp u/t_io_xml_tagnode.cpp \
-    u/t_io_xml_textnode.cpp u/t_io_xml_node.cpp u/t_io_xml_visitor.cpp \
-    u/t_base_nullenumerator.cpp u/t_net_redis_integerfield.cpp \
-    u/t_test_translator.cpp u/t_base_stoppable.cpp u/t_base_inlinememory.cpp \
+FILES_testsuite = u/t_io_archive_arreader.cpp \
+    u/t_charset_asciitransliterator.cpp u/t_string_languagecode.cpp \
+    u/t_io_xml_nodereader.cpp u/t_io_xml_parser.cpp u/t_io_xml_pinode.cpp \
+    u/t_io_xml_tagnode.cpp u/t_io_xml_textnode.cpp u/t_io_xml_node.cpp \
+    u/t_io_xml_visitor.cpp u/t_base_nullenumerator.cpp \
+    u/t_net_redis_integerfield.cpp u/t_test_translator.cpp \
+    u/t_base_stoppable.cpp u/t_base_inlinememory.cpp \
     u/t_test_commandhandler.cpp u/t_test_callreceiver.cpp \
     u/t_test_networkstack.cpp u/t_test_socket.cpp u/t_test_assert.cpp \
     u/t_test.hpp u/t_checksums_sha512.cpp u/t_checksums_sha384.cpp \

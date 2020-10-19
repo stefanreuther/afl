@@ -85,7 +85,7 @@ afl::io::TransformReaderStream::getPos()
 afl::io::Stream::FileSize_t
 afl::io::TransformReaderStream::getSize()
 {
-    return -1;
+    return FileSize_t(-1);
 }
 
 uint32_t

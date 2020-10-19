@@ -7,6 +7,7 @@
 #include "afl/net/simpleserver.hpp"
 #include "afl/net/listener.hpp"
 #include "afl/net/protocolhandlerfactory.hpp"
+#include "afl/net/protocolhandler.hpp"
 #include "afl/net/socket.hpp"
 #include "afl/net/interact.hpp"
 #include "afl/sys/mutexguard.hpp"

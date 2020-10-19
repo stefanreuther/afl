@@ -18,7 +18,7 @@ TestStringParse::testStrToInt()
     String_t c = "45 ";
     String_t d = " 17 ";
     String_t e = "   99  miles ";
-    int res;
+    int res = -1;
     String_t::size_type pos;
 
     TS_ASSERT(strToInteger(a, res));

@@ -178,28 +178,28 @@ TestCharsetUtf8::testPos()
     TS_ASSERT_EQUALS(u8.charToBytePos("abc", 2), 2U);
     TS_ASSERT_EQUALS(u8.charToBytePos("abc", 3), 3U);
     TS_ASSERT_EQUALS(u8.charToBytePos("abc", 4), 3U);
-    TS_ASSERT_EQUALS(u8.charToBytePos("abc", -1), 3U);
+    TS_ASSERT_EQUALS(u8.charToBytePos("abc", size_t(-1)), 3U);
 
     TS_ASSERT_EQUALS(u8.charToBytePos("a\xC2\x80y", 0), 0U);
     TS_ASSERT_EQUALS(u8.charToBytePos("a\xC2\x80y", 1), 1U);
     TS_ASSERT_EQUALS(u8.charToBytePos("a\xC2\x80y", 2), 3U);
     TS_ASSERT_EQUALS(u8.charToBytePos("a\xC2\x80y", 3), 4U);
     TS_ASSERT_EQUALS(u8.charToBytePos("a\xC2\x80y", 4), 4U);
-    TS_ASSERT_EQUALS(u8.charToBytePos("a\xC2\x80y", -1), 4U);
+    TS_ASSERT_EQUALS(u8.charToBytePos("a\xC2\x80y", size_t(-1)), 4U);
 
     TS_ASSERT_EQUALS(u8.byteToCharPos("abc", 0), 0U);
     TS_ASSERT_EQUALS(u8.byteToCharPos("abc", 1), 1U);
     TS_ASSERT_EQUALS(u8.byteToCharPos("abc", 2), 2U);
     TS_ASSERT_EQUALS(u8.byteToCharPos("abc", 3), 3U);
     TS_ASSERT_EQUALS(u8.byteToCharPos("abc", 4), 3U);
-    TS_ASSERT_EQUALS(u8.byteToCharPos("abc", -1), 3U);
+    TS_ASSERT_EQUALS(u8.byteToCharPos("abc", size_t(-1)), 3U);
 
     TS_ASSERT_EQUALS(u8.byteToCharPos("a\xC2\x80y", 0), 0U);
     TS_ASSERT_EQUALS(u8.byteToCharPos("a\xC2\x80y", 1), 1U);
     TS_ASSERT_EQUALS(u8.byteToCharPos("a\xC2\x80y", 2), 2U);
     TS_ASSERT_EQUALS(u8.byteToCharPos("a\xC2\x80y", 3), 2U);
     TS_ASSERT_EQUALS(u8.byteToCharPos("a\xC2\x80y", 4), 3U);
-    TS_ASSERT_EQUALS(u8.byteToCharPos("a\xC2\x80y", -1), 3U);
+    TS_ASSERT_EQUALS(u8.byteToCharPos("a\xC2\x80y", size_t(-1)), 3U);
 }
 
 /** Test charAt. */

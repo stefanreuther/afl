@@ -7,6 +7,15 @@
 
 #include <cxxtest/TestSuite.h>
 
+class TestIoArchiveArReader : public CxxTest::TestSuite {
+ public:
+    void testList();
+    void testList2();
+    void testList3();
+    void testRead();
+    void testFailure();
+};
+
 class TestIoArchiveTarReader : public CxxTest::TestSuite {
  public:
     void testListCompressed();

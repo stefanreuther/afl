@@ -284,7 +284,7 @@ bool
 afl::net::MimeParser::handleData(afl::base::ConstBytes_t& data)
 {
     while (!data.empty()) {
-        bool did;
+        bool did = false;
         switch (m_state) {
          case StateHeader:     addDataHeader(data);     did = true; break;
          case StatePlainBody:  addDataPlainBody(data);  did = true; break;

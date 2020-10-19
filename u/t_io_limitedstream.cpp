@@ -43,7 +43,7 @@ TestIoLimitedStream::testFull()
     TS_ASSERT_THROWS_NOTHING(testee.setPos(0));
     TS_ASSERT_THROWS_NOTHING(testee.setPos(10));
     TS_ASSERT_THROWS(testee.setPos(11), afl::except::FileProblemException);
-    TS_ASSERT_THROWS(testee.setPos(-1), afl::except::FileProblemException);
+    TS_ASSERT_THROWS(testee.setPos(afl::io::Stream::FileSize_t(-1)), afl::except::FileProblemException);
 
     // Capabilities
     uint32_t cap = testee.getCapabilities();

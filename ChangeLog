@@ -1,3 +1,21 @@
+2020-08-28  Stefan Reuther  <streu@gmx.de>
+
+	* afl/string/posixfilenames.cpp (makePathName): special-case path="." so makePathName(getDirectoryName,getFileName) is a no-op
+	* afl/string/win32filenames.cpp (makePathName): special-case path="." so makePathName(getDirectoryName,getFileName) is a no-op
+
+2020-08-20  Stefan Reuther  <streu@gmx.de>
+
+	* afl/base/types.hpp: define __STDC_LIMIT_MACROS, __STDC_CONSTANT_MACROS
+
+2020-05-17  Stefan Reuther  <streu@gmx.de>
+
+	* afl/bits/smallset.hpp (size, take): new; (fromInteger): fix compile error with non-default Rep
+
+2020-04-29  Stefan Reuther  <streu@gmx.de>
+
+	* afl/io/archive/arreader.cpp, afl/io/archive/arreader.hpp: new
+	* afl/io/limitedstream.cpp (getSize): fixed
+
 2019-10-08  Stefan Reuther  <streu@gmx.de>
 
 	* afl/string/formattraits.cpp: add formatting for Inf, NaN

@@ -26,6 +26,8 @@ TestExceptAssertionFailedException::testClass()
         afl::except::AssertionFailedException ex2(ex);
         std::runtime_error& err(ex);
         std::exception& x(ex);
+        (void) err;
+        (void) x;
     }
 }
 

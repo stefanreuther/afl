@@ -169,7 +169,7 @@ TestDataAccess::testVector()
 
     // Access it
     using afl::data::Access;
-    TS_ASSERT_THROWS(+Access(&vv).toInteger(), afl::except::InvalidDataException);
+    TS_ASSERT_THROWS((void)+Access(&vv).toInteger(), afl::except::InvalidDataException);
     TS_ASSERT_EQUALS(Access(&vv).toString(), "1,,42,xyz,abc,7,9");
     TS_ASSERT_EQUALS(Access(&vv).getArraySize(), 7U);
     TS_ASSERT(!Access(&vv).isNull());
@@ -178,8 +178,8 @@ TestDataAccess::testVector()
     TS_ASSERT_EQUALS(Access(&vv)[0].toInteger(), 1);
     TS_ASSERT_EQUALS(Access(&vv)[1].toInteger(), 0);
     TS_ASSERT_EQUALS(Access(&vv)[2].toInteger(), 42);
-    TS_ASSERT_THROWS(+Access(&vv)[3].toInteger(), afl::except::InvalidDataException);
-    TS_ASSERT_THROWS(+Access(&vv)[4].toInteger(), afl::except::InvalidDataException);
+    TS_ASSERT_THROWS((void)+Access(&vv)[3].toInteger(), afl::except::InvalidDataException);
+    TS_ASSERT_THROWS((void)+Access(&vv)[4].toInteger(), afl::except::InvalidDataException);
     TS_ASSERT_EQUALS(Access(&vv)[5].toInteger(), 7);
     TS_ASSERT_EQUALS(Access(&vv)[6].toInteger(), 9);
 
@@ -222,7 +222,7 @@ TestDataAccess::testHash()
 
     // Access it
     using afl::data::Access;
-    TS_ASSERT_THROWS(+Access(&hv).toInteger(), afl::except::InvalidDataException);
+    TS_ASSERT_THROWS((void)+Access(&hv).toInteger(), afl::except::InvalidDataException);
     TS_ASSERT_EQUALS(Access(&hv).toString(), "<hash>");
     TS_ASSERT_EQUALS(Access(&hv).getArraySize(), 0U);
     TS_ASSERT(!Access(&hv).isNull());
