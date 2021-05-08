@@ -90,13 +90,6 @@ TestBaseClosure::testNullary()
     cc->call();
     TS_ASSERT_EQUALS(g_val, 0);
 
-    // Clone it
-    std::auto_ptr<afl::base::Closure<void()> > cc2(cc->clone());
-    g_val = 1;
-    TS_ASSERT_EQUALS(g_val, 1);
-    cc2->call();
-    TS_ASSERT_EQUALS(g_val, 0);
-
     // Object method
     Tester t;
     cc.reset(new afl::base::Closure<void()>::Bound<Tester>(&t, &Tester::nullary));
@@ -104,13 +97,6 @@ TestBaseClosure::testNullary()
     TS_ASSERT_EQUALS(t.get(), 1);
     cc->call();
     TS_ASSERT_EQUALS(t.get(), 0);
-    delete cc->clone();
-
-    // Clone is unaffected
-    g_val = 1;
-    TS_ASSERT_EQUALS(g_val, 1);
-    cc2->call();
-    TS_ASSERT_EQUALS(g_val, 0);
 }
 
 /** Test unary closures. */
@@ -126,11 +112,6 @@ TestBaseClosure::testUnary()
     cc->call(2);
     TS_ASSERT_EQUALS(g_val, 2);
 
-    // Clone it
-    std::auto_ptr<Closure> cc2(cc->clone());
-    cc2->call(3);
-    TS_ASSERT_EQUALS(g_val, 3);
-
     // Object method
     Tester t;
     cc.reset(new Closure::Bound<Tester>(&t, &Tester::unary));
@@ -138,24 +119,16 @@ TestBaseClosure::testUnary()
     TS_ASSERT_EQUALS(t.get(), 1);
     cc->call(4);
     TS_ASSERT_EQUALS(t.get(), 4);
-    delete cc->clone();
-
-    // Clone is unaffected
-    cc2->call(7);
-    TS_ASSERT_EQUALS(g_val, 7);
-    TS_ASSERT_EQUALS(t.get(), 4);
 
     // Nullary function
     cc.reset(new Closure::StaticNullary(nullary));
     cc->call(99);
     TS_ASSERT_EQUALS(g_val, 0);
-    delete cc->clone();
 
     // Nullary member
     cc.reset(new Closure::BoundNullary<Tester>(&t, &Tester::nullary));
     cc->call(77);
     TS_ASSERT_EQUALS(t.get(), 0);
-    delete cc->clone();
 }
 
 /** Test binary closures. */
@@ -171,11 +144,6 @@ TestBaseClosure::testBinary()
     cc->call(2, 3);
     TS_ASSERT_EQUALS(g_val, 5);
 
-    // Clone it
-    std::auto_ptr<Closure> cc2(cc->clone());
-    cc2->call(3, 4);
-    TS_ASSERT_EQUALS(g_val, 7);
-
     // Object method
     Tester t;
     cc.reset(new Closure::Bound<Tester>(&t, &Tester::binary));
@@ -183,24 +151,16 @@ TestBaseClosure::testBinary()
     TS_ASSERT_EQUALS(t.get(), 1);
     cc->call(4, 5);
     TS_ASSERT_EQUALS(t.get(), 9);
-    delete cc->clone();
-
-    // Clone is unaffected
-    cc2->call(7, 8);
-    TS_ASSERT_EQUALS(g_val, 15);
-    TS_ASSERT_EQUALS(t.get(), 9);
 
     // Nullary function
     cc.reset(new Closure::StaticNullary(nullary));
     cc->call(99, 98);
     TS_ASSERT_EQUALS(g_val, 0);
-    delete cc->clone();
 
     // Nullary member
     cc.reset(new Closure::BoundNullary<Tester>(&t, &Tester::nullary));
     cc->call(77, 76);
     TS_ASSERT_EQUALS(t.get(), 0);
-    delete cc->clone();
 }
 
 /** Test ternary closures. */
@@ -216,11 +176,6 @@ TestBaseClosure::testTernary()
     cc->call(2, 3, 4);
     TS_ASSERT_EQUALS(g_val, 9);
 
-    // Clone it
-    std::auto_ptr<Closure> cc2(cc->clone());
-    cc2->call(3, 4, 5);
-    TS_ASSERT_EQUALS(g_val, 12);
-
     // Object method
     Tester t;
     cc.reset(new Closure::Bound<Tester>(&t, &Tester::ternary));
@@ -228,24 +183,16 @@ TestBaseClosure::testTernary()
     TS_ASSERT_EQUALS(t.get(), 1);
     cc->call(4, 5, 6);
     TS_ASSERT_EQUALS(t.get(), 15);
-    delete cc->clone();
-
-    // Clone is unaffected
-    cc2->call(7, 8, 9);
-    TS_ASSERT_EQUALS(g_val, 24);
-    TS_ASSERT_EQUALS(t.get(), 15);
 
     // Nullary function
     cc.reset(new Closure::StaticNullary(nullary));
     cc->call(99, 98, 97);
     TS_ASSERT_EQUALS(g_val, 0);
-    delete cc->clone();
 
     // Nullary member
     cc.reset(new Closure::BoundNullary<Tester>(&t, &Tester::nullary));
     cc->call(77, 76, 75);
     TS_ASSERT_EQUALS(t.get(), 0);
-    delete cc->clone();
 }
 
 /** Test quaternary closures. */
@@ -261,11 +208,6 @@ TestBaseClosure::testQuaternary()
     cc->call(2, 3, 4, 5);
     TS_ASSERT_EQUALS(g_val, 14);
 
-    // Clone it
-    std::auto_ptr<Closure> cc2(cc->clone());
-    cc2->call(3, 4, 5, 6);
-    TS_ASSERT_EQUALS(g_val, 18);
-
     // Object method
     Tester t;
     cc.reset(new Closure::Bound<Tester>(&t, &Tester::quaternary));
@@ -273,24 +215,16 @@ TestBaseClosure::testQuaternary()
     TS_ASSERT_EQUALS(t.get(), 1);
     cc->call(4, 5, 6, 7);
     TS_ASSERT_EQUALS(t.get(), 22);
-    delete cc->clone();
-
-    // Clone is unaffected
-    cc2->call(7, 8, 9, 10);
-    TS_ASSERT_EQUALS(g_val, 34);
-    TS_ASSERT_EQUALS(t.get(), 22);
 
     // Nullary function
     cc.reset(new Closure::StaticNullary(nullary));
     cc->call(99, 98, 97, 96);
     TS_ASSERT_EQUALS(g_val, 0);
-    delete cc->clone();
 
     // Nullary member
     cc.reset(new Closure::BoundNullary<Tester>(&t, &Tester::nullary));
     cc->call(77, 76, 75, 74);
     TS_ASSERT_EQUALS(t.get(), 0);
-    delete cc->clone();
 }
 
 /** Test quinary closures. */
@@ -306,11 +240,6 @@ TestBaseClosure::testQuinary()
     cc->call(2, 3, 4, 5, 6);
     TS_ASSERT_EQUALS(g_val, 20);
 
-    // Clone it
-    std::auto_ptr<Closure> cc2(cc->clone());
-    cc2->call(3, 4, 5, 6, 7);
-    TS_ASSERT_EQUALS(g_val, 25);
-
     // Object method
     Tester t;
     cc.reset(new Closure::Bound<Tester>(&t, &Tester::quinary));
@@ -318,24 +247,16 @@ TestBaseClosure::testQuinary()
     TS_ASSERT_EQUALS(t.get(), 1);
     cc->call(4, 5, 6, 7, 8);
     TS_ASSERT_EQUALS(t.get(), 30);
-    delete cc->clone();
-
-    // Clone is unaffected
-    cc2->call(7, 8, 9, 10, 11);
-    TS_ASSERT_EQUALS(g_val, 45);
-    TS_ASSERT_EQUALS(t.get(), 30);
 
     // Nullary function
     cc.reset(new Closure::StaticNullary(nullary));
     cc->call(99, 98, 97, 96, 95);
     TS_ASSERT_EQUALS(g_val, 0);
-    delete cc->clone();
 
     // Nullary member
     cc.reset(new Closure::BoundNullary<Tester>(&t, &Tester::nullary));
     cc->call(77, 76, 75, 74, 73);
     TS_ASSERT_EQUALS(t.get(), 0);
-    delete cc->clone();
 }
 
 /** Test senary closures. */
@@ -351,11 +272,6 @@ TestBaseClosure::testSenary()
     cc->call(2, 3, 4, 5, 6, 7);
     TS_ASSERT_EQUALS(g_val, 27);
 
-    // Clone it
-    std::auto_ptr<Closure> cc2(cc->clone());
-    cc2->call(3, 4, 5, 6, 7, 8);
-    TS_ASSERT_EQUALS(g_val, 33);
-
     // Object method
     Tester t;
     cc.reset(new Closure::Bound<Tester>(&t, &Tester::senary));
@@ -363,24 +279,16 @@ TestBaseClosure::testSenary()
     TS_ASSERT_EQUALS(t.get(), 1);
     cc->call(4, 5, 6, 7, 8, 9);
     TS_ASSERT_EQUALS(t.get(), 39);
-    delete cc->clone();
-
-    // Clone is unaffected
-    cc2->call(7, 8, 9, 10, 11, 12);
-    TS_ASSERT_EQUALS(g_val, 57);
-    TS_ASSERT_EQUALS(t.get(), 39);
 
     // Nullary function
     cc.reset(new Closure::StaticNullary(nullary));
     cc->call(99, 98, 97, 96, 95, 94);
     TS_ASSERT_EQUALS(g_val, 0);
-    delete cc->clone();
 
     // Nullary member
     cc.reset(new Closure::BoundNullary<Tester>(&t, &Tester::nullary));
     cc->call(77, 76, 75, 74, 73, 72);
     TS_ASSERT_EQUALS(t.get(), 0);
-    delete cc->clone();
 }
 
 /*
@@ -398,13 +306,6 @@ TestBaseClosure::testNullaryFactory()
     cc->call();
     TS_ASSERT_EQUALS(g_val, 0);
 
-    // Clone it
-    std::auto_ptr<afl::base::Closure<void()> > cc2(cc->clone());
-    g_val = 1;
-    TS_ASSERT_EQUALS(g_val, 1);
-    cc2->call();
-    TS_ASSERT_EQUALS(g_val, 0);
-
     // Object method
     Tester t;
     cc.reset(afl::base::Closure<void()>::makeBound(&t, &Tester::nullary));
@@ -412,13 +313,6 @@ TestBaseClosure::testNullaryFactory()
     TS_ASSERT_EQUALS(t.get(), 1);
     cc->call();
     TS_ASSERT_EQUALS(t.get(), 0);
-    delete cc->clone();
-
-    // Clone is unaffected
-    g_val = 1;
-    TS_ASSERT_EQUALS(g_val, 1);
-    cc2->call();
-    TS_ASSERT_EQUALS(g_val, 0);
 }
 
 /** Test unary closure factory methods. */
@@ -434,11 +328,6 @@ TestBaseClosure::testUnaryFactory()
     cc->call(2);
     TS_ASSERT_EQUALS(g_val, 2);
 
-    // Clone it
-    std::auto_ptr<Closure> cc2(cc->clone());
-    cc2->call(3);
-    TS_ASSERT_EQUALS(g_val, 3);
-
     // Object method
     Tester t;
     cc.reset(Closure::makeBound(&t, &Tester::unary));
@@ -446,24 +335,16 @@ TestBaseClosure::testUnaryFactory()
     TS_ASSERT_EQUALS(t.get(), 1);
     cc->call(4);
     TS_ASSERT_EQUALS(t.get(), 4);
-    delete cc->clone();
-
-    // Clone is unaffected
-    cc2->call(7);
-    TS_ASSERT_EQUALS(g_val, 7);
-    TS_ASSERT_EQUALS(t.get(), 4);
 
     // Nullary function
     cc.reset(Closure::makeStatic(nullary));
     cc->call(99);
     TS_ASSERT_EQUALS(g_val, 0);
-    delete cc->clone();
 
     // Nullary member
     cc.reset(Closure::makeBound(&t, &Tester::nullary));
     cc->call(77);
     TS_ASSERT_EQUALS(t.get(), 0);
-    delete cc->clone();
 }
 
 /** Test binary closure factory methods. */
@@ -479,11 +360,6 @@ TestBaseClosure::testBinaryFactory()
     cc->call(2, 3);
     TS_ASSERT_EQUALS(g_val, 5);
 
-    // Clone it
-    std::auto_ptr<Closure> cc2(cc->clone());
-    cc2->call(3, 4);
-    TS_ASSERT_EQUALS(g_val, 7);
-
     // Object method
     Tester t;
     cc.reset(Closure::makeBound(&t, &Tester::binary));
@@ -491,24 +367,16 @@ TestBaseClosure::testBinaryFactory()
     TS_ASSERT_EQUALS(t.get(), 1);
     cc->call(4, 5);
     TS_ASSERT_EQUALS(t.get(), 9);
-    delete cc->clone();
-
-    // Clone is unaffected
-    cc2->call(7, 8);
-    TS_ASSERT_EQUALS(g_val, 15);
-    TS_ASSERT_EQUALS(t.get(), 9);
 
     // Nullary function
     cc.reset(Closure::makeStatic(nullary));
     cc->call(99, 98);
     TS_ASSERT_EQUALS(g_val, 0);
-    delete cc->clone();
 
     // Nullary member
     cc.reset(Closure::makeBound(&t, &Tester::nullary));
     cc->call(77, 76);
     TS_ASSERT_EQUALS(t.get(), 0);
-    delete cc->clone();
 }
 
 /** Test ternary closure factory methods. */
@@ -524,11 +392,6 @@ TestBaseClosure::testTernaryFactory()
     cc->call(2, 3, 4);
     TS_ASSERT_EQUALS(g_val, 9);
 
-    // Clone it
-    std::auto_ptr<Closure> cc2(cc->clone());
-    cc2->call(3, 4, 5);
-    TS_ASSERT_EQUALS(g_val, 12);
-
     // Object method
     Tester t;
     cc.reset(Closure::makeBound(&t, &Tester::ternary));
@@ -536,24 +399,16 @@ TestBaseClosure::testTernaryFactory()
     TS_ASSERT_EQUALS(t.get(), 1);
     cc->call(4, 5, 6);
     TS_ASSERT_EQUALS(t.get(), 15);
-    delete cc->clone();
-
-    // Clone is unaffected
-    cc2->call(7, 8, 9);
-    TS_ASSERT_EQUALS(g_val, 24);
-    TS_ASSERT_EQUALS(t.get(), 15);
 
     // Nullary function
     cc.reset(Closure::makeStatic(nullary));
     cc->call(99, 98, 97);
     TS_ASSERT_EQUALS(g_val, 0);
-    delete cc->clone();
 
     // Nullary member
     cc.reset(Closure::makeBound(&t, &Tester::nullary));
     cc->call(77, 76, 75);
     TS_ASSERT_EQUALS(t.get(), 0);
-    delete cc->clone();
 }
 
 /** Test quaternary closure factory methods. */
@@ -569,11 +424,6 @@ TestBaseClosure::testQuaternaryFactory()
     cc->call(2, 3, 4, 5);
     TS_ASSERT_EQUALS(g_val, 14);
 
-    // Clone it
-    std::auto_ptr<Closure> cc2(cc->clone());
-    cc2->call(3, 4, 5, 6);
-    TS_ASSERT_EQUALS(g_val, 18);
-
     // Object method
     Tester t;
     cc.reset(Closure::makeBound(&t, &Tester::quaternary));
@@ -581,24 +431,16 @@ TestBaseClosure::testQuaternaryFactory()
     TS_ASSERT_EQUALS(t.get(), 1);
     cc->call(4, 5, 6, 7);
     TS_ASSERT_EQUALS(t.get(), 22);
-    delete cc->clone();
-
-    // Clone is unaffected
-    cc2->call(7, 8, 9, 10);
-    TS_ASSERT_EQUALS(g_val, 34);
-    TS_ASSERT_EQUALS(t.get(), 22);
 
     // Nullary function
     cc.reset(Closure::makeStatic(nullary));
     cc->call(99, 98, 97, 96);
     TS_ASSERT_EQUALS(g_val, 0);
-    delete cc->clone();
 
     // Nullary member
     cc.reset(Closure::makeBound(&t, &Tester::nullary));
     cc->call(77, 76, 75, 74);
     TS_ASSERT_EQUALS(t.get(), 0);
-    delete cc->clone();
 }
 
 /** Test quinary closure factory methods. */
@@ -614,11 +456,6 @@ TestBaseClosure::testQuinaryFactory()
     cc->call(2, 3, 4, 5, 6);
     TS_ASSERT_EQUALS(g_val, 20);
 
-    // Clone it
-    std::auto_ptr<Closure> cc2(cc->clone());
-    cc2->call(3, 4, 5, 6, 7);
-    TS_ASSERT_EQUALS(g_val, 25);
-
     // Object method
     Tester t;
     cc.reset(Closure::makeBound(&t, &Tester::quinary));
@@ -626,24 +463,16 @@ TestBaseClosure::testQuinaryFactory()
     TS_ASSERT_EQUALS(t.get(), 1);
     cc->call(4, 5, 6, 7, 8);
     TS_ASSERT_EQUALS(t.get(), 30);
-    delete cc->clone();
-
-    // Clone is unaffected
-    cc2->call(7, 8, 9, 10, 11);
-    TS_ASSERT_EQUALS(g_val, 45);
-    TS_ASSERT_EQUALS(t.get(), 30);
 
     // Nullary function
     cc.reset(Closure::makeStatic(nullary));
     cc->call(99, 98, 97, 96, 95);
     TS_ASSERT_EQUALS(g_val, 0);
-    delete cc->clone();
 
     // Nullary member
     cc.reset(Closure::makeBound(&t, &Tester::nullary));
     cc->call(77, 76, 75, 74, 73);
     TS_ASSERT_EQUALS(t.get(), 0);
-    delete cc->clone();
 }
 
 /** Test senary closure factory methods. */
@@ -659,11 +488,6 @@ TestBaseClosure::testSenaryFactory()
     cc->call(2, 3, 4, 5, 6, 7);
     TS_ASSERT_EQUALS(g_val, 27);
 
-    // Clone it
-    std::auto_ptr<Closure> cc2(cc->clone());
-    cc2->call(3, 4, 5, 6, 7, 8);
-    TS_ASSERT_EQUALS(g_val, 33);
-
     // Object method
     Tester t;
     cc.reset(Closure::makeBound(&t, &Tester::senary));
@@ -671,24 +495,16 @@ TestBaseClosure::testSenaryFactory()
     TS_ASSERT_EQUALS(t.get(), 1);
     cc->call(4, 5, 6, 7, 8, 9);
     TS_ASSERT_EQUALS(t.get(), 39);
-    delete cc->clone();
-
-    // Clone is unaffected
-    cc2->call(7, 8, 9, 10, 11, 12);
-    TS_ASSERT_EQUALS(g_val, 57);
-    TS_ASSERT_EQUALS(t.get(), 39);
 
     // Nullary function
     cc.reset(Closure::makeStatic(nullary));
     cc->call(99, 98, 97, 96, 95, 94);
     TS_ASSERT_EQUALS(g_val, 0);
-    delete cc->clone();
 
     // Nullary member
     cc.reset(Closure::makeBound(&t, &Tester::nullary));
     cc->call(77, 76, 75, 74, 73, 72);
     TS_ASSERT_EQUALS(t.get(), 0);
-    delete cc->clone();
 }
 
 /** Test interaction between closures and smart pointers. */

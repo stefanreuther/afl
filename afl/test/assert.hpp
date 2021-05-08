@@ -58,6 +58,16 @@ namespace afl { namespace test {
             \throw afl::except::AssertionFailedException */
         void fail(const String_t& info) const;
 
+        /** Make a derived location.
+            \param location Extra location information to be added to this one
+            \return New Assert object */
+        Assert operator()(const char* location) const;
+
+        /** Make a derived location.
+            \param location Extra location information to be added to this one
+            \return New Assert object */
+        Assert operator()(const String_t& location) const;
+
      private:
         String_t m_location;
     };

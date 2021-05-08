@@ -31,4 +31,16 @@ TestTestAssert::testIt()
     // Constructor variants
     TS_ASSERT_THROWS(afl::test::Assert(String_t("s1")).check("hi", false), afl::except::AssertionFailedException);
     TS_ASSERT_THROWS(afl::test::Assert("s1").check("hi", false), afl::except::AssertionFailedException);
+    TS_ASSERT_THROWS(afl::test::Assert(String_t("s1"))(String_t("s2")).check("hi", false), afl::except::AssertionFailedException);
+    TS_ASSERT_THROWS(afl::test::Assert("s1")("s2").check("hi", false), afl::except::AssertionFailedException);
+
+    // Exception content
+    try {
+        afl::test::Assert("xxx1")("xxx2").check("xxx3", false);
+    }
+    catch (afl::except::AssertionFailedException& e) {
+        TS_ASSERT_DIFFERS(String_t(e.what()).find("xxx1"), String_t::npos);
+        TS_ASSERT_DIFFERS(String_t(e.what()).find("xxx2"), String_t::npos);
+        TS_ASSERT_DIFFERS(String_t(e.what()).find("xxx3"), String_t::npos);
+    }
 }

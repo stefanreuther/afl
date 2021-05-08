@@ -1,3 +1,15 @@
+2021-01-12  Stefan Reuther  <streu@gmx.de>
+
+	* afl/base/closure.hpp (clone): remove. Method is not required; not requiring users to implement it reduces code size and effort
+
+2020-12-12  Stefan Reuther  <streu@gmx.de>
+
+	* afl/base/signal.hpp (addNewClosure): make non-inline to reduce code size
+
+2020-10-31  Stefan Reuther  <streu@gmx.de>
+
+	* afl/test/assert.hpp (operator()): new
+
 2020-08-28  Stefan Reuther  <streu@gmx.de>
 
 	* afl/string/posixfilenames.cpp (makePathName): special-case path="." so makePathName(getDirectoryName,getFileName) is a no-op

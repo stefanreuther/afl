@@ -65,11 +65,7 @@ namespace afl { namespace base {
                 This function can be used to create custom Closure implementations.
                 \param closure closure. Ownership is taken by signal.
                 \return SignalHandler (for use in a SignalConnection) */
-            SignalHandler* addNewClosure(Closure_t* closure)
-                {
-                    m_list = new SignalHandlerClosure(&m_list, closure);
-                    return m_list;
-                }
+            SignalHandler* addNewClosure(Closure_t* closure);
 
          protected:
             SignalHandler* m_list;
@@ -79,7 +75,13 @@ namespace afl { namespace base {
                     : SignalHandler(pList),
                       m_closure(closure)
                     { }
-                ClonableRef<Closure_t> m_closure;
+                ~SignalHandlerClosure()
+                    { delete m_closure; }
+                Closure_t* m_closure;
+
+             private:
+                SignalHandlerClosure(const SignalHandlerClosure&);
+                SignalHandlerClosure& operator=(const SignalHandlerClosure&);
             };
         };
     }
@@ -208,6 +210,14 @@ namespace afl { namespace base {
 } }
 
 /***************************** Implementation ****************************/
+
+template<typename Closure>
+afl::base::SignalHandler*
+afl::base::detail::SignalBase<Closure>::addNewClosure(Closure_t* closure)
+{
+    m_list = new SignalHandlerClosure(&m_list, closure);
+    return m_list;
+}
 
 /*
  *  SignalBase

@@ -24,9 +24,6 @@ namespace afl { namespace base {
         /** Invoke the referenced function. */
         virtual T call() = 0;
 
-        /** Clone this closure. */
-        virtual Closure<T()>* clone() const = 0;
-
         /** Make a null closure.
             When invoked, it does nothing.
             \return the closure, never null */
@@ -62,7 +59,6 @@ namespace afl { namespace base {
      public:
         Static(T (*func)());
         T call();
-        Static* clone() const;
      private:
         T (*m_func)();
     };
@@ -74,7 +70,6 @@ namespace afl { namespace base {
      public:
         Bound(Ptr ptr, T (Obj::*func)());
         T call();
-        Bound<Obj,Ptr>* clone() const;
      private:
         Ptr m_ptr;
         void (Obj::*m_func)();
@@ -91,7 +86,6 @@ namespace afl { namespace base {
      public:                                                                                                                                           \
         typedef Closure<T(AFL_BASE_CLOSURE_ARGS(AFL_BASE_CLOSURE_ARG_TYPE))> Self_t;                                                                   \
         virtual T call(AFL_BASE_CLOSURE_ARGS(AFL_BASE_CLOSURE_ARG_TYPE)) = 0;                                                                          \
-        virtual Self_t* clone() const = 0;                                                                                                             \
                                                                                                                                                        \
         static Self_t* makeNull();                                                                                                                     \
         static Self_t* makeStatic(T (*func)(AFL_BASE_CLOSURE_ARGS(AFL_BASE_CLOSURE_ARG_TYPE)));                                                        \
@@ -118,8 +112,6 @@ namespace afl { namespace base {
             { }                                                                                                                                        \
         T call(AFL_BASE_CLOSURE_ARGS(AFL_BASE_CLOSURE_ARG_DECL))                                                                                       \
             { return m_func(AFL_BASE_CLOSURE_ARGS(AFL_BASE_CLOSURE_ARG_NAME)); }                                                                       \
-        Static* clone() const                                                                                                                          \
-            { return new Static(m_func); }                                                                                                             \
      private:                                                                                                                                          \
         T (*m_func)(AFL_BASE_CLOSURE_ARGS(AFL_BASE_CLOSURE_ARG_TYPE));                                                                                 \
     };                                                                                                                                                 \
@@ -135,8 +127,6 @@ namespace afl { namespace base {
             { }                                                                                                                                        \
         T call(AFL_BASE_CLOSURE_ARGS(AFL_BASE_CLOSURE_ARG_DECL))                                                                                       \
             { return ((*m_ptr).*m_func)(AFL_BASE_CLOSURE_ARGS(AFL_BASE_CLOSURE_ARG_NAME)); }                                                           \
-        Bound<Obj,Ptr>* clone() const                                                                                                                  \
-            { return new Bound<Obj,Ptr>(m_ptr, m_func); }                                                                                              \
      private:                                                                                                                                          \
         Ptr m_ptr;                                                                                                                                     \
         T (Obj::*m_func)(AFL_BASE_CLOSURE_ARGS(AFL_BASE_CLOSURE_ARG_TYPE));                                                                            \
@@ -152,8 +142,6 @@ namespace afl { namespace base {
             { }                                                                                                                                        \
         T call(AFL_BASE_CLOSURE_ARGS(AFL_BASE_CLOSURE_ARG_TYPE))                                                                                       \
             { return m_func(); }                                                                                                                       \
-        StaticNullary* clone() const                                                                                                                   \
-            { return new StaticNullary(m_func); }                                                                                                      \
      private:                                                                                                                                          \
         T (*m_func)();                                                                                                                                 \
     };                                                                                                                                                 \
@@ -169,8 +157,6 @@ namespace afl { namespace base {
             { }                                                                                                                                        \
         T call(AFL_BASE_CLOSURE_ARGS(AFL_BASE_CLOSURE_ARG_TYPE))                                                                                       \
             { return ((*m_ptr).*m_func)(); }                                                                                                           \
-        BoundNullary<Obj,Ptr>* clone() const                                                                                                           \
-            { return new BoundNullary<Obj,Ptr>(m_ptr, m_func); }                                                                                       \
      private:                                                                                                                                          \
         Ptr m_ptr;                                                                                                                                     \
         T (Obj::*m_func)();                                                                                                                            \
@@ -277,14 +263,6 @@ afl::base::Closure<T()>::Bound<Obj,Ptr>::call()
 
 template<typename T>
 template<typename Obj, typename Ptr>
-afl::base::Closure<T()>::Bound<Obj,Ptr>*
-afl::base::Closure<T()>::Bound<Obj,Ptr>::clone() const
-{
-    return new Bound<Obj,Ptr>(m_ptr, m_func);
-}
-
-template<typename T>
-template<typename Obj, typename Ptr>
 afl::base::Closure<T()>*
 afl::base::Closure<T()>::makeBound(Ptr ptr, T (Obj::*func)())
 {
@@ -317,13 +295,6 @@ T
 afl::base::Closure<T()>::Static::call()
 {
     return m_func();
-}
-
-template<typename T>
-typename afl::base::Closure<T()>::Static*
-afl::base::Closure<T()>::Static::clone() const
-{
-    return new Static(m_func);
 }
 
 #endif

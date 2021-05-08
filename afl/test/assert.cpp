@@ -27,3 +27,15 @@ afl::test::Assert::fail(const String_t& info) const
 {
     throw afl::except::AssertionFailedException(info, m_location);
 }
+
+afl::test::Assert
+afl::test::Assert::operator()(const char* location) const
+{
+    return operator()(String_t(location));
+}
+
+afl::test::Assert
+afl::test::Assert::operator()(const String_t& location) const
+{
+    return Assert(m_location + ": " + location);
+}
