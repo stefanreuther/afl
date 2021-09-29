@@ -83,6 +83,7 @@ arch::posix::PosixInterrupt::Instance::Instance(afl::async::InterruptOperation::
 {
     // Creata a pipe
     ::pipe(m_pipe);
+    // FIXME: ^^^ handle errors
     ::fcntl(m_pipe[Read],  F_SETFL, O_NONBLOCK);
     ::fcntl(m_pipe[Write], F_SETFL, O_NONBLOCK);
     ::fcntl(m_pipe[Read],  F_SETFD, FD_CLOEXEC);

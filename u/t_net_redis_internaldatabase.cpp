@@ -620,6 +620,13 @@ TestNetRedisInternalDatabase::testSortList()
     TS_ASSERT_EQUALS(Access(result)[5].toInteger(), 9);
     TS_ASSERT_EQUALS(Access(result)[6].toInteger(), 10);
 
+    // Sort subrange: [3,5,8]
+    result.reset(db.call(StringSegment("sort a limit 2 3").self()));
+    TS_ASSERT_EQUALS(Access(result).getArraySize(), 3U);
+    TS_ASSERT_EQUALS(Access(result)[0].toInteger(), 3);
+    TS_ASSERT_EQUALS(Access(result)[1].toInteger(), 5);
+    TS_ASSERT_EQUALS(Access(result)[2].toInteger(), 8);
+
     // Sort descending: [10,9,8,5,3,2,1]
     result.reset(db.call(StringSegment("sort a desc").self()));
     TS_ASSERT_EQUALS(Access(result).getArraySize(), 7U);
@@ -752,6 +759,12 @@ TestNetRedisInternalDatabase::testSortExt()
     TS_ASSERT_EQUALS(Access(result)[3].toString(), "dos");
     TS_ASSERT_EQUALS(Access(result)[4].toString(), "three");
     TS_ASSERT_EQUALS(Access(result)[5].toString(), "tres");
+
+    // Sort normally but get two external keys, with limit
+    result.reset(db.call(StringSegment("sort a limit 1 1 get k:* get h:*->f alpha").self()));
+    TS_ASSERT_EQUALS(Access(result).getArraySize(), 2U);
+    TS_ASSERT_EQUALS(Access(result)[0].toString(), "two");
+    TS_ASSERT_EQUALS(Access(result)[1].toString(), "dos");
 
     // Sort by external key, get origin value and external key
     result.reset(db.call(StringSegment("sort a by k:* get h:*->f get # alpha").self()));

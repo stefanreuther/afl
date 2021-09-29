@@ -1210,7 +1210,7 @@ afl::net::redis::InternalDatabase::executeSortOperation(Sortable* key, Segment_t
         // If we have origin values, produce output. This will never produce an empty list, as we always have get's.
         if (!originValues.empty()) {
             List& lk = getCreate<List>(storeKey);
-            for (int32_t i = 0; i < count && offset < int32_t(originValues.size()); ++i, ++offset) {
+            for (int32_t i = offset; i < int32_t(originValues.size()) && count > 0; ++i, --count) {
                 for (std::vector<String_t>::const_iterator it = get.begin(), e = get.end(); it != e; ++it) {
                     String_t tmp;
                     getSortValue(originValues[i], *it, tmp);
@@ -1221,7 +1221,7 @@ afl::net::redis::InternalDatabase::executeSortOperation(Sortable* key, Segment_t
         // FIXME: this differs from redis: redis will return a number of elements, whereas this returns an empty list.
     } else {
         // Store to set for user
-        for (int32_t i = 0; i < count && offset < int32_t(originValues.size()); ++i, ++offset) {
+        for (int32_t i = offset; i < int32_t(originValues.size()) && count > 0; ++i, --count) {
             for (std::vector<String_t>::const_iterator it = get.begin(), e = get.end(); it != e; ++it) {
                 String_t tmp;
                 if (getSortValue(originValues[i], *it, tmp)) {

@@ -1,3 +1,7 @@
+2021-09-21  Stefan Reuther  <streu@gmx.de>
+
+	* afl/net/redis/internaldatabase.cpp (executeSortOperation): fix LIMIT handling
+
 2021-01-12  Stefan Reuther  <streu@gmx.de>
 
 	* afl/base/closure.hpp (clone): remove. Method is not required; not requiring users to implement it reduces code size and effort
