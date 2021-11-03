@@ -15,7 +15,6 @@ namespace afl { namespace except {
     class CommandLineException : public std::runtime_error {
      public:
         /** Construct from file name and message.
-            \param fileName File name
             \param msg Message, not ending in a period or newline */
         CommandLineException(const String_t& msg);
     };

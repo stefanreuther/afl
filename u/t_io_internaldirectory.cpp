@@ -134,6 +134,8 @@ TestIoInternalDirectory::testCreation()
     // Check that creation resets file to zero size
     Ref<Stream> s4 = md->openFile("foo", FileSystem::Create);
     TS_ASSERT_EQUALS(s4->getSize(), 0U);
+    // Re-creating the stream will discard the previous "master" stream,
+    // which in turn invalidates all its children.
     TS_ASSERT_EQUALS(s3->getSize(), 0U);
     TS_ASSERT_EQUALS(s2->getSize(), 0U);
     TS_ASSERT_EQUALS(s->getSize(), 0U);

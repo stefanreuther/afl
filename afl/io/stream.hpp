@@ -160,7 +160,6 @@ namespace afl { namespace io {
 
             Creates a real, operating-system supported mapping if possible, an InternalFileMapping otherwise.
 
-            \param stream Input stream. Object needs to be valid for the duration of this call, but no longer.
             \param limit Size limit. Map at most this many bytes.
             \return New file mapping, never null */
         afl::base::Ref<FileMapping> createVirtualMapping(FileSize_t limit = FileSize_t(-1));
