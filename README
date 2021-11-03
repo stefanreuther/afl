@@ -41,24 +41,27 @@ avoid sporadic failures.
 Building
 ---------
 
-You need a 'config.mk' file. A template is provided as 'config.def'. 
-You also need a 'afl/config.h' file.A template is provided as
-'afl/config.def'.
+Makefiles are generated using https://github.com/stefanreuther/accidental-build
 
-On Unix, 'sh config.sh' will create both files for you.
+To build:
 
-To compile, use 'make' (Unix) or 'make -f Makefile.min' (Win32 with
-MinGW). You may have luck with 'make -f Makefile.bor' (Win32 with
-Borland compiler) but this is largely untested.
+    mkdir afl-build
+    cd afl-build
+    /path/to/accidental-build/Make.pl IN=/path/to/afl prefix=result
+    make all test install
 
-To modify the project, get the 'proj9' makefile generator. Edit the
-files in P9/ and regenerate Makefiles using 'proj9 update'.
+This will build everything and place the result in afl-build/result.
+
+The build system supports out-of-tree builds, parallelisation, and
+automatic dependencies.
+
+To add or remove files, modify the file list file in P9/Settings.
 
 
 Source Code Layout
 -------------------
 
-- P9/       Makefile generator inputs.
+- P9/       Old Makefile generator inputs; now only file list.
 - afl/      Main library.
 - app/      Example applications.
 - arch/     Platform specifics. Do not include in your applications.
