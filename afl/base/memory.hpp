@@ -715,7 +715,9 @@ afl::base::Memory<T>::compareContent(const Memory<const T>& other) const
         }
     }
 
-    if (m_size < other.m_size) {
+    if (m_size == other.m_size) {
+        return 0;
+    } else if (m_size < other.m_size) {
         return -1;
     } else {
         return +1;

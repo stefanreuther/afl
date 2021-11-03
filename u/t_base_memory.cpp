@@ -35,6 +35,8 @@ namespace {
             TS_ASSERT(!two.equalContent(blank));
             TS_ASSERT(two.compareContent(blank) > 0);
             TS_ASSERT(blank.compareContent(two) < 0);
+            TS_ASSERT(two.equalContent(two));
+            TS_ASSERT_EQUALS(two.compareContent(two), 0);
             TS_ASSERT(two.copyFrom(blank).empty());
             TS_ASSERT_EQUALS(blank.find(T()), 0U);
             TS_ASSERT(blank.atEnd(0) == 0);

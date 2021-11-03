@@ -78,7 +78,7 @@ TestNetHttpPageRequest::testBody()
         rq.handleData(BODY);
         rq.finish();
         TS_ASSERT_EQUALS(rq.body().getContent().size(), 4U);
-        TS_ASSERT(rq.body().getContent().compareContent(BODY));
+        TS_ASSERT_EQUALS(rq.body().getContent().compareContent(BODY), 0);
     }
 
     // POST form data
