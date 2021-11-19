@@ -1,3 +1,9 @@
+2021-11-19  Stefan Reuther  <streu@gmx.de>
+
+	* afl/io/xml/node.cpp (getTextContent): new
+	* afl/io/xml/visitor.cpp (visit): new method taking a Nodes_t
+	* afl/io/xml/writer.hpp: new
+
 2021-09-21  Stefan Reuther  <streu@gmx.de>
 
 	* afl/net/redis/internaldatabase.cpp (executeSortOperation): fix LIMIT handling

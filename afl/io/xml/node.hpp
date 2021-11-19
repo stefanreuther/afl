@@ -7,6 +7,7 @@
 
 #include "afl/base/deletable.hpp"
 #include "afl/container/ptrvector.hpp"
+#include "afl/string/string.hpp"
 
 namespace afl { namespace io { namespace xml {
 
@@ -21,6 +22,10 @@ namespace afl { namespace io { namespace xml {
             Calls the appropriate visit method.
             \param v Visitor */
         virtual void visit(Visitor& v) const = 0;
+
+        /** Get text content.
+            \return concatenation of the text of all TextNode's in this tree */
+        String_t getTextContent() const;
     };
 
     /** Array of nodes.

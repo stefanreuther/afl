@@ -6,10 +6,10 @@
 #define AFL_AFL_IO_XML_VISITOR_HPP
 
 #include "afl/base/deletable.hpp"
+#include "afl/io/xml/node.hpp"
 
 namespace afl { namespace io { namespace xml {
 
-    class Node;
     class PINode;
     class TagNode;
     class TextNode;
@@ -34,6 +34,11 @@ namespace afl { namespace io { namespace xml {
             This is a convenience method that calls Node::visit().
             \param node Node */
         void visit(const Node& node);
+
+        /** Visit a node list.
+            This is a convenience method that calls visit() for all elements of the list.
+            \param nodes Nodes */
+        void visit(const Nodes_t& nodes);
     };
 
 } } }

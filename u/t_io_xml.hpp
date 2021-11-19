@@ -26,6 +26,7 @@ class TestIoXmlEntityHandler : public CxxTest::TestSuite {
 class TestIoXmlNode : public CxxTest::TestSuite {
  public:
     void testInterface();
+    void testGetTextContent();
 };
 
 class TestIoXmlNodeReader : public CxxTest::TestSuite {
@@ -78,6 +79,13 @@ class TestIoXmlTextNode : public CxxTest::TestSuite {
 class TestIoXmlVisitor : public CxxTest::TestSuite {
  public:
     void testInterface();
+};
+
+class TestIoXmlWriter : public CxxTest::TestSuite {
+ public:
+    void testSimple();
+    void testComplex();
+    void testEscape();
 };
 
 #endif

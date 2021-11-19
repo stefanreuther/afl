@@ -6,6 +6,8 @@
 #include "afl/io/xml/node.hpp"
 
 #include "t_io_xml.hpp"
+#include "afl/io/xml/textnode.hpp"
+#include "afl/io/xml/tagnode.hpp"
 
 /** Interface test. */
 void
@@ -17,5 +19,16 @@ TestIoXmlNode::testInterface()
             { }
     };
     Tester t;
+}
+
+/** Test getTextContent. */
+void
+TestIoXmlNode::testGetTextContent()
+{
+    afl::io::xml::TagNode tag("p");
+    tag.addNewChild(new afl::io::xml::TextNode("t"));
+    tag.addNewChild(new afl::io::xml::TextNode("q"));
+
+    TS_ASSERT_EQUALS(tag.getTextContent(), "tq");
 }
 
