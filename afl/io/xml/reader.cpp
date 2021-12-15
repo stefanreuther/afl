@@ -199,12 +199,18 @@ afl::io::xml::Reader::readNextToken()
                     }
                 } else if (m_currentCharacter == '-') {
                     // possible comment
+                    m_value.clear();
                     if (readCharacterSequence(MinusChar, 0) >= 2) {
                         // "<!--". Comment ends at "-->". XML-1.1 forbids "--" within a comment,
                         // so we treat that as the comment end (although we allow more than two
                         // "--"s, which is also not permitted).
+                        bool loop = false;
                         do {
-                            readCharacterSequence(~(MinusChar | ProcessQuotes), 0);
+                            if (loop) {
+                                m_value += '-';
+                            }
+                            readCharacterSequence(~(MinusChar | ProcessQuotes), &m_value);
+                            loop = true;
                         } while (m_currentCharacter == '-' && readCharacterSequence(MinusChar, 0) < 2);
                     }
                     readCharacterSequence(~GTChar, 0);

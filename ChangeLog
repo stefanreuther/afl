@@ -1,3 +1,7 @@
+2021-12-15  Stefan Reuther  <streu@gmx.de>
+
+	* afl/io/xml/reader.cpp: make comment content available to users
+
 2021-11-19  Stefan Reuther  <streu@gmx.de>
 
 	* afl/io/xml/node.cpp (getTextContent): new

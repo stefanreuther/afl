@@ -519,10 +519,11 @@ TestIoXmlReader::testPosUtf16()
 void
 TestIoXmlReader::testComment()
 {
-    afl::io::ConstMemoryStream ms(afl::string::toBytes("<!-- Hi --><foo>A<!-- ho -->B</foo>"));
+    afl::io::ConstMemoryStream ms(afl::string::toBytes("<!-- Hi --><foo>A<!-- ho-hu -->B</foo>"));
     afl::charset::DefaultCharsetFactory cf;
     afl::io::xml::Reader xr(ms, DefaultEntityHandler::getInstance(), cf);
     TS_ASSERT_EQUALS(xr.readNext(), xr.Comment);
+    TS_ASSERT_EQUALS(xr.getValue(), " Hi ");
 
     TS_ASSERT_EQUALS(xr.readNext(), xr.TagStart);
     TS_ASSERT_EQUALS(xr.getTag(), "foo");
@@ -531,6 +532,7 @@ TestIoXmlReader::testComment()
     TS_ASSERT_EQUALS(xr.getValue(), "A");
 
     TS_ASSERT_EQUALS(xr.readNext(), xr.Comment);
+    TS_ASSERT_EQUALS(xr.getValue(), " ho-hu ");
 
     TS_ASSERT_EQUALS(xr.readNext(), xr.Text);
     TS_ASSERT_EQUALS(xr.getValue(), "B");

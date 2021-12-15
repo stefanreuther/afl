@@ -58,7 +58,7 @@ namespace afl { namespace io { namespace xml {
             PIAttribute,
 
             /** Comment.
-                No further data. */
+                - getValue(): comment content */
             Comment,
 
             /** Text.
