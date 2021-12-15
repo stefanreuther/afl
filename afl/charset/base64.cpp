@@ -8,13 +8,13 @@
 #include "afl/charset/base64.hpp"
 
 namespace {
-    const char g_base64Alphabet[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+    const uint8_t g_base64Alphabet[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
-    int b64Value(uint8_t c)
+    uint32_t b64Value(uint8_t c)
     {
-        const char* p = std::strchr(g_base64Alphabet, c);
+        const uint8_t* p = (const uint8_t*) std::memchr(g_base64Alphabet, c, sizeof(g_base64Alphabet)-1);
         if (p != 0) {
-            return int(p - g_base64Alphabet);
+            return uint8_t(p - g_base64Alphabet);
         } else {
             return 0;
         }

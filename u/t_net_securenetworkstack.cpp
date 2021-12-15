@@ -93,10 +93,7 @@ TestNetSecureNetworkStack::testConnect()
         try {
             Name name("localhost", "26");     // 26 is unassigned, we assume nothing runs there
             Ref<afl::net::Socket> sock = ns.connect(name, 1000);
-            if (&sock.get() != 0) {
-                // If it returns, it must be nonzero
-                ok = true;
-            }
+            ok = true;
         }
         catch (afl::except::FileProblemException&) {
             // Failed with error, is also ok

@@ -188,7 +188,7 @@ TestBaseGrowableMemory::testDuplicate()
     TS_ASSERT_EQUALS(vec.size(), 5120U);
 
     // Verify content
-    for (int i = 0; i < 5120; ++i) {
+    for (size_t i = 0; i < 5120; ++i) {
         TS_ASSERT(vec.at(i));
         TS_ASSERT_EQUALS(*vec.at(i), stuff[i % 5]);
     }

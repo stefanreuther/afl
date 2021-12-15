@@ -17,8 +17,8 @@ afl::charset::QuotedPrintable::encode(afl::string::ConstStringMemory_t in)
         uint8_t u = uint8_t(*pc);
         if (u >= 0x80 || u < 0x20 || u == '=') {
             result.append('=');
-            result.append(afl::string::HEX_DIGITS_UPPER[u >> 4]);
-            result.append(afl::string::HEX_DIGITS_UPPER[u & 15]);
+            result.append(static_cast<uint8_t>(afl::string::HEX_DIGITS_UPPER[u >> 4]));
+            result.append(static_cast<uint8_t>(afl::string::HEX_DIGITS_UPPER[u & 15]));
         } else {
             result.append(u);
         }
@@ -34,17 +34,17 @@ afl::charset::QuotedPrintable::decode(afl::base::ConstBytes_t in)
         typedef const uint8_t TwoBytes_t[2];
         TwoBytes_t* p2;
         if (*pc == '=' && (p2 = in.eatN<2>()) != 0) {
-            int a = afl::string::getHexDigitValue((*p2)[0]);
-            int b = afl::string::getHexDigitValue((*p2)[1]);
+            int a = afl::string::getHexDigitValue(static_cast<char>((*p2)[0]));
+            int b = afl::string::getHexDigitValue(static_cast<char>((*p2)[1]));
             if (a >= 0 && b >= 0) {
                 result += char(16*a + b);
             } else {
-                result += *pc;
-                result += (*p2)[0];
-                result += (*p2)[1];
+                result += static_cast<char>(*pc);
+                result += static_cast<char>((*p2)[0]);
+                result += static_cast<char>((*p2)[1]);
             }
         } else {
-            result += *pc;
+            result += static_cast<char>(*pc);
         }
     }
     return result;

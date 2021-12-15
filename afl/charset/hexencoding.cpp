@@ -23,9 +23,9 @@ afl::charset::HexEncoding::encode(afl::string::ConstStringMemory_t in)
     afl::base::GrowableBytes_t result;
     result.reserve(in.size()*2);
     while (const char* p = in.eat()) {
-        uint8_t i = *p;
-        result.append(m_digits[i >> 4]);
-        result.append(m_digits[i & 15]);
+        uint8_t i = static_cast<uint8_t>(*p);
+        result.append(static_cast<uint8_t>(m_digits[i >> 4]));
+        result.append(static_cast<uint8_t>(m_digits[i & 15]));
     }
     return result;
 }
@@ -35,10 +35,10 @@ afl::charset::HexEncoding::decode(afl::base::ConstBytes_t in)
 {
     String_t result;
     while (const uint8_t* p = in.eat()) {
-        int a = afl::string::getHexDigitValue(*p);
+        int a = afl::string::getHexDigitValue(static_cast<char>(*p));
         if (a >= 0) {
             if (const uint8_t* q = in.eat()) {
-                int b = afl::string::getHexDigitValue(*q);
+                int b = afl::string::getHexDigitValue(static_cast<char>(*q));
                 if (b >= 0) {
                     result += char(16*a + b);
                 }

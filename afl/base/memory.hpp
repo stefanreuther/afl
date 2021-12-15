@@ -336,7 +336,7 @@ namespace afl { namespace base { namespace detail {
                 const void* result = std::memchr(a, n, count);
                 return result == 0
                     ? count
-                    : static_cast<const char*>(result) - static_cast<const char*>(a);
+                    : static_cast<size_t>(static_cast<const char*>(result) - static_cast<const char*>(a));
             }
     };
 
@@ -411,7 +411,7 @@ template<typename T>
 size_t
 afl::base::detail::MemoryGenericTraits<T>::find(const T* a, size_t count, const T& val)
 {
-    return std::find(a, a+count, val) - a;
+    return static_cast<size_t>(std::find(a, a+count, val) - a);
 }
 
 
@@ -546,7 +546,7 @@ afl::base::Memory<T>::splitUpdate(Size_t& amount)
     if (realSize != 0) {
         m_ptr += realSize;
         m_size -= realSize;
-        amount = static_cast<Size_t>(amount - realSize);
+        amount = static_cast<Size_t>(static_cast<size_t>(amount) - realSize);
     }
 
     return result;

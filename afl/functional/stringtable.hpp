@@ -49,7 +49,7 @@ class afl::functional::detail::StringTable : public afl::functional::StringTable
             if (static_cast<int32_t>(static_cast<size_t>(a)) != a) {
                 // Index is not representable
                 return String_t();
-            } else if (const T* p = m_table.at(a)) {
+            } else if (const T* p = m_table.at(static_cast<size_t>(a))) {
                 return *p;
             } else {
                 return String_t();
@@ -65,7 +65,7 @@ class afl::functional::detail::StringTable : public afl::functional::StringTable
     virtual bool getNextKey(int32_t& a) const
         {
             ++a;
-            return m_table.at(a) != 0;
+            return m_table.at(static_cast<size_t>(a)) != 0;
         }
 
  private:

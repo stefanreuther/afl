@@ -319,7 +319,6 @@ TestNetRespClient::testError()
      private:
         afl::base::Ptr<afl::net::Listener> m_listener;
         bool m_running;
-        bool m_readByte;
     };
 
     // Set up network

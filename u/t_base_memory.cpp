@@ -23,6 +23,7 @@ namespace {
             TS_ASSERT(!two.empty());
             TS_ASSERT_EQUALS(two.size(), 2U);
             TS_ASSERT_EQUALS(two.unsafeData(), &array[0]);
+            two.fill(T());
 
             // Construct from single object
             T obj;
