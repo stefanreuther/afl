@@ -264,8 +264,10 @@ afl::net::http::Manager::getHeaders(const Url& url)
     // Defaults
     result += "Host: ";
     result += url.getHost();
-    result += ":";
-    result += url.getPort();
+    if (!url.getPort().empty()) {
+        result += ":";
+        result += url.getPort();
+    }
     result += "\r\n";
     if (afl::io::InflateDataSink::isAvailable()) {
         result += "Accept-Encoding: gzip\r\n";
