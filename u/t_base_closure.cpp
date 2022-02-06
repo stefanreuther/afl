@@ -341,6 +341,11 @@ TestBaseClosure::testUnaryFactory()
     cc->call(99);
     TS_ASSERT_EQUALS(g_val, 0);
 
+    // Null
+    cc.reset(Closure::makeNull());
+    cc->call(99);
+    TS_ASSERT_EQUALS(g_val, 0);
+
     // Nullary member
     cc.reset(Closure::makeBound(&t, &Tester::nullary));
     cc->call(77);
@@ -370,6 +375,11 @@ TestBaseClosure::testBinaryFactory()
 
     // Nullary function
     cc.reset(Closure::makeStatic(nullary));
+    cc->call(99, 98);
+    TS_ASSERT_EQUALS(g_val, 0);
+
+    // Null
+    cc.reset(Closure::makeNull());
     cc->call(99, 98);
     TS_ASSERT_EQUALS(g_val, 0);
 
@@ -405,6 +415,11 @@ TestBaseClosure::testTernaryFactory()
     cc->call(99, 98, 97);
     TS_ASSERT_EQUALS(g_val, 0);
 
+    // Null
+    cc.reset(Closure::makeNull());
+    cc->call(99, 98, 97);
+    TS_ASSERT_EQUALS(g_val, 0);
+
     // Nullary member
     cc.reset(Closure::makeBound(&t, &Tester::nullary));
     cc->call(77, 76, 75);
@@ -434,6 +449,11 @@ TestBaseClosure::testQuaternaryFactory()
 
     // Nullary function
     cc.reset(Closure::makeStatic(nullary));
+    cc->call(99, 98, 97, 96);
+    TS_ASSERT_EQUALS(g_val, 0);
+
+    // Null
+    cc.reset(Closure::makeNull());
     cc->call(99, 98, 97, 96);
     TS_ASSERT_EQUALS(g_val, 0);
 
@@ -469,6 +489,11 @@ TestBaseClosure::testQuinaryFactory()
     cc->call(99, 98, 97, 96, 95);
     TS_ASSERT_EQUALS(g_val, 0);
 
+    // Null
+    cc.reset(Closure::makeNull());
+    cc->call(99, 98, 97, 96, 95);
+    TS_ASSERT_EQUALS(g_val, 0);
+
     // Nullary member
     cc.reset(Closure::makeBound(&t, &Tester::nullary));
     cc->call(77, 76, 75, 74, 73);
@@ -498,6 +523,11 @@ TestBaseClosure::testSenaryFactory()
 
     // Nullary function
     cc.reset(Closure::makeStatic(nullary));
+    cc->call(99, 98, 97, 96, 95, 94);
+    TS_ASSERT_EQUALS(g_val, 0);
+
+    // Null
+    cc.reset(Closure::makeNull());
     cc->call(99, 98, 97, 96, 95, 94);
     TS_ASSERT_EQUALS(g_val, 0);
 

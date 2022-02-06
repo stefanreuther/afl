@@ -166,7 +166,7 @@ namespace afl { namespace base {
     Closure<T(AFL_BASE_CLOSURE_ARGS(AFL_BASE_CLOSURE_ARG_TYPE))>*                                                                                      \
     Closure<T(AFL_BASE_CLOSURE_ARGS(AFL_BASE_CLOSURE_ARG_TYPE))>::makeNull()                                                                           \
     {                                                                                                                                                  \
-        return new Static(Closure<T()>::nullFunction);                                                                                                 \
+        return new StaticNullary(Closure<T()>::nullFunction);                                                                                                 \
     }                                                                                                                                                  \
                                                                                                                                                        \
     template<typename T, AFL_BASE_CLOSURE_ARGS(AFL_BASE_CLOSURE_ARG_TEMPLATE)>                                                                         \
