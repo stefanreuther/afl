@@ -35,6 +35,10 @@ class TestNetMimeBuilder : public CxxTest::TestSuite {
     void testSimple();
     void testBase64();
     void testBoundaryConflict();
+    void testMultiBoundary();
+    void testForm();
+    void testAddFormFields();
+    void testAddHeaders();
 };
 
 class TestNetMimeParser : public CxxTest::TestSuite {

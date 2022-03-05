@@ -1,5 +1,6 @@
 /**
   *  \file afl/net/mimebuilder.hpp
+  *  \brief Class afl::net::MimeBuilder
   */
 #ifndef AFL_AFL_NET_MIMEBUILDER_HPP
 #define AFL_AFL_NET_MIMEBUILDER_HPP
@@ -10,6 +11,8 @@
 
 namespace afl { namespace net {
 
+    class HeaderTable;
+
     /** Simple MIME Multipart Entity Builder.
         This gathers up a MIME message line by line, and fills in the boundaries.
 
@@ -17,6 +20,8 @@ namespace afl { namespace net {
         - construct an object <tt>MimeBuilder b("content-type");</tt> giving it the multipart content type as parameter
         - use addHeader(...) to add additional headers
         - use addBoundary() followed by multiple addHeader(), followed by addLine()/addBase64()/addLineQP() to add parts
+        - alternatively, use addFormFieldValue() to add form fields
+        - alternatively, use addFormField() or addFormFile(), followed by addHeader(), addLine()/addBase64() to add complex form fields (e.g. file upload)
         - use addBoundary() to add the final boundary
         - use finish() to finish the object
         - possibly use removeInitialHeaders()
@@ -58,13 +63,47 @@ namespace afl { namespace net {
             \param data Data to add */
         void addRawData(afl::base::ConstBytes_t data);
 
+        /** Add a form field.
+            Starts a new part representing a form field, by adding a boundary and the Content-Disposition header.
+            Follow by addHeader() to add additional headers (e.g. Content-Type of the field content),
+            then addRawData() etc. to add the content.
+            \param name Field name */
+        void addFormField(String_t name);
+
+        /** Add a form field with value.
+            Creates a new part representing a form field and its value.
+            Equivalent to addFormFieldHeader(), addRawData(), addBoundary().
+            Use for adding simple fields.
+            \param name Field name
+            \param data Form data */
+        void addFormFieldValue(String_t name, afl::base::ConstBytes_t data);
+
+        /** Add a form file.
+            Starts a new part representing a file uploaded with a form, by adding a boundary and the Content-Disposition header.
+            Follow by addHeader() to add additional headers (e.g. Content-Type of the file content),
+            then addRawData() etc. to add the file content.
+            \param name Field name
+            \param fileName File name */
+        void addFormFile(String_t name, String_t fileName);
+
+        /** Add form fields for a HeaderTable.
+            \param tab HeaderTable */
+        void addFormFields(const HeaderTable& tab);
+
+        /** Add headers from a HeaderTable.
+            \param tab HeaderTable */
+        void addHeaders(const HeaderTable& tab);
+
         /** Add a boundary.
-            After this call, you can either write a new part using addHeader() etc., or use finish(). */
+            After this call, you can either write a new part using addHeader() etc., or use finish().
+            If called multiple times, adds only one boundary. */
         void addBoundary();
 
         /** Complete the MIME entity.
-            This figures out the boundary string to use, and fills it in at appropriate places. */
-        void finish();
+            This figures out the boundary string to use, and fills it in at appropriate places.
+            Returns the used boundary in case you're manually generating headers.
+            \return boundary */
+        String_t finish();
 
         /** Compute total size of this entity. */
         size_t getTotalSize() const;

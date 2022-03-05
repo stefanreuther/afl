@@ -1,16 +1,31 @@
 /**
   *  \file afl/net/mimebuilder.cpp
+  *  \brief Class afl::net::MimeBuilder
   */
 
 #include "afl/net/mimebuilder.hpp"
 #include "afl/charset/base64.hpp"
 #include "afl/charset/quotedprintable.hpp"
+#include "afl/net/headertable.hpp"
+#include "afl/net/headerconsumer.hpp"
 
 using afl::charset::QuotedPrintable;
 using afl::charset::Base64;
 
 namespace {
     const char CRLF[] = "\r\n";
+
+    String_t quoteFieldName(String_t name)
+    {
+        String_t result;
+        for (size_t i = 0; i < name.size(); ++i) {
+            if (name[i] == '"' || name[i] == '\\') {
+                result += '\\';
+            }
+            result += name[i];
+        }
+        return result;
+    }
 }
 
 afl::net::MimeBuilder::MimeBuilder(String_t ctype)
@@ -97,15 +112,73 @@ afl::net::MimeBuilder::addRawData(afl::base::ConstBytes_t data)
 }
 
 void
-afl::net::MimeBuilder::addBoundary()
+afl::net::MimeBuilder::addFormField(String_t name)
 {
-    flushHeaderAndStartBody();
-    flushBase64();
-    m_Content.push_back(Element(String_t(), BoundaryElement));
-    m_State = StateHeader;
+    addBoundary();
+    addHeader("Content-Disposition", "form-data; name=\"" + quoteFieldName(name) + "\"");
 }
 
 void
+afl::net::MimeBuilder::addFormFieldValue(String_t name, afl::base::ConstBytes_t data)
+{
+    addFormField(name);
+    addRawData(data);
+    addBoundary();
+}
+
+void
+afl::net::MimeBuilder::addFormFile(String_t name, String_t fileName)
+{
+    addBoundary();
+    addHeader("Content-Disposition", "form-data; name=\"" + quoteFieldName(name) + "\"; filename=\"" + quoteFieldName(fileName) + "\"");
+}
+
+void
+afl::net::MimeBuilder::addFormFields(const HeaderTable& tab)
+{
+    class Enum : public HeaderConsumer {
+     public:
+        Enum(MimeBuilder& self)
+            : m_self(self)
+            { }
+        virtual void handleHeader(String_t key, String_t value)
+            { m_self.addFormFieldValue(key, afl::string::toBytes(value)); }
+     private:
+        MimeBuilder& m_self;
+    };
+    Enum e(*this);
+    tab.enumerateHeaders(e);
+}
+
+void
+afl::net::MimeBuilder::addHeaders(const HeaderTable& tab)
+{
+    class Enum : public HeaderConsumer {
+     public:
+        Enum(MimeBuilder& self)
+            : m_self(self)
+            { }
+        virtual void handleHeader(String_t key, String_t value)
+            { m_self.addHeader(key, value); }
+     private:
+        MimeBuilder& m_self;
+    };
+    Enum e(*this);
+    tab.enumerateHeaders(e);
+}
+
+void
+afl::net::MimeBuilder::addBoundary()
+{
+    if (m_Content.empty() || m_Content.back().m_Type != BoundaryElement) {
+        flushHeaderAndStartBody();
+        flushBase64();
+        m_Content.push_back(Element(String_t(), BoundaryElement));
+        m_State = StateHeader;
+    }
+}
+
+String_t
 afl::net::MimeBuilder::finish()
 {
     // figure out a good boundary
@@ -152,6 +225,7 @@ afl::net::MimeBuilder::finish()
     if (last_boundary) {
         *last_boundary = boundary + "--" + CRLF;
     }
+    return boundary.substr(2);
 }
 
 size_t
