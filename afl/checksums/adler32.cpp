@@ -30,6 +30,7 @@ afl::checksums::Adler32::add(Memory_t data, uint32_t prev) const
         if (++counter > 5500) {
             s1 %= BASE;
             s2 %= BASE;
+            counter = 0;
         }
         s1 += *p;
         s2 += s1;
