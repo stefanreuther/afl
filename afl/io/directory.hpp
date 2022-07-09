@@ -103,6 +103,11 @@ namespace afl { namespace io {
             \param name Name of file
             \return true if file was erased successfully, false on error */
         bool eraseNT(String_t name);
+
+        /** Erase all content, recursively.
+            Obtains all directory entries and removes them; recursively if they are directories.
+            \throw FileProblemException if there is a problem */
+        void eraseContentRecursively();
     };
 
 } }

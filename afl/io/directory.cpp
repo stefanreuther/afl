@@ -51,3 +51,30 @@ afl::io::Directory::eraseNT(String_t name)
         return false;
     }
 }
+
+void
+afl::io::Directory::eraseContentRecursively()
+{
+    // For now, implement this as a normal recursive procedure.
+    // It would make sense to implement it iteratively to avoid stack trouble.
+
+    // First, obtain list of entries and stash them away.
+    // (This is to avoid potential unspecified behaviour by modifying a directory being read.)
+    std::vector<afl::base::Ptr<DirectoryEntry> > entries;
+    afl::base::Ref<afl::base::Enumerator<afl::base::Ptr<DirectoryEntry> > > it = getDirectoryEntries();
+    afl::base::Ptr<DirectoryEntry> entry;
+    while (it->getNextElement(entry)) {
+        if (entry.get() != 0) {
+            entries.push_back(entry);
+        }
+    }
+
+    // Erase recursively
+    for (size_t i = 0, n = entries.size(); i < n; ++i) {
+        DirectoryEntry& e = *entries[i];
+        if (e.getFileType() == DirectoryEntry::tDirectory && !e.getFlags().contains(DirectoryEntry::Link)) {
+            e.openDirectory()->eraseContentRecursively();
+        }
+        e.erase();
+    }
+}

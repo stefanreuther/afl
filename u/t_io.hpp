@@ -43,6 +43,8 @@ class TestIoDirectory : public CxxTest::TestSuite {
  public:
     void testDirectoryAccess2();
     void testParent();
+    void testEraseContentRecursively();
+    void testEraseContentRecursivelyLive();
     void setUp();
     void tearDown();
 

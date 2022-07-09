@@ -8,10 +8,11 @@
 #include <stdexcept>
 #include <cstdio>
 #include "u/t_io.hpp"
-#include "afl/io/filesystem.hpp"
-#include "afl/io/stream.hpp"
-#include "afl/io/directoryentry.hpp"
 #include "afl/except/fileproblemexception.hpp"
+#include "afl/io/directoryentry.hpp"
+#include "afl/io/filesystem.hpp"
+#include "afl/io/internalfilesystem.hpp"
+#include "afl/io/stream.hpp"
 #include "afl/string/string.hpp"
 
 namespace {
@@ -277,3 +278,52 @@ TestIoDirectory::testParent()
         dir = dir->getParentDirectory();
     }
 }
+
+/** Test eraseContentRecursively(). */
+void
+TestIoDirectory::testEraseContentRecursively()
+{
+    // Set up
+    afl::io::InternalFileSystem fs;
+    fs.openDirectory("/")->getDirectoryEntryByName("d")->createAsDirectory();
+    fs.openDirectory("/d")->getDirectoryEntryByName("a")->openFile(afl::io::FileSystem::Create);
+    fs.openDirectory("/d")->getDirectoryEntryByName("b")->createAsDirectory();
+    fs.openDirectory("/d")->getDirectoryEntryByName("c")->openFile(afl::io::FileSystem::Create);
+    fs.openDirectory("/d/b")->getDirectoryEntryByName("x")->createAsDirectory();
+    fs.openDirectory("/d/b")->getDirectoryEntryByName("y")->openFile(afl::io::FileSystem::Create);
+
+    // Execute
+    fs.openDirectory("/d")->eraseContentRecursively();
+
+    // Verify
+    afl::base::Ptr<afl::io::DirectoryEntry> e;
+    TS_ASSERT(!fs.openDirectory("/d")->getDirectoryEntries()->getNextElement(e));
+}
+
+/** Test eraseContentRecursively() on live system. */
+void
+TestIoDirectory::testEraseContentRecursivelyLive()
+{
+    // Create
+    afl::io::FileSystem& fs = afl::io::FileSystem::getInstance();
+    afl::base::Ref<afl::io::Directory> dir = fs.openDirectory(fs.getWorkingDirectoryName());
+    TS_ASSERT_THROWS_NOTHING(dir->getDirectoryEntryByName(DIR_NAME)->createAsDirectory());
+
+    // Populate
+    {
+        afl::base::Ref<afl::io::Directory> subdir = dir->openDirectory(DIR_NAME);
+        subdir->openFile("a", afl::io::FileSystem::Create);
+        subdir->openFile("b", afl::io::FileSystem::Create);
+        subdir->openFile("c", afl::io::FileSystem::Create);
+    }
+
+    // Directory is un-removable now
+    TS_ASSERT_EQUALS(dir->eraseNT(DIR_NAME), false);
+
+    // Remove content
+    dir->openDirectory(DIR_NAME)->eraseContentRecursively();
+
+    // Remove it
+    TS_ASSERT_EQUALS(dir->eraseNT(DIR_NAME), true);
+}
+
