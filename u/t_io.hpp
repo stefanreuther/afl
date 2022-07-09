@@ -101,6 +101,19 @@ class TestIoInternalFileMapping : public CxxTest::TestSuite {
     void testMem();
 };
 
+class TestIoInternalFileSystem : public CxxTest::TestSuite {
+ public:
+    void testFileNames();
+    void testRoot();
+    void testContent();
+    void testEnum();
+    void testEntry();
+    void testErase();
+    void testRename();
+    void testCreate();
+    void testCreateDirectory();
+};
+
 class TestIoInternalSink : public CxxTest::TestSuite {
  public:
     void testIt();
