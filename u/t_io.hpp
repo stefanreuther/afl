@@ -193,6 +193,14 @@ class TestIoStream : public CxxTest::TestSuite {
     void testCopy();
 };
 
+class TestIoTemporaryDirectory : public CxxTest::TestSuite {
+ public:
+    void testLive();
+    void testInternal();
+    void testFail();
+    void testFailErase();
+};
+
 class TestIoTextFile : public CxxTest::TestSuite {
  public:
     void testReadLine();
