@@ -47,6 +47,16 @@ class TestSysError : public CxxTest::TestSuite {
     void testIt();
 };
 
+class TestSysInternalEnvironment : public CxxTest::TestSuite {
+ public:
+    void testEmpty();
+    void testCommandLine();
+    void testStrings();
+    void testStream();
+    void testWriter();
+    void testReader();
+};
+
 class TestSysLog : public CxxTest::TestSuite {
  public:
     void testIt();
