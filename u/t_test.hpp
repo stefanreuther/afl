@@ -34,6 +34,11 @@ class TestTestCommandHandler : public CxxTest::TestSuite {
     void testParameterTypes();
 };
 
+class TestTestLogListener : public CxxTest::TestSuite {
+ public:
+    void testIt();
+};
+
 class TestTestNetworkStack : public CxxTest::TestSuite {
  public:
     void testSuccess();
