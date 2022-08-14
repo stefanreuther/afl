@@ -5,8 +5,8 @@
 #ifndef AFL_AFL_NET_REDIS_HASHKEY_HPP
 #define AFL_AFL_NET_REDIS_HASHKEY_HPP
 
-#include "afl/net/redis/key.hpp"
 #include "afl/data/stringlist.hpp"
+#include "afl/net/redis/key.hpp"
 
 namespace afl { namespace net { namespace redis {
 
@@ -55,6 +55,11 @@ namespace afl { namespace net { namespace redis {
             Produces a list of alternating keys and values in \c result.
             \param result [in/out] Keys and values will be appended here */
         void getAll(afl::data::StringList_t& result) const;
+
+        /** Set multiple fields (HMSET).
+            Requires a list of alternating keys and values in \c vec.
+            \param vec Key/value list */
+        void setAll(const afl::data::StringList_t& vec);
     };
 
 } } }
