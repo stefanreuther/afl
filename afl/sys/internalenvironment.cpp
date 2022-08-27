@@ -152,7 +152,11 @@ afl::sys::InternalEnvironment::attachTextWriter(Channel ch)
                 m_textFile.setCharsetNew(new afl::charset::Utf8Charset());
             }
         ~TextWriterWithStream()
-            { m_textFile.flush(); }
+            {
+                // Sweep exceptions under the carpet; see BufferedStream
+                try { m_textFile.flush(); }
+                catch (...) { }
+            }
         virtual void doWriteText(afl::string::ConstStringMemory_t data)
             { m_textFile.writeText(data); }
         virtual void doWriteNewline()
