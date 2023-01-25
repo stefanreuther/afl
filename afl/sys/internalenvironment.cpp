@@ -4,6 +4,7 @@
   */
 
 #include "afl/sys/internalenvironment.hpp"
+#include "afl/base/vectorenumerator.hpp"
 #include "afl/charset/utf8charset.hpp"
 #include "afl/except/fileproblemexception.hpp"
 #include "afl/io/textfile.hpp"
@@ -73,25 +74,7 @@ afl::sys::InternalEnvironment::setChannelStream(Channel ch, afl::base::Ptr<afl::
 afl::base::Ref<afl::sys::Environment::CommandLine_t>
 afl::sys::InternalEnvironment::getCommandLine()
 {
-    class Enum : public afl::sys::Environment::CommandLine_t {
-     public:
-        Enum(const afl::data::StringList_t& list)
-            : m_list(list), m_pos(0)
-            { }
-        bool getNextElement(String_t& out)
-            {
-                if (m_pos < m_list.size()) {
-                    out = m_list[m_pos++];
-                    return true;
-                } else {
-                    return false;
-                }
-            }
-     private:
-        afl::data::StringList_t m_list;
-        size_t m_pos;
-    };
-    return *new Enum(m_commandLine);
+    return *new afl::base::VectorEnumerator<String_t>(m_commandLine);
 }
 
 String_t

@@ -8,43 +8,16 @@
 #include <vector>
 #include <stdexcept>
 #include "arch/win32/win32environment.hpp"
+#include "afl/base/vectorenumerator.hpp"
+#include "afl/charset/utf8.hpp"
+#include "afl/except/filesystemexception.hpp"
+#include "afl/io/bufferedstream.hpp"
+#include "afl/string/messages.hpp"
 #include "arch/win32/win32.hpp"
 #include "arch/win32/win32filesystem.hpp"
 #include "arch/win32/win32stream.hpp"
-#include "afl/io/bufferedstream.hpp"
-#include "afl/except/filesystemexception.hpp"
-#include "afl/string/messages.hpp"
-#include "afl/charset/utf8.hpp"
 
 namespace {
-    /* CommandLine implementation for Win32 */
-    class CommandLine : public afl::sys::Environment::CommandLine_t {
-     public:
-        CommandLine()
-            : m_index(),
-              m_commandLine()
-            { }
-
-        bool getNextElement(String_t& result)
-            {
-                if (m_index < m_commandLine.size()) {
-                    result = m_commandLine[m_index++];
-                    return true;
-                } else {
-                    return false;
-                }
-            }
-
-        void add(const String_t& s)
-            {
-                m_commandLine.push_back(s);
-            }
-
-     private:
-        std::size_t m_index;
-        std::vector<String_t> m_commandLine;
-    };
-
     HANDLE getChannelHandle(arch::win32::Win32Environment::Channel ch)
     {
         switch (ch) {
@@ -80,7 +53,7 @@ arch::win32::Win32Environment::Win32Environment(const char*const* argv)
 afl::base::Ref<afl::sys::Environment::CommandLine_t>
 arch::win32::Win32Environment::getCommandLine()
 {
-    afl::base::Ref<CommandLine> cmdl = *new CommandLine();
+    afl::base::Ref<afl::base::VectorEnumerator<String_t> > cmdl = *new afl::base::VectorEnumerator<String_t>();
 
     // Unicode command line is supported on all Windows versions.
     // Parse it into argv.

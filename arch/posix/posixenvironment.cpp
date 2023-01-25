@@ -9,47 +9,18 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include "arch/posix/posixenvironment.hpp"
-#include "arch/posix/posixfilesystem.hpp"
-#include "afl/string/char.hpp"
-#include "arch/posix/posix.hpp"
-#include "arch/posix/posixstream.hpp"
-#include "afl/io/bufferedstream.hpp"
-#include "afl/string/messages.hpp"
+#include "afl/base/vectorenumerator.hpp"
 #include "afl/except/unsupportedexception.hpp"
+#include "afl/io/bufferedstream.hpp"
+#include "afl/string/char.hpp"
+#include "afl/string/messages.hpp"
 #include "afl/string/posixfilenames.hpp"
+#include "arch/posix/posix.hpp"
 #include "arch/posix/posixcwd.hpp"
+#include "arch/posix/posixfilesystem.hpp"
+#include "arch/posix/posixstream.hpp"
 
 namespace {
-    /* CommandLine implementation for POSIX */
-    class CommandLine : public afl::sys::Environment::CommandLine_t {
-     public:
-        CommandLine()
-            : m_index(),
-              m_commandLine()
-            { }
-
-        bool getNextElement(String_t& result)
-            {
-                if (m_index < m_commandLine.size()) {
-                    result = m_commandLine[m_index++];
-                    return true;
-                } else {
-                    return false;
-                }
-            }
-
-        void add(const String_t& s)
-            {
-                m_commandLine.push_back(s);
-            }
-
-     private:
-        std::size_t m_index;
-        std::vector<String_t> m_commandLine;
-    };
-
-
-
     /* Console implementation for POSIX.
        This is a stripped-down version of TextFile, with BOM-snooping removed and charset conversion hardcoded to convertExternalToUtf8.
        It must also keep the stream alive (Ptr<>). */
@@ -135,7 +106,7 @@ afl::base::Ref<afl::sys::Environment::CommandLine_t>
 arch::posix::PosixEnvironment::getCommandLine()
 {
     const char*const* argv = m_argv;
-    afl::base::Ref<CommandLine> cmdl = *new CommandLine();
+    afl::base::Ref<afl::base::VectorEnumerator<String_t> > cmdl = *new afl::base::VectorEnumerator<String_t>();
     while (const char* p = *++argv) {
         cmdl->add(convertExternalToUtf8(afl::string::toMemory(p)));
     }

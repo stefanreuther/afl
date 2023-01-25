@@ -200,6 +200,12 @@ class TestBaseUncopyable : public CxxTest::TestSuite {
     void testIt();
 };
 
+class TestBaseVectorEnumerator : public CxxTest::TestSuite {
+ public:
+    void testInit();
+    void testAdd();
+};
+
 class TestBaseWeakLink : public CxxTest::TestSuite {
  public:
     void testIt();
