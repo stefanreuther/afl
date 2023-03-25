@@ -66,6 +66,38 @@ TestSysTime::testConstruction()
     }
 }
 
+/** Test construction and deconstruction from local time. */
+void
+TestSysTime::testConstructionLocal()
+{
+    using afl::sys::Time;
+    using afl::sys::ParsedTime;
+
+    // Time in January
+    {
+        static const ParsedTime pt = { 1990, 1, 1, 10, 0, 0, 500, 0 };
+        ParsedTime pt2;
+        Time(pt, Time::LocalTime).unpack(pt2, Time::LocalTime);
+        TS_ASSERT_EQUALS(pt.m_year,   pt2.m_year);
+        TS_ASSERT_EQUALS(pt.m_month,  pt2.m_month);
+        TS_ASSERT_EQUALS(pt.m_day,    pt2.m_day);
+        TS_ASSERT_EQUALS(pt.m_hour,   pt2.m_hour);
+        TS_ASSERT_EQUALS(pt.m_minute, pt2.m_minute);
+    }
+
+    // Time in July
+    {
+        static const ParsedTime pt = { 1990, 7, 1, 10, 0, 0, 500, 0 };
+        ParsedTime pt2;
+        Time(pt, Time::LocalTime).unpack(pt2, Time::LocalTime);
+        TS_ASSERT_EQUALS(pt.m_year,   pt2.m_year);
+        TS_ASSERT_EQUALS(pt.m_month,  pt2.m_month);
+        TS_ASSERT_EQUALS(pt.m_day,    pt2.m_day);
+        TS_ASSERT_EQUALS(pt.m_hour,   pt2.m_hour);
+        TS_ASSERT_EQUALS(pt.m_minute, pt2.m_minute);
+    }
+}
+
 /** Test comparisons. */
 void
 TestSysTime::testComparison()

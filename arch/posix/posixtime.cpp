@@ -26,7 +26,7 @@ arch::posix::PosixTime::packTime(const afl::sys::ParsedTime& parsedTime, afl::sy
         t.tm_year  = parsedTime.m_year - 1900;
         t.tm_wday  = 0;
         t.tm_yday  = 0;
-        t.tm_isdst = 0;
+        t.tm_isdst = -1;
 
         return fromSysTime(::mktime(&t), parsedTime.m_millisecond);
     } else {

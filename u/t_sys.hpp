@@ -115,6 +115,7 @@ class TestSysThread : public CxxTest::TestSuite {
 class TestSysTime : public CxxTest::TestSuite {
  public:
     void testConstruction();
+    void testConstructionLocal();
     void testComparison();
     void testArithmetic();
     void testCurrent();
