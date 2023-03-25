@@ -24,9 +24,11 @@ find_archiver();
 add_variable(TARGET => 'POSIX');
 if ($V{TARGET} =~ /POSIX/i) {
     set_variable(CXXFLAGS => "$V{CXXFLAGS} -DTARGET_OS_POSIX");
+    add_variable(EXE_SUFFIX => '');
     find_system_libraries(qw(-lpthread -lrt));
 } elsif ($V{TARGET} =~ /Win(32|64)/i) {
     set_variable(CXXFLAGS => "$V{CXXFLAGS} -DTARGET_OS_WIN32");
+    add_variable(EXE_SUFFIX => '.exe');
     find_system_libraries(qw(-lws2_32));
 } else {
     die "Error: the specified target '$V{TARGET}' is not known; provide correct 'TARGET=' option";
