@@ -43,6 +43,61 @@ namespace {
         }
         return "?";
     }
+
+    bool tryExpandWildcard(afl::base::VectorEnumerator<String_t>& out, const String_t& pattern)
+    {
+        bool did = false;
+        if (arch::win32::hasUnicodeSupport()) {
+            arch::win32::WStr uniPattern;
+            arch::win32::convertToUnicode(uniPattern, afl::string::toMemory(pattern));
+            uniPattern.push_back(L'\0');
+
+            size_t uniPos = uniPattern.size();
+            while (uniPos > 0 && (uniPattern[uniPos-1] != L'/' && uniPattern[uniPos-1] != L'\\' && uniPattern[uniPos-1] != L':')) {
+                --uniPos;
+            }
+
+            WIN32_FIND_DATAW data;
+            HANDLE h = FindFirstFileW(&uniPattern[0], &data);
+            if (h != INVALID_HANDLE_VALUE) {
+                do {
+                    if (wcscmp(data.cFileName, L".") != 0 && wcscmp(data.cFileName, L"..") != 0) {
+                        arch::win32::WStr uniCombined(&uniPattern[0], &uniPattern[uniPos]);
+                        for (size_t i = 0; data.cFileName[i] != 0; ++i) {
+                            uniCombined.push_back(data.cFileName[i]);
+                        }
+                        out.add(arch::win32::convertFromUnicode(uniCombined));
+                        did = true;
+                    }
+                } while (FindNextFileW(h, &data));
+                FindClose(h);
+            }
+        } else {
+            String_t ansiPattern = arch::win32::convertToANSI(afl::string::toMemory(pattern));
+            String_t::size_type ansiPos = ansiPattern.find_last_of("/\\:");
+            if (ansiPos == String_t::npos) {
+                ansiPos = 0;
+            } else {
+                ++ansiPos;
+            }
+
+            WIN32_FIND_DATAA data;
+            HANDLE h = FindFirstFileA(ansiPattern.c_str(), &data);
+            if (h != INVALID_HANDLE_VALUE) {
+                do {
+                    if (strcmp(data.cFileName, ".") != 0 && strcmp(data.cFileName, "..") != 0) {
+                        String_t ansiCombined(ansiPattern, 0, ansiPos);
+                        ansiCombined += data.cFileName;
+                        out.add(arch::win32::convertFromANSI(afl::string::toMemory(ansiCombined)));
+                        did = true;
+                    }
+                } while (FindNextFileA(h, &data));
+                FindClose(h);
+            }
+        }
+        return did;
+    }
+
 }
 
 arch::win32::Win32Environment::Win32Environment(const char*const* argv)
@@ -57,8 +112,10 @@ arch::win32::Win32Environment::getCommandLine()
 
     // Unicode command line is supported on all Windows versions.
     // Parse it into argv.
-    static const wchar_t SPACE = L' ', TAB = L'\t', NUL = L'\0', QUOTE = L'"';
+    static const wchar_t SPACE = L' ', TAB = L'\t', NUL = L'\0', QUOTE = L'"',
+        BKSP = L'\\', COLON = L':', STAR = L'*', SLASH = L'/', QUES = L'?';
     const wchar_t* p = GetCommandLineW();
+
     bool first = true;
     afl::charset::Utf8 u8(0);
     while (1) {
@@ -72,32 +129,58 @@ arch::win32::Win32Environment::getCommandLine()
 
         // Gather a word
         String_t word;
-        if (*p == QUOTE) {
-            // Quoted
-            ++p;
-            while (*p != NUL) {
-                wchar_t ch = *p++;
-                if (ch == QUOTE) {
-                    if (*p == QUOTE) {
-                        u8.append(word, QUOTE);
+        bool hadWild = false;
+        bool isQuoted = false;
+        while (wchar_t ch = *p) {
+            if (ch == QUOTE) {
+                // Quote
+                if (isQuoted) {
+                    // Within a quote. Double-quote produces single quote output.
+                    // Otherwise, just end the quote.
+                    if (p[1] == QUOTE) {
                         ++p;
+                        u8.append(word, ch);
                     } else {
-                        break;
+                        isQuoted = false;
                     }
+                } else {
+                    // Starting a quote
+                    isQuoted = true;
+                }
+            } else if (ch == BKSP && isQuoted && p[1] == QUOTE) {
+                // Cygwin quote
+                u8.append(word, p[1]);
+                ++p;
+            } else if (ch == COLON || ch == BKSP || ch == SLASH) {
+                // Path delimiter. Forget that we had a wildcard.
+                hadWild = false;
+                u8.append(word, ch);
+            } else if (ch == STAR || ch == QUES) {
+                // Wildcard.
+                if (!isQuoted) {
+                    hadWild = true;
+                }
+                u8.append(word, ch);
+            } else if (ch == SPACE || ch == TAB) {
+                if (!isQuoted) {
+                    break;
                 } else {
                     u8.append(word, ch);
                 }
+            } else {
+                u8.append(word, ch);
             }
-        } else {
-            // Simple word
-            while (*p != SPACE && *p != TAB && *p != NUL) {
-                u8.append(word, *p);
-                ++p;
-            }
+            ++p;
         }
+
         if (!first) {
-            cmdl->add(word);
+            if (hadWild && tryExpandWildcard(*cmdl, word)) {
+                // ok, wildcard expanded
+            } else {
+                cmdl->add(word);
+            }
         } else {
+            // Ignore first (argv[0], program name)
             first = false;
         }
     }
