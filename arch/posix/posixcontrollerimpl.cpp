@@ -90,9 +90,11 @@ arch::posix::PosixControllerImpl::wait(afl::sys::Timeout_t timeout)
             }
 
             // Check waiters
+            // Do NOT refer to m_requests.end() here.
+            // Completion of a request may re-post another one, and therefore embiggen the list,
+            // although not having a m_pollfds slot.
             std::list<Request>::iterator it = m_requests.begin();
-            i = 1;
-            while (it != m_requests.end()) {
+            for (i = 1; i < m_pollfds.size(); ++i) {
                 bool done = (m_pollfds[i].revents != 0
                              && (it->m_read
                                  ? it->m_pSelectRequest->handleReadReady()
@@ -102,7 +104,6 @@ arch::posix::PosixControllerImpl::wait(afl::sys::Timeout_t timeout)
                 } else {
                     ++it;
                 }
-                ++i;
             }
 
             // Perform deferred cancellations
