@@ -9,7 +9,7 @@
 #
 
 GENERATE = 
-PROJ_AUTO += afl:afl/*pp testsuite:u/*pp
+PROJ_AUTO += afl:afl/*pp testsuite:test/*pp
 
 
 ##
@@ -367,139 +367,193 @@ DEPEND_unzip = afl
 ##  Testsuite
 ##
 TARGETS += testsuite
-FILES_testsuite = u/t_base_vectorenumerator.cpp u/t_net_redis_hashkey.cpp \
-    u/t_test_loglistener.cpp u/t_sys_internalenvironment.cpp \
-    u/t_io_temporarydirectory.cpp u/t_io_internalfilesystem.cpp \
-    u/t_io_xml_writer.cpp u/t_io_archive_arreader.cpp \
-    u/t_charset_asciitransliterator.cpp u/t_string_languagecode.cpp \
-    u/t_io_xml_nodereader.cpp u/t_io_xml_parser.cpp u/t_io_xml_pinode.cpp \
-    u/t_io_xml_tagnode.cpp u/t_io_xml_textnode.cpp u/t_io_xml_node.cpp \
-    u/t_io_xml_visitor.cpp u/t_base_nullenumerator.cpp \
-    u/t_net_redis_integerfield.cpp u/t_test_translator.cpp \
-    u/t_base_stoppable.cpp u/t_base_inlinememory.cpp \
-    u/t_test_commandhandler.cpp u/t_test_callreceiver.cpp \
-    u/t_test_networkstack.cpp u/t_test_socket.cpp u/t_test_assert.cpp \
-    u/t_test.hpp u/t_checksums_sha512.cpp u/t_checksums_sha384.cpp \
-    u/t_checksums_sha256.cpp u/t_checksums_sha224.cpp \
-    u/t_net_tunnel_tunnelablenetworkstack.cpp \
-    u/t_net_tunnel_socks5networkstack.cpp u/t_net_tunnel_socketwrapper.cpp \
-    u/t_net_tunnel_socks4networkstack.cpp u/t_net_tunnel.hpp \
-    u/t_net_smtp_configuration.cpp u/t_net_smtp_mailrequest.cpp \
-    u/t_net_smtp.hpp u/t_net_interact.cpp u/t_net_line_simplequery.cpp \
-    u/t_net_line_client.cpp u/t_net_line_protocolhandler.cpp \
-    u/t_net_line_linehandler.cpp u/t_net_line_linesink.cpp u/t_net_line.hpp \
-    u/t_io_internaltextwriter.cpp u/t_async_interrupt.cpp \
-    u/t_async_interruptoperation.cpp u/t_io_unchangeabledirectoryentry.cpp \
-    u/t_net_mimeparser.cpp u/t_io_archive_tarreader.cpp \
-    u/t_string_win32filenames.cpp u/t_net_reconnectable.cpp \
-    u/t_net_mimebuilder.cpp u/t_net_nullnetworkstack.cpp \
-    u/t_charset_hexencoding.cpp u/t_string_hex.cpp \
-    u/t_net_nullcommandhandler.cpp u/t_net_server.cpp \
-    u/t_base_observable.cpp u/t_sys_dialog.cpp u/t_base_weaklink.cpp \
-    u/t_base_baseweaklink.cpp u/t_base_weaktarget.cpp \
-    u/t_io_transformreaderstream.cpp u/t_io_json_parser_testsuite.cpp \
-    u/t_io_deflatetransform.cpp u/t_io_archive_zipreader.cpp \
-    u/t_io_archive.hpp u/t_io_limitedstream.cpp u/t_base_ref.cpp \
-    u/t_net_http_errorresponse.cpp u/t_io_msexpandtransform.cpp \
-    u/t_net_redis_sortoperation.cpp u/t_net_redis_stringsetkey.cpp \
-    u/t_net_redis_integersetkey.cpp u/t_net_redis_subtree.cpp \
-    u/t_net_redis_key.cpp u/t_net_redis_stringkey.cpp \
-    u/t_net_redis_integerkey.cpp u/t_io_nullfilesystem.cpp \
-    u/t_string_posixfilenames.cpp u/t_net_http_client.cpp \
-    u/t_net_parameterencoder.cpp u/t_io_nulltextwriter.cpp \
-    u/t_io_textreader.cpp u/t_io_textwriter.cpp \
-    u/t_except_assertionfailedexception.cpp \
-    u/t_sys_longcommandlineparser.cpp u/t_string_proxytranslator.cpp \
-    u/t_sys_standardcommandlineparser.cpp u/t_sys_commandlineparser.cpp \
-    u/t_data_namequery.cpp u/t_base_inlineoptional.cpp u/t_base_clonable.cpp \
-    u/t_base_growablememory.cpp u/t_functional_stringtable.cpp \
-    u/t_functional_mapping.cpp u/t_functional_binaryfunction.cpp \
-    u/t_functional_unaryfunction.cpp u/t_functional.hpp \
-    u/t_io_internalfilemapping.cpp u/t_io_filemapping.cpp \
-    u/t_charset_defaultcharsetfactory.cpp u/t_charset_charsetfactory.cpp \
-    u/t_io_xml_defaultentityhandler.cpp u/t_io_xml_entityhandler.cpp \
-    u/t_io_xml_basereader.cpp u/t_io_xml_reader.cpp u/t_io_xml.hpp \
-    u/t_net_http_formparser.cpp u/t_io_textsink.cpp \
-    u/t_net_http_pagedispatcher.cpp u/t_net_http_page.cpp \
-    u/t_net_http_pageresponse.cpp u/t_net_http_pagerequest.cpp \
-    u/t_net_http_response.cpp u/t_net_http_dispatcher.cpp \
-    u/t_net_http_request.cpp u/t_net_commandhandler.cpp \
-    u/t_net_resp_protocolhandler.cpp u/t_container_ptrqueue.cpp \
-    u/t_net_redis_internaldatabase.cpp u/t_net_redis.hpp \
-    u/t_data_segmentview.cpp u/t_net_resp_client.cpp u/t_net_resp.hpp \
-    u/t_async_communicationsink.cpp u/t_io_bufferedsink.cpp \
-    u/t_io_internalsink.cpp u/t_data_stringlist.cpp u/t_data_integerlist.cpp \
-    u/t_data_errorvalue.cpp u/t_io_transformdatasink.cpp \
-    u/t_io_inflatetransform.cpp u/t_io_transform.cpp u/t_base.hpp \
-    u/t_base_memory.cpp u/t_container.hpp u/t_container_ptrvector.cpp \
-    u/t_sys.hpp u/t_sys_mutex.cpp u/t_sys_thread.cpp u/t_base_runnable.cpp \
-    u/t_base_deletable.cpp u/t_sys_mutexguard.cpp u/t_sys_semaphore.cpp \
-    u/t_base_deleter.cpp u/t_container_ptrmap.cpp u/t_base_enumerator.cpp \
-    u/t_container_ptrmultilist.cpp u/t_container_ptrmultilistbase.cpp \
-    u/t_tmp_ifthenelse.cpp u/t_base_staticassert.cpp u/t_tmp.hpp \
-    u/t_base_closure.cpp u/t_base_clonableref.cpp u/t_base_signalhandler.cpp \
-    u/t_base_countof.cpp u/t_bits_smallset.cpp u/t_bits.hpp \
-    u/t_base_signalconnection.cpp u/t_base_signal.cpp \
-    u/t_sys_atomicinteger.cpp u/t_base_refcounted.cpp u/t_base_ptr.cpp \
-    u/t_bits_rotate.cpp u/t_bits_bits.cpp u/t_checksums.hpp \
-    u/t_checksums_bytesum.cpp u/t_checksums_crc32.cpp \
-    u/t_checksums_crc16.cpp u/t_checksums_adler32.cpp u/t_tmp_stripcv.cpp \
-    u/t_string.hpp u/t_string_char.cpp u/t_string_string.cpp \
-    u/t_string_format.cpp u/t_string_formatstate.cpp u/t_tmp_sizedint.cpp \
-    u/t_tmp_sizeduint.cpp u/t_tmp_issametype.cpp u/t_tmp_typelist.cpp \
-    u/t_container_dereferencingiterator.cpp u/t_container_memberiterator.cpp \
-    u/t_tmp_dereferencetype.cpp u/t_charset.hpp u/t_charset_utf8reader.cpp \
-    u/t_tmp_copycv.cpp u/t_charset_utf8.cpp u/t_charset_unicode.cpp \
-    u/t_bits_pack.cpp u/t_bits_uint8.cpp u/t_bits_uint16le.cpp \
-    u/t_bits_uint32le.cpp u/t_bits_uint64le.cpp u/t_bits_int16le.cpp \
-    u/t_bits_int32le.cpp u/t_bits_int8.cpp u/t_bits_int64le.cpp \
-    u/t_sys_error.cpp u/t_io.hpp u/t_io_stream.cpp u/t_except.hpp \
-    u/t_except.cpp u/t_io_filesystem.cpp u/t_io_nullstream.cpp \
-    u/t_io_directoryentry.cpp u/t_io_directory.cpp u/t_io_memorystream.cpp \
-    u/t_io_constmemorystream.cpp u/t_io_internalstream.cpp \
-    u/t_io_multiplexablestream.cpp u/t_io_internaldirectory.cpp \
-    u/t_string_translator.cpp u/t_string_nulltranslator.cpp \
-    u/t_string_messages.cpp u/t_bits_value.cpp u/t_charset_charset.cpp \
-    u/t_charset_utf8charset.cpp u/t_charset_codepage.cpp \
-    u/t_charset_codepagecharset.cpp u/t_io_textfile.cpp \
-    u/t_io_bufferedstream.cpp u/t_net.hpp u/t_net_name.cpp \
-    u/t_net_socket.cpp u/t_net_networkstack.cpp u/t_net_listener.cpp \
-    u/t_bits_fixedstring.cpp u/t_charset_quotedprintable.cpp \
-    u/t_charset_urlencoding.cpp u/t_charset_base64.cpp u/t_sys_duration.cpp \
-    u/t_sys_time.cpp u/t_async.hpp u/t_async_semaphore.cpp \
-    u/t_async_mutex.cpp u/t_async_messageexchange.cpp u/t_async_timer.cpp \
-    u/t_async_sendoperation.cpp u/t_async_receiveoperation.cpp \
-    u/t_async_cancelable.cpp u/t_async_communicationobject.cpp \
-    u/t_async_synchronisationobject.cpp u/t_async_controller.cpp \
-    u/t_async_operation.cpp u/t_async_operationlist.cpp \
-    u/t_sys_environment.cpp u/t_async_communicationstream.cpp u/t_data.hpp \
-    u/t_data_namemap.cpp u/t_data_value.cpp u/t_data_scalarvalue.cpp \
-    u/t_data_integervalue.cpp u/t_data_booleanvalue.cpp \
-    u/t_data_floatvalue.cpp u/t_data_stringvalue.cpp u/t_data_segment.cpp \
-    u/t_data_hash.cpp u/t_data_hashvalue.cpp u/t_data_vector.cpp \
-    u/t_data_vectorvalue.cpp u/t_data_valuefactory.cpp \
-    u/t_data_defaultvaluefactory.cpp u/t_io_json.hpp u/t_io_json_parser.cpp \
-    u/t_io_json_writer.cpp u/t_string_parse.cpp u/t_data_access.cpp \
-    u/t_io_resp.hpp u/t_io_resp_writer.cpp u/t_io_resp_parser.cpp \
-    u/t_net_url.cpp u/t_net_acceptoperation.cpp u/t_net_protocolhandler.cpp \
-    u/t_net_protocolhandlerfactory.cpp u/t_net_simpleserver.cpp \
-    u/t_net_headerconsumer.cpp u/t_net_headerparser.cpp \
-    u/t_async_notifier.cpp u/t_string_parsememory.cpp u/t_net_http.hpp \
-    u/t_net_http_clientresponse.cpp \
-    u/t_net_http_clientconnectionprovider.cpp u/t_net_http_clientrequest.cpp \
-    u/t_net_http_clientconnection.cpp u/t_io_datasink.cpp \
-    u/t_net_http_chunkedsink.cpp u/t_io_limiteddatasink.cpp \
-    u/t_io_inflatedatasink.cpp u/t_sys_log.cpp u/t_net_headerfield.cpp \
-    u/t_net_headertable.cpp u/t_net_http_defaultconnectionprovider.cpp \
-    u/t_net_http_downloadlistener.cpp u/t_net_http_cookie.cpp \
-    u/t_net_http_cookiejar.cpp u/t_sys_loglistener.cpp u/t_base_types.cpp \
-    u/t_base_uncopyable.cpp u/t_checksums_checksum.cpp u/t_data_visitor.cpp \
-    u/t_string_formatunion.cpp u/t_string_formattraits.cpp u/t_sys_types.cpp \
-    u/t_sys_parsedtime.cpp u/t_net_securesocket.cpp \
-    u/t_net_securecontext.cpp u/t_net_securenetworkstack.cpp \
-    u/t_io_multidirectory.cpp u/t_checksums_md5.cpp u/t_checksums_hash.cpp \
-    u/t_checksums_sha1.cpp u/t_bits_int16be.cpp u/t_bits_int32be.cpp \
-    u/t_bits_int64be.cpp u/t_bits_uint16be.cpp u/t_bits_uint32be.cpp \
-    u/t_bits_uint64be.cpp u/t_base_optional.cpp
+FILES_testsuite = test/afl/tmp/typelisttest.cpp \
+    test/afl/tmp/sizeduinttest.cpp test/afl/tmp/stripcvtest.cpp \
+    test/afl/tmp/sizedinttest.cpp test/afl/tmp/issametypetest.cpp \
+    test/afl/tmp/ifthenelsetest.cpp test/afl/tmp/dereferencetypetest.cpp \
+    test/afl/tmp/copycvtest.cpp test/afl/sys/typestest.cpp \
+    test/afl/sys/timetest.cpp test/afl/sys/threadtest.cpp \
+    test/afl/sys/standardcommandlineparsertest.cpp \
+    test/afl/sys/semaphoretest.cpp test/afl/sys/parsedtimetest.cpp \
+    test/afl/sys/mutexguardtest.cpp test/afl/sys/mutextest.cpp \
+    test/afl/sys/longcommandlineparsertest.cpp \
+    test/afl/sys/loglistenertest.cpp test/afl/sys/logtest.cpp \
+    test/afl/sys/internalenvironmenttest.cpp test/afl/sys/errortest.cpp \
+    test/afl/sys/environmenttest.cpp test/afl/sys/durationtest.cpp \
+    test/afl/sys/dialogtest.cpp test/afl/sys/commandlineparsertest.cpp \
+    test/afl/sys/atomicintegertest.cpp \
+    test/afl/string/win32filenamestest.cpp \
+    test/afl/string/translatortest.cpp test/afl/string/stringtest.cpp \
+    test/afl/string/proxytranslatortest.cpp \
+    test/afl/string/posixfilenamestest.cpp \
+    test/afl/string/parsememorytest.cpp test/afl/string/parsetest.cpp \
+    test/afl/string/nulltranslatortest.cpp test/afl/string/messagestest.cpp \
+    test/afl/string/languagecodetest.cpp test/afl/string/hextest.cpp \
+    test/afl/string/formatuniontest.cpp test/afl/string/formattraitstest.cpp \
+    test/afl/string/formatstatetest.cpp test/afl/string/formattest.cpp \
+    test/afl/string/chartest.cpp \
+    test/afl/net/tunnel/tunnelablenetworkstacktest.cpp \
+    test/afl/net/tunnel/socks5networkstacktest.cpp \
+    test/afl/net/tunnel/socks4networkstacktest.cpp \
+    test/afl/net/tunnel/socketwrappertest.cpp \
+    test/afl/net/smtp/mailrequesttest.cpp \
+    test/afl/net/smtp/configurationtest.cpp \
+    test/afl/net/resp/protocolhandlertest.cpp \
+    test/afl/net/resp/clienttest.cpp test/afl/net/redis/subtreetest.cpp \
+    test/afl/net/redis/stringsetkeytest.cpp \
+    test/afl/net/redis/stringkeytest.cpp \
+    test/afl/net/redis/sortoperationtest.cpp test/afl/net/redis/keytest.cpp \
+    test/afl/net/redis/internaldatabasetest.cpp \
+    test/afl/net/redis/integersetkeytest.cpp \
+    test/afl/net/redis/integerkeytest.cpp \
+    test/afl/net/redis/integerfieldtest.cpp \
+    test/afl/net/redis/hashkeytest.cpp test/afl/net/line/simplequerytest.cpp \
+    test/afl/net/line/protocolhandlertest.cpp \
+    test/afl/net/line/linesinktest.cpp test/afl/net/line/linehandlertest.cpp \
+    test/afl/net/line/clienttest.cpp test/afl/net/http/responsetest.cpp \
+    test/afl/net/http/requesttest.cpp test/afl/net/http/pageresponsetest.cpp \
+    test/afl/net/http/pagerequesttest.cpp \
+    test/afl/net/http/pagedispatchertest.cpp test/afl/net/http/pagetest.cpp \
+    test/afl/net/http/formparsertest.cpp \
+    test/afl/net/http/errorresponsetest.cpp \
+    test/afl/net/http/downloadlistenertest.cpp \
+    test/afl/net/http/dispatchertest.cpp \
+    test/afl/net/http/defaultconnectionprovidertest.cpp \
+    test/afl/net/http/cookiejartest.cpp test/afl/net/http/cookietest.cpp \
+    test/afl/net/http/clientresponsetest.cpp \
+    test/afl/net/http/clientrequesttest.cpp \
+    test/afl/net/http/clientconnectionprovidertest.cpp \
+    test/afl/net/http/clientconnectiontest.cpp \
+    test/afl/net/http/clienttest.cpp test/afl/net/http/chunkedsinktest.cpp \
+    test/afl/net/interacttest.cpp test/afl/net/urltest.cpp \
+    test/afl/net/sockettest.cpp test/afl/net/simpleservertest.cpp \
+    test/afl/net/servertest.cpp test/afl/net/securesockettest.cpp \
+    test/afl/net/securenetworkstacktest.cpp \
+    test/afl/net/securecontexttest.cpp test/afl/net/reconnectabletest.cpp \
+    test/afl/net/protocolhandlerfactorytest.cpp \
+    test/afl/net/protocolhandlertest.cpp test/afl/net/networkstacktest.cpp \
+    test/afl/net/nametest.cpp test/afl/net/listenertest.cpp \
+    test/afl/net/parameterencodertest.cpp \
+    test/afl/net/nullnetworkstacktest.cpp \
+    test/afl/net/nullcommandhandlertest.cpp test/afl/net/mimeparsertest.cpp \
+    test/afl/net/mimebuildertest.cpp test/afl/net/headertabletest.cpp \
+    test/afl/net/headerparsertest.cpp test/afl/net/headerfieldtest.cpp \
+    test/afl/net/headerconsumertest.cpp test/afl/net/commandhandlertest.cpp \
+    test/afl/net/acceptoperationtest.cpp test/afl/io/xml/writertest.cpp \
+    test/afl/io/xml/visitortest.cpp test/afl/io/xml/textnodetest.cpp \
+    test/afl/io/xml/tagnodetest.cpp test/afl/io/xml/readertest.cpp \
+    test/afl/io/xml/parsertest.cpp test/afl/io/xml/pinodetest.cpp \
+    test/afl/io/xml/nodereadertest.cpp test/afl/io/xml/nodetest.cpp \
+    test/afl/io/xml/entityhandlertest.cpp \
+    test/afl/io/xml/defaultentityhandlertest.cpp \
+    test/afl/io/xml/basereadertest.cpp \
+    test/afl/io/unchangeabledirectoryentrytest.cpp \
+    test/afl/io/transformreaderstreamtest.cpp \
+    test/afl/io/transformdatasinktest.cpp test/afl/io/transformtest.cpp \
+    test/afl/io/textwritertest.cpp test/afl/io/textsinktest.cpp \
+    test/afl/io/textreadertest.cpp test/afl/io/textfiletest.cpp \
+    test/afl/io/temporarydirectorytest.cpp test/afl/io/streamtest.cpp \
+    test/afl/io/nulltextwritertest.cpp test/afl/io/nullstreamtest.cpp \
+    test/afl/io/nullfilesystemtest.cpp \
+    test/afl/io/multiplexablestreamtest.cpp \
+    test/afl/io/multidirectorytest.cpp test/afl/io/msexpandtransformtest.cpp \
+    test/afl/io/memorystreamtest.cpp test/afl/io/limitedstreamtest.cpp \
+    test/afl/io/limiteddatasinktest.cpp \
+    test/afl/io/internaltextwritertest.cpp \
+    test/afl/io/internalstreamtest.cpp test/afl/io/internalsinktest.cpp \
+    test/afl/io/internalfilesystemtest.cpp \
+    test/afl/io/internalfilemappingtest.cpp \
+    test/afl/io/internaldirectorytest.cpp \
+    test/afl/io/inflatetransformtest.cpp test/afl/io/inflatedatasinktest.cpp \
+    test/afl/io/filesystemtest.cpp test/afl/io/filemappingtest.cpp \
+    test/afl/io/directoryentrytest.cpp test/afl/io/directorytest.cpp \
+    test/afl/io/deflatetransformtest.cpp test/afl/io/datasinktest.cpp \
+    test/afl/io/constmemorystreamtest.cpp test/afl/io/bufferedstreamtest.cpp \
+    test/afl/io/bufferedsinktest.cpp test/afl/io/archive/zipreadertest.cpp \
+    test/afl/io/archive/tarreadertest.cpp \
+    test/afl/io/archive/arreadertest.cpp \
+    test/afl/functional/unaryfunctiontest.cpp \
+    test/afl/functional/stringtabletest.cpp \
+    test/afl/functional/mappingtest.cpp \
+    test/afl/functional/binaryfunctiontest.cpp \
+    test/afl/except/exceptiontest.cpp \
+    test/afl/except/assertionfailedexceptiontest.cpp \
+    test/afl/data/scalarvaluetest.cpp test/afl/data/visitortest.cpp \
+    test/afl/data/vectorvaluetest.cpp test/afl/data/vectortest.cpp \
+    test/afl/data/valuefactorytest.cpp test/afl/data/valuetest.cpp \
+    test/afl/data/stringvaluetest.cpp test/afl/data/stringlisttest.cpp \
+    test/afl/data/segmentviewtest.cpp test/afl/data/segmenttest.cpp \
+    test/afl/data/integervaluetest.cpp test/afl/data/integerlisttest.cpp \
+    test/afl/data/hashvaluetest.cpp test/afl/data/hashtest.cpp \
+    test/afl/data/namequerytest.cpp test/afl/data/namemaptest.cpp \
+    test/afl/data/floatvaluetest.cpp test/afl/data/errorvaluetest.cpp \
+    test/afl/data/defaultvaluefactorytest.cpp \
+    test/afl/data/booleanvaluetest.cpp test/afl/data/accesstest.cpp \
+    test/afl/container/ptrvectortest.cpp test/afl/container/ptrqueuetest.cpp \
+    test/afl/container/ptrmultilistbasetest.cpp \
+    test/afl/container/ptrmultilisttest.cpp \
+    test/afl/container/ptrmaptest.cpp \
+    test/afl/container/memberiteratortest.cpp \
+    test/afl/container/dereferencingiteratortest.cpp \
+    test/afl/checksums/sha512test.cpp test/afl/checksums/sha384test.cpp \
+    test/afl/checksums/sha256test.cpp test/afl/checksums/sha224test.cpp \
+    test/afl/checksums/sha1test.cpp test/afl/checksums/md5test.cpp \
+    test/afl/checksums/hashtest.cpp test/afl/checksums/crc32test.cpp \
+    test/afl/checksums/crc16test.cpp test/afl/checksums/checksumtest.cpp \
+    test/afl/checksums/bytesumtest.cpp test/afl/checksums/adler32test.cpp \
+    test/afl/charset/utf8readertest.cpp test/afl/charset/utf8charsettest.cpp \
+    test/afl/charset/utf8test.cpp test/afl/charset/urlencodingtest.cpp \
+    test/afl/charset/unicodetest.cpp \
+    test/afl/charset/quotedprintabletest.cpp \
+    test/afl/charset/hexencodingtest.cpp \
+    test/afl/charset/defaultcharsetfactorytest.cpp \
+    test/afl/charset/codepagecharsettest.cpp \
+    test/afl/charset/codepagetest.cpp \
+    test/afl/charset/charsetfactorytest.cpp test/afl/charset/charsettest.cpp \
+    test/afl/charset/base64test.cpp \
+    test/afl/charset/asciitransliteratortest.cpp test/afl/bits/valuetest.cpp \
+    test/afl/bits/uint64betest.cpp test/afl/bits/uint64letest.cpp \
+    test/afl/bits/uint32betest.cpp test/afl/bits/uint32letest.cpp \
+    test/afl/bits/uint16betest.cpp test/afl/bits/uint16letest.cpp \
+    test/afl/bits/uint8test.cpp test/afl/bits/smallsettest.cpp \
+    test/afl/bits/rotatetest.cpp test/afl/bits/packtest.cpp \
+    test/afl/bits/int64letest.cpp test/afl/bits/int64betest.cpp \
+    test/afl/bits/int32letest.cpp test/afl/bits/int32betest.cpp \
+    test/afl/bits/int16letest.cpp test/afl/bits/int16betest.cpp \
+    test/afl/bits/int8test.cpp test/afl/bits/fixedstringtest.cpp \
+    test/afl/bits/bitstest.cpp test/afl/async/timertest.cpp \
+    test/afl/async/synchronisationobjecttest.cpp \
+    test/afl/async/semaphoretest.cpp test/afl/async/sendoperationtest.cpp \
+    test/afl/async/receiveoperationtest.cpp \
+    test/afl/async/operationlisttest.cpp test/afl/async/operationtest.cpp \
+    test/afl/async/notifiertest.cpp test/afl/async/mutextest.cpp \
+    test/afl/async/messageexchangetest.cpp \
+    test/afl/async/interruptoperationtest.cpp \
+    test/afl/async/interrupttest.cpp test/afl/async/controllertest.cpp \
+    test/afl/async/communicationstreamtest.cpp \
+    test/afl/async/communicationsinktest.cpp \
+    test/afl/async/communicationobjecttest.cpp \
+    test/afl/async/cancelabletest.cpp test/afl/base/weaktargettest.cpp \
+    test/afl/base/weaklinktest.cpp test/afl/base/vectorenumeratortest.cpp \
+    test/afl/base/uncopyabletest.cpp test/afl/base/typestest.cpp \
+    test/afl/base/stoppabletest.cpp test/afl/base/staticasserttest.cpp \
+    test/afl/base/signalhandlertest.cpp \
+    test/afl/base/signalconnectiontest.cpp test/afl/base/signaltest.cpp \
+    test/afl/base/runnabletest.cpp test/afl/base/refcountedtest.cpp \
+    test/afl/base/reftest.cpp test/afl/base/ptrtest.cpp \
+    test/afl/base/optionaltest.cpp test/afl/base/observabletest.cpp \
+    test/afl/base/nullenumeratortest.cpp test/afl/base/memorytest.cpp \
+    test/afl/base/inlineoptionaltest.cpp test/afl/base/inlinememorytest.cpp \
+    test/afl/base/growablememorytest.cpp test/afl/base/enumeratortest.cpp \
+    test/afl/base/deletertest.cpp test/afl/base/deletabletest.cpp \
+    test/afl/base/countoftest.cpp test/afl/base/closuretest.cpp \
+    test/afl/base/clonablereftest.cpp test/afl/io/json/parsertest.cpp \
+    test/afl/io/json/writertest.cpp test/afl/io/json/parsertestsuite.cpp \
+    test/afl/test/translatortest.cpp test/afl/test/sockettest.cpp \
+    test/afl/test/networkstacktest.cpp test/afl/test/loglistenertest.cpp \
+    test/afl/test/commandhandlertest.cpp test/afl/test/callreceivertest.cpp \
+    test/afl/test/asserttest.cpp test/afl/base/baseweaklinktest.cpp \
+    test/afl/base/clonabletest.cpp test/afl/io/resp/parsertest.cpp \
+    test/main.cpp test/afl/io/resp/writertest.cpp
 TYPE_testsuite = app
 DEPEND_testsuite = afl
