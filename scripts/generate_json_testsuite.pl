@@ -6,7 +6,7 @@
 #  Usage:
 #  + check out the above repo
 #  + run this script as
-#        perl generate_json_testsuite.pl /path/to/JSONTestSuite > u/t_io_json_parser_testsuite.cpp
+#        perl generate_json_testsuite.pl /path/to/JSONTestSuite > test/afl/io/json/parsertestsuite.cpp
 #
 use strict;
 use bytes;
@@ -69,7 +69,7 @@ my %hadThisName;
 
 print <<'EOF';
 /**
-  *  \file u/t_io_json_parser_testsuite.cpp
+  *  \file test/afl/io/json/parsertestsuite.cpp
   *  \brief Test for afl::io::json::Parser - Testsuite
   *
   *  GENERATED FILE, do not edit. See scripts/generate_json_testsuite.pl.
@@ -94,12 +94,12 @@ print <<'EOF';
 
 #include "afl/io/json/parser.hpp"
 
-#include "u/t_io_json.hpp"
 #include "afl/data/defaultvaluefactory.hpp"
 #include "afl/data/value.hpp"
 #include "afl/except/fileformatexception.hpp"
 #include "afl/io/bufferedstream.hpp"
 #include "afl/io/constmemorystream.hpp"
+#include "afl/test/testrunner.hpp"
 
 namespace {
     void parseString(afl::base::ConstBytes_t str)
@@ -111,64 +111,54 @@ namespace {
     }
 }
 
-/** Test "good" cases. These must all parse successfully. */
-void
-TestIoJsonParser::testTestsuiteGood()
-{
+/*
+ *  Test "good" cases. These must all parse successfully.
+ */
 EOF
 
 foreach (sort <$dir/test_parsing/y_*.json>) {
     my $name = testName($_);
     next if $BLACKLIST{$name};
+    print "AFL_TEST(\"afl.io.json.Parser:good:$name\", a) {\n";
     dumpFile($_, $name);
-    print "    TS_ASSERT_THROWS_NOTHING(parseString($name));\n\n";
+    print "    AFL_CHECK_SUCCEEDS(a, parseString($name));\n";
+    print "}\n\n";
     close FILE;
 }
 
 print <<'EOF';
-}
 
-/** Test "bad" cases. These must all fail. */
-void
-TestIoJsonParser::testTestsuiteBad()
-{
+/*
+ *  Test "bad" cases. These must all fail.
+ */
 EOF
 
 foreach (sort <$dir/test_parsing/n_*.json>) {
     my $name = testName($_);
     next if $BLACKLIST{$name};
+    print "AFL_TEST(\"afl.io.json.Parser:bad:$name\", a) {\n";
     dumpFile($_, $name);
-    print "    TS_ASSERT_THROWS(parseString($name), afl::except::FileFormatException);\n\n";
+    print "    AFL_CHECK_THROWS(a, parseString($name), afl::except::FileFormatException);\n";
+    print "}\n\n";
     close FILE;
 }
 
 print <<'EOF';
-}
 
-/** Test "ignore" cases. We have filtered them to cases we parse. */
-void
-TestIoJsonParser::testTestsuiteUgly()
-{
+/*
+ *  Test "ignore" cases. We have filtered them to cases we parse.
+ */
 EOF
 
 foreach (sort <$dir/test_parsing/i_*.json>) {
     my $name = testName($_);
     next if $BLACKLIST{$name};
+    print "AFL_TEST(\"afl.io.json.Parser:ignore:$name\", a) {\n";
     dumpFile($_, $name);
-    print "    TS_ASSERT_THROWS_NOTHING(parseString($name));\n\n";
+    print "    AFL_CHECK_SUCCEEDS(a, parseString($name));\n";
+    print "}\n\n";
     close FILE;
 }
-
-print <<'EOF';
-}
-EOF
-
-
-
-
-
-
-
 
 
 

@@ -35,10 +35,6 @@ if ($V{TARGET} =~ /POSIX/i) {
 }
 
 # Libraries
-find_directory('CXXTESTDIR',
-               files =>[qw(cxxtest/TestSuite.h cxxtestgen.pl)],
-               guess => [glob('../cxxtest* ../../cxxtest* ../../../cxxtest*')],
-               allow_missing => 1);
 find_library('WITH_OPENSSL',
              libs => '-lssl -lcrypto',
              program => "#include \"openssl/ssl.h\"\nint main() { TLSv1_client_method(); }\n",
@@ -91,23 +87,11 @@ my $libafl = compile_static_library('afl', [to_prefix_list($IN, $settings->{FILE
 generate('all', $libafl);
 
 # Testsuite
-if ($V{CXXTESTDIR} ne '') {
-    my $ts_file = normalize_filename($IN, 'testsuite.cpp');
+{
     my @ts_src = sort(to_prefix_list($IN, $settings->{FILES_testsuite}));
-    my @ts_obj = map {compile_file($_, {CXXFLAGS=>"-I$V{CXXTESTDIR} -D_CXXTEST_HAVE_EH -D_CXXTEST_HAVE_STD -g"})} @ts_src;
-
-    # - build test driver
-    my $ts_main_src = normalize_filename($V{TMP}, "testsuite.cpp");
-    my @ts_headers = <$IN/u/t_*.hpp>;
-    generate($ts_main_src, [@ts_headers], "$V{PERL} $V{CXXTESTDIR}/cxxtestgen.pl --gui=TestController --have-eh --error-printer -o $ts_main_src ".join(' ', @ts_headers));
-    rule_add_info($ts_main_src, 'Generating test driver');
-
-    # - compile test driver
-    my @ts_main_obj = map {compile_file($_, {CXXFLAGS=>"-I$V{CXXTESTDIR} -O0"})} $ts_main_src;
-
-    # - compile & run
-    my $exe = compile_executable('testsuite', [@ts_obj, @ts_main_obj], ['afl']);
-    generate('test', 'testsuite', "$V{RUN} ./testsuite");
+    my @ts_obj = map {compile_file($_)} @ts_src;
+    my $exe = compile_executable('testsuite', [@ts_obj], ['afl']);
+    generate('test', 'testsuite', "$V{RUN} ./testsuite -p");
     rule_add_info('test', 'Running testsuite');
     rule_set_phony('test');
 
@@ -173,7 +157,6 @@ foreach my $f (@utils) {
 
 # We need to publish TestController.h despite not being an "official" API because it is convenient and c2ng uses it.
 # Same thing for the coverage_optimize.pl script.
-generate('install', generate_copy("$result_dir/include/cxxtest/TestController.h", "$IN/cxxtest/TestController.h"));
 generate('install', generate_copy("$result_dir/bin/coverage_optimize.pl", "$IN/scripts/coverage_optimize.pl"));
 
 # Publish configuration for benefit of consumers

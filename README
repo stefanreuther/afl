@@ -71,7 +71,7 @@ Source Code Layout
 - config/   Configuration specifics. Do not include in your applications.
             These expect a macro from afl/config.h to be set.
 - etc/      Extra (non source) files.
-- u/        Unit tests.
+- test/     Unit tests.
 
 For compiling your own applications, point "-I" to the source root
 directory, so you can include afl header files as "afl/...".
