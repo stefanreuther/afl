@@ -3,6 +3,7 @@
   *  \brief Class afl::test::Assert
   */
 
+#include <cmath>
 #include "afl/test/assert.hpp"
 #include "afl/except/assertionfailedexception.hpp"
 
@@ -23,6 +24,22 @@ afl::test::Assert::check(const String_t& info, bool condition) const
 }
 
 void
+afl::test::Assert::checkNull(const String_t& info, const void* p) const
+{
+    if (p != 0) {
+        fail(afl::string::Format("%s (found %p != nullptr)", info, p));
+    }
+}
+
+void
+afl::test::Assert::checkNear(const String_t& info, double value, double expected, double range) const
+{
+    if (std::abs(value - expected) > range) {
+        fail(afl::string::Format("%s (found %.2f differ from %.2f by more than %.2f)", info, value, expected, range));
+    }
+}
+
+void
 afl::test::Assert::fail(const String_t& info) const
 {
     throw afl::except::AssertionFailedException(info, m_location);
@@ -38,4 +55,10 @@ afl::test::Assert
 afl::test::Assert::operator()(const String_t& location) const
 {
     return Assert(m_location + ": " + location);
+}
+
+const String_t&
+afl::test::Assert::getLocation() const
+{
+    return m_location;
 }

@@ -156,6 +156,14 @@ namespace afl { namespace sys {
         int64_t m_time;
     };
 
+    /** Make Time printable for assertions.
+        Returns the platform-specific representation.
+        @return integer */
+    inline int64_t makePrintable(const Time& t)
+    {
+        return t.getRepresentation();
+    }
+
 } }
 
 inline

@@ -231,6 +231,19 @@ namespace afl { namespace bits {
             : m_rep(r)
             { }
     };
+
+    /** Make SmallSet printable for assertions.
+        Returns just the representation as an integer.
+        @tparam T Member type
+        @tparam Rep Representation type
+        @param v SmallSet instance
+        @return integer */
+    template<typename T, typename Rep>
+    inline Rep makePrintable(SmallSet<T,Rep> v)
+    {
+        return v.toInteger();
+    }
+
 } }
 
 #endif

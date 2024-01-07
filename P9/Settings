@@ -16,12 +16,14 @@ PROJ_AUTO += afl:afl/*pp testsuite:u/*pp
 ##  Main Library
 ##
 TARGETS += afl
-FILES_afl = afl/base/vectorenumerator.hpp afl/test/loglistener.cpp \
-    afl/test/loglistener.hpp afl/sys/internalenvironment.cpp \
-    afl/sys/internalenvironment.hpp afl/io/temporarydirectory.cpp \
-    afl/io/temporarydirectory.hpp afl/io/internalfilesystem.cpp \
-    afl/io/internalfilesystem.hpp afl/io/xml/node.cpp afl/io/xml/writer.cpp \
-    afl/io/xml/writer.hpp arch/textfile.hpp afl/io/archive/arreader.cpp \
+FILES_afl = afl/test/makeprintable.hpp afl/test/testrunner.cpp \
+    afl/test/testrunner.hpp afl/base/vectorenumerator.hpp \
+    afl/test/loglistener.cpp afl/test/loglistener.hpp \
+    afl/sys/internalenvironment.cpp afl/sys/internalenvironment.hpp \
+    afl/io/temporarydirectory.cpp afl/io/temporarydirectory.hpp \
+    afl/io/internalfilesystem.cpp afl/io/internalfilesystem.hpp \
+    afl/io/xml/node.cpp afl/io/xml/writer.cpp afl/io/xml/writer.hpp \
+    arch/textfile.hpp afl/io/archive/arreader.cpp \
     afl/io/archive/arreader.hpp afl/charset/asciitransliterator.cpp \
     afl/charset/asciitransliterator.hpp \
     afl/except/assertionfailedexception.hpp afl/base/uncopyable.hpp \
