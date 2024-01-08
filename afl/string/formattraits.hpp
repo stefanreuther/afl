@@ -133,7 +133,8 @@ namespace afl { namespace string {
         typedef TypeList<unsigned char,
                     TypeList<unsigned short,
                         TypeList<unsigned int,
-                            TypeList<unsigned long, void> > > > UnsignedTypes1;
+                            TypeList<unsigned long,
+                                TypeList<unsigned long long, void> > > > > UnsignedTypes1;
         typedef TypeList<size_t, UnsignedTypes1> UnsignedTypes2;
         typedef TypeList<uintptr_t, UnsignedTypes2> UnsignedTypes3;
         typedef TypeList<uintmax_t, UnsignedTypes3> UnsignedTypes4;
@@ -143,6 +144,8 @@ namespace afl { namespace string {
     template<> struct FormatTraits<unsigned short> : public detail::FormatUnsigned { };
     template<> struct FormatTraits<unsigned int>   : public detail::FormatUnsigned { };
     template<> struct FormatTraits<unsigned long>  : public detail::FormatUnsigned { };
+    template<> struct FormatTraits<unsigned long long> : public detail::FormatUnsigned { };
+    template<> struct FormatTraits<bool>           : public detail::FormatUnsigned { };
     template<> struct FormatTraits<detail::FormatSelect<detail::UnsignedTypes1, struct FormatSizet,    size_t>::Type>    : public detail::FormatUnsigned { };
     template<> struct FormatTraits<detail::FormatSelect<detail::UnsignedTypes2, struct FormatUintptrt, uintptr_t>::Type> : public detail::FormatUnsigned { };
     template<> struct FormatTraits<detail::FormatSelect<detail::UnsignedTypes3, struct FormatUintmaxt, uintmax_t>::Type> : public detail::FormatUnsigned { };
@@ -170,7 +173,8 @@ namespace afl { namespace string {
                     TypeList<char,
                         TypeList<signed short,
                             TypeList<signed int,
-                                TypeList<signed long, void> > > > > SignedTypes1;
+                                TypeList<signed long,
+                                    TypeList<signed long long, void> > > > > > SignedTypes1;
         typedef TypeList<ptrdiff_t, SignedTypes1> SignedTypes2;
         typedef TypeList<intptr_t, SignedTypes2> SignedTypes3;
         typedef TypeList<intmax_t, SignedTypes3> SignedTypes4;
@@ -181,6 +185,7 @@ namespace afl { namespace string {
     template<> struct FormatTraits<signed short> : public detail::FormatSigned { };
     template<> struct FormatTraits<signed int>   : public detail::FormatSigned { };
     template<> struct FormatTraits<signed long>  : public detail::FormatSigned { };
+    template<> struct FormatTraits<signed long long> : public detail::FormatSigned { };
     template<> struct FormatTraits<detail::FormatSelect<detail::SignedTypes1, struct FormatPtrdifft, ptrdiff_t>::Type> : public detail::FormatSigned { };
     template<> struct FormatTraits<detail::FormatSelect<detail::SignedTypes2, struct FormatIntptrt,  intptr_t>::Type>  : public detail::FormatSigned { };
     template<> struct FormatTraits<detail::FormatSelect<detail::SignedTypes3, struct FormatIntmaxt,  intmax_t>::Type>  : public detail::FormatSigned { };
