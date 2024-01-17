@@ -22,6 +22,12 @@ namespace afl { namespace tmp {
         static const bool result = true;
     };
 
+    template<typename A, typename B>
+    const bool IsSameType<A,B>::result;
+
+    template<typename A>
+    const bool IsSameType<A,A>::result;
+
 } }
 
 #endif

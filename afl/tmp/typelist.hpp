@@ -40,6 +40,15 @@ namespace afl { namespace tmp {
         static const bool result = true;
     };
 
+    template<typename Type, typename List>
+    const bool TypeListContains<Type, List>::result;
+
+    template<typename Type, typename Car, typename Cdr>
+    const bool TypeListContains<Type, TypeList<Car,Cdr> >::result;
+
+    template<typename Type, typename Cdr>
+    const bool TypeListContains<Type, TypeList<Type,Cdr> >::result;
+
 } }
 
 #endif
