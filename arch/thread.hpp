@@ -40,7 +40,7 @@ class afl::sys::Thread::Impl {
         : m_handle(),
           m_parent(parent)
         { }
-        
+
     ~Impl()
         { }
 

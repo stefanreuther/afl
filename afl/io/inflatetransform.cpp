@@ -214,7 +214,7 @@ afl::io::InflateTransform::Impl::transform(afl::base::ConstBytes_t& in, afl::bas
                 m_state = CheckHeaderCRC;
             }
             break;
-            
+
          case CheckHeaderCRC:
             // Do we need this?
             if ((m_gzHeaderFlags & flHeaderCRC) != 0) {

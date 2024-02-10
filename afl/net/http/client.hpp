@@ -38,7 +38,7 @@ namespace afl { namespace net { namespace http {
             The object will not be usable until you set the connection provider,
             see setNewConnectionProvider(). */
         Client();
-        
+
         /** Destructor. */
         ~Client();
 

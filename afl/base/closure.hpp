@@ -10,7 +10,7 @@
 namespace afl { namespace base {
 
     template<typename Signature> class Closure;
-    
+
 
     /*
      *  Nullary

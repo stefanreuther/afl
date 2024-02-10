@@ -44,7 +44,7 @@ namespace afl { namespace except {
         /** File name. */
         String_t m_fileName;
     };
-    
+
 } }
 
 inline const String_t&

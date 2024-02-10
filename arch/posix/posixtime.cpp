@@ -39,7 +39,7 @@ arch::posix::PosixTime::packTime(const afl::sys::ParsedTime& parsedTime, afl::sy
 
         year += month / 12;
         month %= 12;
-        
+
         static const uint16_t daysSinceNewYear[12] = {
             // Ja Feb Mar  Apr  May June July  Aug  Sep  Oct  Nov
             // 31 +28 +31  +30  +31  +30  +31  +31  +30  +31  +30

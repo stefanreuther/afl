@@ -55,7 +55,7 @@ namespace afl { namespace async {
      private:
         std::list<Operation*> m_list;
     };
-    
+
 } }
 
 /***************************** Implementation ****************************/

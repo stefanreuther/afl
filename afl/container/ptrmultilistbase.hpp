@@ -45,7 +45,7 @@ namespace afl { namespace container {
             bool operator!=(const iterator& other) const;
             void* get() const;
             void invalidate();
-            
+
          private:
             void unlink();
             void link(const iterator& other);

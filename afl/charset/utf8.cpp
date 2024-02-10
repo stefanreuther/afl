@@ -29,7 +29,7 @@ namespace {
             out.append(1, char(0xFE));
             extraBytes = 6;
         }
-        
+
         while (extraBytes > 0) {
             --extraBytes;
             out.append(1, char(0x80 + ((ch >> (6*extraBytes)) & 0x3F)));

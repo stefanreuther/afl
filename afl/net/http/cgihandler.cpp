@@ -97,7 +97,7 @@ afl::net::http::CGIHandler::handlePage(Page& page)
             result += fpe->getFileName();
             result += "\r\n";
         }
-        
+
         m_environment.attachStream(afl::sys::Environment::Output)->fullWrite(toBytes(result));
     }
     return 0;
@@ -137,7 +137,7 @@ afl::net::http::CGIHandler::buildPageRequest(PageRequest& req)
     if (!method.empty()) {
         req.setMethod(method);
     }
-    
+
     // Request body
     if (method == "POST") {
         size_t size = 0;

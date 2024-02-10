@@ -149,7 +149,7 @@ namespace afl { namespace net { namespace http {
 
         FormParser m_formParser;
     };
-    
+
 } } }
 
 #endif

@@ -144,7 +144,7 @@ arch::win32::Win32Stream::init(afl::io::FileSystem::FileName_t name, afl::io::Fi
         creationDistribution = CREATE_ALWAYS;
         shareMode = 0;
         break;
-        
+
      case afl::io::FileSystem::CreateNew:
         m_capabilities = CanRead | CanWrite | CanSeek;
         desiredAccess = GENERIC_READ | GENERIC_WRITE;

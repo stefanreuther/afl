@@ -9,7 +9,7 @@
 #include "afl/tmp/dereferencetype.hpp"
 
 namespace afl { namespace container {
-    
+
     /** Dereferencing iterator.
         If T is an iterator whose value_type is a pointer, i.e. "U*",
         DereferencingIterator<T> iterates over the U's. */

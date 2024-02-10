@@ -23,7 +23,7 @@ namespace afl { namespace io {
         /** Virtual destructor. */
         virtual ~TextReader();
 
-        
+
         /*
          *  Reading
          */

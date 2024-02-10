@@ -22,5 +22,5 @@ namespace config { namespace openssl {
     };
 
 } }
-    
+
 #endif

@@ -89,7 +89,7 @@ namespace afl { namespace net {
             \return result */
         String_t callString(const Segment_t& command);
     };
-    
+
 } }
 
 #endif

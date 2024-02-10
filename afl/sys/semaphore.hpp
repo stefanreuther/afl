@@ -44,7 +44,7 @@ namespace afl { namespace sys {
         class Impl;
         Impl* m_pImpl;
     };
-    
+
 } }
 
 #endif

@@ -33,7 +33,7 @@ namespace {
             { return m_futureOutput; }
 
      private:
-        std::auto_ptr<afl::base::GrowableBytes_t> m_futureOutput;        
+        std::auto_ptr<afl::base::GrowableBytes_t> m_futureOutput;
     };
 }
 

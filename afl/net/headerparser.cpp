@@ -68,7 +68,7 @@ afl::net::HeaderParser::handleData(afl::base::ConstBytes_t& bytes)
                 m_hasErrors = true;
                 m_state = ErrorState;
                 break;
-                
+
              case ValueState:
                 if (!m_value.empty()) {
                     m_value.append(1, char(*p));

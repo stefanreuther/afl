@@ -356,7 +356,6 @@ afl::net::matchPath(const String_t& path, const String_t& prefix, String_t& suff
     } else {
         return false;
     }
-    
 }
 
 void

@@ -24,7 +24,6 @@ namespace afl { namespace data {
         virtual Value* createVector(Segment& values);
         virtual Value* createError(const String_t& source, const String_t& str);
         virtual Value* createNull();
-        
     };
 
 } }

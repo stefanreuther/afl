@@ -34,7 +34,7 @@ namespace {
         uint8_t offset;         // Offset, must be power of two
         uint8_t count;          // Number of characters
     };
-        
+
     const Mapping UPPERCASE_TABLE[] = {
         { 0x0061, 0x0041,    1,   26 },
         { 0x00B5, 0x039C,    1,    1 },

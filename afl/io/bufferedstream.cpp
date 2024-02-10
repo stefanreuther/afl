@@ -29,7 +29,7 @@ afl::io::BufferedStream::~BufferedStream()
         // So all we can do is ignore it.
     }
 }
-        
+
 size_t
 afl::io::BufferedStream::read(Bytes_t m)
 {
@@ -110,7 +110,6 @@ afl::io::BufferedStream::getSize()
         break;
     }
     return p;
-    
 }
 
 uint32_t

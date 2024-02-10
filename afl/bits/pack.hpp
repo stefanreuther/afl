@@ -23,7 +23,7 @@ namespace afl { namespace bits {
     /** Unpack an array from a byte buffer.
         The template parameter T is an element descriptor.
         See the description of afl/bits/pack.hpp for details.
- 
+
         \param T array element descriptor
         \param out [out] data array
         \param in [in] byte array
@@ -46,7 +46,7 @@ namespace afl { namespace bits {
     /** Pack an array into a byte buffer.
         The template parameter T is an element descriptor.
         See the description of afl/bits/pack.hpp for details.
- 
+
         \param T array element descriptor
         \param out [out] byte array
         \param in [in] data array */

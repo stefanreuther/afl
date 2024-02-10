@@ -49,7 +49,7 @@ class afl::functional::BinaryFunction<A1,A2,B>::ComposedFunction : public Binary
         : m_inner(inner),
           m_outer(outer)
         { }
-    
+
     virtual C get(A1 a1, A2 a2) const
         { return m_outer(m_inner(a1, a2)); }
 

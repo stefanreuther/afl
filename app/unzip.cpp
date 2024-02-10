@@ -22,7 +22,7 @@ int main(int, char** argv)
     using afl::io::FileSystem;
     using afl::io::Stream;
     using afl::io::DirectoryEntry;
-    
+
     try {
         // Get environment
         Environment& env = Environment::getInstance(argv);
@@ -34,7 +34,7 @@ int main(int, char** argv)
         if (!cmdl->getNextElement(fileName)) {
             std::cout << "usage: " << argv[0] << " FILE.zip [MEMBER...]\n";
             return 0;
-        }            
+        }
 
         // Open zip file
         FileSystem& fs = FileSystem::getInstance();

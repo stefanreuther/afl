@@ -56,7 +56,7 @@ class arch::posix::PosixInterrupt::Instance : public afl::async::Notifier {
     void notify(afl::async::Operation& op);
     void notifyDirect(afl::async::Operation& op);
 
- public:
+ private:
     const afl::async::InterruptOperation::Kind m_kind;
     const int m_signalNumber;
     PosixInterrupt& m_parent;

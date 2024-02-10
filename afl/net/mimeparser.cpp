@@ -162,7 +162,7 @@ namespace {
             : m_parent(parent),
               m_did(false)
             { }
-        
+
         bool getNextElement(MimeParser& result);
 
      private:
@@ -247,7 +247,7 @@ MessageIterator::getNextElement(MimeParser& result)
         return false;
     }
     m_did = true;
-    
+
     // Decode it
     copyBodyPart(m_parent, result, 0, m_parent.getBody().size());
     return true;

@@ -153,7 +153,7 @@ namespace afl { namespace net {
 
         // HeaderConsumer:
         virtual void handleHeader(String_t key, String_t value);
-        
+
         void addDataHeader(afl::base::ConstBytes_t& data);
         void addDataPlainBody(afl::base::ConstBytes_t& data);
         void addDataBase64Body(afl::base::ConstBytes_t& data);

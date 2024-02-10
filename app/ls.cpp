@@ -31,7 +31,7 @@ namespace {
         return s.size() >= suffix.size()
             && s.compare(s.size() - suffix.size(), suffix.size(), suffix) == 0;
     }
-    
+
     Ref<Directory> openDir(const String_t& arg)
     {
         if (arg == "--root") {

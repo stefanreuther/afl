@@ -43,7 +43,7 @@ namespace afl { namespace io {
             \retval false zlib functionality is not available; constructing InflateDataSink will fail */
         static bool isAvailable();
     };
-    
+
 } }
 
 #endif

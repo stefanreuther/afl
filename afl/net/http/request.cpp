@@ -162,7 +162,7 @@ afl::net::http::Request::isKeepalive() const
         // HTTP/0.9 never is keepalive because it delimits messages with connection-close
         return false;
     } else if (const HeaderField* hf = m_header.get("Connection")) {
-        // Explicit keep-alive request 
+        // Explicit keep-alive request
         return hf->getValue() == "keepalive";
     } else {
         // No header field; use default: keepalive for 1.1 only

@@ -170,7 +170,7 @@ arch::win32::Win32Directory::Entry::doRename(String_t newName)
     const afl::io::FileSystem::FileName_t utfOldName = getPathName();
     const afl::io::FileSystem::FileName_t utfNewName =
         Win32FileSystem().makePathName(m_parent->getDirectoryName(), newName);
-    
+
     if (hasUnicodeSupport()) {
         WStr uniOldName, uniNewName;
         convertToUnicode(uniOldName, afl::string::toMemory(utfOldName));

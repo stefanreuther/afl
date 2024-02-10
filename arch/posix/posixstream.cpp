@@ -165,13 +165,13 @@ arch::posix::PosixStream::init(afl::io::FileSystem::FileName_t name, afl::io::Fi
         m_capabilities = CanRead | CanWrite | CanSeek;
         m_fd = ::open(sysName.c_str(), O_RDWR | O_TRUNC | O_CREAT | O_LARGEFILE, 0666);
         break;
-        
+
      case afl::io::FileSystem::CreateNew:
         m_capabilities = CanRead | CanWrite | CanSeek;
         m_fd = ::open(sysName.c_str(), O_RDWR | O_EXCL | O_CREAT | O_LARGEFILE, 0666);
         break;
     }
- 
+
     if (m_fd < 0) {
         // FIXME: use a FileOpenException?
         error();

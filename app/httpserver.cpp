@@ -51,7 +51,7 @@ namespace {
         } else {
             return "application/octet-stream";
         }
-    }                          
+    }
 
     /*
      *  Sample Response implementation. This sends a file (Stream).

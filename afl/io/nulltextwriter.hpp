@@ -23,7 +23,6 @@ namespace afl { namespace io {
         /** Force output out. This implements flush(). */
         virtual void doFlush();
     };
-    
 
 } }
 

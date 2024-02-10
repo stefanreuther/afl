@@ -54,7 +54,7 @@ namespace afl { namespace net { namespace smtp {
             Content_2,          // receive content response, "2xx", then send QUIT
             Quit_2              // receive QUIT response, then quit
         };
-        
+
         Configuration m_config;
         afl::base::ConstBytes_t m_content;
         afl::base::Memory<const String_t> m_to;

@@ -158,7 +158,7 @@ namespace afl { namespace net {
         /** Get URL in string form.
             \return string */
         String_t toString() const;
-        
+
      private:
         /** URL scheme.
             Always in decoded form.

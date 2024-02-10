@@ -29,7 +29,7 @@ namespace afl { namespace net { namespace http {
 
         // DataSink:
         virtual bool handleData(afl::base::ConstBytes_t& data);
-        
+
      private:
         HeaderConsumer& m_consumer;
 

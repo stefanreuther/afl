@@ -114,7 +114,7 @@ afl::string::LanguageCode::generalize()
     while (pos >= 2 && (charIsUpper(m_code[pos-1]) || charIsLower(m_code[pos-1])) && isDelimiter(m_code[pos-2])) {
         pos -= 2;
     }
-            
+
     // Found valid result?
     // Need to check '>1' because 1 would mean we leave a one-character token
     if (pos > 1) {

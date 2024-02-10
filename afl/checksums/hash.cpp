@@ -50,7 +50,7 @@ afl::checksums::Hash::computeHMAC(ConstBytes_t key, ConstBytes_t data)
     for (size_t i = 0; i < sizeof(k_opad); ++i) {
         k_opad[i] ^= 0x5C;
     }
-    
+
     // Perform inner hash
     clear();
     add(Bytes_t(k_ipad).trim(blockSize));

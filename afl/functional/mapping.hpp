@@ -71,7 +71,7 @@ class afl::functional::Mapping<A,B>::ComposedMapping : public Mapping<A,C> {
         : m_inner(inner),
           m_outer(outer)
         { }
-    
+
     virtual C get(A a) const
         { return m_outer(m_inner(a)); }
 
@@ -104,5 +104,5 @@ afl::functional::Mapping<A,B>::map(const UnaryFunction<B,C>& function) const
 {
     return ComposedMapping<C>(*this, function);
 }
-    
+
 #endif

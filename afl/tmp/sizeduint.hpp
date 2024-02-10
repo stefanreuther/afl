@@ -13,7 +13,7 @@ namespace afl { namespace tmp {
     /** Integer with a fixed byte size.
         Given an integer, returns one of uint8_t, uint16_t, uint32_t, or uint64_t,
         if the size matches the type. Otherwise, returns a default.
-    
+
         \param N desired size.
         \param Default default value to return if none matches. */
     template<size_t N, typename Default = void>

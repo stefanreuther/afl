@@ -35,7 +35,7 @@ namespace afl { namespace sys {
             This can be useful when chaining Log instances together.
             \param msg Message */
         void handleMessage(const Message& msg);
-        
+
         /** Get default instance.
             \return a default instance of the Log class.
             This is a useful default log target for all components until a different one is configured. */

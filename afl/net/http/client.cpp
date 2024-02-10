@@ -153,7 +153,7 @@ afl::net::http::Client::run()
             processCancels(ctl);
             wakeActive = false;
         } else {
-            // No external call. Handle with internal 
+            // No external call. Handle with internal
             uint32_t now = afl::sys::Time::getTickCounter();
             uint32_t elapsed = now - time;
             time = now;

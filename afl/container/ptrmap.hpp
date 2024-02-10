@@ -60,7 +60,7 @@ namespace afl { namespace container {
      private:
         /** Content. Implemented by mapping to void*, to share implementation. */
         std::map<Key,void*> m_data;
-        
+
         void deleteAll();
     };
 

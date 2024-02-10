@@ -125,7 +125,7 @@ afl::net::resp::ProtocolHandler::handleNewValue(afl::data::Value* p)
 
      private:
         CommandHandler& m_ch;
-        afl::io::resp::Writer& m_writer;        
+        afl::io::resp::Writer& m_writer;
         void fail()
             { m_writer.sendError(afl::string::Messages::invalidOperation()); }
     };

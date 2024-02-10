@@ -71,7 +71,7 @@ afl::string::toBytes(const char* ntbs)
     return ntbs != 0
         ? afl::base::ConstBytes_t::unsafeCreate(reinterpret_cast<const uint8_t*>(ntbs), std::strlen(ntbs))
         : afl::base::ConstBytes_t();
-    
+
 }
 
 String_t

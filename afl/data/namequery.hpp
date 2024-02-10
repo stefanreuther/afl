@@ -64,7 +64,7 @@ namespace afl { namespace data {
         afl::string::ConstStringMemory_t m_text;
         size_t m_hashCode;
     };
-    
+
 } }
 
 
