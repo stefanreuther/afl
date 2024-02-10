@@ -105,6 +105,10 @@ namespace afl { namespace net { namespace http {
         String_t m_failureMessage;
     };
 
+    /** Convert SimpleDownloadListener::Status to string.
+        The response is intended for technical users/logfiles and thus not translated. */
+    String_t toString(SimpleDownloadListener::Status st);
+
 } } }
 
 #endif

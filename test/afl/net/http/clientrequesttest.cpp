@@ -6,10 +6,12 @@
 #include "afl/net/http/clientrequest.hpp"
 #include "afl/test/testrunner.hpp"
 
-AFL_TEST("afl.net.http.ClientRequest", a)
+using afl::net::http::ClientRequest;
+
+AFL_TEST("afl.net.http.ClientRequest:interface", a)
 {
     // Test interface instance
-    class Tester : public afl::net::http::ClientRequest {
+    class Tester : public ClientRequest {
      public:
         virtual afl::net::Name getName() const
             { return afl::net::Name(); }
@@ -37,4 +39,14 @@ AFL_TEST("afl.net.http.ClientRequest", a)
 
     t.setRequestId(999999999);
     a.checkEqual("getRequestId set", t.getRequestId(), 999999999U);
+}
+
+AFL_TEST("afl.net.http.ClientRequest:toString", a)
+{
+    a.checkDifferent("01", toString(ClientRequest::Cancelled),           "");
+    a.checkDifferent("02", toString(ClientRequest::ConnectionFailed),    "");
+    a.checkDifferent("03", toString(ClientRequest::ConnectionClosed),    "");
+    a.checkDifferent("04", toString(ClientRequest::UnsupportedProtocol), "");
+    a.checkDifferent("05", toString(ClientRequest::NetworkError),        "");
+    a.checkDifferent("06", toString(ClientRequest::ServerError),         "");
 }

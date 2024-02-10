@@ -102,3 +102,15 @@ afl::net::http::SimpleDownloadListener::handleSuccess()
 {
     m_semaphore.post();
 }
+
+String_t
+afl::net::http::toString(SimpleDownloadListener::Status st)
+{
+    switch (st) {
+     case SimpleDownloadListener::Succeeded:     return "Succeeded";
+     case SimpleDownloadListener::Failed:        return "Failed";
+     case SimpleDownloadListener::TimedOut:      return "TimedOut";
+     case SimpleDownloadListener::LimitExceeded: return "LimitExceeded";
+    }
+    return "?";
+}

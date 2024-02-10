@@ -113,6 +113,10 @@ namespace afl { namespace net { namespace http {
         uint32_t m_requestId;
     };
 
+    /** Convert ClientResponse::FailureReason to string.
+        The response is intended for technical users/logfiles and thus not translated. */
+    String_t toString(ClientRequest::FailureReason r);
+
 } } }
 
 inline
