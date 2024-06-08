@@ -12,12 +12,12 @@
 namespace afl { namespace string {
 
     /** Parse decimal string into integer (strtol/strtoul).
-        \param T Numeric type (signed or unsigned integer, up to long/int32_t)
+        \tparam T Numeric type (signed or unsigned integer, up to long/int32_t)
         \param str   [in] String to parse
         \param value [out] Value; modified only if string is completely valid
         \param pos   [out] If string is not valid, number of characters that form a possibly-valid prefix
-        \retval true String was completely valid, #value has been set.
-        \retval false String was not completely valid, #pos has been set. */
+        \retval true String was completely valid, \c value has been set.
+        \retval false String was not completely valid, \c pos has been set. */
     template<typename T>
     bool strToInteger(const String_t& str, T& value, String_t::size_type& pos);
     bool strToInteger(const String_t& str, long& value, String_t::size_type& pos);
@@ -27,10 +27,10 @@ namespace afl { namespace string {
 
     /** Parse decimal string into integer (strtol/strtoul).
         This differs from the other signature in that it does not return the position.
-        \param T Numeric type (signed or unsigned integer, up to long/int32_t)
+        \tparam T Numeric type (signed or unsigned integer, up to long/int32_t)
         \param str   [in] String to parse
         \param value [out] Value; modified only if string is completely valid
-        \retval true String was completely valid, #value has been set.
+        \retval true String was completely valid, \c value has been set.
         \retval false String was not completely valid. */
     template<typename T>
     bool strToInteger(const String_t& str, T& value);
@@ -39,15 +39,15 @@ namespace afl { namespace string {
         \param str   [in] String to parse
         \param value [out] Value; modified only if string is completely valid
         \param pos   [out] If string is not valid, number of characters that form a possibly-valid prefix
-        \retval true String was completely valid, #value has been set.
-        \retval false String was not completely valid, #pos has been set. */
+        \retval true String was completely valid, \c value has been set.
+        \retval false String was not completely valid, \c pos has been set. */
     bool strToFloat(const String_t& str, double& value, String_t::size_type& pos);
 
     /** Parse decimal string into floating-point number (strtod).
         This differs from the other signature in that it does not return the position.
         \param str   [in] String to parse
         \param value [out] Value; modified only if string is completely valid
-        \retval true String was completely valid, #value has been set.
+        \retval true String was completely valid, \c value has been set.
         \retval false String was not completely valid. */
     bool strToFloat(const String_t& str, double& value);
 } }

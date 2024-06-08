@@ -25,7 +25,7 @@ namespace afl { namespace net { namespace http {
         Request();
 
         /** Push header data.
-            \param data [in/out] On input, data to process. On output, remaining unprocessed data.
+            \param bytes [in/out] On input, data to process. On output, remaining unprocessed data.
             \retval false More data required (%data is empty)
             \retval true No more data required (%data has unprocessed data) */
         bool handleData(afl::base::ConstBytes_t& bytes);

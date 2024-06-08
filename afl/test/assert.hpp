@@ -39,7 +39,7 @@ namespace afl { namespace test {
             \throw afl::except::AssertionFailedException if condition==false */
         void check(const String_t& info, bool condition) const;
 
-        /** Check for non-null object..
+        /** Check for non-null object.
             \param info Information string to be passed into exception
             \param p Pointer to check
             \return *p

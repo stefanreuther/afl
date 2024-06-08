@@ -21,7 +21,7 @@ namespace afl { namespace io {
     class BufferedStream : public MultiplexableStream, public afl::base::Uncopyable {
      public:
         /** Constructor.
-            \param s Underlying stream. Lifetime must be managed such that #s outlives the BufferedStream object. */
+            \param s Underlying stream. Lifetime must be managed such that \c s outlives the BufferedStream object. */
         BufferedStream(Stream& s);
 
         /** Destructor. */
@@ -91,7 +91,7 @@ namespace afl { namespace io {
         /** Buffer data. Accessed through m_buffer. */
         uint8_t m_rawBuffer[1024];
 
-        /** Set mode. Prepares for the operation specified as #m.
+        /** Set mode. Prepares for the operation specified as \c m.
             \param m New operation. */
         void setMode(Mode m);
 

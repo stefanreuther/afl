@@ -46,7 +46,7 @@ namespace afl { namespace base {
 
             If the operation fails, deletes p and rethrows the exception.
 
-            \param T type of object. Must be a descendant of Deletable.
+            \tparam T type of object. Must be a descendant of Deletable.
             \param p Object. Must not be NULL.
             \return *p */
         template<class T> T& addNew(T* p);

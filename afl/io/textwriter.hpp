@@ -35,7 +35,7 @@ namespace afl { namespace io {
             Writes text to the output device.
             Does not append a line separator; see writeLine for that.
             Embedded newlines are converted to proper output newlines.
-            \param text [in] line in UTF-8
+            \param data [in] line in UTF-8
             \throw FileProblemException if data cannot be written. */
         void writeText(afl::string::ConstStringMemory_t data);
 

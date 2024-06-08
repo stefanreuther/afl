@@ -130,7 +130,7 @@ namespace afl { namespace container {
         /** Sort by predicate.
             Null elements are sorted at the end.
             Non-null elements are sorted by comparing their content using p::operator()(T,T).
-            \param Predicate predicate type
+            \tparam Predicate predicate type
             \param p Predicate instance */
         template<typename Predicate>
         void sort(Predicate p);

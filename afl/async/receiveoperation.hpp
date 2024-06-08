@@ -25,7 +25,7 @@ namespace afl { namespace async {
         ReceiveOperation();
 
         /** Set data buffer.
-            Calling this resets the object back to the state as if it had been constructed giving #data as parameter.
+            Calling this resets the object back to the state as if it had been constructed giving \c data as parameter.
             \param data Buffer for data to receive */
         void setData(afl::base::Bytes_t data);
 

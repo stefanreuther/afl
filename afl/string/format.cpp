@@ -18,11 +18,11 @@
   *  </pre>
   *  which is easier to translate.
   *
-  *  The disadvantage of #sprintf is that it is not typesafe and not extensible.
+  *  The disadvantage of \c sprintf is that it is not typesafe and not extensible.
   *  How do we solve that? Instead of relying on the format string for types,
   *  we take type information from the compiler, and only use the format string as a guide.
   *  For example, using "%d" to output a number gets you the number in decimal, "%x" gets you lower-case hex.
-  *  Unlike #sprintf, however, "%s" does not try to output the thing as a string; in this case it'll get you decimal.
+  *  Unlike \c sprintf, however, "%s" does not try to output the thing as a string; in this case it'll get you decimal.
   *
   *  Extensibility is achieved by implementing the actual formatting in a FormatTraits template,
   *  which receives the parsed format placeholder in a FormatState object.

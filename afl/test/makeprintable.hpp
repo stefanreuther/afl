@@ -7,7 +7,7 @@
 
 namespace afl { namespace test {
 
-    /** @func makePrintable
+    /** @fn makePrintable
 
         @brief Making Things Printable
 

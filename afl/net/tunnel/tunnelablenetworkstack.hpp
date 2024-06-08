@@ -42,7 +42,7 @@ namespace afl { namespace net { namespace tunnel {
         bool add(const String_t& link);
 
         /** Add tunnel (URL).
-            \param link Tunnel link in parsed Url form (see class description)
+            \param url Tunnel link in parsed Url form (see class description)
             \return true if link could be processed correctly (no statement whether the tunnel server can be reached) */
         bool add(const Url& url);
 

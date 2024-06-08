@@ -40,7 +40,7 @@ namespace afl { namespace base {
 
         /** Copy constructor for related object.
             Makes a copy of a related object.
-            \param OtherStorage,OtherNull,OtherUser Parameters for other type.
+            \tparam OtherStorage,OtherNull,OtherUser Parameters for other type.
             \param other Object to copy from */
         template<typename OtherStorage, OtherStorage OtherNull, class OtherUser>
         InlineOptional(const InlineOptional<OtherStorage, OtherNull, OtherUser>& other);
@@ -69,21 +69,7 @@ namespace afl { namespace base {
             \param value Nothing
             \return *this
             \see clear */
-        InlineOptional& operator=(NothingType);
-
-        // /** Get contained object.
-        //     If this object contains a value, returns a pointer to it.
-        //     Otherwise, returns null.
-        //     Use as "if (const T* p = x.get()) {...}".
-        //     \return pointer */
-        // const T* get() const;
-
-        // /** Get contained object.
-        //     If this object contains a value, returns a pointer to it.
-        //     Otherwise, returns null.
-        //     Use as "if (const T* p = x.get()) {...}".
-        //     \return pointer */
-        // T* get();
+        InlineOptional& operator=(NothingType value);
 
         /** Get contained object, copy-out version.
             If this object contains a value, copies it to the provided variable.
@@ -96,18 +82,6 @@ namespace afl { namespace base {
             \retval true This object contains a value
             \retval false This object is empty */
         bool isValid() const;
-
-        // /** Assign a value.
-        //     Makes this object contain %value.
-        //     If this object already contains a value, assigns it internally; otherwise, constructs a copy.
-        //     This method allows a possibly mixed-type assignment,
-        //     e.g. Optional<String_t>::assign("const char*").
-        //     \param Other Related type
-        //     \param value Object to copy from
-        //     \return *this
-        //     \see assign */
-        // template<typename Other>
-        // void assign(const Other& value);
 
         /** Clear content.
             Makes this object contain nothing. */

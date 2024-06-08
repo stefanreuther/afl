@@ -45,7 +45,7 @@ namespace afl { namespace io {
             \param line [out] line in UTF-8
             \retval true Line was read
             \retval false No line was read because the stream ended; line is the empty string */
-        virtual bool doReadLine(String_t& out) = 0;
+        virtual bool doReadLine(String_t& line) = 0;
 
      private:
         LineNumber_t m_lineNumber;

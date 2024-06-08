@@ -35,7 +35,7 @@ namespace afl { namespace test {
         void expectCall(const String_t& list);
 
         /** Provide a return value (call from test).
-            \param expected result, newly allocated */
+            \param value expected result, newly allocated */
         void provideNewResult(Value_t* value);
 
         /** Verify that call sequence is complete (call from test).

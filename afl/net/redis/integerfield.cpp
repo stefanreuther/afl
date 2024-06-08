@@ -41,9 +41,9 @@ afl::net::redis::IntegerField::operator--()
 
 // Decrement (HINCRBY).
 int32_t
-afl::net::redis::IntegerField::operator-=(int32_t incr)
+afl::net::redis::IntegerField::operator-=(int32_t decr)
 {
-    return operator+=(-incr);
+    return operator+=(-decr);
 }
 
 // Set value (HSET).

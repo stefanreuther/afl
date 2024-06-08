@@ -69,7 +69,7 @@ namespace afl { namespace io {
 
      protected:
         // TextReader:
-        virtual bool doReadLine(String_t& out);
+        virtual bool doReadLine(String_t& line);
 
         // TextWriter:
         virtual void doWriteText(afl::string::ConstStringMemory_t data);

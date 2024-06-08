@@ -11,7 +11,7 @@ namespace afl { namespace bits {
 
     /** Check for power of two.
         Templatized to avoid unneeded widening of the operands.
-        \param T value type
+        \tparam T value type
         \param i value
         \return true iff i is a power of two. 0 is considered a power of two by this function. */
     template<typename T>

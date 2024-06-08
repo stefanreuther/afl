@@ -25,10 +25,10 @@ namespace afl { namespace net {
         - fragment (optional)
 
         Possible syntactic forms:
-        - scheme:path[#fragment]
-        - scheme://host[:port][path][#fragment]
-        - scheme://user[:password]@host[:port][path][#fragment]
-        - path[#fragment]
+        - scheme:path[\#fragment]
+        - scheme://host[:port][path][\#fragment]
+        - scheme://user[:password]\@host[:port][path][\#fragment]
+        - path[\#fragment]
 
         The path includes a possible query string. */
     class Url {
@@ -214,6 +214,7 @@ namespace afl { namespace net {
         - "/"
         - "/dir1"
 
+        \param path [in] Path to check
         \param prefix [in] Expected path prefix
         \param suffix [out] Path suffix
         \retval true match succeeded; \c suffix has been set

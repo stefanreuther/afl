@@ -118,7 +118,7 @@ namespace afl { namespace io { namespace xml {
         bool readByte(uint8_t& out);
         void refillBuffer();
         void detectEncoding();
-        size_t readCharacterSequence(int cl, String_t* accum);
+        size_t readCharacterSequence(int acceptClasses, String_t* accum);
         void readUnparsedCharacterData(String_t& out);
         String_t expandEntities(String_t s);
     };

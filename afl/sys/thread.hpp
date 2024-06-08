@@ -42,7 +42,7 @@ namespace afl { namespace sys {
         <b>Bad implementation patterns</b>
 
         (x) Derive from Stoppable. Make the Thread not the last member.
-        If you do not manually call stop(), join(), <me>this does not work</em>.
+        If you do not manually call stop(), join(), <em>this does not work</em>.
         Thread will attempt to call stop().
         However the members stop() uses will already have been destroyed. */
     class Thread : public afl::base::Uncopyable {
@@ -77,7 +77,7 @@ namespace afl { namespace sys {
         const String_t& getName() const;
 
         /** Sleep.
-            Defers the current thread's execution by #time milliseconds.
+            Defers the current thread's execution by \c time milliseconds.
 
             Note that various events can cause the thread to sleep longer (busy CPU)
             or shorter (rounding, interrupts);

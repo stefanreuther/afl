@@ -24,7 +24,7 @@ namespace afl { namespace bits {
         The template parameter T is an element descriptor.
         See the description of afl/bits/pack.hpp for details.
 
-        \param T array element descriptor
+        \tparam T array element descriptor
         \param out [out] data array
         \param in [in] byte array
         \param defaultValue [in] default value to place in destination array for insufficient input */
@@ -47,7 +47,7 @@ namespace afl { namespace bits {
         The template parameter T is an element descriptor.
         See the description of afl/bits/pack.hpp for details.
 
-        \param T array element descriptor
+        \tparam T array element descriptor
         \param out [out] byte array
         \param in [in] data array */
     template<typename T>

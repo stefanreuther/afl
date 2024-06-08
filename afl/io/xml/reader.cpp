@@ -498,7 +498,7 @@ afl::io::xml::Reader::detectEncoding()
 }
 
 /** Read character sequence.
-    \param cl     [in] Character classes to accept, plus optional options.
+    \param acceptClasses [in] Character classes to accept, plus optional options.
     \param accum  [out,optional] Characters will be stored here
     \return Number of characters read */
 size_t

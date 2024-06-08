@@ -256,7 +256,7 @@ afl::io::archive::ZipReader::ZipDirEnum::getNextElement(afl::base::Ptr<afl::io::
 /************************ ZipReader::ZipStoredMember ***********************/
 
 /** Constructor.
-    \param parent Link to containing zip file.
+    \param file Underlying file
     \param entry Index entry for this member */
 afl::io::archive::ZipReader::ZipStoredMember::ZipStoredMember(afl::base::Ref<Stream> file, const IndexEntry& entry)
     : m_file(file),

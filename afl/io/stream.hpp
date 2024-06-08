@@ -125,13 +125,13 @@ namespace afl { namespace io {
          */
 
         /** Full read.
-            Attempts to read all of #m, retrying partial reads if necessary.
+            Attempts to read all of \c m, retrying partial reads if necessary.
             If not enough data can be read, throws a FileTooShortException.
             \param m Memory to read. */
         void fullRead(Bytes_t m);
 
         /** Full write.
-            Attempts to write all of #m, retrying partial writes if necessary.
+            Attempts to write all of \c m, retrying partial writes if necessary.
             If not enough data can be read, throws a FileProblemException.
             \param m Memory to write. */
         void fullWrite(ConstBytes_t m);
@@ -142,13 +142,13 @@ namespace afl { namespace io {
         bool hasCapabilities(uint32_t which);
 
         /** Copy from another stream.
-            Copies as many bytes as possible, i.e. until #other ends.
+            Copies as many bytes as possible, i.e. until \c other ends.
             \param other Stream to copy from */
         // FIXME: progress indicator?
         void copyFrom(Stream& other);
 
         /** Copy bytes from another stream.
-            Copies precisely #size bytes from another stream.
+            Copies precisely \c size bytes from another stream.
             Throws a FileTooShortException if the source stream can not supply enough data.
             \param other Stream to copy from
             \param size Number of bytes to copy */

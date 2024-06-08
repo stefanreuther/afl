@@ -44,7 +44,7 @@ namespace afl { namespace base {
         Ref(const Ref& other);
 
         /** Converting copy constructor.
-            \param U source type (must be derived class of T)
+            \tparam U source type (must be derived class of T)
             \param other other smart pointer */
         template<typename U>
         Ref(const Ref<U>& other);

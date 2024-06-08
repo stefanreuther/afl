@@ -23,7 +23,7 @@ namespace afl { namespace data {
         static const size_t HASH_MAX = 64;
 
         /** Construct from string.
-            \param tmp string */
+            \param str string */
         NameQuery(const String_t& str);
 
         /** Construct from string.
@@ -53,7 +53,7 @@ namespace afl { namespace data {
         bool before(const char* str) const;
 
         /** Compare prefix.
-            \param str string to compare
+            \param prefix string to compare
             \return true if this NameQuery was constructed from a string that starts with \c prefix. */
         bool startsWith(const char* prefix) const;
 

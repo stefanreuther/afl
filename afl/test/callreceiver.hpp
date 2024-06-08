@@ -74,7 +74,7 @@ namespace afl { namespace test {
 
         /** Consume a return value (call from mock).
             \tparam T type
-            \param t value */
+            \return value */
         template<typename T>
         T& consumeReturnValue();
 

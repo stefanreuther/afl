@@ -39,13 +39,13 @@ namespace afl { namespace base {
 
         /** Construct from array.
             The descriptor refers to the array.
-            \param N array size
+            \tparam N array size
             \param array data */
         template<size_t N>
         Memory(T (&array)[N]);
 
         /** Construct from different type.
-            \param U other type. Must be equivalent to this descriptor's type, but can have more CV qualifiers.
+            \tparam U other type. Must be equivalent to this descriptor's type, but can have more CV qualifiers.
             \param other other descriptor */
         template<typename U>
         Memory(Memory<U> other);
@@ -102,7 +102,7 @@ namespace afl { namespace base {
             and handles the case that %amount is a value other than a %size_t
             (including half-word, double-word, and signed values).
 
-            \param Size_t size type, any integer type
+            \tparam Size_t size type, any integer type
             \param amount [in/out] On input, number of elements to chop off.
             On output, number of "missing" elements (0 if all requested elements were found).
             \return descriptor to the removed elements */
@@ -158,7 +158,7 @@ namespace afl { namespace base {
             This is treated as a safe operation because it's intended to be used in a
             "if (T (*p)[N] = eatN<N>())" pattern.
 
-            \param N number of bytes to remove
+            \tparam N number of bytes to remove
             \return pointer to array of N bytes, 0 if that could not be extracted */
         template<size_t N>
         T (*eatN())[N];

@@ -42,14 +42,14 @@ namespace afl { namespace base {
 
         /** Copy constructor.
             Makes a copy of a related object.
-            \param Other Other type. Must be assignable to T.
+            \tparam Other Other type. Must be assignable to T.
             \param other Object to copy from */
         template<typename Other>
         Optional(const Optional<Other>& other);
 
         /** Copy constructor.
             Makes a copy of a related InlineOptional object.
-            \param OtherStorage,OtherNull,OtherUser Parameters for other type.
+            \tparam OtherStorage,OtherNull,OtherUser Parameters for other type.
             \param other Object to copy from */
         template<typename OtherStorage, OtherStorage OtherNull, class OtherUser>
         Optional(const InlineOptional<OtherStorage, OtherNull, OtherUser>& other);
@@ -79,7 +79,7 @@ namespace afl { namespace base {
             \param value Nothing
             \return *this
             \see clear */
-        Optional& operator=(NothingType);
+        Optional& operator=(NothingType value);
 
         /** Get contained object.
             If this object contains a value, returns a pointer to it.
@@ -112,7 +112,7 @@ namespace afl { namespace base {
             If this object already contains a value, assigns it internally; otherwise, constructs a copy.
             This method allows a possibly mixed-type assignment,
             e.g. Optional<String_t>::assign("const char*").
-            \param Other Related type
+            \tparam Other Related type
             \param value Object to copy from
             \return *this
             \see assign */

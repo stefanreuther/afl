@@ -34,7 +34,7 @@ namespace afl { namespace base {
             ~SignalBase();
 
             /** Add static function.
-                \param Fun function type
+                \tparam Fun function type
                 \param f Function as appropriate for the derived signal
                 \return SignalHandler (for use in a SignalConnection) */
             template<typename Fun>
@@ -42,8 +42,8 @@ namespace afl { namespace base {
                 { return addNewClosure(Closure_t::makeStatic(f)); }
 
             /** Add bound function.
-                \param Obj object pointer type
-                \param Fun function type
+                \tparam Obj object pointer type
+                \tparam Fun function type
                 \param obj Object pointer
                 \param f member function as appropriate for the derived signal
                 \return SignalHandler (for use in a SignalConnection) */
@@ -52,8 +52,8 @@ namespace afl { namespace base {
                 { return addNewClosure(Closure_t::makeBound(obj, f)); }
 
             /** Add bound function, with lifetime control.
-                \param Obj object pointer type
-                \param Fun function type
+                \tparam Obj object pointer type
+                \tparam Fun function type
                 \param obj Object pointer. Ownership is taken by signal.
                 \param f member function as appropriate for the derived signal
                 \return SignalHandler (for use in a SignalConnection) */

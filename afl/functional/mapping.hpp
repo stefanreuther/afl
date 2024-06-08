@@ -54,7 +54,7 @@ namespace afl { namespace functional {
 
             This function is reimplemented from UnaryFunction to pass on the getFirstKey()/getNextKey() functions.
 
-            \param C final result type
+            \tparam C final result type
             \param function transformation function
             \return composed mapping */
         template<typename C>

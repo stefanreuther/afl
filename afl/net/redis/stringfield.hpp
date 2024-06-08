@@ -19,7 +19,7 @@ namespace afl { namespace net { namespace redis {
         StringField(HashKey& hash, const String_t& name);
 
         /** Set value (HSET).
-            \param newValue new value
+            \param value new value
             \retval false field already existed and was updated
             \retval true field did not yet exist and was created */
         bool set(String_t value);

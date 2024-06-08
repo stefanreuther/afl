@@ -273,7 +273,7 @@ afl::io::archive::TarReader::TarDirEnum::getNextElement(afl::base::Ptr<afl::io::
 /************************ TarReader::TarStoredMember ***********************/
 
 /** Constructor.
-    \param parent Link to containing tar file.
+    \param file Underlying file
     \param entry Index entry for this member */
 afl::io::archive::TarReader::TarStoredMember::TarStoredMember(afl::base::Ref<Stream> file, const IndexEntry& entry)
     : m_file(file),

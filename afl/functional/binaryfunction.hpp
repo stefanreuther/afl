@@ -33,7 +33,7 @@ namespace afl { namespace functional {
             The result is another binary function.
             If <tt>c = a.map(b)</tt>, <tt>c(x,y) = b(a(x,y))</tt>.
 
-            \param C final result type
+            \tparam C final result type
             \param function transformation function */
         template<typename C>
         ComposedFunction<C> map(const UnaryFunction<B,C>& function) const;

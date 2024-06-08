@@ -346,7 +346,7 @@ afl::io::json::Parser::parseString()
 }
 
 /** Internal - Expect a character.
-    Makes sure that we are about to read the character specified in #which (but does not consume it).
+    Makes sure that we are about to read the character specified in \c which (but does not consume it).
     If this assumption fails, throws an appropriate exception (syntaxError, endOfFile).
     \param which Character to expect */
 void

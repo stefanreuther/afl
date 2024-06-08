@@ -14,10 +14,10 @@ namespace afl { namespace string {
         This class contains all information extracted from a format string, needed to format a single argument.
         It consists of two parts:
         - per-argument state: this is the result of parsing the format place-holder.
-          It is provided by #Format, and read by the #FormatTraits implementation.
+          It is provided by Format, and read by the FormatTraits implementation.
           It is reset after each placeholder format.
         - persistent state: this is the result of formatting placeholders, controlling conditionals.
-          It is set by the #FormatTraits implementation, and evaluated by #Format.
+          It is set by the FormatTraits implementation, and evaluated by Format.
           It is persistent over multiple format operations. */
     class FormatState {
      public:
@@ -92,11 +92,11 @@ namespace afl { namespace string {
         void setCondition(Condition which, bool value);
 
         /** Set number states for a string interpreted as a number (persistent state).
-            Assumes that the #data refers to a number stringified with possibly fancy options
+            Assumes that the \c data refers to a number stringified with possibly fancy options
             (such as added unit before/after, grouping, whitespace, etc.),
             and sets the ZeroCondition and OneCondition accordingly.
 
-            The idea is to make it possible for #Format to handle numeric conditions
+            The idea is to make it possible for Format to handle numeric conditions
             even if the input numbers are formatted by an external formatter.
 
             \param data [in] String */

@@ -24,7 +24,7 @@ namespace afl { namespace async {
         SendOperation();
 
         /** Set data.
-            Calling this resets the object back to the state as if it had been constructed giving #data as parameter.
+            Calling this resets the object back to the state as if it had been constructed giving \c data as parameter.
             \param data Data to send */
         void setData(afl::base::ConstBytes_t data);
 

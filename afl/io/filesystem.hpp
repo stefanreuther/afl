@@ -104,10 +104,10 @@ namespace afl { namespace io {
         virtual bool isPathSeparator(char c) = 0;
 
         /** Make path name from path and subsequent file name.
-            Interprets #name as a relative file name as seen from #path.
+            Interprets \c name as a relative file name as seen from \c path.
             Constructs a joint path name that points to that file,
             usually by concatenating both with a path separator inbetween
-            (unless, for example, the #name already is an absolute name).
+            (unless, for example, the \c name already is an absolute name).
 
             The result is neither guaranteed to be canonical nor absolute.
 

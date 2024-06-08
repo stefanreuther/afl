@@ -336,7 +336,7 @@ AFL_TEST("afl.io.archive.ZipReader:unsupported:encryption", a)
 AFL_TEST("afl.io.archive.ZipReader:unsupported:compression", a)
 {
     // Open zip file
-    afl::base::Ref<afl::io::archive::ZipReader> testee(afl::io::archive::ZipReader::open(*new afl::io::ConstMemoryStream(CRYPT_ZIP), 0));
+    afl::base::Ref<afl::io::archive::ZipReader> testee(afl::io::archive::ZipReader::open(*new afl::io::ConstMemoryStream(UNSUPP_ZIP), 0));
 
     // Try to read the members (treated as nonexistant because they cannot be decompressed)
     AFL_CHECK_THROWS(a("openFile 1"), testee->openFile("TURBOC.CFG", afl::io::FileSystem::OpenRead), afl::except::FileProblemException);

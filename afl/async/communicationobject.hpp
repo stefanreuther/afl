@@ -83,7 +83,7 @@ namespace afl { namespace async {
         /** Full send, synchronous.
             If the send() function returns partial sends, this function retries until all data has been sent.
             This blocks the current thread until the operation has been performed or the timeout expires.
-            \paral ctl Controller
+            \param ctl Controller
             \param bytes Bytes to send
             \param timeout Timeout in milliseconds
             \throw afl::except::FileProblemException send() returns a timeout or refuses to send.
@@ -93,7 +93,7 @@ namespace afl { namespace async {
         /** Full receive, synchronous.
             If the receive() function returns partial data, this function retries until the full buffer has been received.
             This blocks the current thread until the operation has been performed or the timeout expires.
-            \paral ctl Controller
+            \param ctl Controller
             \param bytes Buffer to receive
             \param timeout Timeout in milliseconds
             \throw afl::except::FileProblemException send() returns a timeout or refuses to receive.

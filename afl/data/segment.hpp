@@ -125,7 +125,7 @@ namespace afl { namespace data {
         Segment& pushBackString(const char* value);
 
         /** Push content of array.
-            \param T type of elements; one of Segment, IntegerList_t, StringList_t.
+            \tparam T type of elements; one of Segment, IntegerList_t, StringList_t.
             \param array Array of values to push
             \return *this */
         template<typename T>
@@ -164,7 +164,7 @@ namespace afl { namespace data {
         Value* extractTop();
 
         /** Transfer elements from this stack segment to another one.
-            The top #count elements are transferred to #other without changing their order.
+            The top \c count elements are transferred to \c other without changing their order.
             \param count Number of elements
             \param other Target segment */
         void transferLastTo(Offset_t count, Segment& other);

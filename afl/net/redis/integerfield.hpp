@@ -29,7 +29,7 @@ namespace afl { namespace net { namespace redis {
 
         /** Increment (HINCRBY).
             Atomically increment the current value by the given value and returns the new value.
-            \param val Value to add
+            \param incr Value to add
             \return new value */
         int32_t operator+=(int32_t incr);
 
@@ -40,12 +40,12 @@ namespace afl { namespace net { namespace redis {
 
         /** Decrement (HINCRBY).
             Atomically decrement the current value by the given value and returns the new value.
-            \param val Value to subtract
+            \param decr Value to subtract
             \return new value */
-        int32_t operator-=(int32_t incr);
+        int32_t operator-=(int32_t decr);
 
         /** Set value (HSET).
-            \param newValue new value
+            \param value new value
             \retval false field already existed and was updated
             \retval true field did not yet exist and was created */
         bool set(int32_t value);

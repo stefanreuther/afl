@@ -53,7 +53,7 @@ namespace afl { namespace base {
 
         /** Assignment operator.
             Makes this WeakLink point at the given object.
-            \param p pointer
+            \param rhs pointer
             \return *this */
         WeakLink& operator=(Target* rhs)
             { BaseWeakLink::reset(rhs); return *this; }

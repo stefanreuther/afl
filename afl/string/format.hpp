@@ -84,8 +84,8 @@ namespace afl { namespace string {
           hence the other integer things work, too.
 
         Format strings can contain conditional constructs.
-        - \%<n>{\<value-if-true>\%}
-        - \%<n>{\<value-if-true>\%|\<value-if-false>\%}
+        - \%\<n>{\<value-if-true>\%}
+        - \%\<n>{\<value-if-true>\%|\<value-if-false>\%}
 
         \<n> is the number of the condition we're testing, 0 to 31.
         If omitted, it is zero.
@@ -267,7 +267,7 @@ namespace afl { namespace string {
             }
 
         /** Add one parameter.
-            \param T type
+            \tparam T type
             \param arg value
             \return *this */
         template<typename T>

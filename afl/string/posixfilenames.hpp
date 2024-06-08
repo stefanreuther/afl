@@ -39,7 +39,7 @@ namespace afl { namespace string {
         bool isPathSeparator(char c) const;
 
         /** Make path name from path and subsequent file name.
-            Interprets #name as a relative file name as seen from #path.
+            Interprets \c name as a relative file name as seen from \ path.
             Constructs a joint path name that points to that file.
 
             \param path Origin path, UTF-8 encoded.

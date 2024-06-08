@@ -55,7 +55,7 @@ namespace afl { namespace string {
     /** Convert limited null-terminated string (C string) to StringMemory.
         Returns a memory object describing the string's characters,
         NOT including the terminating null byte.
-        Returns at most #maxLen bytes.
+        Returns at most \c maxLen bytes.
         \param ntbs C string (can be null; will then be treated as empty string)
         \param maxLen maximum length
         \return memory descriptor */

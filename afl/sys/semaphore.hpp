@@ -31,7 +31,7 @@ namespace afl { namespace sys {
         void wait();
 
         /** Decrease semaphore value by one, with timeout.
-            If the semaphore's value is zero, waits for #timeout milliseconds that another thread calls post().
+            If the semaphore's value is zero, waits for \c timeout milliseconds that another thread calls post().
             If no other thread does so, returns false.
             The special values 0 (do not wait at all) and INFINITE_TIMEOUT (wait indefinitely, like parameterless wait())
             are allowed.

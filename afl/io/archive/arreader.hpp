@@ -29,7 +29,6 @@ namespace afl { namespace io { namespace archive {
             Open an archive file file for reading.
             This method ensures that all ArReader instances are created dynamically.
             \param file File
-            \param options Options for interpreting the file
             \return ArReader */
         static afl::base::Ref<ArReader> open(afl::base::Ref<Stream> file);
 

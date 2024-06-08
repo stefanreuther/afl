@@ -37,8 +37,8 @@ namespace afl { namespace base {
 
         /** Make a bound member function closure.
             When invoked, calls the function on the object.
-            \param Obj object type
-            \param Ptr pointer type (could be a smart pointer)
+            \tparam Obj object type
+            \tparam Ptr pointer type (could be a smart pointer)
             \param ptr pointer (must be dereferencable, i.e. operator*)
             \param func function
             \return the closure, never null */

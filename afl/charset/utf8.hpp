@@ -134,7 +134,7 @@ namespace afl { namespace charset {
             \param text [in] String to work on
             \param index [in] Index of first rune to extract, 0-based
             \param count [in] Maximum number of runes to extract
-            \return Substring as Memory object referring into #text. Empty if index or count are out of range. */
+            \return Substring as Memory object referring into \c text. Empty if index or count are out of range. */
         Bytes_t substrMemory(Bytes_t text, size_t index, size_t count) const;
 
         /** Get character by position.

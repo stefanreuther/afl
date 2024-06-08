@@ -329,7 +329,7 @@ afl::io::archive::ArReader::ArDirEnum::getNextElement(afl::base::Ptr<afl::io::Di
 // /************************ ArReader::ArMember ***********************/
 
 /** Constructor.
-    \param parent Link to containing tar file.
+    \param file Underlying file
     \param entry Index entry for this member */
 afl::io::archive::ArReader::ArMember::ArMember(afl::base::Ref<Stream> file, const IndexEntry& entry)
     : m_file(file),

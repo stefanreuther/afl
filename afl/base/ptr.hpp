@@ -58,7 +58,7 @@ namespace afl { namespace base {
         Ptr(const Ptr& other);
 
         /** Converting copy constructor.
-            \param U source type (must be derived class of T)
+            \tparam U source type (must be derived class of T)
             \param other other smart pointer */
         template<typename U>
         Ptr(const Ptr<U>& other);
@@ -72,7 +72,7 @@ namespace afl { namespace base {
         Ptr& operator=(const Ptr& other);
 
         /** Converting assignment operator.
-            \param U source type (must be derived class of T)
+            \tparam U source type (must be derived class of T)
             \param other other smart pointer
             \return *this */
         template<typename U>
@@ -98,7 +98,7 @@ namespace afl { namespace base {
         T* operator->() const;
 
         /** Smart dynamic_cast.
-            \param U target type
+            \tparam U target type
             \return smart pointer referring to the same object as this one if the cast was successfull,
             smart null pointer otherwise */
         template<typename U>
