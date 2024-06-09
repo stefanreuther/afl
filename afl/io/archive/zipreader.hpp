@@ -34,10 +34,11 @@ namespace afl { namespace io { namespace archive {
             \return ZipReader */
         static afl::base::Ref<ZipReader> open(afl::base::Ref<Stream> file, int options);
 
+        /** Virtual destructor. */
         virtual ~ZipReader();
 
         enum {
-            /** Keep paths.
+            /** Option: keep paths.
                 If specified, reports path names "as-is".
                 If not specified (default), reports path names restricted to their final component,
                 thus "flattening" the file. */
@@ -61,9 +62,7 @@ namespace afl { namespace io { namespace archive {
         struct IndexEntry;
         afl::container::PtrVector<IndexEntry> m_index;
         bool m_indexerReachedEnd;
-        bool m_hadUnsupportedFile;
         bool m_hadUnsupportedFeature;
-        bool m_hadDuplicateFile;
 
         // Directory interface
         class ZipDirEntry;

@@ -1,24 +1,25 @@
 /**
   *  \file afl/io/archive/zipreader.cpp
+  *  \brief Class afl::io::archive::ZipReader
   */
 
 #include "afl/io/archive/zipreader.hpp"
-#include "afl/string/messages.hpp"
+#include "afl/base/growablememory.hpp"
+#include "afl/base/staticassert.hpp"
+#include "afl/bits/uint16le.hpp"
+#include "afl/bits/uint32le.hpp"
+#include "afl/bits/value.hpp"
+#include "afl/charset/codepage.hpp"
+#include "afl/charset/codepagecharset.hpp"
 #include "afl/except/fileproblemexception.hpp"
 #include "afl/io/directoryentry.hpp"
-#include "afl/bits/value.hpp"
-#include "afl/bits/uint32le.hpp"
-#include "afl/bits/uint16le.hpp"
-#include "afl/base/staticassert.hpp"
-#include "afl/base/growablememory.hpp"
-#include "afl/string/posixfilenames.hpp"
-#include "afl/io/limitedstream.hpp"
 #include "afl/io/filemapping.hpp"
 #include "afl/io/inflatetransform.hpp"
+#include "afl/io/limitedstream.hpp"
 #include "afl/io/multiplexablestream.hpp"
-#include "afl/charset/codepagecharset.hpp"
-#include "afl/charset/codepage.hpp"
 #include "afl/io/unchangeabledirectoryentry.hpp"
+#include "afl/string/messages.hpp"
+#include "afl/string/posixfilenames.hpp"
 
 namespace {
     // General flags
@@ -34,8 +35,13 @@ namespace {
     const uint16_t cmDeflated = 8;
 
     // Shortcuts
-    typedef afl::bits::Value<afl::bits::UInt32LE> UInt32_t;
     typedef afl::bits::Value<afl::bits::UInt16LE> UInt16_t;
+    typedef afl::bits::Value<afl::bits::UInt32LE> UInt32_t;
+    using afl::base::Ptr;
+    using afl::base::Ref;
+    using afl::except::FileProblemException;
+    using afl::string::Messages;
+    using afl::string::PosixFileNames;
 
     // Local header file format
     struct LocalHeader {
@@ -84,33 +90,35 @@ struct afl::io::archive::ZipReader::IndexEntry {
 /** Zip "DirectoryEntry" implementation. */
 class afl::io::archive::ZipReader::ZipDirEntry : public afl::io::UnchangeableDirectoryEntry {
  public:
-    ZipDirEntry(const IndexEntry& entry, afl::base::Ref<ZipReader> parent);
+    ZipDirEntry(const IndexEntry& entry, const Ref<ZipReader>& parent);
     ~ZipDirEntry();
 
     // DirectoryEntry:
     virtual String_t getTitle();
     virtual String_t getPathName();
-    virtual afl::base::Ref<Stream> openFileForReading();
-    virtual afl::base::Ref<Directory> openDirectory();
-    virtual afl::base::Ref<Directory> openContainingDirectory();
+    virtual Ref<Stream> openFileForReading();
+    virtual Ref<Directory> openDirectory();
+    virtual Ref<Directory> openContainingDirectory();
 
     virtual void updateInfo(uint32_t requested);
 
  private:
+    /** IndexEntry. Owned by ZipReader. */
     const IndexEntry& m_entry;
-    afl::base::Ref<ZipReader> m_parent;
+    /** Parent. Keeps m_entry alive. */
+    const Ref<ZipReader> m_parent;
 };
 
 /** Zip DirectoryEntry Enumerator implementation. */
-class afl::io::archive::ZipReader::ZipDirEnum : public afl::base::Enumerator<afl::base::Ptr<afl::io::DirectoryEntry> > {
+class afl::io::archive::ZipReader::ZipDirEnum : public afl::base::Enumerator<Ptr<afl::io::DirectoryEntry> > {
  public:
-    ZipDirEnum(afl::base::Ref<ZipReader> parent);
+    ZipDirEnum(const Ref<ZipReader>& parent);
     ~ZipDirEnum();
 
-    virtual bool getNextElement(afl::base::Ptr<afl::io::DirectoryEntry>& result);
+    virtual bool getNextElement(Ptr<afl::io::DirectoryEntry>& result);
 
  private:
-    afl::base::Ref<ZipReader> m_parent;
+    const Ref<ZipReader> m_parent;
     size_t m_current;
 };
 
@@ -118,7 +126,7 @@ class afl::io::archive::ZipReader::ZipDirEnum : public afl::base::Enumerator<afl
     Essentially, this is a LimitedStream, plus some housekeeping. */
 class afl::io::archive::ZipReader::ZipStoredMember : public afl::io::Stream {
  public:
-    ZipStoredMember(afl::base::Ref<Stream> file, const IndexEntry& entry);
+    ZipStoredMember(const Ref<Stream>& file, const IndexEntry& entry);
     ZipStoredMember(ZipStoredMember& orig);
     ~ZipStoredMember();
 
@@ -130,12 +138,12 @@ class afl::io::archive::ZipReader::ZipStoredMember : public afl::io::Stream {
     virtual size_t write(ConstBytes_t m);
     virtual size_t read(Bytes_t m);
     virtual uint32_t getCapabilities();
-    virtual afl::base::Ref<Stream> createChild();
-    virtual afl::base::Ptr<FileMapping> createFileMapping(FileSize_t limit = FileSize_t(-1));
+    virtual Ref<Stream> createChild();
+    virtual Ptr<FileMapping> createFileMapping(FileSize_t limit);
 
  private:
-    afl::base::Ref<Stream> m_file;
-    afl::base::Ref<Stream> m_worker;
+    const Ref<Stream> m_file;
+    const Ref<Stream> m_worker;
     String_t m_name;
 };
 
@@ -144,7 +152,7 @@ class afl::io::archive::ZipReader::ZipStoredMember : public afl::io::Stream {
     FIXME: this could be a generic class for reading compressed stuff */
 class afl::io::archive::ZipReader::ZipDeflatedMember : public afl::io::MultiplexableStream {
  public:
-    ZipDeflatedMember(afl::base::Ref<Stream> file, const IndexEntry& entry);
+    ZipDeflatedMember(const Ref<Stream>& file, const IndexEntry& entry);
     ~ZipDeflatedMember();
 
     virtual String_t getName();
@@ -155,13 +163,13 @@ class afl::io::archive::ZipReader::ZipDeflatedMember : public afl::io::Multiplex
     virtual size_t write(ConstBytes_t m);
     virtual size_t read(Bytes_t m);
     virtual uint32_t getCapabilities();
-    virtual afl::base::Ptr<FileMapping> createFileMapping(FileSize_t limit = FileSize_t(-1));
+    virtual Ptr<FileMapping> createFileMapping(FileSize_t limit);
 
  private:
-    afl::base::Ref<Stream> m_file;
+    const Ref<Stream> m_file;
     LimitedStream m_worker;
     InflateTransform m_transform;
-    String_t m_name;
+    const String_t m_name;
 
     uint8_t m_buffer[4096];
     ConstBytes_t m_bufferDescriptor;
@@ -173,8 +181,8 @@ class afl::io::archive::ZipReader::ZipDeflatedMember : public afl::io::Multiplex
 /** Constructor.
     \param entry Index entry for this directory entry
     \param parent Link to containing zip file. */
-afl::io::archive::ZipReader::ZipDirEntry::ZipDirEntry(const IndexEntry& entry, afl::base::Ref<ZipReader> parent)
-    : UnchangeableDirectoryEntry(afl::string::Messages::cannotModifyArchiveFile()),
+afl::io::archive::ZipReader::ZipDirEntry::ZipDirEntry(const IndexEntry& entry, const Ref<ZipReader>& parent)
+    : UnchangeableDirectoryEntry(Messages::cannotModifyArchiveFile()),
       m_entry(entry),
       m_parent(parent)
 { }
@@ -195,7 +203,7 @@ afl::io::archive::ZipReader::ZipDirEntry::getPathName()
     return String_t();
 }
 
-afl::base::Ref<afl::io::Stream>
+Ref<afl::io::Stream>
 afl::io::archive::ZipReader::ZipDirEntry::openFileForReading()
 {
     if (m_entry.method == cmStored) {
@@ -203,17 +211,17 @@ afl::io::archive::ZipReader::ZipDirEntry::openFileForReading()
     } else if (m_entry.method == cmDeflated) {
         return *new ZipDeflatedMember(m_parent->m_file, m_entry);
     } else {
-        throw afl::except::FileProblemException(getTitle(), afl::string::Messages::unsupportedCompressionMode());
+        throw FileProblemException(getTitle(), Messages::unsupportedCompressionMode());
     }
 }
 
-afl::base::Ref<afl::io::Directory>
+Ref<afl::io::Directory>
 afl::io::archive::ZipReader::ZipDirEntry::openDirectory()
 {
-    throw afl::except::FileProblemException(m_parent->getTitle(), afl::string::Messages::cannotAccessDirectories());
+    throw FileProblemException(m_parent->getTitle(), Messages::cannotAccessDirectories());
 }
 
-afl::base::Ref<afl::io::Directory>
+Ref<afl::io::Directory>
 afl::io::archive::ZipReader::ZipDirEntry::openContainingDirectory()
 {
     return m_parent;
@@ -231,7 +239,7 @@ afl::io::archive::ZipReader::ZipDirEntry::updateInfo(uint32_t /*requested*/)
 
 /** Constructor.
     \param parent Link to containing zip file. */
-afl::io::archive::ZipReader::ZipDirEnum::ZipDirEnum(afl::base::Ref<ZipReader> parent)
+afl::io::archive::ZipReader::ZipDirEnum::ZipDirEnum(const Ref<ZipReader>& parent)
     : m_parent(parent),
       m_current(0)
 { }
@@ -240,7 +248,7 @@ afl::io::archive::ZipReader::ZipDirEnum::~ZipDirEnum()
 { }
 
 bool
-afl::io::archive::ZipReader::ZipDirEnum::getNextElement(afl::base::Ptr<afl::io::DirectoryEntry>& result)
+afl::io::archive::ZipReader::ZipDirEnum::getNextElement(Ptr<afl::io::DirectoryEntry>& result)
 {
     // Attempt to read sufficient elements
     while (m_parent->m_index.size() <= m_current) {
@@ -259,7 +267,7 @@ afl::io::archive::ZipReader::ZipDirEnum::getNextElement(afl::base::Ptr<afl::io::
 /** Constructor.
     \param file Underlying file
     \param entry Index entry for this member */
-afl::io::archive::ZipReader::ZipStoredMember::ZipStoredMember(afl::base::Ref<Stream> file, const IndexEntry& entry)
+afl::io::archive::ZipReader::ZipStoredMember::ZipStoredMember(const Ref<Stream>& file, const IndexEntry& entry)
     : m_file(file),
       m_worker(*new LimitedStream(file->createChild(), entry.start, entry.compressedSize)),
       m_name(entry.name)
@@ -277,7 +285,7 @@ afl::io::archive::ZipReader::ZipStoredMember::~ZipStoredMember()
 String_t
 afl::io::archive::ZipReader::ZipStoredMember::getName()
 {
-    return afl::string::PosixFileNames().makePathName(m_file->getName(), m_name);
+    return PosixFileNames().makePathName(m_file->getName(), m_name);
 }
 
 afl::io::Stream::FileSize_t
@@ -307,7 +315,7 @@ afl::io::archive::ZipReader::ZipStoredMember::flush()
 size_t
 afl::io::archive::ZipReader::ZipStoredMember::write(ConstBytes_t /*m*/)
 {
-    throw afl::except::FileProblemException(*this, afl::string::Messages::cannotWrite());
+    throw FileProblemException(*this, Messages::cannotWrite());
 }
 
 size_t
@@ -322,13 +330,13 @@ afl::io::archive::ZipReader::ZipStoredMember::getCapabilities()
     return CanRead | CanSeek;
 }
 
-afl::base::Ref<afl::io::Stream>
+Ref<afl::io::Stream>
 afl::io::archive::ZipReader::ZipStoredMember::createChild()
 {
     return *new ZipStoredMember(*this);
 }
 
-afl::base::Ptr<afl::io::FileMapping>
+Ptr<afl::io::FileMapping>
 afl::io::archive::ZipReader::ZipStoredMember::createFileMapping(FileSize_t limit)
 {
     return m_worker->createFileMapping(limit);
@@ -336,7 +344,7 @@ afl::io::archive::ZipReader::ZipStoredMember::createFileMapping(FileSize_t limit
 
 /*********************** ZipReader::ZipDeflatedMember **********************/
 
-afl::io::archive::ZipReader::ZipDeflatedMember::ZipDeflatedMember(afl::base::Ref<Stream> file, const IndexEntry& entry)
+afl::io::archive::ZipReader::ZipDeflatedMember::ZipDeflatedMember(const Ref<Stream>& file, const IndexEntry& entry)
     : m_file(file),
       m_worker(file->createChild(), entry.start, entry.compressedSize),
       m_transform(InflateTransform::Raw),
@@ -352,7 +360,7 @@ afl::io::archive::ZipReader::ZipDeflatedMember::~ZipDeflatedMember()
 String_t
 afl::io::archive::ZipReader::ZipDeflatedMember::getName()
 {
-    return afl::string::PosixFileNames().makePathName(m_file->getName(), m_name);
+    return PosixFileNames().makePathName(m_file->getName(), m_name);
 }
 
 afl::io::Stream::FileSize_t
@@ -371,7 +379,7 @@ void
 afl::io::archive::ZipReader::ZipDeflatedMember::setPos(FileSize_t pos)
 {
     if (pos != m_bytesRead) {
-        throw afl::except::FileProblemException(*this, afl::string::Messages::invalidOperation());
+        throw FileProblemException(*this, Messages::invalidOperation());
     }
 }
 
@@ -382,7 +390,7 @@ afl::io::archive::ZipReader::ZipDeflatedMember::flush()
 size_t
 afl::io::archive::ZipReader::ZipDeflatedMember::write(ConstBytes_t /*m*/)
 {
-    throw afl::except::FileProblemException(*this, afl::string::Messages::cannotWrite());
+    throw FileProblemException(*this, Messages::cannotWrite());
 }
 
 size_t
@@ -418,7 +426,7 @@ afl::io::archive::ZipReader::ZipDeflatedMember::getCapabilities()
     return CanRead;
 }
 
-afl::base::Ptr<afl::io::FileMapping>
+Ptr<afl::io::FileMapping>
 afl::io::archive::ZipReader::ZipDeflatedMember::createFileMapping(FileSize_t /*limit*/)
 {
     return 0;
@@ -451,12 +459,12 @@ afl::io::archive::ZipReader::getDirectoryEntryByName(String_t name)
 
     // Found?
     if (xe == 0) {
-        throw afl::except::FileProblemException(name, afl::string::Messages::fileNotFound());
+        throw FileProblemException(name, Messages::fileNotFound());
     }
     return *new ZipDirEntry(*xe, *this);
 }
 
-afl::base::Ref<afl::base::Enumerator<afl::base::Ptr<afl::io::DirectoryEntry> > >
+afl::base::Ref<afl::base::Enumerator<Ptr<afl::io::DirectoryEntry> > >
 afl::io::archive::ZipReader::getDirectoryEntries()
 {
     return *new ZipDirEnum(*this);
@@ -482,24 +490,25 @@ afl::io::archive::ZipReader::getTitle()
     return m_file->getName();
 }
 
-// /** Constructor. Use create(Ptr<Stream>) to create instances of this class. */
+/** Private constructor.
+    Use create(Ptr<Stream>) to create instances of this class.
+    \param file Underlying file
+    \param options Options */
 afl::io::archive::ZipReader::ZipReader(afl::base::Ref<Stream> file, int options)
     : m_file(file),
       m_view(file->createChild()),
       m_options(options),
       m_index(),
       m_indexerReachedEnd(false),
-      m_hadUnsupportedFile(false),
-      m_hadUnsupportedFeature(false),
-      m_hadDuplicateFile(false)
+      m_hadUnsupportedFeature(false)
 {
     // Read first entry to fail if we were not given a zip file
     readNextEntry();
 }
 
-// /** Read next entry from Zip file.
-//     \retval true I have read something, successfully. It may or may not have been added to the index.
-//     \retval false I have stopped parsing, at end of file or at an item I don't understand */
+/** Read next entry from Zip file.
+    \retval true I have read something, successfully. It may or may not have been added to the index.
+    \retval false I have stopped parsing, at end of file or at an item I don't understand */
 bool
 afl::io::archive::ZipReader::readNextEntry()
 {
@@ -515,15 +524,15 @@ afl::io::archive::ZipReader::readNextEntry()
         /* Local Header */
         LocalHeader header;
         m_view->fullRead(afl::base::fromObject(header));
-//         // uint16_t min_version = getUint16(buffer+0);
+        // uint16_t min_version = getUint16(buffer+0);
         uint16_t flags       = header.flags;
         uint16_t method      = header.method;
-//         // uint32_t mtime       = getUint32(buffer+6);
-//         // uint32_t crc         = getUint32(buffer+10);
+        // uint32_t mtime       = getUint32(buffer+6);
+        // uint32_t crc         = getUint32(buffer+10);
         uint32_t compsize    = header.compressedSize;
         uint32_t uncompsize  = header.uncompressedSize;
-        uint32_t namelength  = header.nameLength;   // FIXME type
-        uint16_t extraLength = header.extraLength;  // FIXME type
+        uint16_t namelength  = header.nameLength;
+        uint16_t extraLength = header.extraLength;
 
         /* If this header is not supported, stop parsing */
         if ((flags & ~gfKnown) != 0) {
@@ -557,7 +566,6 @@ afl::io::archive::ZipReader::readNextEntry()
             }
         } else {
             /* Unsupported */
-            m_hadUnsupportedFile = true;
         }
         m_view->setPos(m_view->getPos() + compsize);
         return true;
