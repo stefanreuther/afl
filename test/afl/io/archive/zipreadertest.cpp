@@ -317,6 +317,22 @@ AFL_TEST("afl.io.archive.ZipReader:uncompressed-member", a)
     }
 }
 
+/** Test uncompressed member, child handling. */
+AFL_TEST("afl.io.archive.ZipReader:uncompressed-member:child", a)
+{
+    // Open zip file
+    afl::base::Ref<afl::io::archive::ZipReader> testee(afl::io::archive::ZipReader::open(*new afl::io::ConstMemoryStream(UNCOMPR_ZIP), 0));
+
+    // Read member "hello.txt" (uncompressed)
+    {
+        afl::base::Ref<afl::io::Stream> in(testee->openFile("hello.txt", afl::io::FileSystem::OpenRead));
+        afl::base::Ref<afl::io::Stream> child(in->createChild());
+
+        a.checkEqual("getName", in->getName(), child->getName());
+        a.checkEqual("getCapabilities", in->getCapabilities(), child->getCapabilities());
+    }
+}
+
 /** Test encrypted member. */
 AFL_TEST("afl.io.archive.ZipReader:unsupported:encryption", a)
 {

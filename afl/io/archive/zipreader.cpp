@@ -119,6 +119,7 @@ class afl::io::archive::ZipReader::ZipDirEnum : public afl::base::Enumerator<afl
 class afl::io::archive::ZipReader::ZipStoredMember : public afl::io::Stream {
  public:
     ZipStoredMember(afl::base::Ref<Stream> file, const IndexEntry& entry);
+    ZipStoredMember(ZipStoredMember& orig);
     ~ZipStoredMember();
 
     virtual String_t getName();
@@ -134,7 +135,7 @@ class afl::io::archive::ZipReader::ZipStoredMember : public afl::io::Stream {
 
  private:
     afl::base::Ref<Stream> m_file;
-    LimitedStream m_worker;
+    afl::base::Ref<Stream> m_worker;
     String_t m_name;
 };
 
@@ -260,8 +261,14 @@ afl::io::archive::ZipReader::ZipDirEnum::getNextElement(afl::base::Ptr<afl::io::
     \param entry Index entry for this member */
 afl::io::archive::ZipReader::ZipStoredMember::ZipStoredMember(afl::base::Ref<Stream> file, const IndexEntry& entry)
     : m_file(file),
-      m_worker(file->createChild(), entry.start, entry.compressedSize),
+      m_worker(*new LimitedStream(file->createChild(), entry.start, entry.compressedSize)),
       m_name(entry.name)
+{ }
+
+afl::io::archive::ZipReader::ZipStoredMember::ZipStoredMember(ZipStoredMember& orig)
+    : m_file(orig.m_file),
+      m_worker(orig.m_worker->createChild()),
+      m_name(orig.m_name)
 { }
 
 afl::io::archive::ZipReader::ZipStoredMember::~ZipStoredMember()
@@ -276,25 +283,25 @@ afl::io::archive::ZipReader::ZipStoredMember::getName()
 afl::io::Stream::FileSize_t
 afl::io::archive::ZipReader::ZipStoredMember::getSize()
 {
-    return m_worker.getSize();
+    return m_worker->getSize();
 }
 
 afl::io::Stream::FileSize_t
 afl::io::archive::ZipReader::ZipStoredMember::getPos()
 {
-    return m_worker.getPos();
+    return m_worker->getPos();
 }
 
 void
 afl::io::archive::ZipReader::ZipStoredMember::setPos(FileSize_t pos)
 {
-    m_worker.setPos(pos);
+    m_worker->setPos(pos);
 }
 
 void
 afl::io::archive::ZipReader::ZipStoredMember::flush()
 {
-    m_worker.flush();
+    m_worker->flush();
 }
 
 size_t
@@ -306,7 +313,7 @@ afl::io::archive::ZipReader::ZipStoredMember::write(ConstBytes_t /*m*/)
 size_t
 afl::io::archive::ZipReader::ZipStoredMember::read(Bytes_t m)
 {
-    return m_worker.read(m);
+    return m_worker->read(m);
 }
 
 uint32_t
@@ -318,13 +325,13 @@ afl::io::archive::ZipReader::ZipStoredMember::getCapabilities()
 afl::base::Ref<afl::io::Stream>
 afl::io::archive::ZipReader::ZipStoredMember::createChild()
 {
-    return m_worker.createChild();
+    return *new ZipStoredMember(*this);
 }
 
 afl::base::Ptr<afl::io::FileMapping>
 afl::io::archive::ZipReader::ZipStoredMember::createFileMapping(FileSize_t limit)
 {
-    return m_worker.createFileMapping(limit);
+    return m_worker->createFileMapping(limit);
 }
 
 /*********************** ZipReader::ZipDeflatedMember **********************/
