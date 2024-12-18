@@ -14,11 +14,13 @@
 #include "afl/data/defaultvaluefactory.hpp"
 #include "afl/data/errorvalue.hpp"
 #include "afl/data/integervalue.hpp"
+#include "afl/except/assertionfailedexception.hpp"
 #include "afl/except/remoteerrorexception.hpp"
 #include "afl/except/systemexception.hpp"
 #include "afl/io/bufferedsink.hpp"
 #include "afl/io/resp/parser.hpp"
 #include "afl/io/resp/writer.hpp"
+#include "afl/net/internalnetworkstack.hpp"
 #include "afl/net/listener.hpp"
 #include "afl/net/name.hpp"
 #include "afl/net/networkstack.hpp"
@@ -26,7 +28,6 @@
 #include "afl/sys/semaphore.hpp"
 #include "afl/sys/thread.hpp"
 #include "afl/test/testrunner.hpp"
-#include "afl/except/assertionfailedexception.hpp"
 
 namespace {
     using afl::base::Ref;
@@ -99,8 +100,11 @@ namespace {
     };
 }
 
-/** Simple test. */
-AFL_TEST("afl.net.resp.Client:simple", a)
+/*
+ *  Simple test.
+ *  Test using system and internal network stack.
+ */
+static void testClientSimple(afl::test::Assert a, afl::net::NetworkStack& stack)
 {
     class Tester : public afl::base::Stoppable {
      public:
@@ -158,7 +162,6 @@ AFL_TEST("afl.net.resp.Client:simple", a)
     // Set up network
     uint16_t portNr = static_cast<uint16_t>(20000 + std::rand() % 10000);
     afl::net::Name name("127.0.0.1", portNr);
-    afl::net::NetworkStack& stack(afl::net::NetworkStack::getInstance());
 
     // Make a tester
     Tester testRunnable(a("Tester"), stack.listen(name, 5));
@@ -191,6 +194,17 @@ AFL_TEST("afl.net.resp.Client:simple", a)
     // Trigger shutdown
     testRunnable.setData("", "");
 }
+
+AFL_TEST("afl.net.resp.Client:simple:system", a)
+{
+    testClientSimple(a, afl::net::NetworkStack::getInstance());
+}
+
+AFL_TEST("afl.net.resp.Client:simple:internal", a)
+{
+    testClientSimple(a, *afl::net::InternalNetworkStack::create());
+}
+
 
 /** Test reconnect behaviour with a server that closes between requests. */
 AFL_TEST("afl.net.resp.Client:reconnect", a)

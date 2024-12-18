@@ -12,6 +12,7 @@
 #include "afl/base/ptr.hpp"
 #include "afl/net/http/clientconnection.hpp"
 #include "afl/net/http/clientconnectionprovider.hpp"
+#include "afl/net/internalnetworkstack.hpp"
 #include "afl/net/networkstack.hpp"
 #include "afl/net/socket.hpp"
 #include "afl/sys/semaphore.hpp"
@@ -43,11 +44,12 @@ namespace {
     };
 }
 
-/** Test operation against a stupid server that closes the connection after every request. */
-AFL_TEST_NOARG("afl.net.http.Client:simple-server")
+/*
+ *  Test operation against a stupid server that closes the connection after every request.
+ *  Test using system and internal network stack.
+ */
+static void testClientSimpleServer(afl::net::NetworkStack& ns)
 {
-    // Set up network
-    afl::net::NetworkStack& ns = afl::net::NetworkStack::getInstance();
     afl::net::Name name("127.0.0.1", uint16_t(std::rand() % 10000 + 20000));
     afl::base::Ref<afl::net::Listener> listener = ns.listen(name, 10);
 
@@ -174,11 +176,23 @@ AFL_TEST_NOARG("afl.net.http.Client:simple-server")
     serverThread.join();
 }
 
-/** Test shutdown. */
-AFL_TEST("afl.net.http.Client:shutdown", a)
+AFL_TEST_NOARG("afl.net.http.Client:simple-server:system")
+{
+    testClientSimpleServer(afl::net::NetworkStack::getInstance());
+}
+
+AFL_TEST_NOARG("afl.net.http.Client:simple-server:internal")
+{
+    testClientSimpleServer(*afl::net::InternalNetworkStack::create());
+}
+
+/*
+ *  Test shutdown.
+ *  Test using system and internal network stack.
+ */
+static void testClientShutdown(afl::test::Assert a, afl::net::NetworkStack& ns)
 {
     // Set up network
-    afl::net::NetworkStack& ns = afl::net::NetworkStack::getInstance();
     afl::net::Name name("127.0.0.1", uint16_t(std::rand() % 10000 + 20000));
     afl::base::Ref<afl::net::Listener> listener = ns.listen(name, 10);
 
@@ -287,4 +301,14 @@ AFL_TEST("afl.net.http.Client:shutdown", a)
     // Stop the threads
     clientThread.join();
     serverThread.join();
+}
+
+AFL_TEST("afl.net.http.Client:shutdown:system", a)
+{
+    testClientShutdown(a, afl::net::NetworkStack::getInstance());
+}
+
+AFL_TEST("afl.net.http.Client:shutdown:internal", a)
+{
+    testClientShutdown(a, *afl::net::InternalNetworkStack::create());
 }
