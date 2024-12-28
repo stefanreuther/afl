@@ -137,6 +137,22 @@ AFL_TEST("afl.sys.Time:arithmetic", a)
     a.check("12. op-=", t ==Time(100));
 }
 
+/** Test getUnixTime. */
+AFL_TEST("afl.sys.Time:getUnixTime", a)
+{
+    static const ParsedTime pt = { 2024, 5, 7, 12, 30, 40, 0, 0 };
+    Time t(pt, Time::UniversalTime);
+    a.checkEqual("00. getUnixTime", t.getUnixTime(), 1715085040);
+
+    ParsedTime pt2;
+    t.unpack(pt2, Time::UniversalTime);
+    a.checkEqual("01. year",   pt.m_year,   pt2.m_year);
+    a.checkEqual("02. month",  pt.m_month,  pt2.m_month);
+    a.checkEqual("03. day",    pt.m_day,    pt2.m_day);
+    a.checkEqual("04. hour",   pt.m_hour,   pt2.m_hour);
+    a.checkEqual("05. minute", pt.m_minute, pt2.m_minute);
+}
+
 /** Test current time access. */
 AFL_TEST("afl.sys.Time:getCurrentTime", a)
 {

@@ -48,9 +48,9 @@ arch::posix::PosixTime::packTime(const afl::sys::ParsedTime& parsedTime, afl::sy
 
         // Number of leap years since 1970
         int32_t leapYearsSinceEpoch
-            = (year - 1967) / 4
-            - (year - 1899) / 100
-            + (year - 1599) / 400;
+            = (year - 1969) / 4
+            - (year - 1901) / 100
+            + (year - 1601) / 400;
 
         // Days since 1970
         int32_t daysSinceEpoch = (year - 1970)*365 + leapYearsSinceEpoch + daysSinceNewYear[month] + day;
