@@ -262,6 +262,7 @@ afl::net::MimeParser::MimeParser()
       m_body(),
       m_accum(),
       m_state(StateHeader),
+      m_decodeBody(true),
       m_pLog(0),
       m_headerParser(new HeaderParser(*this))
 {
@@ -277,6 +278,13 @@ void
 afl::net::MimeParser::setLog(afl::sys::LogListener* pLog)
 {
     m_pLog = pLog;
+}
+
+// Set body decode mode.
+void
+afl::net::MimeParser::setDecodeBody(bool enable)
+{
+    m_decodeBody = enable;
 }
 
 // Add data.
@@ -450,9 +458,8 @@ afl::net::MimeParser::addDataHeader(afl::base::ConstBytes_t& data)
 {
     if (m_headerParser->handleData(data)) {
         // Blank line, we're starting the body
-        // processReceivedHeader();
         HeaderField* hf = m_headers.get("Content-Transfer-Encoding");
-        if (hf == 0) {
+        if (hf == 0 || !m_decodeBody) {
             m_state = StatePlainBody;
         } else {
             String_t typ = strLCase(hf->getPrimaryValue());

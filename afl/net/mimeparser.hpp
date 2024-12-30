@@ -61,6 +61,13 @@ namespace afl { namespace net {
             \param pLog Logger */
         void setLog(afl::sys::LogListener* pLog);
 
+        /** Set body decode mode.
+            When body decoding is enabled (default), body is decoded according to Content-Transfer-Encoding.
+            Set body decoding is disabled, body is just split into lines (as if Content-Transfer-Encoding header was missing).
+
+            \param enable true to enable body decoding */
+        void setDecodeBody(bool enable);
+
 
         /*
          *  Manipulation/Setup
@@ -144,6 +151,9 @@ namespace afl { namespace net {
             StateBase64Body,
             StateQPBody
         } m_state;
+
+        /** Body decoding? */
+        bool m_decodeBody;
 
         /** Logger. */
         afl::sys::LogListener* m_pLog;

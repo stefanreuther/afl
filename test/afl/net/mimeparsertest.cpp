@@ -208,6 +208,22 @@ AFL_TEST("afl.net.MimeParser:getBodyAsString:base64", a)
     a.checkEqual("", testee.getBodyAsString(), "poof-, a harsh method of error correction!\r\n\r\nSo it is");
 }
 
+/** Test base64 body, body decoding disabled. */
+AFL_TEST("afl.net.MimeParser:getBodyAsString:base64:disabled", a)
+{
+    afl::net::MimeParser testee;
+
+    testee.setDecodeBody(false);
+    testee.handleFullData(afl::string::toBytes("Content-Type: text/plain; charset=utf-8\n"
+                                               "Content-Transfer-Encoding: base64\n"
+                                               "\n"
+                                               "cG9vZi0sIGEgaGFyc2ggbWV0aG9kIG9mIGVycm9yIGNvcnJlY3Rpb24hDQoNClNvIGl0IGlz\n"));
+    testee.finish();
+
+    // Verify
+    a.checkEqual("", testee.getBodyAsString(), "cG9vZi0sIGEgaGFyc2ggbWV0aG9kIG9mIGVycm9yIGNvcnJlY3Rpb24hDQoNClNvIGl0IGlz\n");
+}
+
 /** Test encoded header. */
 AFL_TEST("afl.net.MimeParser:encoded-header:single-word", a)
 {
