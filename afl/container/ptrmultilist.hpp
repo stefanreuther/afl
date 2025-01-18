@@ -76,13 +76,19 @@ namespace afl { namespace container {
 
         /** Append a newly-allocated element. If the operation fails, the element
             will be deleted before the exception is rethrown. */
-        void pushBackNew(T* t)
-            { m_data.pushBackNew(t); }
+        T* pushBackNew(T* t)
+            {
+                m_data.pushBackNew(t);
+                return t;
+            }
 
         /** Prepend a newly-allocated element. If the operation fails, the element
             will be deleted before the exception is rethrown. */
-        void pushFrontNew(T* t)
-            { m_data.pushFrontNew(t); }
+        T* pushFrontNew(T* t)
+            {
+                m_data.pushFrontNew(t);
+                return t;
+            }
 
         /** Remove and delete first element. */
         void popFront()

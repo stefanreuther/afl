@@ -36,7 +36,9 @@ AFL_TEST("afl.container.PtrMultiList", a)
         afl::container::PtrMultiList<Obj> ml;
         a.check("init empty", ml.empty());
         a.checkEqual("init size", ml.size(), 0U);
-        ml.pushBackNew(new Obj(1));
+        Obj* firstObj = new Obj(1);
+        Obj* firstAdded = ml.pushBackNew(firstObj);
+        a.checkEqual("one ptr", firstObj, firstAdded);
         a.check("one empty", !ml.empty());
         a.checkEqual("one size", ml.size(), 1U);
         ml.pushBackNew(new Obj(2));
@@ -208,6 +210,36 @@ AFL_TEST("afl.container.PtrMultiList:merge", a)
         ++p;
     }
     a.check("64. end", p == ml2.end());
+}
+
+/** Test adding on both sides. */
+AFL_TEST("afl.container.PtrMultiList:pushBackNew:pushFrontNew", a)
+{
+    afl::container::PtrMultiList<Obj> ml;
+    Obj* o3 = ml.pushBackNew(new Obj(3));
+    Obj* o2 = ml.pushFrontNew(new Obj(2));
+    Obj* o4 = ml.pushBackNew(new Obj(4));
+    Obj* o1 = ml.pushFrontNew(new Obj(1));
+    Obj* o5 = ml.pushBackNew(new Obj(5));
+
+    a.checkEqual("01. live", Obj::live, 5);
+    a.checkEqual("02. size", ml.size(), 5U);
+
+    a.checkEqual("11. value", o1->n, 1);
+    a.checkEqual("12. value", o2->n, 2);
+    a.checkEqual("13. value", o3->n, 3);
+    a.checkEqual("14. value", o4->n, 4);
+    a.checkEqual("15. value", o5->n, 5);
+
+    // Verify
+    afl::container::PtrMultiList<Obj>::iterator p = ml.begin();
+    for (int i = 1; i <= 5; ++i) {
+        a.check("21. iter", p != ml.end());
+        a.check("22. ptr", *p != 0);
+        a.checkEqual("23. value", (*p)->n, i);
+        ++p;
+    }
+    a.check("24. end", p == ml.end());
 }
 
 /** Test sort operation. */
