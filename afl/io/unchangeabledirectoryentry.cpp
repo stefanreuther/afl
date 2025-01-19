@@ -41,6 +41,12 @@ afl::io::UnchangeableDirectoryEntry::doSetFlag(FileFlag /*flag*/, bool /*value*/
 }
 
 void
+afl::io::UnchangeableDirectoryEntry::doMoveTo(Directory& /*dir*/, String_t /*name*/)
+{
+    fail();
+}
+
+void
 afl::io::UnchangeableDirectoryEntry::fail()
 {
     String_t name = getPathName();

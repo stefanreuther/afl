@@ -22,6 +22,7 @@ class afl::io::InternalDirectory::Entry : public afl::io::DirectoryEntry {
     virtual void doErase();
     virtual void doCreateAsDirectory();
     virtual void doSetFlag(FileFlag flag, bool value);
+    virtual void doMoveTo(Directory& dir, String_t name);
 
  private:
     afl::base::Ref<InternalDirectory> m_parent;
@@ -156,6 +157,17 @@ afl::io::InternalDirectory::Entry::doSetFlag(FileFlag /*flag*/, bool /*value*/)
 {
     throw afl::except::FileProblemException(m_name, afl::string::Messages::invalidOperation());
 }
+
+void
+afl::io::InternalDirectory::Entry::doMoveTo(Directory& dir, String_t name)
+{
+    if (&dir != &*m_parent) {
+        throw afl::except::FileProblemException(m_name, afl::string::Messages::invalidOperation());
+    } else {
+        doRename(name);
+    }
+}
+
 
 
 /******************** afl::io::InternalDirectory::Enum *******************/

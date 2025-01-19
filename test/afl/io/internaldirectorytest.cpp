@@ -16,6 +16,7 @@
 using afl::base::ConstBytes_t;
 using afl::base::Ptr;
 using afl::base::Ref;
+using afl::except::FileProblemException;
 using afl::io::Directory;
 using afl::io::DirectoryEntry;
 using afl::io::FileSystem;
@@ -75,12 +76,12 @@ AFL_TEST("afl.io.InternalDirectory:create", a)
 
     // Open fails for nonexistant file
     a.checkNull("02. open", md->openFileNT("foo", FileSystem::OpenRead).get());
-    AFL_CHECK_THROWS(a("03. open"), md->openFile("foo", FileSystem::OpenRead), afl::except::FileProblemException);
+    AFL_CHECK_THROWS(a("03. open"), md->openFile("foo", FileSystem::OpenRead), FileProblemException);
     a.checkEqual("04. eraseNT", md->eraseNT("foo"), false);
-    AFL_CHECK_THROWS(a("05. erase"), md->erase("foo"), afl::except::FileProblemException);
+    AFL_CHECK_THROWS(a("05. erase"), md->erase("foo"), FileProblemException);
 
     a.checkNonNull("06. getDirectoryEntryByName", md->getDirectoryEntryByName("foo").asPtr().get());
-    AFL_CHECK_THROWS(a("07. getDirectoryEntryByName"), md->getDirectoryEntryByName("foo")->renameTo("bar"), afl::except::FileProblemException);
+    AFL_CHECK_THROWS(a("07. getDirectoryEntryByName"), md->getDirectoryEntryByName("foo")->renameTo("bar"), FileProblemException);
 
     // Test creation
     Ref<Stream> s = md->openFile("foo", FileSystem::Create);
@@ -92,7 +93,7 @@ AFL_TEST("afl.io.InternalDirectory:create", a)
     a.checkEqual("16. getSize", s->getSize(), 5U);
 
     // Cannot re-create
-    AFL_CHECK_THROWS(a("21. create"), md->openFile("foo", FileSystem::CreateNew), afl::except::FileProblemException);
+    AFL_CHECK_THROWS(a("21. create"), md->openFile("foo", FileSystem::CreateNew), FileProblemException);
 
     // Test re-opening / reading
     uint8_t tmp[10];
@@ -180,7 +181,7 @@ AFL_TEST("afl.io.InternalDirectory:iteration", a)
     }
 
     // Entry must not be open-able as directory
-    AFL_CHECK_THROWS(a("51. openDirectory"), entry->openDirectory(), afl::except::FileProblemException);
+    AFL_CHECK_THROWS(a("51. openDirectory"), entry->openDirectory(), FileProblemException);
 
     // Entry must be linked to directory
     a.check("61. openContainingDirectory", &entry->openContainingDirectory().get() == &md.get());
@@ -217,4 +218,46 @@ AFL_TEST("afl.io.InternalDirectory:concurrent-iteration", a)
             a.check("05. next", entry.get() != 0);
         } while (e->getNextElement(entry));
     }
+}
+
+/** Test move between different instances. */
+AFL_TEST("afl.io.InternalDirectory:move:by-copy", a)
+{
+    Ref<Directory> aa = InternalDirectory::create("aa");
+    Ref<Directory> bb = InternalDirectory::create("bb");
+    aa->openFile("test", FileSystem::Create)->fullWrite(afl::string::toBytes("abc"));
+    bb->openFile("other", FileSystem::Create)->fullWrite(afl::string::toBytes("x"));
+
+    // Direct move fails
+    AFL_CHECK_THROWS(a("01. moveTo"), aa->getDirectoryEntryByName("test")->moveTo(*bb, "other"), FileProblemException);
+    a.checkEqual("02. moveToNT", aa->getDirectoryEntryByName("test")->moveToNT(*bb, "other"), false);
+    a.checkEqual("03. aa size", aa->openFile("test", FileSystem::OpenRead)->getSize(), 3U);
+    a.checkEqual("04. bb size", bb->openFile("other", FileSystem::OpenRead)->getSize(), 1U);
+
+    // Move by copy succeeds
+    AFL_CHECK_SUCCEEDS(a("11. moveFileByCopying"), aa->getDirectoryEntryByName("test")->moveFileByCopying(*bb, "other"));
+    AFL_CHECK_THROWS(a("12. aa size"), aa->openFile("test", FileSystem::OpenRead), FileProblemException);
+    a.checkEqual("13. bb size", bb->openFile("other", FileSystem::OpenRead)->getSize(), 3U);
+}
+
+/** Test move within same instance. */
+AFL_TEST("afl.io.InternalDirectory:move:as-rename", a)
+{
+    Ref<Directory> aa = InternalDirectory::create("aa");
+    aa->openFile("test", FileSystem::Create)->fullWrite(afl::string::toBytes("abc"));
+
+    // Direct move fails
+    aa->getDirectoryEntryByName("test")->moveTo(*aa, "new");
+    a.checkEqual("01. size", aa->openFile("new", FileSystem::OpenRead)->getSize(), 3U);
+}
+
+/** Test move within same instance, no name change. */
+AFL_TEST("afl.io.InternalDirectory:move:no-op", a)
+{
+    Ref<Directory> aa = InternalDirectory::create("aa");
+    aa->openFile("test", FileSystem::Create)->fullWrite(afl::string::toBytes("abc"));
+
+    // Direct move fails
+    aa->getDirectoryEntryByName("test")->moveTo(*aa, "test");
+    a.checkEqual("01. size", aa->openFile("test", FileSystem::OpenRead)->getSize(), 3U);
 }

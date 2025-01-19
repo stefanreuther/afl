@@ -85,21 +85,68 @@ namespace afl { namespace io {
             \return flags, empty if not known. */
         FileFlags_t getFlags();
 
-        /** Rename directory entry.
+        /** Rename item.
             The DirectoryEntry keeps refering to the original name.
             \param newName New file name. Should be just a file name, not a path name (in a different directory).
             \throw FileProblemException if there is a problem */
         void renameTo(String_t newName);
 
-        /** Rename directory entry.
+        /** Rename item.
             The DirectoryEntry keeps refering to the original name.
 
-            This is a wrapper for erase; if there is a FileProblemException, this function just returns false.
+            This is a wrapper for renameTo(); if there is a FileProblemException, this function just returns false.
             Other exceptions propagate normally.
 
             \param newName New file name. Should be just a file name, not a path name (in a different directory).
             \return true on success */
         bool renameToNT(String_t newName);
+
+        /** Move item.
+            If the item can be moved directly, it will be moved.
+            Typically, this is the case for move within the same file system.
+
+            If it cannot be moved directly, this operation fails.
+            Typically, this is the case if the Directory refers to a different FileSystem implementation,
+            or the underlying operating system refuses to move atomically because it's on a different file system partition.
+
+            If source and target refer to an existing file, the move is supposed to be executed atomically,
+            with the source overwriting the target.
+
+            The DirectoryEntry keeps refering to the original item.
+
+            \param dir Target directory
+            \param newName New file name. Should be just a file name, not a path name.
+
+            \throw FileProblemException if there is a problem */
+        void moveTo(Directory& dir, String_t newName);
+
+        /** Move item.
+            This is a wrapper for moveTo(); if there is a FileProblemException, this function just returns false.
+            Other exceptions propagate normally.
+
+            The DirectoryEntry keeps refering to the original item.
+
+            \param dir Target directory
+            \param newName New file name. Should be just a file name, not a path name. */
+        bool moveToNT(Directory& dir, String_t newName);
+
+        /** Move item, fall back to copying if needed.
+            Tries to move this file by copying as if by moveTo().
+            If that files, tries to move the file by creating it, copying the data,
+            and erasing the original.
+
+            Behaviour with non-files is not defined.
+
+            The DirectoryEntry keeps refering to the original item.
+
+            Note that this operation is not necessarily atomic.
+            In case of an error, it's possible that this leaves us with two copies of the file.
+
+            \param dir Target directory
+            \param newName New file name. Should be just a file name, not a path name.
+
+            \throw FileProblemException if there is a problem */
+        void moveFileByCopying(Directory& dir, String_t newName);
 
         /** Erase directory entry.
             The DirectoryEntry keeps refering to the original name.
@@ -196,6 +243,16 @@ namespace afl { namespace io {
             \param value New value
             \throw FileProblemException if there is a problem */
         virtual void doSetFlag(FileFlag flag, bool value) = 0;
+
+        /** Move, implementation.
+            If an atomic move is possible, this function shall do it.
+            If an atomic move is not possible, it shall reject it.
+            A move-by-copying might still succeed.
+
+            \param dir Target directory
+            \param name New name
+            \throw FileProblemException if there is a problem */
+        virtual void doMoveTo(Directory& dir, String_t name) = 0;
 
 
         /** Set file type.

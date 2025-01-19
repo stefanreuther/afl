@@ -41,6 +41,8 @@ AFL_TEST_NOARG("afl.io.DirectoryEntry:interface")
             { }
         virtual void doSetFlag(FileFlag /*flag*/, bool /*value*/)
             { }
+        virtual void doMoveTo(Directory& /*dir*/, String_t /*name*/)
+            { }
     };
     Tester t;
 }
@@ -101,6 +103,8 @@ namespace {
             { throw std::runtime_error("unexpected: doCreateAsDirectory"); }
         virtual void doSetFlag(FileFlag /*flag*/, bool /*value*/)
             { throw std::runtime_error("unexpected: doSetFlag"); }
+        virtual void doMoveTo(Directory& /*dir*/, String_t /*name*/)
+            { throw std::runtime_error("unexpected: doMoveTo"); }
 
         Optional<FileType> m_type;
         Optional<FileSize_t> m_fileSize;

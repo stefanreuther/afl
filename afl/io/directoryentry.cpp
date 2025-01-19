@@ -5,6 +5,8 @@
 
 #include "afl/io/directoryentry.hpp"
 #include "afl/except/fileproblemexception.hpp"
+#include "afl/io/directory.hpp"
+#include "afl/string/messages.hpp"
 
 afl::io::DirectoryEntry::DirectoryEntry()
     : afl::base::Deletable(),
@@ -79,6 +81,51 @@ afl::io::DirectoryEntry::renameToNT(String_t newName)
     catch (afl::except::FileProblemException& e) {
         (void) e;
         return false;
+    }
+}
+
+void
+afl::io::DirectoryEntry::moveTo(Directory& dir, String_t newName)
+{
+    clearInfo();
+    doMoveTo(dir, newName);
+}
+
+bool
+afl::io::DirectoryEntry::moveToNT(Directory& dir, String_t newName)
+{
+    try {
+        moveTo(dir, newName);
+        return true;
+    }
+    catch (afl::except::FileProblemException& e) {
+        (void) e;
+        return false;
+    }
+}
+
+void
+afl::io::DirectoryEntry::moveFileByCopying(Directory& dir, String_t newName)
+{
+    FileType t = getFileType();
+    if (t != tFile && t != tArchive) {
+        throw afl::except::FileProblemException(getPathName(), afl::string::Messages::invalidOperation());
+    }
+
+    try {
+        moveTo(dir, newName);
+    }
+    catch (afl::except::FileProblemException& e) {
+        // Copy
+        {
+            afl::base::Ref<Stream> in = openFile(FileSystem::OpenRead);
+            afl::base::Ref<Stream> out = dir.openFile(newName, FileSystem::Create);
+            out->copyFrom(*in);
+            out->flush();
+        }
+
+        // Delete this
+        erase();
     }
 }
 

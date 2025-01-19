@@ -8,13 +8,24 @@
 #include "afl/except/fileproblemexception.hpp"
 #include "afl/io/directory.hpp"
 #include "afl/io/directoryentry.hpp"
+#include "afl/io/internaldirectory.hpp"
 #include "afl/io/nullstream.hpp"
+#include "afl/io/temporarydirectory.hpp"
 #include "afl/test/testrunner.hpp"
+
+using afl::base::Ptr;
+using afl::base::Ref;
+using afl::except::FileProblemException;
+using afl::io::Directory;
+using afl::io::DirectoryEntry;
+using afl::io::FileSystem;
+using afl::io::InternalDirectory;
+using afl::io::TemporaryDirectory;
 
 /** Generic tests. */
 AFL_TEST("afl.io.FileSystem:path-names:generic", a)
 {
-    afl::io::FileSystem& fs = afl::io::FileSystem::getInstance();
+    FileSystem& fs = FileSystem::getInstance();
 
     a.check("empty string never is absolute",
             !fs.isAbsolutePathName(""));
@@ -32,7 +43,7 @@ AFL_TEST("afl.io.FileSystem:path-names:generic", a)
 /** POSIX tests. */
 AFL_TEST("afl.io.FileSystem:path-names:posix", a)
 {
-    afl::io::FileSystem& fs = afl::io::FileSystem::getInstance();
+    FileSystem& fs = FileSystem::getInstance();
 
     // isPathSeparator
     a.check("isPathSeparator 1", fs.isPathSeparator('/'));
@@ -97,8 +108,8 @@ AFL_TEST("afl.io.FileSystem:path-names:posix", a)
     // Reading a directory: opening "." or "/" works, but check that null is correctly rejected
     AFL_CHECK_SUCCEEDS(a("openDirectory ."), fs.openDirectory(".")->getDirectoryEntries());
     AFL_CHECK_SUCCEEDS(a("openDirectory /"), fs.openDirectory("/")->getDirectoryEntries());
-    AFL_CHECK_THROWS(a("openDirectory .nul"), fs.openDirectory(String_t(".\0Q", 3))->getDirectoryEntries(), afl::except::FileProblemException);
-    AFL_CHECK_THROWS(a("openDirectory /nul"), fs.openDirectory(String_t("/\0Q", 3))->getDirectoryEntries(), afl::except::FileProblemException);
+    AFL_CHECK_THROWS(a("openDirectory .nul"), fs.openDirectory(String_t(".\0Q", 3))->getDirectoryEntries(), FileProblemException);
+    AFL_CHECK_THROWS(a("openDirectory /nul"), fs.openDirectory(String_t("/\0Q", 3))->getDirectoryEntries(), FileProblemException);
 }
 #endif
 
@@ -106,7 +117,7 @@ AFL_TEST("afl.io.FileSystem:path-names:posix", a)
 /** Win32 tests. */
 AFL_TEST("afl.io.FileSystem:path-names:win32", a)
 {
-    afl::io::FileSystem& fs = afl::io::FileSystem::getInstance();
+    FileSystem& fs = FileSystem::getInstance();
 
     // isPathSeparator
     a.check("isPathSeparator 1", fs.isPathSeparator('/'));
@@ -198,10 +209,10 @@ AFL_TEST("afl.io.FileSystem:path-names:win32", a)
     The system instance must allow successful traversal of the root. */
 AFL_TEST("afl.io.FileSystem:openRootDirectory", a)
 {
-    afl::io::FileSystem& fs = afl::io::FileSystem::getInstance();
+    FileSystem& fs = FileSystem::getInstance();
 
     // Must be able to open it
-    afl::base::Ref<afl::io::Directory> root = fs.openRootDirectory();
+    Ref<Directory> root = fs.openRootDirectory();
 
     // Root properties:
     // - no parent, no name
@@ -210,29 +221,29 @@ AFL_TEST("afl.io.FileSystem:openRootDirectory", a)
     // - but a title
     a.check("03. getTitle", !root->getTitle().empty());
     // - cannot access files
-    AFL_CHECK_THROWS(a("04. createAsDirectory"), root->getDirectoryEntryByName("x")->createAsDirectory(), afl::except::FileProblemException);
+    AFL_CHECK_THROWS(a("04. createAsDirectory"), root->getDirectoryEntryByName("x")->createAsDirectory(), FileProblemException);
 
     // Enumerate content
-    afl::base::Ref<afl::base::Enumerator<afl::base::Ptr<afl::io::DirectoryEntry> > > entries = root->getDirectoryEntries();
+    Ref<afl::base::Enumerator<Ptr<DirectoryEntry> > > entries = root->getDirectoryEntries();
     a.check("11. getDirectoryEntries", &entries.get() != 0);
 
-    afl::base::Ptr<afl::io::DirectoryEntry> entry;
+    Ptr<DirectoryEntry> entry;
     size_t n = 0;
     while (entries->getNextElement(entry)) {
         // Verify the entry
         a.check("21. getNextElement", entry.get() != 0);
         a.check("22. getTitle", !entry->getTitle().empty());
         a.checkEqual("23. openContainingDirectory", &*entry->openContainingDirectory(), &*root);
-        a.check("24. getFileType", entry->getFileType() == afl::io::DirectoryEntry::tDirectory);
-        if (entry->getFlags().contains(afl::io::DirectoryEntry::Link)) {
+        a.check("24. getFileType", entry->getFileType() == DirectoryEntry::tDirectory);
+        if (entry->getFlags().contains(DirectoryEntry::Link)) {
             a.check("25. getLinkText", !entry->getLinkText().empty());
         }
 
         // Cannot be modified
-        AFL_CHECK_THROWS(a("26. renameTo"), entry->renameTo("foo"), afl::except::FileProblemException);
-        AFL_CHECK_THROWS(a("27. erase"), entry->erase(), afl::except::FileProblemException);
-        AFL_CHECK_THROWS(a("28. createAsDirectory"), entry->createAsDirectory(), afl::except::FileProblemException);
-        AFL_CHECK_THROWS(a("29. setFlag"), entry->setFlag(afl::io::DirectoryEntry::Hidden, true), afl::except::FileProblemException);
+        AFL_CHECK_THROWS(a("26. renameTo"), entry->renameTo("foo"), FileProblemException);
+        AFL_CHECK_THROWS(a("27. erase"), entry->erase(), FileProblemException);
+        AFL_CHECK_THROWS(a("28. createAsDirectory"), entry->createAsDirectory(), FileProblemException);
+        AFL_CHECK_THROWS(a("29. setFlag"), entry->setFlag(DirectoryEntry::Hidden, true), FileProblemException);
 
         ++n;
     }
@@ -244,21 +255,21 @@ AFL_TEST("afl.io.FileSystem:openRootDirectory", a)
 /** Test openFileNT. Also serves as an interface test. */
 AFL_TEST("afl.io.FileSystem:openFileNT", a)
 {
-    class Tester : public afl::io::FileSystem {
+    class Tester : public FileSystem {
      public:
-        virtual afl::base::Ref<afl::io::Stream> openFile(FileName_t fileName, OpenMode /*mode*/)
+        virtual Ref<afl::io::Stream> openFile(FileName_t fileName, OpenMode /*mode*/)
             {
                 if (fileName == "fpe") {
-                    throw afl::except::FileProblemException(fileName, "boom");
+                    throw FileProblemException(fileName, "boom");
                 } else if (fileName == "ex") {
                     throw std::runtime_error("err");
                 } else {
                     return *new afl::io::NullStream();
                 }
             }
-        virtual afl::base::Ref<afl::io::Directory> openDirectory(FileName_t /*dirName*/)
+        virtual Ref<Directory> openDirectory(FileName_t /*dirName*/)
             { throw std::runtime_error("no ref"); }
-        virtual afl::base::Ref<afl::io::Directory> openRootDirectory()
+        virtual Ref<Directory> openRootDirectory()
             { throw std::runtime_error("no ref"); }
         virtual bool isAbsolutePathName(FileName_t /*path*/)
             { return false; }
@@ -283,4 +294,166 @@ AFL_TEST("afl.io.FileSystem:openFileNT", a)
     a.check("fpe", t.openFileNT("fpe", Tester::OpenRead).get() == 0);
     a.check("other", t.openFileNT("other", Tester::OpenRead).get() != 0);
     AFL_CHECK_THROWS(a("ex"), t.openFileNT("ex", Tester::OpenRead), std::runtime_error);
+}
+
+/** Test moving between two directories. */
+AFL_TEST("afl.io.FileSystem:moveFile:two-directories", a)
+{
+    FileSystem& fs = FileSystem::getInstance();
+    Ref<Directory> dir = fs.openDirectory(fs.getWorkingDirectoryName());
+    std::auto_ptr<TemporaryDirectory> dir1(new TemporaryDirectory(dir));
+    std::auto_ptr<TemporaryDirectory> dir2(new TemporaryDirectory(dir));
+    Ref<InternalDirectory> internal = InternalDirectory::create("int");
+
+    dir1->get()->openFile("file1", FileSystem::Create)->fullWrite(afl::string::toBytes("a"));
+    dir1->get()->openFile("file2", FileSystem::Create)->fullWrite(afl::string::toBytes("bb"));
+    dir1->get()->openFile("file3", FileSystem::Create)->fullWrite(afl::string::toBytes("ccc"));
+
+    // Direct rename
+    AFL_CHECK_SUCCEEDS(a("01. direct rename succeeds"), dir1->get()->getDirectoryEntryByName("file1")->moveTo(*dir2->get(), "new1"));
+
+    // No-throw rename
+    a.checkEqual("02. no-throw rename", dir1->get()->getDirectoryEntryByName("file2")->moveToNT(*dir2->get(), "new2"), true);
+
+    // Failure
+    AFL_CHECK_THROWS(a("03. cross-device fails"), dir1->get()->getDirectoryEntryByName("file3")->moveTo(*internal, "new3"), FileProblemException);
+    a.checkEqual("04. cross-device fails", dir1->get()->getDirectoryEntryByName("file3")->moveToNT(*internal, "new3"), false);
+
+    // Verify resulting status
+    a.checkEqual("81. result", dir2->get()->getDirectoryEntryByName("new1")->getFileSize(), 1U);
+    a.checkEqual("82. result", dir2->get()->getDirectoryEntryByName("new2")->getFileSize(), 2U);
+    a.checkEqual("83. result", dir1->get()->getDirectoryEntryByName("file3")->getFileSize(), 3U);
+}
+
+/** Test moving within one directory. */
+AFL_TEST("afl.io.FileSystem:moveFile:one-directory", a)
+{
+    FileSystem& fs = FileSystem::getInstance();
+    Ref<Directory> dir = fs.openDirectory(fs.getWorkingDirectoryName());
+    std::auto_ptr<TemporaryDirectory> dir1(new TemporaryDirectory(dir));
+
+    dir1->get()->openFile("file1", FileSystem::Create)->fullWrite(afl::string::toBytes("a"));
+
+    // Direct rename
+    AFL_CHECK_SUCCEEDS(a("01. rename succeeds"), dir1->get()->getDirectoryEntryByName("file1")->moveTo(*dir1->get(), "new1"));
+
+    // Verify resulting status
+    a.checkEqual("81. result", dir1->get()->getDirectoryEntryByName("new1")->getFileSize(), 1U);
+}
+
+/** Test moving: source does not exist. */
+AFL_TEST("afl.io.FileSystem:moveFile:error:source-missing", a)
+{
+    FileSystem& fs = FileSystem::getInstance();
+    Ref<Directory> dir = fs.openDirectory(fs.getWorkingDirectoryName());
+    std::auto_ptr<TemporaryDirectory> dir1(new TemporaryDirectory(dir));
+
+    // Direct rename
+    AFL_CHECK_THROWS(a("01. rename succeeds"), dir1->get()->getDirectoryEntryByName("file1")->moveTo(*dir1->get(), "new1"), FileProblemException);
+}
+
+/** Test moving a directory. */
+AFL_TEST("afl.io.FileSystem:moveFile:dir", a)
+{
+    FileSystem& fs = FileSystem::getInstance();
+    Ref<Directory> dir = fs.openDirectory(fs.getWorkingDirectoryName());
+    std::auto_ptr<TemporaryDirectory> dir1(new TemporaryDirectory(dir));
+
+    dir1->get()->getDirectoryEntryByName("file1")->createAsDirectory();
+
+    // Direct rename
+    AFL_CHECK_SUCCEEDS(a("01. rename fails"), dir1->get()->getDirectoryEntryByName("file1")->moveTo(*dir1->get(), "new1"));
+    a.checkEqual("02. type", dir1->get()->getDirectoryEntryByName("new1")->getFileType(), DirectoryEntry::tDirectory);
+}
+
+/** Test overwriting a file with another one. */
+AFL_TEST("afl.io.FileSystem:moveFile:file-overwrites-file", a)
+{
+    FileSystem& fs = FileSystem::getInstance();
+    Ref<Directory> dir = fs.openDirectory(fs.getWorkingDirectoryName());
+    std::auto_ptr<TemporaryDirectory> dir1(new TemporaryDirectory(dir));
+
+    dir1->get()->openFile("file1", FileSystem::Create)->fullWrite(afl::string::toBytes("a"));
+    dir1->get()->openFile("new1", FileSystem::Create)->fullWrite(afl::string::toBytes("xxx"));
+
+    // Direct rename
+    AFL_CHECK_SUCCEEDS(a("01. rename fails"), dir1->get()->getDirectoryEntryByName("file1")->moveTo(*dir1->get(), "new1"));
+    a.checkEqual("02. size", dir1->get()->getDirectoryEntryByName("new1")->getFileSize(), 1U);
+}
+
+/** Test error: incompatible overwrite. */
+AFL_TEST("afl.io.FileSystem:moveFile:error:dir-overwrites-file", a)
+{
+    FileSystem& fs = FileSystem::getInstance();
+    Ref<Directory> dir = fs.openDirectory(fs.getWorkingDirectoryName());
+    std::auto_ptr<TemporaryDirectory> dir1(new TemporaryDirectory(dir));
+
+    dir1->get()->getDirectoryEntryByName("file1")->createAsDirectory();
+    dir1->get()->openFile("new1", FileSystem::Create);
+
+    // Direct rename
+#if TARGET_OS_WIN32
+    AFL_CHECK_SUCCEEDS(a("01. rename succeeds on Win32"), dir1->get()->getDirectoryEntryByName("file1")->moveTo(*dir1->get(), "new1"));
+#else
+    AFL_CHECK_THROWS(a("01. rename fails"), dir1->get()->getDirectoryEntryByName("file1")->moveTo(*dir1->get(), "new1"), FileProblemException);
+#endif
+}
+
+/** Test error: incompatible overwrite. */
+AFL_TEST("afl.io.FileSystem:moveFile:error:file-overwrites-dir", a)
+{
+    FileSystem& fs = FileSystem::getInstance();
+    Ref<Directory> dir = fs.openDirectory(fs.getWorkingDirectoryName());
+    std::auto_ptr<TemporaryDirectory> dir1(new TemporaryDirectory(dir));
+
+    dir1->get()->openFile("file1", FileSystem::Create);
+    dir1->get()->getDirectoryEntryByName("new1")->createAsDirectory();
+
+    // Direct rename
+    AFL_CHECK_THROWS(a("01. rename fails"), dir1->get()->getDirectoryEntryByName("file1")->moveTo(*dir1->get(), "new1"), FileProblemException);
+}
+
+/** Test moving between two incompatible directories. */
+AFL_TEST("afl.io.FileSystem:moveFile:by-copying", a)
+{
+    FileSystem& fs = FileSystem::getInstance();
+    Ref<Directory> dir = fs.openDirectory(fs.getWorkingDirectoryName());
+    std::auto_ptr<TemporaryDirectory> dir1(new TemporaryDirectory(dir));
+    Ref<InternalDirectory> internal = InternalDirectory::create("int");
+
+    dir1->get()->openFile("file1", FileSystem::Create)->fullWrite(afl::string::toBytes("a"));
+
+    // Direct move fails, by-copy succeeds
+    a.checkEqual("01. cross-device fails", dir1->get()->getDirectoryEntryByName("file1")->moveToNT(*internal, "new1"), false);
+    AFL_CHECK_SUCCEEDS(a("02. move succeeds"), dir1->get()->getDirectoryEntryByName("file1")->moveFileByCopying(*internal, "new1"));
+
+    // Verify resulting status
+    a.checkEqual("81. result", internal->getDirectoryEntryByName("new1")->getFileSize(), 1U);
+}
+
+/** Test moving by copy, error: source is a directory */
+AFL_TEST("afl.io.FileSystem:moveFile:by-copying:error:source-is-dir", a)
+{
+    FileSystem& fs = FileSystem::getInstance();
+    Ref<Directory> dir = fs.openDirectory(fs.getWorkingDirectoryName());
+    std::auto_ptr<TemporaryDirectory> dir1(new TemporaryDirectory(dir));
+    Ref<InternalDirectory> internal = InternalDirectory::create("int");
+
+    dir1->get()->getDirectoryEntryByName("file1")->createAsDirectory();
+
+    AFL_CHECK_THROWS(a("01. move fails"), dir1->get()->getDirectoryEntryByName("file1")->moveFileByCopying(*internal, "new1"), FileProblemException);
+}
+
+/** Test moving by copy, error: target is a directory */
+AFL_TEST("afl.io.FileSystem:moveFile:by-copying:error:target-is-dir", a)
+{
+    FileSystem& fs = FileSystem::getInstance();
+    Ref<Directory> dir = fs.openDirectory(fs.getWorkingDirectoryName());
+    std::auto_ptr<TemporaryDirectory> dir1(new TemporaryDirectory(dir));
+    Ref<InternalDirectory> internal = InternalDirectory::create("int");
+
+    internal->openFile("file1", FileSystem::Create)->fullWrite(afl::string::toBytes("a"));
+    dir1->get()->getDirectoryEntryByName("new1")->createAsDirectory();
+
+    AFL_CHECK_THROWS(a("01. move fails"), internal->getDirectoryEntryByName("file1")->moveFileByCopying(*dir1->get(), "new1"), FileProblemException);
 }

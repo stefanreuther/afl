@@ -119,6 +119,7 @@ class afl::io::InternalFileSystem::Entry : public DirectoryEntry {
     virtual void doErase();
     virtual void doCreateAsDirectory();
     virtual void doSetFlag(FileFlag flag, bool value);
+    virtual void doMoveTo(Directory& dir, String_t name);
 
  private:
     Ref<Dir> m_parent;
@@ -173,6 +174,7 @@ class afl::io::InternalFileSystem::RootEntry : public DirectoryEntry {
     virtual void doErase();
     virtual void doCreateAsDirectory();
     virtual void doSetFlag(FileFlag flag, bool value);
+    virtual void doMoveTo(Directory& dir, String_t name);
 
  private:
     Ref<RootDir> m_parent;
@@ -448,7 +450,7 @@ afl::io::InternalFileSystem::Entry::doRename(String_t newName)
             }
             n->name = newName;
         } else if (dynamic_cast<DirectoryNode*>(n) != 0) {
-            // Cannot overwrite anything with a file
+            // Cannot overwrite anything with a directory
             if (list.findNode(afl::string::toMemory(newName)) != 0) {
                 throw FileProblemException(getPathName(), Messages::fileExists());
             }
@@ -502,6 +504,48 @@ void
 afl::io::InternalFileSystem::Entry::doSetFlag(FileFlag /*flag*/, bool /*value*/)
 {
     throw FileProblemException(getPathName(), Messages::invalidOperation());
+}
+
+void
+afl::io::InternalFileSystem::Entry::doMoveTo(Directory& dir, String_t name)
+{
+    // Validate destination directory
+    Dir* d = dynamic_cast<Dir*>(&dir);
+    if (d == 0) {
+        throw FileProblemException(getPathName(), Messages::invalidOperation());
+    }
+
+    // Locate source file
+    NodeList& srcList = m_parent->content();
+    afl::container::PtrMultiList<Node>::iterator srcIt = srcList.findIterator(afl::string::toMemory(m_name));
+    if (srcIt == srcList.nodes.end()) {
+        // Source file does not exist
+        throw FileProblemException(getPathName(), Messages::fileNotFound());
+    }
+
+    // Locate destination
+    NodeList& destList = d->content();
+    afl::container::PtrMultiList<Node>::iterator destIt = destList.findIterator(afl::string::toMemory(name));
+
+    if (dynamic_cast<FileNode*>(*srcIt) != 0) {
+        // It'a a file. Validate/remove destination file
+        if (destIt != destList.nodes.end()) {
+            // Destination file exists, can we overwrite it?
+            if (dynamic_cast<FileNode*>(*destIt) == 0) {
+                throw FileProblemException(PosixFileNames().makePathName(dir.getDirectoryName(), name), Messages::fileExists());
+            }
+            destList.nodes.erase(destIt);
+        }
+    } else {
+        // Not a file. Can only move if target does not exist
+        if (destIt != destList.nodes.end()) {
+            throw FileProblemException(PosixFileNames().makePathName(dir.getDirectoryName(), name), Messages::fileExists());
+        }
+    }
+
+    // Move it
+    Node* destNode = destList.nodes.pushBackNew(srcList.nodes.extractElement(srcIt));
+    destNode->name = name;
 }
 
 
@@ -641,6 +685,12 @@ afl::io::InternalFileSystem::RootEntry::doCreateAsDirectory()
 
 void
 afl::io::InternalFileSystem::RootEntry::doSetFlag(FileFlag /*flag*/, bool /*value*/)
+{
+    throw FileProblemException(m_parent->getTitle(), Messages::cannotAccessFiles());
+}
+
+void
+afl::io::InternalFileSystem::RootEntry::doMoveTo(Directory& /*dir*/, String_t /*name*/)
 {
     throw FileProblemException(m_parent->getTitle(), Messages::cannotAccessFiles());
 }

@@ -39,6 +39,7 @@ class arch::posix::PosixDirectory::Entry : public afl::io::DirectoryEntry {
     virtual void doErase();
     virtual void doCreateAsDirectory();
     virtual void doSetFlag(FileFlag flag, bool value);
+    virtual void doMoveTo(Directory& dir, String_t name);
 
  private:
     afl::base::Ref<PosixDirectory> m_parent;
@@ -232,6 +233,22 @@ arch::posix::PosixDirectory::Entry::doSetFlag(FileFlag flag, bool value)
         }
         break;
      }
+    }
+}
+
+void
+arch::posix::PosixDirectory::Entry::doMoveTo(Directory& dir, String_t name)
+{
+    PosixDirectory* pd = dynamic_cast<PosixDirectory*>(&dir);
+    if (pd == 0) {
+        throw afl::except::FileProblemException(getPathName(), afl::string::Messages::invalidOperation());
+    }
+
+    const afl::io::FileSystem::FileName_t sysSource = convertUtf8ToPathName(getPathName());
+    const afl::io::FileSystem::FileName_t sysTarget = convertUtf8ToPathName(PosixFileSystem().makePathName(dir.getDirectoryName(), name));
+    int ok = ::rename(sysSource.c_str(), sysTarget.c_str());
+    if (ok != 0) {
+        throw afl::except::FileSystemException(getPathName(), afl::sys::Error::current());
     }
 }
 

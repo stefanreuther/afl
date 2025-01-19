@@ -7,8 +7,12 @@
 
 #include "afl/except/fileproblemexception.hpp"
 #include "afl/io/constmemorystream.hpp"
+#include "afl/io/internaldirectory.hpp"
 #include "afl/test/testrunner.hpp"
 
+using afl::base::Ref;
+using afl::except::FileProblemException;
+using afl::io::InternalDirectory;
 
 AFL_TEST("afl.io.UnchangeableDirectoryEntry", a)
 {
@@ -22,11 +26,11 @@ AFL_TEST("afl.io.UnchangeableDirectoryEntry", a)
             { return m_title; }
         virtual String_t getPathName()
             { return m_pathName; }
-        virtual afl::base::Ref<afl::io::Directory> openDirectory()
+        virtual Ref<afl::io::Directory> openDirectory()
             { throw std::runtime_error("no ref"); }
-        virtual afl::base::Ref<afl::io::Directory> openContainingDirectory()
+        virtual Ref<afl::io::Directory> openContainingDirectory()
             { throw std::runtime_error("no ref"); }
-        virtual afl::base::Ref<afl::io::Stream> openFileForReading()
+        virtual Ref<afl::io::Stream> openFileForReading()
             { return *new afl::io::ConstMemoryStream(afl::base::Nothing); }
         virtual void updateInfo(uint32_t /*requested*/)
             { }
@@ -34,21 +38,24 @@ AFL_TEST("afl.io.UnchangeableDirectoryEntry", a)
         String_t m_title;
         String_t m_pathName;
     };
+    Ref<InternalDirectory> target = InternalDirectory::create("x");
 
     // Test mock accessors:
     a.checkEqual("getTitle",    Tester("t", "p").getTitle(), "t");
     a.checkEqual("getPathName", Tester("t", "p").getPathName(), "p");
 
     // Test regular modifiers:
-    AFL_CHECK_THROWS(a("renameTo"),          Tester("a", "").renameTo("b"), afl::except::FileProblemException);
-    AFL_CHECK_THROWS(a("erase"),             Tester("a", "").erase(), afl::except::FileProblemException);
-    AFL_CHECK_THROWS(a("createAsDirectory"), Tester("a", "").createAsDirectory(), afl::except::FileProblemException);
-    AFL_CHECK_THROWS(a("setFlag"),           Tester("a", "").setFlag(afl::io::DirectoryEntry::Executable, true), afl::except::FileProblemException);
-    AFL_CHECK_THROWS(a("openFile"),          Tester("a", "").openFile(afl::io::FileSystem::Create), afl::except::FileProblemException);
+    AFL_CHECK_THROWS(a("renameTo"),          Tester("a", "").renameTo("b"), FileProblemException);
+    AFL_CHECK_THROWS(a("erase"),             Tester("a", "").erase(), FileProblemException);
+    AFL_CHECK_THROWS(a("createAsDirectory"), Tester("a", "").createAsDirectory(), FileProblemException);
+    AFL_CHECK_THROWS(a("setFlag"),           Tester("a", "").setFlag(afl::io::DirectoryEntry::Executable, true), FileProblemException);
+    AFL_CHECK_THROWS(a("openFile"),          Tester("a", "").openFile(afl::io::FileSystem::Create), FileProblemException);
+    AFL_CHECK_THROWS(a("moveTo"),            Tester("a", "").moveTo(*target, "x"), FileProblemException);
 
     // Test NT modifiers:
     a.check("renameToNT", !Tester("a", "").renameToNT("b"));
     a.check("eraseNT",    !Tester("a", "").eraseNT());
+    a.check("moveToNT",   !Tester("a", "").moveToNT(*target, "x"));
 
     // Test successful opening
     AFL_CHECK_SUCCEEDS(a("openFile"), Tester("a", "").openFile(afl::io::FileSystem::OpenRead));
@@ -59,7 +66,7 @@ AFL_TEST("afl.io.UnchangeableDirectoryEntry", a)
         Tester("t", "p").erase();
         a.fail("erase should fail");
     }
-    catch (afl::except::FileProblemException& fpe) {
+    catch (FileProblemException& fpe) {
         a.checkEqual("getFileName after erase", fpe.getFileName(), "p");
         a.checkEqual("what after erase", String_t(fpe.what()), "fail!");
     }
@@ -72,7 +79,7 @@ AFL_TEST("afl.io.UnchangeableDirectoryEntry", a)
         Tester("t", "").erase();
         a.fail("erase should fail 2");
     }
-    catch (afl::except::FileProblemException& fpe) {
+    catch (FileProblemException& fpe) {
         a.checkEqual("getFileName after erase 2", fpe.getFileName(), "t");
         a.checkEqual("what after erase 2", String_t(fpe.what()), "fail!");
     }

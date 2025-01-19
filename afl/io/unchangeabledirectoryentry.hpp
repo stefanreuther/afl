@@ -66,6 +66,7 @@ namespace afl { namespace io {
         virtual void doErase();
         virtual void doCreateAsDirectory();
         virtual void doSetFlag(FileFlag flag, bool value);
+        virtual void doMoveTo(Directory& dir, String_t name);
 
      private:
         void fail();

@@ -37,6 +37,7 @@ class arch::posix::PosixRoot::Entry : public afl::io::DirectoryEntry {
     virtual void doErase();
     virtual void doCreateAsDirectory();
     virtual void doSetFlag(FileFlag flag, bool value);
+    virtual void doMoveTo(Directory& dir, String_t name);
 
  private:
     afl::base::Ref<PosixRoot> m_parent;
@@ -155,6 +156,12 @@ arch::posix::PosixRoot::Entry::doCreateAsDirectory()
 
 void
 arch::posix::PosixRoot::Entry::doSetFlag(FileFlag /*flag*/, bool /*value*/)
+{
+    fail();
+}
+
+void
+arch::posix::PosixRoot::Entry::doMoveTo(Directory& /*dir*/, String_t /*name*/)
 {
     fail();
 }

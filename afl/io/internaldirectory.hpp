@@ -19,7 +19,10 @@ namespace afl { namespace io {
         using the specific addStream() interface.
 
         Instances of InternalDirectory must be created dynamically;
-        therefore, this class does not publish a constructor, but a factory function create(). */
+        therefore, this class does not publish a constructor, but a factory function create().
+
+        The moveTo() operation cannot move between different InternalDirectory instances.
+        If you need that, use directory instances derived from InternalFileSystem. */
     class InternalDirectory : public Directory {
      public:
         /*

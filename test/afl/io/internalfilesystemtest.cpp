@@ -8,6 +8,8 @@
 #include "afl/except/fileproblemexception.hpp"
 #include "afl/io/directoryentry.hpp"
 #include "afl/test/testrunner.hpp"
+#include "afl/io/temporarydirectory.hpp"
+#include "afl/io/internaldirectory.hpp"
 
 using afl::base::Ptr;
 using afl::base::Ref;
@@ -15,6 +17,9 @@ using afl::except::FileProblemException;
 using afl::io::Directory;
 using afl::io::DirectoryEntry;
 using afl::io::FileSystem;
+using afl::io::InternalDirectory;
+using afl::io::InternalFileSystem;
+using afl::io::TemporaryDirectory;
 
 namespace {
     void prepare(FileSystem& fs)
@@ -29,7 +34,7 @@ namespace {
     Modelled after TestIoFileSystem::testGeneric(), TestIoFileSystem::testPosix(). */
 AFL_TEST("afl.io.InternalFileSystem:file-names", a)
 {
-    afl::io::InternalFileSystem fs;
+    InternalFileSystem fs;
 
     // getWorkingDirectoryName
     a.check("getWorkingDirectoryName 1", fs.getWorkingDirectoryName() != "");
@@ -104,7 +109,7 @@ AFL_TEST("afl.io.InternalFileSystem:file-names", a)
     Modelled after TestIoFileSystem::testRoot() */
 AFL_TEST("afl.io.InternalFileSystem:openRootDirectory", a)
 {
-    afl::io::InternalFileSystem fs;
+    InternalFileSystem fs;
 
     // Must be able to open it
     Ref<Directory> root = fs.openRootDirectory();
@@ -151,7 +156,7 @@ AFL_TEST("afl.io.InternalFileSystem:openRootDirectory", a)
 /** Test handling of content. */
 AFL_TEST("afl.io.InternalFileSystem:content", a)
 {
-    afl::io::InternalFileSystem fs;
+    InternalFileSystem fs;
     prepare(fs);
 
     // Error: createAsDirectory when directory exists
@@ -199,7 +204,7 @@ AFL_TEST("afl.io.InternalFileSystem:content", a)
 /** Test enumerating a directory. */
 AFL_TEST("afl.io.InternalFileSystem:getDirectoryEntries", a)
 {
-    afl::io::InternalFileSystem fs;
+    InternalFileSystem fs;
     prepare(fs);
 
     // Open directory
@@ -235,7 +240,7 @@ AFL_TEST("afl.io.InternalFileSystem:getDirectoryEntries", a)
 /** Test dealing with DirectoryEntry objects. */
 AFL_TEST("afl.io.InternalFileSystem:DirectoryEntry", a)
 {
-    afl::io::InternalFileSystem fs;
+    InternalFileSystem fs;
     prepare(fs);
 
     // DirectoryEntry for a directory
@@ -276,7 +281,7 @@ AFL_TEST("afl.io.InternalFileSystem:DirectoryEntry", a)
 /** Test erase. */
 AFL_TEST("afl.io.InternalFileSystem:erase", a)
 {
-    afl::io::InternalFileSystem fs;
+    InternalFileSystem fs;
     prepare(fs);
 
     // Try to erase "d": fails because it's not empty
@@ -299,7 +304,7 @@ AFL_TEST("afl.io.InternalFileSystem:erase", a)
 // Rename directory
 AFL_TEST("afl.io.InternalFileSystem:rename:directory", a)
 {
-    afl::io::InternalFileSystem fs;
+    InternalFileSystem fs;
     prepare(fs);
     AFL_CHECK_SUCCEEDS(a("rename"), fs.openDirectory("/")->getDirectoryEntryByName("d")->renameTo("e"));
     AFL_CHECK_SUCCEEDS(a("openFile"), fs.openFile("/e/f1", FileSystem::OpenRead));
@@ -308,7 +313,7 @@ AFL_TEST("afl.io.InternalFileSystem:rename:directory", a)
 // Null-rename directory
 AFL_TEST("afl.io.InternalFileSystem:rename:directory-noop", a)
 {
-    afl::io::InternalFileSystem fs;
+    InternalFileSystem fs;
     prepare(fs);
     AFL_CHECK_SUCCEEDS(a("rename"), fs.openDirectory("/")->getDirectoryEntryByName("d")->renameTo("d"));
     AFL_CHECK_SUCCEEDS(a("openFile"), fs.openFile("/d/f1", FileSystem::OpenRead));
@@ -317,7 +322,7 @@ AFL_TEST("afl.io.InternalFileSystem:rename:directory-noop", a)
 // Rename file
 AFL_TEST("afl.io.InternalFileSystem:rename:file", a)
 {
-    afl::io::InternalFileSystem fs;
+    InternalFileSystem fs;
     prepare(fs);
     AFL_CHECK_SUCCEEDS(a("rename"), fs.openDirectory("/d")->getDirectoryEntryByName("f1")->renameTo("q"));
     AFL_CHECK_SUCCEEDS(a("openFile new"), fs.openFile("/d/q", FileSystem::OpenRead));
@@ -327,7 +332,7 @@ AFL_TEST("afl.io.InternalFileSystem:rename:file", a)
 // Rename file, overwriting
 AFL_TEST("afl.io.InternalFileSystem:rename:file-overwrite", a)
 {
-    afl::io::InternalFileSystem fs;
+    InternalFileSystem fs;
     prepare(fs);
     AFL_CHECK_SUCCEEDS(a("rename"), fs.openDirectory("/d")->getDirectoryEntryByName("f1")->renameTo("f2"));
     AFL_CHECK_THROWS(a("openFile old"), fs.openFile("/d/f1", FileSystem::OpenRead), FileProblemException);
@@ -341,7 +346,7 @@ AFL_TEST("afl.io.InternalFileSystem:rename:file-overwrite", a)
 // Null-rename file
 AFL_TEST("afl.io.InternalFileSystem:rename:file-noop", a)
 {
-    afl::io::InternalFileSystem fs;
+    InternalFileSystem fs;
     prepare(fs);
     AFL_CHECK_SUCCEEDS(a("rename"), fs.openDirectory("/d")->getDirectoryEntryByName("f1")->renameTo("f1"));
     AFL_CHECK_SUCCEEDS(a("openFile"), fs.openFile("/d/f1", FileSystem::OpenRead));
@@ -350,7 +355,7 @@ AFL_TEST("afl.io.InternalFileSystem:rename:file-noop", a)
 // Error: rename directory, file in the way
 AFL_TEST("afl.io.InternalFileSystem:rename:directory-conflict", a)
 {
-    afl::io::InternalFileSystem fs;
+    InternalFileSystem fs;
     prepare(fs);
     fs.openFile("/e", FileSystem::Create);
     AFL_CHECK_THROWS(a("rename"), fs.openDirectory("/")->getDirectoryEntryByName("d")->renameTo("e"), FileProblemException);
@@ -361,7 +366,7 @@ AFL_TEST("afl.io.InternalFileSystem:rename:directory-conflict", a)
 // Error: rename file, directory in the way
 AFL_TEST("afl.io.InternalFileSystem:rename:file-conflict", a)
 {
-    afl::io::InternalFileSystem fs;
+    InternalFileSystem fs;
     prepare(fs);
     fs.openDirectory("/d")->getDirectoryEntryByName("x")->createAsDirectory();
     AFL_CHECK_THROWS(a("rename"), fs.openDirectory("/d")->getDirectoryEntryByName("f1")->renameTo("x"), FileProblemException);
@@ -371,7 +376,7 @@ AFL_TEST("afl.io.InternalFileSystem:rename:file-conflict", a)
 /** Test open(Create) variations. */
 AFL_TEST("afl.io.InternalFileSystem:create", a)
 {
-    afl::io::InternalFileSystem fs;
+    InternalFileSystem fs;
     prepare(fs);
 
     // Error cases
@@ -392,7 +397,7 @@ AFL_TEST("afl.io.InternalFileSystem:create", a)
 /** Test createDirectory(). */
 AFL_TEST("afl.io.InternalFileSystem:createDirectory", a)
 {
-    afl::io::InternalFileSystem fs;
+    InternalFileSystem fs;
     prepare(fs);
 
     // Error: already exists
@@ -405,4 +410,117 @@ AFL_TEST("afl.io.InternalFileSystem:createDirectory", a)
     // Success
     AFL_CHECK_SUCCEEDS(a("create success"), fs.createDirectory("/d/sub"));
     AFL_CHECK_SUCCEEDS(a("open success"),   fs.openDirectory("/d/sub"));
+}
+
+/** Test moving between two directories. */
+AFL_TEST("afl.io.InternalFileSystem:moveFile:two-directories", a)
+{
+    InternalFileSystem fs;
+    Ref<Directory> dir = fs.openDirectory(fs.getWorkingDirectoryName());
+    std::auto_ptr<TemporaryDirectory> dir1(new TemporaryDirectory(dir));
+    std::auto_ptr<TemporaryDirectory> dir2(new TemporaryDirectory(dir));
+    Ref<InternalDirectory> internal = InternalDirectory::create("int");
+
+    dir1->get()->openFile("file1", FileSystem::Create)->fullWrite(afl::string::toBytes("a"));
+    dir1->get()->openFile("file2", FileSystem::Create)->fullWrite(afl::string::toBytes("bb"));
+    dir1->get()->openFile("file3", FileSystem::Create)->fullWrite(afl::string::toBytes("ccc"));
+
+    // Direct rename
+    AFL_CHECK_SUCCEEDS(a("01. direct rename succeeds"), dir1->get()->getDirectoryEntryByName("file1")->moveTo(*dir2->get(), "new1"));
+
+    // No-throw rename
+    a.checkEqual("02. no-throw rename", dir1->get()->getDirectoryEntryByName("file2")->moveToNT(*dir2->get(), "new2"), true);
+
+    // Failure
+    AFL_CHECK_THROWS(a("03. cross-device fails"), dir1->get()->getDirectoryEntryByName("file3")->moveTo(*internal, "new3"), FileProblemException);
+    a.checkEqual("04. cross-device fails", dir1->get()->getDirectoryEntryByName("file3")->moveToNT(*internal, "new3"), false);
+
+    // Verify resulting status
+    a.checkEqual("81. result", dir2->get()->getDirectoryEntryByName("new1")->getFileSize(), 1U);
+    a.checkEqual("82. result", dir2->get()->getDirectoryEntryByName("new2")->getFileSize(), 2U);
+    a.checkEqual("83. result", dir1->get()->getDirectoryEntryByName("file3")->getFileSize(), 3U);
+}
+
+/** Test moving within one directory. */
+AFL_TEST("afl.io.InternalFileSystem:moveFile:one-directory", a)
+{
+    InternalFileSystem fs;
+    Ref<Directory> dir = fs.openDirectory(fs.getWorkingDirectoryName());
+    std::auto_ptr<TemporaryDirectory> dir1(new TemporaryDirectory(dir));
+
+    dir1->get()->openFile("file1", FileSystem::Create)->fullWrite(afl::string::toBytes("a"));
+
+    // Direct rename
+    AFL_CHECK_SUCCEEDS(a("01. rename succeeds"), dir1->get()->getDirectoryEntryByName("file1")->moveTo(*dir1->get(), "new1"));
+
+    // Verify resulting status
+    a.checkEqual("81. result", dir1->get()->getDirectoryEntryByName("new1")->getFileSize(), 1U);
+}
+
+/** Test moving: source does not exist. */
+AFL_TEST("afl.io.InternalFileSystem:moveFile:error:source-missing", a)
+{
+    InternalFileSystem fs;
+    Ref<Directory> dir = fs.openDirectory(fs.getWorkingDirectoryName());
+    std::auto_ptr<TemporaryDirectory> dir1(new TemporaryDirectory(dir));
+
+    // Direct rename
+    AFL_CHECK_THROWS(a("01. rename succeeds"), dir1->get()->getDirectoryEntryByName("file1")->moveTo(*dir1->get(), "new1"), FileProblemException);
+}
+
+/** Test moving a directory. */
+AFL_TEST("afl.io.InternalFileSystem:moveFile:dir", a)
+{
+    InternalFileSystem fs;
+    Ref<Directory> dir = fs.openDirectory(fs.getWorkingDirectoryName());
+    std::auto_ptr<TemporaryDirectory> dir1(new TemporaryDirectory(dir));
+
+    dir1->get()->getDirectoryEntryByName("file1")->createAsDirectory();
+
+    // Direct rename
+    AFL_CHECK_SUCCEEDS(a("01. rename fails"), dir1->get()->getDirectoryEntryByName("file1")->moveTo(*dir1->get(), "new1"));
+    a.checkEqual("02. type", dir1->get()->getDirectoryEntryByName("new1")->getFileType(), DirectoryEntry::tDirectory);
+}
+
+/** Test overwriting a file with another one. */
+AFL_TEST("afl.io.InternalFileSystem:moveFile:file-overwrites-file", a)
+{
+    InternalFileSystem fs;
+    Ref<Directory> dir = fs.openDirectory(fs.getWorkingDirectoryName());
+    std::auto_ptr<TemporaryDirectory> dir1(new TemporaryDirectory(dir));
+
+    dir1->get()->openFile("file1", FileSystem::Create)->fullWrite(afl::string::toBytes("a"));
+    dir1->get()->openFile("new1", FileSystem::Create)->fullWrite(afl::string::toBytes("xxx"));
+
+    // Direct rename
+    AFL_CHECK_SUCCEEDS(a("01. rename fails"), dir1->get()->getDirectoryEntryByName("file1")->moveTo(*dir1->get(), "new1"));
+    a.checkEqual("02. size", dir1->get()->getDirectoryEntryByName("new1")->getFileSize(), 1U);
+}
+
+/** Test error: incompatible overwrite. */
+AFL_TEST("afl.io.InternalFileSystem:moveFile:error:dir-overwrites-file", a)
+{
+    InternalFileSystem fs;
+    Ref<Directory> dir = fs.openDirectory(fs.getWorkingDirectoryName());
+    std::auto_ptr<TemporaryDirectory> dir1(new TemporaryDirectory(dir));
+
+    dir1->get()->getDirectoryEntryByName("file1")->createAsDirectory();
+    dir1->get()->openFile("new1", FileSystem::Create);
+
+    // Direct rename
+    AFL_CHECK_THROWS(a("01. rename fails"), dir1->get()->getDirectoryEntryByName("file1")->moveTo(*dir1->get(), "new1"), FileProblemException);
+}
+
+/** Test error: incompatible overwrite. */
+AFL_TEST("afl.io.InternalFileSystem:moveFile:error:file-overwrites-dir", a)
+{
+    InternalFileSystem fs;
+    Ref<Directory> dir = fs.openDirectory(fs.getWorkingDirectoryName());
+    std::auto_ptr<TemporaryDirectory> dir1(new TemporaryDirectory(dir));
+
+    dir1->get()->openFile("file1", FileSystem::Create);
+    dir1->get()->getDirectoryEntryByName("new1")->createAsDirectory();
+
+    // Direct rename
+    AFL_CHECK_THROWS(a("01. rename fails"), dir1->get()->getDirectoryEntryByName("file1")->moveTo(*dir1->get(), "new1"), FileProblemException);
 }

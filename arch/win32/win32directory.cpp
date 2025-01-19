@@ -44,6 +44,7 @@ class arch::win32::Win32Directory::Entry : public afl::io::DirectoryEntry {
     virtual void doErase();
     virtual void doCreateAsDirectory();
     virtual void doSetFlag(FileFlag flag, bool value);
+    virtual void doMoveTo(Directory& dir, String_t name);
 
     void setFlagsAndFileType(DWORD attr);
 
@@ -254,6 +255,38 @@ arch::win32::Win32Directory::Entry::doSetFlag(FileFlag flag, bool value)
      case Executable:
         throw afl::except::FileProblemException(getPathName(), afl::string::Messages::invalidOperation());
         break;
+    }
+}
+
+void
+arch::win32::Win32Directory::Entry::doMoveTo(Directory& dir, String_t name)
+{
+    // Same type?
+    if (dynamic_cast<Win32Directory*>(&dir) == 0) {
+        throw afl::except::FileProblemException(getPathName(), afl::string::Messages::invalidOperation());
+    }
+
+    // Convert path names
+    bool success;
+    const afl::io::FileSystem::FileName_t utfOldName = getPathName();
+    const afl::io::FileSystem::FileName_t utfNewName = Win32FileSystem().makePathName(dir.getDirectoryName(), name);
+
+    if (hasUnicodeSupport()) {
+        WStr uniOldName, uniNewName;
+        convertToUnicode(uniOldName, afl::string::toMemory(utfOldName));
+        convertToUnicode(uniNewName, afl::string::toMemory(utfNewName));
+        if (!terminateUnicode(uniOldName)) {
+            throw afl::except::FileProblemException(utfOldName, afl::string::Messages::invalidFileName());
+        }
+        if (!terminateUnicode(uniNewName)) {
+            throw afl::except::FileProblemException(utfNewName, afl::string::Messages::invalidFileName());
+        }
+        success = MoveFileExW(&uniOldName[0], &uniNewName[0], MOVEFILE_REPLACE_EXISTING);
+    } else {
+        success = MoveFileExA(convertFileNameToANSI(utfOldName).c_str(), convertFileNameToANSI(utfNewName).c_str(), MOVEFILE_REPLACE_EXISTING);
+    }
+    if (!success) {
+        throw afl::except::FileSystemException(utfOldName, afl::sys::Error::current());
     }
 }
 
