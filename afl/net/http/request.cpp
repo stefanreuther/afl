@@ -3,7 +3,6 @@
   *  \brief Class afl::net::http::Request
   */
 
-#include <stdio.h>
 #include "afl/net/http/request.hpp"
 #include "afl/net/url.hpp"
 
@@ -163,7 +162,9 @@ afl::net::http::Request::isKeepalive() const
         return false;
     } else if (const HeaderField* hf = m_header.get("Connection")) {
         // Explicit keep-alive request
-        return hf->getValue() == "keepalive";
+        // RfC 2068 says: "keep-alive means keep-alive"
+        // RfC 2616 says: "close means not keep-alive"
+        return hf->getValue() == "keep-alive";
     } else {
         // No header field; use default: keepalive for 1.1 only
         return m_version == HTTP_1_1;

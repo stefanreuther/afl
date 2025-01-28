@@ -83,7 +83,7 @@ AFL_TEST("afl.net.http.Request:http-1.0", a)
 AFL_TEST("afl.net.http.Request:http-1.0:keepalive", a)
 {
     Request req;
-    ConstBytes_t bytes(afl::string::toBytes("GET / HTTP/1.0\r\nConnection: keepalive\r\n\r\n"));
+    ConstBytes_t bytes(afl::string::toBytes("GET / HTTP/1.0\r\nConnection: keep-alive\r\n\r\n"));
     a.check("data accepted", req.handleData(bytes));
     a.check("data complete", bytes.empty());
     a.checkEqual("getMethod", req.getMethod(), "GET");
