@@ -40,6 +40,14 @@ afl::test::Assert::checkNear(const String_t& info, double value, double expected
 }
 
 void
+afl::test::Assert::checkContains(const String_t& info, const String_t& haystack, const String_t& needle) const
+{
+    if (haystack.find(needle) == String_t::npos) {
+        fail(afl::string::Format("%s (found '%s', does not contain '%s')", info, haystack, needle));
+    }
+}
+
+void
 afl::test::Assert::fail(const String_t& info) const
 {
     throw afl::except::AssertionFailedException(info, m_location);

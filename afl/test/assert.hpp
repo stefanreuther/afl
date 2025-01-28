@@ -146,6 +146,13 @@ namespace afl { namespace test {
             \throw afl::except::AssertionFailedException if abs(value-expected) > range */
         void checkNear(const String_t& info, double value, double expected, double range) const;
 
+        /** Check that string contains another string.
+            \param info Information string to be passed into exception
+            \param haystack Subject value
+            \param needle Substring to be located
+            \throw afl::except::AssertionFailedException if needle not found in haystack */
+        void checkContains(const String_t& info, const String_t& haystack, const String_t& needle) const;
+
         /** Fail.
             Just throws the exception.
             \param info Information string to be passed into exception

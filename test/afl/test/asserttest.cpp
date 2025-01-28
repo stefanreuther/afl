@@ -20,6 +20,7 @@ AFL_TEST("afl.test.Assert:success", a) {
     AFL_CHECK_SUCCEEDS(a("checkEqual:mixed-int"), t.checkEqual("hi", 9, 9L));
     AFL_CHECK_SUCCEEDS(a("checkEqual:mixed-str"), t.checkEqual("hi", "a", String_t("a")));
     AFL_CHECK_SUCCEEDS(a("checkEqualContent"),    t.checkEqualContent("hi", toMemory("axy"), toMemory("axy")));
+    AFL_CHECK_SUCCEEDS(a("checkContains"),        t.checkContains("hi", "foobar", "ob"));
 }
 
 // Error cases
@@ -32,6 +33,7 @@ AFL_TEST("afl.test.Assert:error", a) {
     AFL_CHECK_THROWS(a("checkEqual:mixed-str"),           t.checkEqual("hi", "a", String_t("b")),                      AssertionFailedException);
     AFL_CHECK_THROWS(a("checkEqualContent:content-diff"), t.checkEqualContent("hi", toMemory("azy"), toMemory("axy")), AssertionFailedException);
     AFL_CHECK_THROWS(a("checkEqualContent:size-diff"),    t.checkEqualContent("hi", toMemory("hjk"), toMemory("hj")),  AssertionFailedException);
+    AFL_CHECK_THROWS(a("checkContains"),                  t.checkContains("hi", "foobar", "xy"),                       AssertionFailedException);
 }
 
 // Constructor variants
