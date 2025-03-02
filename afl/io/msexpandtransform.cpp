@@ -114,7 +114,7 @@ afl::io::MsExpandTransform::transform(afl::base::ConstBytes_t& in, afl::base::By
             if ((p = in.eat()) != 0) {
                 // Got a length byte. Prepare for reading a backreference.
                 m_count = (*p & 15) + 3;
-                m_pos = m_data | ((*p & 0xF0) << 4);
+                m_pos = static_cast<size_t>(m_data | ((*p & 0xF0) << 4));
                 m_state = WriteBackreference;
             } else {
                 // Unable to complete this step which means input is exhausted. Break.

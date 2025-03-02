@@ -41,7 +41,7 @@ afl::io::json::Writer::visitString(const String_t& str)
 {
     String_t fmt = "\"";
     for (size_t i = 0; i < str.size(); ++i) {
-        uint8_t ch = str[i];
+        uint8_t ch = static_cast<uint8_t>(str[i]);
         if (ch == '\\') {
             fmt += "\\\\";
         } else if (ch == '"') {

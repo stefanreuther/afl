@@ -60,7 +60,7 @@ class afl::functional::BinaryFunction<A1,A2,B>::ComposedFunction : public Binary
 
 template<typename A1, typename A2, typename B>
 template<typename C>
-inline afl::functional::BinaryFunction<A1,A2,B>::ComposedFunction<C>
+inline typename afl::functional::BinaryFunction<A1,A2,B>::template ComposedFunction<C>
 afl::functional::BinaryFunction<A1,A2,B>::map(const UnaryFunction<B,C>& function) const
 {
     return ComposedFunction<C>(*this, function);

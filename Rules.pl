@@ -17,7 +17,7 @@ add_variable(RUN => '',
 
 # Programs
 find_compiler();
-find_compiler_options("-I$V{IN}", "-I$V{OUT}", qw(-g -O2 -ansi -pedantic -fmessage-length=0 -Wno-long-long -Wconversion -mthreads -W -Wall));
+find_compiler_options("-I$V{IN}", "-I$V{OUT}", qw(-g -O2 -ansi -pedantic -fmessage-length=0 -Wno-long-long -Wconversion -W -Wall -Wno-dtor-name));
 find_archiver();
 
 # Target
@@ -30,6 +30,7 @@ if ($V{TARGET} =~ /POSIX/i) {
     set_variable(CXXFLAGS => "$V{CXXFLAGS} -DTARGET_OS_WIN32");
     add_variable(EXE_SUFFIX => '.exe');
     find_system_libraries(qw(-lws2_32));
+    find_compiler_options(qw(-mthreads));
 } else {
     die "Error: the specified target '$V{TARGET}' is not known; provide correct 'TARGET=' option";
 }

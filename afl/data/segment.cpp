@@ -71,7 +71,7 @@ afl::data::Segment::insertNew(Index_t index, Value* value)
 
     // Replace the element. This will not throw, and even if it did,
     // it would be PtrVector's responsibility to clean up ("...New" function).
-    m_content.insertNew(m_content.begin() + index, value);
+    m_content.insertNew(m_content.begin() + static_cast<ptrdiff_t>(index), value);
 }
 
 afl::data::Value*

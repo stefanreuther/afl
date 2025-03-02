@@ -65,7 +65,7 @@ class afl::functional::UnaryFunction<A,B>::ComposedFunction : public afl::functi
 
 template<typename A, typename B>
 template<typename C>
-inline afl::functional::UnaryFunction<A,B>::ComposedFunction<C>
+inline typename afl::functional::UnaryFunction<A,B>::template ComposedFunction<C>
 afl::functional::UnaryFunction<A,B>::map(const UnaryFunction<B,C>& function) const
 {
     return ComposedFunction<C>(*this, function);

@@ -99,7 +99,7 @@ afl::functional::Mapping<A,B>::fold(const BinaryFunction<Acc, B, Acc>& function,
 
 template<typename A, typename B>
 template<typename C>
-inline afl::functional::Mapping<A,B>::ComposedMapping<C>
+inline typename afl::functional::Mapping<A,B>::template ComposedMapping<C>
 afl::functional::Mapping<A,B>::map(const UnaryFunction<B,C>& function) const
 {
     return ComposedMapping<C>(*this, function);
