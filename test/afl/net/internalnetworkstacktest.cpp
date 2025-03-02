@@ -4,6 +4,7 @@
 
 #include "afl/net/internalnetworkstack.hpp"
 
+#include <stdexcept>
 #include "afl/async/controller.hpp"
 #include "afl/async/receiveoperation.hpp"
 #include "afl/async/sendoperation.hpp"
