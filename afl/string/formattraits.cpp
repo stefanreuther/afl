@@ -173,7 +173,7 @@ namespace {
         std::frexp(c, &exp2);
         exp10 = int(exp2 * 19728L / 65536);     // 65536/19728 = 3.3219 = ld 10
         long double divi = ipow(10, exp10);
-        if (divi > c && c) {
+        if (divi > c && c != 0) {
             divi /= 10;
             --exp10;
         }
@@ -275,22 +275,22 @@ afl::string::formatToString(const long double& val, FormatState& state)
             // Non-exponential format
             if (expon >= 0) {
                 if (rv.length() < pre + size_t(expon)) {
-                    rv.append(pre + expon - rv.length(), '0');
+                    rv.append(pre + size_t(expon) - rv.length(), '0');
                 }
-                roundString(rv, pre + expon, expon, true);
+                roundString(rv, pre + size_t(expon), expon, true);
                 if (pre > 0) {
-                    rv.insert(expon+1, 1, '.');
+                    rv.insert(size_t(expon)+1, 1, '.');
                     if (trim) {
                         trimZeroes(rv);
                     }
                 }
             } else {
                 if (expon < 0) {
-                    rv.insert(String_t::size_type(0), -expon, '0');
+                    rv.insert(String_t::size_type(0), size_t(-expon), '0');
                     expon = 0;
-                    roundString(rv, pre + expon, expon, false);
+                    roundString(rv, pre - size_t(-expon), expon, false);
                 } else {
-                    roundString(rv, pre + expon, expon, true);
+                    roundString(rv, pre + size_t(expon), expon, true);
                 }
                 rv.insert(1, 1, '.');
                 if (trim) {
@@ -343,7 +343,7 @@ namespace {
     char*
     formatUnsigned(uintmax_t c, char typ, char* p)
     {
-        int base = (typ == 'o') ? 8 : (typ == 'x' || typ == 'X') ? 16 : 10;
+        unsigned int base = (typ == 'o') ? 8 : (typ == 'x' || typ == 'X') ? 16 : 10;
         const char*const alpha = (typ == 'X') ? afl::string::HEX_DIGITS_UPPER : afl::string::HEX_DIGITS_LOWER;
         *--p = 0;
         while (c) {
@@ -438,12 +438,12 @@ afl::string::detail::FormatSigned::format(const FormatUnion& u, FormatState& sta
     if ((state.getCode() != 'd' && state.getCode() != 'i') || u.m_signed >= 0) {
         // Non-negative? Just let the unsigned formatter do it.
         FormatUnion u2;
-        u2.m_unsigned = u.m_signed;
+        u2.m_unsigned = static_cast<uintmax_t>(u.m_signed);
         return FormatUnsigned::format(u2, state);
     } else {
         // Signed decimal. Pretty hackish, but should do:
         FormatUnion u2;
-        u2.m_unsigned = -u.m_signed;
+        u2.m_unsigned = static_cast<uintmax_t>(-u.m_signed);
         state.setFlag(FormatState::SignFlag);
 
         String_t result = FormatUnsigned::format(u2, state);

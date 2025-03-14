@@ -42,7 +42,7 @@ size_t
 arch::win32::Win32Stream::read(Bytes_t m)
 {
     DWORD got = 0;
-    if (!ReadFile(m_handle, m.unsafeData(), m.size(), &got, 0)) {
+    if (!ReadFile(m_handle, m.unsafeData(), convertSizeToDWORD(m.size()), &got, 0)) {
         error();
     }
     return got;
@@ -52,7 +52,7 @@ size_t
 arch::win32::Win32Stream::write(ConstBytes_t m)
 {
     DWORD written = 0;
-    if (!WriteFile(m_handle, m.unsafeData(), m.size(), &written, 0)) {
+    if (!WriteFile(m_handle, m.unsafeData(), convertSizeToDWORD(m.size()), &written, 0)) {
         error();
     }
     return written;

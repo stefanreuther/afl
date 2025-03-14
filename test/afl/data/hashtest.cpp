@@ -12,7 +12,7 @@ AFL_TEST("afl.data.Hash", a)
 {
     // Make it
     afl::base::Ref<afl::data::Hash> p = afl::data::Hash::create();
-    a.check("01. addr", &p.get() != 0);
+    a.check("01. addr", p.asPtr().get() != 0);
     a.check("02. getKeys", p->getKeys().getNumNames() == 0);
     a.check("03. getValues", p->getValues().size() == 0);
 

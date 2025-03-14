@@ -98,7 +98,7 @@ afl::net::http::Client::cancelRequest(uint32_t id)
     for (size_t i = 0, n = m_requests.size(); i < n; ++i) {
         if (m_requests[i]->getRequestId() == id) {
             m_requests[i]->handleFailure(ClientRequest::Cancelled, afl::string::Messages::operationCancelled());
-            m_requests.erase(m_requests.begin() + i);
+            m_requests.erase(m_requests.begin() + static_cast<ptrdiff_t>(i));
             found = true;
             break;
         }
@@ -200,7 +200,7 @@ afl::net::http::Client::cancelRequestsByTarget(const Name& name,
     for (size_t reqIndex = 0; reqIndex < m_requests.size(); /* no increment */) {
         if (m_requests[reqIndex]->getName() == name && m_requests[reqIndex]->getScheme() == scheme) {
             m_requests[reqIndex]->handleFailure(reason, message);
-            m_requests.erase(m_requests.begin() + reqIndex);
+            m_requests.erase(m_requests.begin() + static_cast<ptrdiff_t>(reqIndex));
         } else {
             ++reqIndex;
         }
@@ -274,7 +274,7 @@ afl::net::http::Client::processConnections(size_t i, afl::async::Controller& ctl
             m_needNewConnection = true;
 
             // Delete this connection
-            m_connections.erase(m_connections.begin()+i);
+            m_connections.erase(m_connections.begin()+static_cast<ptrdiff_t>(i));
             break;
         }
     }
@@ -288,7 +288,7 @@ afl::net::http::Client::extractMatchingRequest(ClientConnection& conn)
     for (size_t i = 0; i < m_requests.size(); ++i) {
         if (conn.matchRequest(*m_requests[i])) {
             result = m_requests.extractElement(i);
-            m_requests.erase(m_requests.begin() + i);
+            m_requests.erase(m_requests.begin() + static_cast<ptrdiff_t>(i));
             break;
         }
     }
@@ -309,7 +309,7 @@ afl::net::http::Client::processCancels(afl::async::Controller& ctl)
             if (conn.handleEvent(ctl, 0, 0) == ClientConnection::Shutdown) {
                 // Connection wants to close.
                 assert(conn.extractRequest() == 0);
-                m_connections.erase(m_connections.begin()+i);
+                m_connections.erase(m_connections.begin()+static_cast<ptrdiff_t>(i));
             } else {
                 // Keep the connection
                 ++i;

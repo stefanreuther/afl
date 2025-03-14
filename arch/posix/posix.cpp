@@ -17,6 +17,8 @@
 #include "afl/except/fileproblemexception.hpp"
 #include "afl/string/messages.hpp"
 
+using afl::charset::Unichar_t;
+
 // Convert external string to UTF-8 for internal use.
 String_t
 arch::posix::convertExternalToUtf8(afl::string::ConstStringMemory_t in)
@@ -35,17 +37,17 @@ arch::posix::convertExternalToUtf8(afl::string::ConstStringMemory_t in)
         if (processed == 0) {
             // Null byte. Pretend the end.
             break;
-        } else if (processed > in.size() || wchar_t(afl::charset::Unichar_t(wc)) != wc || afl::charset::isErrorCharacter(wc)) {
+        } else if (processed > in.size() || wchar_t(Unichar_t(wc)) != wc || afl::charset::isErrorCharacter(Unichar_t(wc))) {
             // Error case. Either the character is invalid, or not representable.
             // "processed > size" catches the regular error returns (-1, -2)
             // as well as other random malfunctions.
             if (const char* pc = in.eat()) {
-                u8.append(result, afl::charset::makeErrorCharacter(*pc));
+                u8.append(result, afl::charset::makeErrorCharacter(static_cast<uint8_t>(*pc)));
             }
         } else {
             // Regular case
             in.split(processed);
-            u8.append(result, wc);
+            u8.append(result, Unichar_t(wc));
         }
     }
     return result;
@@ -78,7 +80,7 @@ arch::posix::convertUtf8ToExternal(String_t& result, afl::string::ConstStringMem
         } else {
             // Regular Unicode character
             char tmp[MB_LEN_MAX];
-            size_t produced = wcrtomb(tmp, ch, &mbs);
+            size_t produced = wcrtomb(tmp, wchar_t(ch), &mbs);
             if (produced > sizeof(tmp)) {
                 // We cannot encode this character.
                 switch (mode) {
@@ -132,7 +134,7 @@ arch::posix::readlinkWrap(const char* fileName, afl::base::GrowableMemory<char>&
         buffer.resize(2*buffer.size());
     }
     if (n > 0) {
-        buffer.resize(n);
+        buffer.resize(size_t(n));
         return true;
     } else {
         return false;

@@ -66,7 +66,7 @@ AFL_TEST("afl.base.ClonableRef", a) {
         a.checkEqual("third value after clone", t3->val(), 23);
 
         // Self-assignment
-        t2 = t2;
+        t2 = *&t2;
         a.checkEqual("must have three objects after self-assignment", Tester::s_count, 3);
         a.checkEqual("first value after self-assignment", t->val(),  42);
         a.checkEqual("second value after self-assignment", t2->val(), 42);

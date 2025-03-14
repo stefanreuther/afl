@@ -12,7 +12,7 @@ AFL_TEST("afl.data.Vector", a)
 {
     // Make it
     afl::base::Ref<afl::data::Vector> p = afl::data::Vector::create();
-    a.check("01. addr", &p.get() != 0);
+    a.check("01. addr", p.asPtr().get() != 0);
     a.checkEqual("02. size", p->size(), 0U);
 
     // Set some value

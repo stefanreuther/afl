@@ -56,7 +56,7 @@ afl::string::parseNumber(ConstStringMemory_t& mem, uint64_t& out)
     uint64_t result = 0;
     while (const char* pch = mem.at(n)) {
         if (*pch >= '0' && *pch <= '9') {
-            uint64_t newVal = 10*result + (*pch - '0');
+            uint64_t newVal = 10*result + static_cast<uint64_t>(*pch - '0');
             if (newVal < result) {
                 return 0;
             }

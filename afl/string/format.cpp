@@ -52,7 +52,7 @@ afl::string::Format::operator String_t() const
     while (const char* q = std::strchr(p, '%')) {
         // Append text leading up to here
         if (conditionState == 0) {
-            result.append(p, q - p);
+            result.append(p, static_cast<size_t>(q - p));
         }
 
         // Initial state
@@ -85,7 +85,7 @@ afl::string::Format::operator String_t() const
         // Parse width
         size_t width = 0;
         while (*p >= '0' && *p <= '9') {
-            width = 10*width + (*p++ - '0');
+            width = 10U*width + static_cast<size_t>(*p++ - '0');
         }
 
         if (*p == '$') {
@@ -103,7 +103,7 @@ afl::string::Format::operator String_t() const
             size_t prec = 0;
             ++p;
             while (*p >= '0' && *p <= '9') {
-                prec = 10*prec + (*p++ - '0');
+                prec = 10U*prec + static_cast<size_t>(*p++ - '0');
             }
             state.setPrecision(prec);
             state.setFlag(FormatState::PrecisionFlag);

@@ -89,7 +89,7 @@ namespace {
             if (ch[0] == '\n') {
                 return true;
             }
-            line += ch[0];
+            line += static_cast<char>(ch[0]);
         }
     }
 

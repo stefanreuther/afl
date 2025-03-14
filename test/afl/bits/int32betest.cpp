@@ -63,7 +63,7 @@ AFL_TEST("afl.bits.Int32BE:pack:FFFF", a) {
 
 AFL_TEST("afl.bits.Int32BE:pack:80000000", a) {
     uint8_t d[4];
-    afl::bits::Int32BE::pack(d, -0x80000000);
+    afl::bits::Int32BE::pack(d, static_cast<int32_t>(-0x80000000));
     a.checkEqual("0", d[0], 0x80);
     a.checkEqual("1", d[1], 0x00);
     a.checkEqual("2", d[2], 0x00);

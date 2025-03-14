@@ -121,7 +121,7 @@ namespace {
             size_t i = 1;
             size_t index = 0;
             while (i < sizeof(name) && name[i] >= '0' && name[i] <= '9') {
-                index = 10*index + name[i++] - '0';
+                index = 10*index + static_cast<size_t>(name[i++] - '0');
             }
             longNameTable.split(index);
 

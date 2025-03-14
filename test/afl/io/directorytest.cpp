@@ -27,7 +27,7 @@ namespace {
         // Pass 1: try by iterating
         bool seenTheFile = false;
         afl::base::Ref<afl::base::Enumerator<afl::base::Ptr<afl::io::DirectoryEntry> > > en = dir.getDirectoryEntries();
-        a.check("getDirectoryEntries", &en.get() != 0);
+        a.check("getDirectoryEntries", en.asPtr().get() != 0);
 
         afl::base::Ptr<afl::io::DirectoryEntry> entry;
         while (en->getNextElement(entry)) {
@@ -94,7 +94,7 @@ AFL_TEST("afl.io.Directory:basic-sequence", a)
     {
         // Open current directory
         afl::base::Ref<afl::io::Directory> dir = fs.openDirectory(fs.getWorkingDirectoryName());
-        a.check("open working directory", &dir.get() != 0);
+        a.check("open working directory", dir.asPtr().get() != 0);
 
         // Must not have too messed-up properties
         a.check("working directory name", dir->getDirectoryName() != "");
@@ -188,15 +188,15 @@ AFL_TEST("afl.io.Directory:directory-access", a)
     Environment env;
     afl::io::FileSystem& fs = afl::io::FileSystem::getInstance();
     afl::base::Ref<afl::io::Directory> dir = fs.openDirectory(fs.getWorkingDirectoryName());
-    a.check("01. openDirectory", &dir.get() != 0);
+    a.check("01. openDirectory", dir.asPtr().get() != 0);
 
     // Create a file
     afl::base::Ref<afl::io::DirectoryEntry> entry = dir->getDirectoryEntryByName(FILE_NAME1);
-    a.check("02. getDirectoryEntryByName", &entry.get() != 0);
+    a.check("02. getDirectoryEntryByName", entry.asPtr().get() != 0);
 
     {
         afl::base::Ref<afl::io::Stream> s = entry->openFile(fs.Create);
-        a.check("03. openFile", &s.get() != 0);
+        a.check("03. openFile", s.asPtr().get() != 0);
 
         static const uint8_t DATA[] = {'f','o','o'};
         size_t written = s->write(DATA);
@@ -215,7 +215,7 @@ AFL_TEST("afl.io.Directory:directory-access", a)
 
     // New entry that refers to new file
     AFL_CHECK_SUCCEEDS(a("21. getDirectoryEntryByName"), entry.reset(*dir->getDirectoryEntryByName(FILE_NAME2)));
-    a.check("22. ptr", &entry.get() != 0);
+    a.check("22. ptr", entry.asPtr().get() != 0);
     a.checkEqual("23. getFileSize", entry->getFileSize(), 3U);
     a.check("24. getFileType", entry->getFileType() == afl::io::DirectoryEntry::tFile);
 
@@ -225,7 +225,7 @@ AFL_TEST("afl.io.Directory:directory-access", a)
     // Try reading the file
     {
         afl::base::Ref<afl::io::Stream> s = entry->openFile(fs.OpenRead);
-        a.check("31. openFile", &s.get() != 0);
+        a.check("31. openFile", s.asPtr().get() != 0);
 
         uint8_t tmp[10];
         size_t read = s->read(tmp);
@@ -250,7 +250,7 @@ AFL_TEST("afl.io.Directory:subdir-access", a)
 {
     afl::io::FileSystem& fs = afl::io::FileSystem::getInstance();
     afl::base::Ref<afl::io::Directory> dir = fs.openDirectory(fs.getWorkingDirectoryName());
-    a.check("01. openDirectory", &dir.get() != 0);
+    a.check("01. openDirectory", dir.asPtr().get() != 0);
 
     // Create a directory
     AFL_CHECK_SUCCEEDS(a("02. createAsDirectory"), dir->getDirectoryEntryByName(DIR_NAME)->createAsDirectory());

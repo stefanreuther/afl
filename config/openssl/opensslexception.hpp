@@ -15,7 +15,7 @@ namespace config { namespace openssl {
      public:
         /** Constructor.
             \param err Error code from ERR_get_error(). */
-        explicit OpenSSLException(long err);
+        explicit OpenSSLException(unsigned long err);
 
         /** Virtual destructor. */
         ~OpenSSLException() throw();

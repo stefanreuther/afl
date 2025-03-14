@@ -205,7 +205,7 @@ config::openssl::OpenSSLSocket::notifyDirect(afl::async::Operation& op)
             int n = BIO_read(m_myEnd, m_buffer, sizeof(m_buffer));
             if (n > 0) {
                 m_state = Sending;
-                m_sendOperation.setData(afl::base::ConstBytes_t::unsafeCreate(m_buffer, n));
+                m_sendOperation.setData(afl::base::ConstBytes_t::unsafeCreate(m_buffer, static_cast<size_t>(n)));
                 m_sendOperation.setNotifier(*this);
                 m_peer->sendAsync(*m_actions.front().m_pOperation->getController(), m_sendOperation);
             } else {
@@ -254,7 +254,7 @@ config::openssl::OpenSSLSocket::classifyResult(int result)
         n = BIO_read(m_myEnd, m_buffer, sizeof(m_buffer));
         if (n > 0) {
             m_state = Sending;
-            m_sendOperation.setData(afl::base::ConstBytes_t::unsafeCreate(m_buffer, n));
+            m_sendOperation.setData(afl::base::ConstBytes_t::unsafeCreate(m_buffer, static_cast<size_t>(n)));
             m_sendOperation.setNotifier(*this);
             m_peer->sendAsync(*m_actions.front().m_pOperation->getController(), m_sendOperation);
             return Wait;
@@ -269,7 +269,7 @@ config::openssl::OpenSSLSocket::classifyResult(int result)
         n = BIO_read(m_myEnd, m_buffer, sizeof(m_buffer));
         if (n > 0) {
             m_state = Sending;
-            m_sendOperation.setData(afl::base::ConstBytes_t::unsafeCreate(m_buffer, n));
+            m_sendOperation.setData(afl::base::ConstBytes_t::unsafeCreate(m_buffer, static_cast<size_t>(n)));
             m_sendOperation.setNotifier(*this);
             m_peer->sendAsync(*m_actions.front().m_pOperation->getController(), m_sendOperation);
         } else {
@@ -414,7 +414,7 @@ config::openssl::OpenSSLSocket::cycleSend(Action& a)
              case Success:
                 if (result > 0) {
                     // We sent a nonzero amount of data. Add it and retry.
-                    sendOperation->addSentBytes(result);
+                    sendOperation->addSentBytes(static_cast<size_t>(result));
                     return false;
                 } else {
                     // We sent nothing and have no indication that retrying will change that.
@@ -459,7 +459,7 @@ config::openssl::OpenSSLSocket::cycleReceive(Action& a)
              case Success:
                 if (result > 0) {
                     // OK, got some bytes; retry.
-                    receiveOperation->addReceivedBytes(result);
+                    receiveOperation->addReceivedBytes(static_cast<size_t>(result));
                     return false;
                 } else {
                     // We got nothing and have no indication that retrying will change that.
@@ -494,7 +494,7 @@ config::openssl::OpenSSLSocket::cycleFlush()
     int n = BIO_read(m_myEnd, m_buffer, sizeof(m_buffer));
     if (n > 0) {
         m_state = Sending;
-        m_sendOperation.setData(afl::base::ConstBytes_t::unsafeCreate(m_buffer, n));
+        m_sendOperation.setData(afl::base::ConstBytes_t::unsafeCreate(m_buffer, static_cast<size_t>(n)));
         m_sendOperation.setNotifier(*this);
         m_peer->sendAsync(*m_actions.front().m_pOperation->getController(), m_sendOperation);
         return false;

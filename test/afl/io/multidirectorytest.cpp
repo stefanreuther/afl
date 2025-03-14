@@ -27,7 +27,7 @@ AFL_TEST("afl.io.MultiDirectory:create-files", a)
     // Creating files in the InternalDirectory works
     {
         Ref<afl::io::Stream> s = id->openFile("c", afl::io::FileSystem::Create);
-        a.check("internal create", &s.get());
+        a.checkNonNull("internal create", s.asPtr().get());
         s->write(afl::string::toBytes("foo"));
         a.checkEqual("internal size", s->getSize(), 3U);
     }
@@ -39,7 +39,7 @@ AFL_TEST("afl.io.MultiDirectory:create-files", a)
     // Recreating an existing file works and resets that to size 0 (InternalDirectory feature)
     {
         Ref<afl::io::Stream> s = id->openFile("c", afl::io::FileSystem::Create);
-        a.check("recreate", &s.get());
+        a.checkNonNull("recreate", s.asPtr().get());
         a.checkEqual("recreate size", s->getSize(), 0U);
     }
 }
@@ -60,14 +60,14 @@ AFL_TEST("afl.io.MultiDirectory:lookup", a)
     id2->openFile("c", afl::io::FileSystem::Create);
 
     // Must be able to open all of them
-    a.check("openFile a", &md->openFile("a", afl::io::FileSystem::OpenRead).get());
-    a.check("openFile b", &md->openFile("b", afl::io::FileSystem::OpenRead).get());
-    a.check("openFile c", &md->openFile("c", afl::io::FileSystem::OpenRead).get());
+    a.checkNonNull("openFile a", md->openFile("a", afl::io::FileSystem::OpenRead).asPtr().get());
+    a.checkNonNull("openFile b", md->openFile("b", afl::io::FileSystem::OpenRead).asPtr().get());
+    a.checkNonNull("openFile c", md->openFile("c", afl::io::FileSystem::OpenRead).asPtr().get());
 
     // Must be able to look up all of them
-    a.check("getDirectoryEntryByName a", &md->getDirectoryEntryByName("a").get());
-    a.check("getDirectoryEntryByName b", &md->getDirectoryEntryByName("b").get());
-    a.check("getDirectoryEntryByName c", &md->getDirectoryEntryByName("c").get());
+    a.checkNonNull("getDirectoryEntryByName a", md->getDirectoryEntryByName("a").asPtr().get());
+    a.checkNonNull("getDirectoryEntryByName b", md->getDirectoryEntryByName("b").asPtr().get());
+    a.checkNonNull("getDirectoryEntryByName c", md->getDirectoryEntryByName("c").asPtr().get());
 
     // The common file must come from id1
     a.check("file from directory b", md->getDirectoryEntryByName("b")->openContainingDirectory().asPtr() == id1.asPtr());

@@ -225,7 +225,7 @@ AFL_TEST("afl.io.FileSystem:openRootDirectory", a)
 
     // Enumerate content
     Ref<afl::base::Enumerator<Ptr<DirectoryEntry> > > entries = root->getDirectoryEntries();
-    a.check("11. getDirectoryEntries", &entries.get() != 0);
+    a.check("11. getDirectoryEntries", entries.asPtr().get() != 0);
 
     Ptr<DirectoryEntry> entry;
     size_t n = 0;

@@ -78,7 +78,7 @@ arch::posix::PosixStream::read(Bytes_t m)
     if (n < 0) {
         error();
     }
-    return n;
+    return size_t(n);
 }
 
 size_t
@@ -88,7 +88,7 @@ arch::posix::PosixStream::write(ConstBytes_t m)
     if (n < 0) {
         error();
     }
-    return n;
+    return size_t(n);
 }
 
 void
@@ -98,7 +98,7 @@ arch::posix::PosixStream::flush()
 void
 arch::posix::PosixStream::setPos(FileSize_t pos)
 {
-    if (::lseek(m_fd, pos, SEEK_SET) < 0) {
+    if (::lseek(m_fd, off_t(pos), SEEK_SET) < 0) {
         error();
     }
 }
@@ -106,7 +106,7 @@ arch::posix::PosixStream::setPos(FileSize_t pos)
 arch::posix::PosixStream::FileSize_t
 arch::posix::PosixStream::getPos()
 {
-    return ::lseek(m_fd, 0, SEEK_CUR);
+    return FileSize_t(::lseek(m_fd, 0, SEEK_CUR));
 }
 
 arch::posix::PosixStream::FileSize_t
@@ -114,7 +114,7 @@ arch::posix::PosixStream::getSize()
 {
     struct stat st;
     if (::fstat(m_fd, &st) == 0) {
-        return st.st_size;
+        return FileSize_t(st.st_size);
     } else {
         return 0;
     }

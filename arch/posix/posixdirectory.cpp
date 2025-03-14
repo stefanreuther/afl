@@ -127,7 +127,7 @@ arch::posix::PosixDirectory::Entry::updateInfo(uint32_t requested)
 
             if (ok) {
                 setFileType(convertFileType(st.st_mode));
-                setFileSize(st.st_size);
+                setFileSize(FileSize_t(st.st_size));
                 setModificationTime(afl::sys::Time(PosixTime::fromSysTime(st.st_mtime, 0)));
             }
 
@@ -226,7 +226,7 @@ arch::posix::PosixDirectory::Entry::doSetFlag(FileFlag flag, bool value)
             newMode |= 0100;
         } else {
             // Remove executable bit
-            newMode &= ~0111;
+            newMode &= ~0111U;
         }
         if (::chmod(sysName.c_str(), newMode) != 0) {
             throw afl::except::FileSystemException(getPathName(), afl::sys::Error::current());

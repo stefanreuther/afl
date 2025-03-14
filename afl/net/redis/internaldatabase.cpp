@@ -110,9 +110,9 @@ class afl::net::redis::InternalDatabase::List : public Sortable {
     size_t convertIndex(int32_t n)
         {
             if (n >= 0) {
-                return size_t(n);
+                return static_cast<size_t>(n);
             } else {
-                return size_t(m_list.size() + n);
+                return static_cast<size_t>(m_list.size()) - static_cast<size_t>(-n);
             }
         }
 
@@ -169,7 +169,7 @@ class afl::net::redis::InternalDatabase::Set : public Sortable {
                 return false;
             } else {
                 std::set<String_t>::iterator it = m_set.begin();
-                std::advance(it, std::rand() % m_set.size());
+                std::advance(it, static_cast<ptrdiff_t>(static_cast<size_t>(std::rand()) % m_set.size()));
                 out = *it;
                 if (remove) {
                     m_set.erase(it);
@@ -393,7 +393,7 @@ afl::net::redis::InternalDatabase::execute(const String_t& verb, afl::data::Segm
             if (beg >= end || beg >= int32_t(sk->m_string.size())) {
                 return factory.createString(String_t());
             } else {
-                return factory.createString(sk->m_string.substr(beg, end-beg));
+                return factory.createString(sk->m_string.substr(static_cast<size_t>(beg), static_cast<size_t>(end-beg)));
             }
         } else {
             return factory.createNull();
@@ -1213,7 +1213,7 @@ afl::net::redis::InternalDatabase::executeSortOperation(Sortable* key, Segment_t
             for (int32_t i = offset; i < int32_t(originValues.size()) && count > 0; ++i, --count) {
                 for (std::vector<String_t>::const_iterator it = get.begin(), e = get.end(); it != e; ++it) {
                     String_t tmp;
-                    getSortValue(originValues[i], *it, tmp);
+                    getSortValue(originValues[static_cast<size_t>(i)], *it, tmp);
                     lk.m_list.push_back(tmp);
                 }
             }
@@ -1224,7 +1224,7 @@ afl::net::redis::InternalDatabase::executeSortOperation(Sortable* key, Segment_t
         for (int32_t i = offset; i < int32_t(originValues.size()) && count > 0; ++i, --count) {
             for (std::vector<String_t>::const_iterator it = get.begin(), e = get.end(); it != e; ++it) {
                 String_t tmp;
-                if (getSortValue(originValues[i], *it, tmp)) {
+                if (getSortValue(originValues[static_cast<size_t>(i)], *it, tmp)) {
                     out.pushBackString(tmp);
                 } else {
                     out.pushBackNew(0);

@@ -230,7 +230,7 @@ afl::test::TestRunner::run(std::ostream& out, const char*const* argv)
 
             // End tracking
             uint32_t endTime = afl::sys::Time::getTickCounter();
-            int elapsedMS = (int)endTime - startTime;
+            int elapsedMS = (int)(endTime - startTime);
             report.addTestCase(t.name, result, message, elapsedMS);
         }
     }

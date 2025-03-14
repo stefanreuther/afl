@@ -7,7 +7,6 @@
 #define NOMINMAX
 #define CINTERFACE
 #include <vector>
-#include <windows.h>
 #include <shlobj.h>
 #include "arch/win32/win32.hpp"
 #include "afl/charset/utf8.hpp"
@@ -56,10 +55,10 @@ arch::win32::convertFromANSI(afl::base::Memory<const char> msg)
 String_t
 arch::win32::convertFromCodepage(afl::base::Memory<const char> msg, unsigned int codepage)
 {
-    int sizeNeeded = MultiByteToWideChar(codepage, 0, msg.unsafeData(), msg.size(), 0, 0);
+    int sizeNeeded = MultiByteToWideChar(codepage, 0, msg.unsafeData(), convertSizeToInt(msg.size()), 0, 0);
     if (sizeNeeded != 0) {
         std::vector<wchar_t> wstr(sizeNeeded);
-        MultiByteToWideChar(codepage, 0, msg.unsafeData(), msg.size(), &wstr[0], sizeNeeded);
+        MultiByteToWideChar(codepage, 0, msg.unsafeData(), convertSizeToInt(msg.size()), &wstr[0], sizeNeeded);
         return convertFromUnicode(afl::base::Memory<const wchar_t>::unsafeCreate(&wstr[0], sizeNeeded));
     } else {
         return String_t();
@@ -93,9 +92,9 @@ arch::win32::convertToCodepage(afl::base::Memory<const char> msg, unsigned int c
     convertToUnicode(wstr, msg);
 
     // Convert Unicode to codepage
-    int sizeNeeded = WideCharToMultiByte(codepage, 0, &wstr[0], wstr.size(), 0, 0, 0, 0);
+    int sizeNeeded = WideCharToMultiByte(codepage, 0, &wstr[0], convertSizeToInt(wstr.size()), 0, 0, 0, 0);
     std::vector<char> astr(sizeNeeded);
-    WideCharToMultiByte(codepage, 0, &wstr[0], wstr.size(), &astr[0], sizeNeeded, 0, 0);
+    WideCharToMultiByte(codepage, 0, &wstr[0], convertSizeToInt(wstr.size()), &astr[0], sizeNeeded, 0, 0);
     return String_t(&astr[0], sizeNeeded);
 }
 
@@ -137,6 +136,22 @@ arch::win32::terminateUnicode(WStr& str)
     }
     str.push_back(L'\0');
     return true;
+}
+
+// Convert a size value to DWORD.
+DWORD
+arch::win32::convertSizeToDWORD(size_t n)
+{
+    const DWORD max = static_cast<DWORD>(-1);
+    return n < max ? static_cast<DWORD>(n) : max;
+}
+
+// Convert a size value to int.
+int
+arch::win32::convertSizeToInt(size_t n)
+{
+    const unsigned int max = static_cast<unsigned int>(INT_MAX);
+    return n < max ? static_cast<int>(n) : INT_MAX;
 }
 
 #else

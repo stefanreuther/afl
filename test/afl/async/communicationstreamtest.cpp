@@ -131,7 +131,7 @@ AFL_TEST("afl.async.CommunicationStream:Socket", a)
 
     // Connect and operate
     afl::base::Ref<afl::net::Socket> socket = ns.connect(name, 5000);
-    a.check("socket connected", &socket.get() != 0);
+    a.checkNonNull("socket connected", socket.asPtr().get());
     testReader(a("reader"), socket.asPtr());
 
     // Close

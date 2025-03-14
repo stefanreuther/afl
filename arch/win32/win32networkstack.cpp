@@ -18,6 +18,7 @@
 #include <stdexcept>
 #include <cstring>
 #include "arch/win32/waitrequest.hpp"
+#include "arch/win32/win32.hpp"
 #include "afl/except/filesystemexception.hpp"
 #include "afl/except/systemexception.hpp"
 #include "afl/sys/error.hpp"
@@ -190,7 +191,7 @@ namespace {
             sock = ::socket(p->ai_family, p->ai_socktype, p->ai_protocol);
             if (sock != INVALID_SOCKET) {
                 // Check whether this socket is good for us.
-                errorCode = f.process(sock, p->ai_addr, p->ai_addrlen);
+                errorCode = f.process(sock, p->ai_addr, static_cast<socklen_t>(p->ai_addrlen));
                 if (errorCode == 0) {
                     break;
                 }
@@ -341,11 +342,11 @@ namespace {
         switch (mode) {
          case WaitForAccept:
             // accept: reports success if it becomes readable
-            result = ::select(fd + 1, &set, 0, 0, ptv);
+            result = ::select(static_cast<int>(fd + 1), &set, 0, 0, ptv);
             break;
         case WaitForConnect:
             // connect: reports success by becoming writable, error by becoming exceptional
-            result = ::select(fd + 1, 0, &set, &set2, ptv);
+           result = ::select(static_cast<int>(fd + 1), 0, &set, &set2, ptv);
             break;
         }
 
@@ -555,7 +556,7 @@ arch::win32::Win32NetworkStack::Socket::sendAsync(Controller& ctl, SendOperation
 
     // Try to send right now.
     afl::base::ConstBytes_t buf = op.getUnsentBytes();
-    int n = buf.empty() ? 0 : ::send(m_fd, (const char*) buf.unsafeData(), buf.size(), 0);
+    int n = buf.empty() ? 0 : ::send(m_fd, (const char*) buf.unsafeData(), convertSizeToInt(buf.size()), 0);
     if (n >= 0) {
         // Success case
         op.addSentBytes(n);
@@ -590,7 +591,7 @@ arch::win32::Win32NetworkStack::Socket::receiveAsync(Controller& ctl, ReceiveOpe
 
     // Try to receive right now.
     afl::base::Bytes_t buf = op.getUnreceivedBytes();
-    int n = buf.empty() ? 0 : ::recv(m_fd, (char*) buf.unsafeData(), buf.size(), 0);
+    int n = buf.empty() ? 0 : ::recv(m_fd, (char*) buf.unsafeData(), convertSizeToInt(buf.size()), 0);
     if (n >= 0) {
         // Success case
         op.addReceivedBytes(n);
@@ -649,7 +650,7 @@ arch::win32::Win32NetworkStack::Socket::getPeerName()
         if (WSAAddressToString(&ss.sa, slen, 0, nameBuf, &nameLen) == 0) {
             // Remove zero-termination
             if (const char* p = static_cast<const char*>(std::memchr(nameBuf, '\0', nameLen))) {
-                nameLen = p - nameBuf;
+                nameLen = static_cast<DWORD>(p - nameBuf);
             }
 
             // Build result
@@ -667,7 +668,7 @@ arch::win32::Win32NetworkStack::Socket::handleWaitReady()
     while (afl::async::ReceiveOperation* op = m_pendingReceives.front()) {
         // Read some data
         afl::base::Bytes_t buf = op->getUnreceivedBytes();
-        int n = buf.empty() ? 0 : ::recv(m_fd, (char*) buf.unsafeData(), buf.size(), 0);
+        int n = buf.empty() ? 0 : ::recv(m_fd, (char*) buf.unsafeData(), convertSizeToInt(buf.size()), 0);
         if (n > 0) {
             op->addReceivedBytes(n);
         }
@@ -686,7 +687,7 @@ arch::win32::Win32NetworkStack::Socket::handleWaitReady()
     while (afl::async::SendOperation* op = m_pendingSends.front()) {
         // Write some data
         afl::base::ConstBytes_t buf = op->getUnsentBytes();
-        int n = buf.empty() ? 0 : ::send(m_fd, (const char*) buf.unsafeData(), buf.size(), 0);
+        int n = buf.empty() ? 0 : ::send(m_fd, (const char*) buf.unsafeData(), convertSizeToInt(buf.size()), 0);
         if (n > 0) {
             op->addSentBytes(n);
         }

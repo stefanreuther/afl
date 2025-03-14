@@ -29,9 +29,9 @@ namespace {
     const uint8_t SOCKS5_VERSION = 5;
 
     const uint8_t SOCKS5_AUTH_NONE = 0;
-    const uint8_t SOCKS5_AUTH_GSSAPI = 1;
-    const uint8_t SOCKS5_AUTH_USER_PASS = 2;
-    const uint8_t SOCKS5_AUTH_INACCEPTABLE = 0xFF;
+    // const uint8_t SOCKS5_AUTH_GSSAPI = 1;
+    // const uint8_t SOCKS5_AUTH_USER_PASS = 2;
+    // const uint8_t SOCKS5_AUTH_INACCEPTABLE = 0xFF;
 
     struct Socks5AuthReply {
         uint8_t version;
@@ -110,8 +110,8 @@ namespace {
     };
 
     const uint8_t SOCKS5_OP_CONNECT = 1;
-    const uint8_t SOCKS5_OP_BIND = 2;
-    const uint8_t SOCKS5_OP_UDP_ASSOCIATE = 3;
+    // const uint8_t SOCKS5_OP_BIND = 2;
+    // const uint8_t SOCKS5_OP_UDP_ASSOCIATE = 3;
 
     const uint8_t SOCKS5_ATYP_IPV4 = 1;
     const uint8_t SOCKS5_ATYP_DOMAIN = 3;

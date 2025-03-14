@@ -7,6 +7,7 @@
 
 #if TARGET_OS_WIN32
 #include <vector>
+#include <windows.h>
 #include "afl/string/string.hpp"
 #include "afl/base/memory.hpp"
 
@@ -66,6 +67,18 @@ namespace arch { namespace win32 {
         \retval false String contains embedded nulls and cannot be zero-terminated
         \retval true Success */
     bool terminateUnicode(WStr& str);
+
+    /** Convert a size value to DWORD.
+        Most functions that take a size, take a DWORD. In Win64, DWORD is still 32 bits.
+        \param n size_t value
+        \return DWORD value */
+    DWORD convertSizeToDWORD(size_t n);
+
+    /** Convert a size value to int.
+        Some socket functions take an int as size.
+        \param n size_t value
+        \return int value */
+    int convertSizeToInt(size_t n);
 
 } }
 #else

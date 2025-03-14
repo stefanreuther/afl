@@ -224,7 +224,7 @@ class afl::io::resp::Parser::ShortState : public State {
                     }
                 } else {
                     // character
-                    m_accumulator.append(1, c);
+                    m_accumulator.append(1, static_cast<char>(c));
                 }
             }
         }
@@ -261,8 +261,8 @@ afl::io::resp::Parser::RootState::handleData(Parser& parser, afl::base::ConstByt
             break;
 
          default:
-            if (parser.m_acceptShort && (afl::string::charIsUpper(*pc) || afl::string::charIsLower(*pc))) {
-                parser.m_pState.reset(new ShortState(*pc));
+            if (parser.m_acceptShort && (afl::string::charIsUpper(static_cast<char>(*pc)) || afl::string::charIsLower(static_cast<char>(*pc)))) {
+                parser.m_pState.reset(new ShortState(static_cast<char>(*pc)));
             } else {
                 syntaxError();
             }

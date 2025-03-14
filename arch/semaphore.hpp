@@ -17,7 +17,7 @@ class afl::sys::Semaphore::Impl {
  public:
     Impl(int value)
         {
-            sem_init(&m_sem, 0, value);
+            sem_init(&m_sem, 0, static_cast<unsigned int>(value));
         }
 
     ~Impl()

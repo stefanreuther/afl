@@ -29,7 +29,7 @@ AFL_TEST("afl.io.InternalDirectory:basic", a)
 {
     // Create directory
     Ref<InternalDirectory> md = InternalDirectory::create("tester");
-    a.check("01. create", &md.get() != 0);
+    a.check("01. create", md.asPtr().get() != 0);
     a.checkEqual("02. getTitle", md->getTitle(), "tester");
     a.checkEqual("03. getDirectoryName", md->getDirectoryName(), "");
 
@@ -85,7 +85,7 @@ AFL_TEST("afl.io.InternalDirectory:create", a)
 
     // Test creation
     Ref<Stream> s = md->openFile("foo", FileSystem::Create);
-    a.check("11. addr", &s.get() != 0);
+    a.check("11. addr", s.asPtr().get() != 0);
     a.checkEqual("12. getPos", s->getPos(), 0U);
     a.checkEqual("13. getSize", s->getSize(), 0U);
     a.checkEqual("14. write", s->write(afl::string::toBytes("hello")), 5U);
@@ -98,7 +98,7 @@ AFL_TEST("afl.io.InternalDirectory:create", a)
     // Test re-opening / reading
     uint8_t tmp[10];
     Ref<Stream> s2 = md->openFile("foo", FileSystem::OpenRead);
-    a.check("21. addr", &s2.get() != 0);
+    a.check("21. addr", s2.asPtr().get() != 0);
     a.checkEqual("22. getPos", s2->getPos(), 0U);
     a.checkEqual("23. getSize", s2->getSize(), 5U);
     a.checkEqual("24. read", s2->read(tmp), 5U);
@@ -107,7 +107,7 @@ AFL_TEST("afl.io.InternalDirectory:create", a)
     a.checkEqual("27. getSize", s2->getSize(), 5U);
 
     Ref<Stream> s3 = md->openFile("foo", FileSystem::OpenWrite);
-    a.check("31. addr", &s3.get() != 0);
+    a.check("31. addr", s3.asPtr().get() != 0);
     a.checkEqual("32. getPos", s3->getPos(), 0U);
     a.checkEqual("33. getSize", s3->getSize(), 5U);
     a.checkEqual("34. read", s3->read(afl::base::Memory<uint8_t>::unsafeCreate(tmp, 3)), 3U);

@@ -469,8 +469,8 @@ afl::container::PtrVector<T>::erase(iterator i, iterator j)
     }
 
     // The iterators are vector<>::const_iterator, convert them to regular iterators:
-    size_type iindex = i - begin();
-    size_type jindex = j - begin();
+    difference_type iindex = i - begin();
+    difference_type jindex = j - begin();
     m_data.erase(m_data.begin() + iindex, m_data.begin() + jindex);
 
     // This used to be

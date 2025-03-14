@@ -94,7 +94,7 @@ namespace config { namespace openssl {
         afl::async::ReceiveOperation m_receiveOperation;
 
         bool m_connectStatus;
-        long m_connectError;
+        unsigned long m_connectError;
 
         uint8_t m_buffer[1024];
 

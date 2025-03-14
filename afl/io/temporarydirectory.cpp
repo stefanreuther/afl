@@ -45,7 +45,7 @@ afl::base::Ref<afl::io::DirectoryEntry>
 afl::io::TemporaryDirectory::create(Directory& parentDirectory)
 {
     // A time-based component. Totally arbitrary, but should try to generate unique names quickly.
-    const uint64_t time = (afl::sys::Time::getCurrentTime() - afl::sys::Time::fromUnixTime(1600000000)).getMilliseconds();
+    const uint64_t time = static_cast<uint64_t>((afl::sys::Time::getCurrentTime() - afl::sys::Time::fromUnixTime(1600000000)).getMilliseconds());
 
     // Create
     for (int i = 0; i < LIMIT; ++i) {

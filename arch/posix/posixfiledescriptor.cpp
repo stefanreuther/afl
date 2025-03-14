@@ -30,7 +30,7 @@ arch::posix::PosixFileDescriptor::send(afl::async::Controller& /*ctl*/, afl::asy
             // FIXME: can we throw here?
             throw afl::except::SystemException(afl::sys::Error::current(), "send");
         }
-        op.addSentBytes(n);
+        op.addSentBytes(size_t(n));
         return true;
     } else {
         return false;
@@ -60,7 +60,7 @@ arch::posix::PosixFileDescriptor::receive(afl::async::Controller& /*ctl*/, afl::
             // FIXME: can we throw here?
             throw afl::except::SystemException(afl::sys::Error::current(), "receive");
         }
-        op.addReceivedBytes(n);
+        op.addReceivedBytes(size_t(n));
         return true;
     } else {
         return false;
@@ -154,7 +154,7 @@ arch::posix::PosixFileDescriptor::handleReadReady()
         // Call read()
         ssize_t n = buf.empty() ? 0 : ::read(self->fd, buf.unsafeData(), buf.size());
         if (n > 0) {
-            op->addReceivedBytes(n);
+            op->addReceivedBytes(size_t(n));
         }
 
         // Exit when getting EAGAIN, this means data is exhausted
@@ -186,7 +186,7 @@ arch::posix::PosixFileDescriptor::handleWriteReady()
         // Call write()
         ssize_t n = buf.empty() ? 0 : ::write(self->fd, buf.unsafeData(), buf.size());
         if (n > 0) {
-            op->addSentBytes(n);
+            op->addSentBytes(size_t(n));
         }
 
         // Exit when getting EAGAIN, this means data is exhausted

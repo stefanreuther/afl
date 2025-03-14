@@ -123,14 +123,14 @@ arch::win32::Win32FileSystem::getWorkingDirectoryName()
     if (hasUnicodeSupport()) {
         std::vector<wchar_t> buffer(PATH_MAX);
         DWORD size;
-        while ((size = GetCurrentDirectoryW(buffer.size(), &buffer[0])) >= buffer.size()) {
+        while ((size = GetCurrentDirectoryW(convertSizeToDWORD(buffer.size()), &buffer[0])) >= buffer.size()) {
             buffer.resize(buffer.size() + PATH_MAX);
         }
         return convertFromUnicode(afl::base::Memory<const wchar_t>::unsafeCreate(&buffer[0], size));
     } else {
         std::vector<char> buffer(PATH_MAX);
         DWORD size;
-        while ((size = GetCurrentDirectoryA(buffer.size(), &buffer[0])) >= buffer.size()) {
+        while ((size = GetCurrentDirectoryA(convertSizeToDWORD(buffer.size()), &buffer[0])) >= buffer.size()) {
             buffer.resize(buffer.size() + PATH_MAX);
         }
         return convertFromANSI(afl::base::Memory<char>::unsafeCreate(&buffer[0], size));

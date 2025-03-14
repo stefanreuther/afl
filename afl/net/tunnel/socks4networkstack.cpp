@@ -117,7 +117,7 @@ namespace {
     const uint8_t SOCKS4_VERSION = 4;
     const uint8_t SOCKS4_OP_CONNECT = 1;
     const uint8_t SOCKS4_OP_BIND = 2;
-    const uint8_t SOCKS4_RESPONSE = 0;
+    // const uint8_t SOCKS4_RESPONSE = 0;
 
     const char* getSocks4Message(uint8_t code)
     {
@@ -303,7 +303,7 @@ afl::net::tunnel::Socks4NetworkStack::ListenerImpl::extractAcceptor(afl::async::
     for (size_t i = 0, n = m_activeOperations.size(); i < n; ++i) {
         if (m_activeOperations[i]->isOperation(op)) {
             p.reset(m_activeOperations.extractElement(i));
-            m_activeOperations.erase(m_activeOperations.begin() + i);
+            m_activeOperations.erase(m_activeOperations.begin() + static_cast<ptrdiff_t>(i));
             break;
         }
     }

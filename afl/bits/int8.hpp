@@ -29,9 +29,9 @@ namespace afl { namespace bits {
                 // gcc optimizes this conditional away entirely.
                 uint8_t tmp = UInt8::unpack(bytes);
                 if ((tmp & 0x80) != 0) {
-                    return -(~tmp) - 1;
+                    return static_cast<int8_t>(-(~tmp) - 1);
                 } else {
-                    return tmp;
+                    return static_cast<int8_t>(tmp);
                 }
             }
 
@@ -42,7 +42,7 @@ namespace afl { namespace bits {
             {
                 // Conversion from signed to unsigned is defined as "as-if two's complement",
                 // so let the compiler do everything.
-                UInt8::pack(bytes, word);
+                UInt8::pack(bytes, static_cast<uint8_t>(word));
             }
     };
 

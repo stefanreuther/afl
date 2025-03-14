@@ -207,7 +207,7 @@ arch::win32::Win32Environment::getEnvironmentVariable(const String_t& name)
             DWORD n = GetEnvironmentVariableW(&uniName[0], 0, 0);
             if (n != 0) {
                 WStr value(n+1);
-                value.resize(GetEnvironmentVariableW(&uniName[0], &value[0], value.size()));
+                value.resize(GetEnvironmentVariableW(&uniName[0], &value[0], convertSizeToDWORD(value.size())));
                 return convertFromUnicode(value);
             } else {
                 return String_t();
@@ -222,7 +222,7 @@ arch::win32::Win32Environment::getEnvironmentVariable(const String_t& name)
             DWORD n = GetEnvironmentVariableA(ansiName.c_str(), 0, 0);
             if (n != 0) {
                 std::vector<char> value(n+1);
-                value.resize(GetEnvironmentVariableA(ansiName.c_str(), &value[0], value.size()));
+                value.resize(GetEnvironmentVariableA(ansiName.c_str(), &value[0], convertSizeToDWORD(value.size())));
                 return convertFromANSI(value);
             } else {
                 return String_t();
@@ -304,7 +304,7 @@ namespace {
                 String_t text = arch::win32::convertToCodepage(data, m_codepage);
                 DWORD written;
                 if (!text.empty()) {
-                    WriteConsoleA(m_handle, text.data(), text.size(), &written, 0);
+                    WriteConsoleA(m_handle, text.data(), arch::win32::convertSizeToDWORD(text.size()), &written, 0);
                 }
             }
 
@@ -339,7 +339,7 @@ namespace {
                 arch::win32::convertToUnicode(out, data);
                 DWORD written;
                 if (!out.empty()) {
-                    WriteConsoleW(m_handle, &out[0], out.size(), &written, 0);
+                    WriteConsoleW(m_handle, &out[0], arch::win32::convertSizeToDWORD(out.size()), &written, 0);
                 }
             }
 

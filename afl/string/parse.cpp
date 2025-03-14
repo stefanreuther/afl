@@ -31,8 +31,8 @@ namespace {
         // The only way to get a negative number is if the subject sequence [c,end)
         // contains a '-', so let's look for one and if we find one, refuse the element.
         if (refuseNegative) {
-            if (const void* pc = std::memchr(c, '-', end-c)) {
-                pos = static_cast<const char*>(pc) - c;
+            if (const void* pc = std::memchr(c, '-', static_cast<size_t>(end-c))) {
+                pos = static_cast<size_t>(static_cast<const char*>(pc) - c);
                 return false;
             }
         }
@@ -44,7 +44,7 @@ namespace {
 
         // Partially valid?
         if (*c == '\0' || *end != '\0') {
-            pos = end - c;
+            pos = static_cast<size_t>(end - c);
             return false;
         } else {
             pos = 0;
@@ -64,7 +64,7 @@ namespace {
         unsigned long long value = 0;
         unsigned long long limit = -1ULL;
         while (*in >= '0' && *in <= '9') {
-            unsigned int digit = *in - '0';
+            unsigned int digit = static_cast<unsigned int>(*in - '0');
             if (value > limit/10 || digit > limit - 10*value) {
                 // overflow!
                 return false;

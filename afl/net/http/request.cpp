@@ -29,7 +29,7 @@ namespace {
                 return found;
             }
             if (save != 0) {
-                *save += *ch;
+                *save += static_cast<char>(*ch);
             }
             bytes.eat();
         }

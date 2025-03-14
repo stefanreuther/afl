@@ -71,7 +71,7 @@ AFL_TEST("afl.bits.Int64BE:pack:-1", a) {
 
 AFL_TEST("afl.bits.Int64BE:pack:8000000000000000", a) {
     uint8_t d[8];
-    afl::bits::Int64BE::pack(d, -0x8000000000000000LL);
+    afl::bits::Int64BE::pack(d, static_cast<int64_t>(-0x8000000000000000LL));
     a.checkEqual("0", d[0], 0x80);
     a.checkEqual("1", d[1], 0x00);
     a.checkEqual("2", d[2], 0x00);

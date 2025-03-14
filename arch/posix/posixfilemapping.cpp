@@ -83,7 +83,7 @@ arch::posix::PosixFileMapping::createFileMapping(int fd, afl::io::Stream::FileSi
     }
 
     // Compute starting address. Must be a multiple of the page size
-    size_t bytesBefore = pos & (pageSize-1);
+    size_t bytesBefore = size_t(pos) & (pageSize-1);
     pos -= bytesBefore;
     sizeToMap += bytesBefore;
 
@@ -92,7 +92,7 @@ arch::posix::PosixFileMapping::createFileMapping(int fd, afl::io::Stream::FileSi
     if (address == MAP_FAILED) {
         return 0;
     }
-    ::lseek(fd, pos + sizeToMap, SEEK_SET);
+    ::lseek(fd, pos + off_t(sizeToMap), SEEK_SET);
 
     // Success! Build a handle for it. Be careful that constructing the handle might fail.
     afl::base::Ptr<afl::io::FileMapping> result;

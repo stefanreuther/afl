@@ -9,7 +9,7 @@
 
 afl::net::http::SimpleDownloadListener::SimpleDownloadListener()
     : m_semaphore(0),
-      m_sizeLimit(-1),
+      m_sizeLimit(static_cast<afl::io::Stream::FileSize_t>(-1)),
       m_data(),
       m_result(Succeeded),
       m_failureReason(),

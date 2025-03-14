@@ -71,7 +71,7 @@ namespace {
         // Parse number
         uint64_t result = 0;
         while (p != 0 && (*p >= '0' && *p <= '7')) {
-            result = 8*result + (*p - '0');
+            result = 8*result + static_cast<uint64_t>(*p - '0');
             p = m.eat();
         }
 
@@ -450,11 +450,11 @@ afl::io::archive::TarReader::readNextEntry()
                 // - attributes
                 Stream::FileSize_t size = getNumber(hdr.size, *m_file);
                 bool executable = (getNumber(hdr.mode, *m_file) & 0111) != 0;
-                afl::sys::Time modificationTime = afl::sys::Time::fromUnixTime(getNumber(hdr.mtime, *m_file));
+                afl::sys::Time modificationTime = afl::sys::Time::fromUnixTime(static_cast<int64_t>(getNumber(hdr.mtime, *m_file)));
 
                 // Compute next entry position
                 Stream::FileSize_t thisEntryPosition = m_nextEntryPosition + sizeof(hdr);
-                m_nextEntryPosition = thisEntryPosition + ((size + 511) & ~511);
+                m_nextEntryPosition = thisEntryPosition + ((size + 511U) & ~511U);
 
                 // So, is this a file after all? Then add it.
                 switch (hdr.typeflag) {

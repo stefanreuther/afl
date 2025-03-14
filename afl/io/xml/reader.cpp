@@ -368,7 +368,7 @@ afl::io::xml::Reader::readNextChar()
             if (!readByte(b)) {
                 m_haveCurrentCharacter = false;
             } else {
-                m_currentCharacter = ((a & 0x1F) << 6) + (b & 0x3F);
+                m_currentCharacter = ((a & 0x1FU) << 6) + (b & 0x3FU);
                 m_haveCurrentCharacter = true;
             }
         } else if (a >= 0xE0 && a < 0xF0) {
@@ -376,7 +376,7 @@ afl::io::xml::Reader::readNextChar()
             if (!readByte(b) || !readByte(c)) {
                 m_haveCurrentCharacter = false;
             } else {
-                m_currentCharacter = ((a & 0x0F) << 12) + ((b & 0x3F) << 6) + (c & 0x3F);
+                m_currentCharacter = ((a & 0x0FU) << 12) + ((b & 0x3FU) << 6) + (c & 0x3FU);
                 m_haveCurrentCharacter = true;
             }
         } else {

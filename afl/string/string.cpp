@@ -39,7 +39,7 @@ afl::string::toMemoryLimited(const char* ntbs, size_t maxLen)
     } else {
         const char* end = static_cast<const char*>(std::memchr(ntbs, 0, maxLen));
         if (end != 0) {
-            maxLen = end - ntbs;
+            maxLen = static_cast<size_t>(end - ntbs);
         }
         return ConstStringMemory_t::unsafeCreate(ntbs, maxLen);
     }
