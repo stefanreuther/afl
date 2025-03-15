@@ -500,7 +500,7 @@ afl::io::archive::ArReader::readNextEntry()
 
         // Read the header
         ArMemberHeader mem;
-        if (m_file->read(afl::base::fromObject(mem)) == sizeof(mem)) {
+        if (m_file->read(afl::base::fromObject(mem)) == sizeof(mem) && afl::base::Bytes_t(mem.magic).equalContent(MEMBER_MAGIC)) {
             // OK, parse header
             uint32_t size = parseNumber(mem.size, 10);
             uint32_t mtime = parseNumber(mem.modificationTime, 10);
