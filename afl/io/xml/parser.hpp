@@ -10,6 +10,8 @@
 
 namespace afl { namespace io { namespace xml {
 
+    class NamedNode;
+
     /** Parser and DOM builder.
         Reads the token stream of a BaseReader and builds a tree of Node objects.
 

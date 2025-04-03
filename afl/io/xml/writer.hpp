@@ -10,6 +10,8 @@
 
 namespace afl { namespace io { namespace xml {
 
+    class NamedNode;
+
     /** Simple XML writer.
         A visitor that serializes all nodes it visits into a DataSink.
         This can be used to save a set of nodes that can later be parsed again
@@ -40,8 +42,7 @@ namespace afl { namespace io { namespace xml {
      private:
         DataSink& m_sink;
 
-        template<typename NodeT>
-        void writeAttributes(const NodeT& node);
+        void writeAttributes(const NamedNode& node);
     };
 
 } } }

@@ -73,9 +73,8 @@ afl::io::xml::Writer::escape(const String_t& in)
     return result;
 }
 
-template<typename NodeT>
-inline void
-afl::io::xml::Writer::writeAttributes(const NodeT& node)
+void
+afl::io::xml::Writer::writeAttributes(const NamedNode& node)
 {
     const NameMap& names = node.getAttributeNames();
     for (size_t i = 0, n = names.getNumNames(); i < n; ++i) {
