@@ -16,22 +16,31 @@
 namespace afl { namespace base {
 
     namespace detail {
+        /** Shared implementation of common part. */
+        class SignalBaseBase : public Uncopyable {
+         public:
+            SignalBaseBase()
+                : m_list(0)
+                { }
+
+            ~SignalBaseBase();
+
+         protected:
+            SignalHandler* m_list;
+        };
+
         /** Base class for signal.
             This class is an implementation detail to implement the constructor and add() methods.
             Users use the derived Signal<> class.
             \param Closure closure type for signal handlers */
         template<typename Closure>
-        class SignalBase : public Uncopyable {
+        class SignalBase : public SignalBaseBase {
          public:
             typedef Closure Closure_t;
 
             /** Constructor. Makes a signal that has no handlers connected. */
             SignalBase()
-                : m_list(0)
                 { }
-
-            /** Destructor. Disconnects all handler. */
-            ~SignalBase();
 
             /** Add static function.
                 \tparam Fun function type
@@ -68,8 +77,6 @@ namespace afl { namespace base {
             SignalHandler* addNewClosure(Closure_t* closure);
 
          protected:
-            SignalHandler* m_list;
-
             struct SignalHandlerClosure : public SignalHandler {
                 SignalHandlerClosure(SignalHandler** pList, Closure_t* closure)
                     : SignalHandler(pList),
@@ -215,21 +222,8 @@ template<typename Closure>
 afl::base::SignalHandler*
 afl::base::detail::SignalBase<Closure>::addNewClosure(Closure_t* closure)
 {
-    m_list = new SignalHandlerClosure(&m_list, closure);
-    return m_list;
-}
-
-/*
- *  SignalBase
- */
-
-template<typename Closure>
-afl::base::detail::SignalBase<Closure>::~SignalBase()
-{
-    // FIXME: this needn't actually be a template!
-    while (m_list) {
-        delete m_list;
-    }
+    this->m_list = new SignalHandlerClosure(&this->m_list, closure);
+    return this->m_list;
 }
 
 /*
