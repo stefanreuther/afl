@@ -34,11 +34,6 @@ namespace afl { namespace io { namespace xml {
             \return result */
         static String_t escape(const String_t& in);
 
-        /** Get inner text of a node.
-            \param node Node
-            \return text */
-        static String_t getInnerText(const Node& node);
-
      private:
         DataSink& m_sink;
 
