@@ -34,13 +34,23 @@ namespace arch { namespace win32 {
      private:
         HANDLE m_event;
 
+        /* Status of cancellation */
+        enum CancelState {
+            Idle,               // Normal state
+            Blocked,            // Do not remove items from m_requests; only flag them for deletion
+            Dirty               // Items were flagged for deletion; postprocessing of the list required
+        };
+        CancelState m_cancelState;
+
         struct Request {
             WaitRequest* m_pWaitRequest;
             HANDLE m_handle;
+            bool m_cancelled;
 
             Request(WaitRequest& waitRequest, HANDLE handle)
                 : m_pWaitRequest(&waitRequest),
-                  m_handle(handle)
+                  m_handle(handle),
+                  m_cancelled(false)
                 { }
         };
 

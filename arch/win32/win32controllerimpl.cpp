@@ -11,6 +11,7 @@
 
 arch::win32::Win32ControllerImpl::Win32ControllerImpl()
     : m_event(CreateEvent(0, FALSE, FALSE, 0)),
+      m_cancelState(Idle),
       m_requests()
 {
     if (m_event == NULL) {
@@ -48,16 +49,37 @@ arch::win32::Win32ControllerImpl::wait(afl::sys::Timeout_t timeout)
     // Evaluate result
     // We do not care about WAIT_OBJECT_0, because that is our own handle.
     if (result >= WAIT_OBJECT_0 + 1 && result < WAIT_OBJECT_0 + n) {
-        // Look up element
-        std::list<Request>::iterator it = m_requests.begin();
-        for (DWORD i = 0; i < result - WAIT_OBJECT_0 - 1 && it != m_requests.end(); ++i) {
-            ++it;
+        // Block cancellations in case handleWaitReady calls removeRequest.
+        if (m_cancelState == Idle) {
+            m_cancelState = Blocked;
         }
 
-        // Handle it
-        if (it != m_requests.end() && it->m_pWaitRequest->handleWaitReady()) {
-            m_requests.erase(it);
+        // Look up element
+        const HANDLE foundHandle = handles[result - WAIT_OBJECT_0];
+        std::list<Request>::iterator it = m_requests.begin();
+        while (it != m_requests.end()) {
+            if (it->m_handle == foundHandle && !it->m_cancelled) {
+                if (it->m_pWaitRequest->handleWaitReady()) {
+                    m_requests.erase(it);
+                }
+                break;
+            } else {
+                ++it;
+            }
         }
+
+        // Perform deferred cancellations
+        if (m_cancelState == Dirty) {
+            std::list<Request>::iterator it = m_requests.begin();
+            while (it != m_requests.end()) {
+                if (it->m_cancelled) {
+                    it = m_requests.erase(it);
+                } else {
+                    ++it;
+                }
+            }
+        }
+        m_cancelState = Idle;
     }
 }
 
@@ -84,10 +106,14 @@ arch::win32::Win32ControllerImpl::addRequest(WaitRequest& req, HANDLE h)
 void
 arch::win32::Win32ControllerImpl::removeRequest(WaitRequest& req, HANDLE h)
 {
-    // FIXME: must deal with a wait running in parallel!!!!!
     for (std::list<Request>::iterator it = m_requests.begin(); it != m_requests.end(); ++it) {
-        if (it->m_pWaitRequest == &req && it->m_handle == h) {
-            m_requests.erase(it);
+        if (it->m_pWaitRequest == &req && it->m_handle == h && !it->m_cancelled) {
+            if (m_cancelState == Idle) {
+                m_requests.erase(it);
+            } else {
+                it->m_cancelled = true;
+                m_cancelState = Dirty;
+            }
             break;
         }
     }
