@@ -43,7 +43,6 @@ class afl::net::SecureNetworkStack::Listener : public afl::net::Listener, privat
 
     // Notifier operations:
     virtual void notify(afl::async::Operation& op);
-    virtual void notifyDirect(afl::async::Operation& op);
 };
 
 inline
@@ -141,12 +140,6 @@ afl::net::SecureNetworkStack::Listener::notify(afl::async::Operation& op)
         }
         m_listener->acceptAsync(ctl, localOperation);
     }
-}
-
-void
-afl::net::SecureNetworkStack::Listener::notifyDirect(afl::async::Operation& op)
-{
-    notify(op);
 }
 
 /*************************** SecureNetworkStack **************************/

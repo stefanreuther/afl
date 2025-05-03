@@ -26,11 +26,6 @@ AFL_TEST("afl.async.Notifier:simple", a)
     defaultNotifier.notify(op);
     a.check("01", ctl.wait(0) == &op);
     a.check("02", ctl.wait(0) == 0);
-
-    // Same things for notifyDirect
-    defaultNotifier.notifyDirect(op);
-    a.check("11", ctl.wait(0) == &op);
-    a.check("12", ctl.wait(0) == 0);
 }
 
 /** Test using a nondefault notifier. */
@@ -46,11 +41,6 @@ AFL_TEST("afl.async.Notifier:integration", a)
             {
                 m_semaphore.post();
                 op.getController()->post(op);
-            }
-
-        void notifyDirect(afl::async::Operation& op)
-            {
-                notify(op);
             }
 
         afl::sys::Semaphore m_semaphore;

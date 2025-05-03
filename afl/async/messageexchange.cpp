@@ -38,7 +38,7 @@ afl::async::MessageExchange::sendAsync(Controller& ctl, SendOperation& op)
         // There is a pending receive; pair it.
         rx->copyFrom(op);
         rx->getNotifier().notify(*rx);
-        op.getNotifier().notifyDirect(op);
+        op.getNotifier().notify(op);
     } else {
         // No pending receive; wait.
         m_pendingSends.pushBack(&op);
@@ -66,7 +66,7 @@ afl::async::MessageExchange::receiveAsync(Controller& ctl, ReceiveOperation& op)
         // There is a pending send; pair it.
         op.copyFrom(*tx);
         tx->getNotifier().notify(*tx);
-        op.getNotifier().notifyDirect(op);
+        op.getNotifier().notify(op);
     } else {
         // No pending send; wait.
         m_pendingReceives.pushBack(&op);

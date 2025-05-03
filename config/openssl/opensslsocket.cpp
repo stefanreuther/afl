@@ -180,12 +180,6 @@ void
 config::openssl::OpenSSLSocket::notify(afl::async::Operation& op)
 {
     afl::sys::MutexGuard g(m_mutex);
-    notifyDirect(op);
-}
-
-void
-config::openssl::OpenSSLSocket::notifyDirect(afl::async::Operation& op)
-{
     switch (m_state) {
      case Idle:
      case Failed:

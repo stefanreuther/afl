@@ -474,7 +474,7 @@ arch::win32::Win32NetworkStack::Listener::acceptAsync(afl::async::Controller& ct
         unsigned long one = 1;
         ::ioctlsocket(data, FIONBIO, &one);
         op.setResult(new Socket(data, m_name));
-        op.getNotifier().notifyDirect(op);
+        op.getNotifier().notify(op);
     } else {
         // No socket available immediately. Wait.
         afl::sys::MutexGuard g(m_mutex);
@@ -560,14 +560,14 @@ arch::win32::Win32NetworkStack::Socket::sendAsync(Controller& ctl, SendOperation
     if (n >= 0) {
         // Success case
         op.addSentBytes(n);
-        op.getNotifier().notifyDirect(op);
+        op.getNotifier().notify(op);
     } else if (WSAGetLastError() == WSAEWOULDBLOCK) {
         // Asynchronous case
         m_pendingSends.pushBack(&op);
         ctl.getImplementation().addRequest(*this, m_event);
     } else {
         // Error case
-        op.getNotifier().notifyDirect(op);
+        op.getNotifier().notify(op);
     }
 }
 
@@ -595,14 +595,14 @@ arch::win32::Win32NetworkStack::Socket::receiveAsync(Controller& ctl, ReceiveOpe
     if (n >= 0) {
         // Success case
         op.addReceivedBytes(n);
-        op.getNotifier().notifyDirect(op);
+        op.getNotifier().notify(op);
     } else if (WSAGetLastError() == WSAEWOULDBLOCK) {
         // Asynchronous case
         m_pendingReceives.pushBack(&op);
         ctl.getImplementation().addRequest(*this, m_event);
     } else {
         // Error case
-        op.getNotifier().notifyDirect(op);
+        op.getNotifier().notify(op);
     }
 }
 

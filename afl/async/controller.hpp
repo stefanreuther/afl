@@ -66,13 +66,6 @@ namespace afl { namespace async {
             \param op Operation */
         void post(Operation& op);
 
-        /** Post a result from this thread.
-            This is a possibly-faster version of post() that can be called from the thread that owns the Controller only.
-            This is for use by implementations of waitAsync() and friends
-            when they decide that the result can be produced immediately.
-            \param op Operation */
-        void postDirect(Operation& op);
-
         /** Revert a previous post().
             Removes the operation from the queue, so it will no longer be returned by wait().
             Use this for implementations of cancel().

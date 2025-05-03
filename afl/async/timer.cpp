@@ -181,7 +181,7 @@ afl::async::Timer::waitAsync(Controller& ctl, Operation& op)
     } else {
         // We have a pending signal
         --m_numSignals;
-        op.getNotifier().notifyDirect(op);
+        op.getNotifier().notify(op);
     }
 }
 

@@ -17,11 +17,6 @@ namespace {
             {
                 op.getController()->post(op);
             }
-
-        virtual void notifyDirect(afl::async::Operation& op)
-            {
-                op.getController()->postDirect(op);
-            }
     };
 }
 

@@ -102,12 +102,6 @@ afl::async::Controller::post(Operation& op)
 }
 
 void
-afl::async::Controller::postDirect(Operation& op)
-{
-    post(op);
-}
-
-void
 afl::async::Controller::revertPost(Operation& op)
 {
     afl::sys::MutexGuard g(m_completedMutex);

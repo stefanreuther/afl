@@ -100,7 +100,6 @@ namespace config { namespace openssl {
 
         // Notifier
         virtual void notify(afl::async::Operation& op);
-        virtual void notifyDirect(afl::async::Operation& op);
 
         enum ResultClass {
             Failure,

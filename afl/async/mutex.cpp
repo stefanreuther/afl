@@ -41,12 +41,12 @@ afl::async::Mutex::waitAsync(Controller& ctl, Operation& op)
     if (m_pOwner == &ctl) {
         // Nested acquisition
         ++m_nestingLevel;
-        op.getNotifier().notifyDirect(op);
+        op.getNotifier().notify(op);
     } else if (m_pOwner == 0) {
         // Initial acquisition
         m_pOwner = &ctl;
         m_nestingLevel = 1;
-        op.getNotifier().notifyDirect(op);
+        op.getNotifier().notify(op);
     } else {
         // Blocked
         m_waiters.pushBack(&op);

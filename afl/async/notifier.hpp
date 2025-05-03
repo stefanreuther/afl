@@ -17,7 +17,7 @@ namespace afl { namespace async {
         In this case, a custom notifier can be used.
 
         Each Operation has an associated Notifier. If it completes,
-        it calls notify() or notifyDirect() on it. */
+        it calls notify() on it. */
     class Notifier {
      public:
         /** Virtual destructor. */
@@ -28,18 +28,6 @@ namespace afl { namespace async {
             and can be called from any thread.
             \param op Operation to notify */
         virtual void notify(Operation& op) = 0;
-
-        /** Post notification from this thread.
-            This method corresponds to Controller::postDirect,
-            and can be called only from the thread that started the operation.
-            It is typically used if (and only if) the function starting the
-            asynchronous operation determines that the operation directly completes
-            in zero time.
-
-            It is always safe to implement notifyDirect() by calling notify().
-
-            \param op Operation to notify */
-        virtual void notifyDirect(Operation& op) = 0;
 
         /** Get default instance.
             The default notifier instance calls post()/postDirect()

@@ -58,7 +58,7 @@ afl::async::Semaphore::waitAsync(Controller& ctl, Operation& op)
     } else {
         // We have pending signal
         --m_value;
-        op.getNotifier().notifyDirect(op);
+        op.getNotifier().notify(op);
     }
 }
 

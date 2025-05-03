@@ -28,14 +28,6 @@ AFL_TEST("afl.async.Controller", a)
     ctl.revertPost(op);
     a.check("21. wait", ctl.wait(0) == 0);
 
-    // Same things for postDirect
-    ctl.postDirect(op);
-    a.check("31. wait", ctl.wait(0) == &op);
-    a.check("32. wait", ctl.wait(0) == 0);
-    ctl.postDirect(op);
-    ctl.revertPost(op);
-    a.check("33. wait", ctl.wait(0) == 0);
-
     // Now from another thread
     class Tester : public afl::base::Stoppable {
      public:

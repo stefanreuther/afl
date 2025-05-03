@@ -210,7 +210,6 @@ class afl::net::tunnel::Socks4NetworkStack::AcceptorImpl : public afl::async::No
     void start();
 
     virtual void notify(afl::async::Operation& op);
-    virtual void notifyDirect(afl::async::Operation& op);
 
     bool isOperation(const afl::async::Operation& op) const;
     void cancel();
@@ -401,12 +400,6 @@ afl::net::tunnel::Socks4NetworkStack::AcceptorImpl::notify(afl::async::Operation
      case Finished:
         break;
     }
-}
-
-void
-afl::net::tunnel::Socks4NetworkStack::AcceptorImpl::notifyDirect(afl::async::Operation& op)
-{
-    notify(op);
 }
 
 inline bool
