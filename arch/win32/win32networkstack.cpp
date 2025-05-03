@@ -226,11 +226,13 @@ namespace {
         afl::sys::MutexGuard g(mtx);
 
         // Check for have getaddrinfo/freeaddrinfo in Winsock DLL
+        static_assert(sizeof(getaddrinfo_t)  == sizeof(DWORD_PTR), "sizeof getaddrinfo_t");
+        static_assert(sizeof(freeaddrinfo_t) == sizeof(DWORD_PTR), "sizeof freeaddrinfo_t");
         static Resolver* pResolver = 0;
         if (pResolver == 0) {
             HMODULE ws2DLL = LoadLibrary("ws2_32.dll");
-            getaddrinfo_t gai = ws2DLL ? (getaddrinfo_t) GetProcAddress(ws2DLL, "getaddrinfo") : 0;
-            freeaddrinfo_t fai = ws2DLL ? (freeaddrinfo_t) GetProcAddress(ws2DLL, "freeaddrinfo") : 0;
+            getaddrinfo_t gai = ws2DLL ? (getaddrinfo_t) (DWORD_PTR) GetProcAddress(ws2DLL, "getaddrinfo") : 0;
+            freeaddrinfo_t fai = ws2DLL ? (freeaddrinfo_t) (DWORD_PTR) GetProcAddress(ws2DLL, "freeaddrinfo") : 0;
             if (gai != 0 && fai != 0) {
                 static ModernResolver mc(gai, fai);
                 pResolver = &mc;
