@@ -409,5 +409,6 @@ AFL_TEST("afl.io.json.Parser:hash:dup-different-type", a) {
 AFL_TEST("afl.io.json.Parser:hash:dup-null", a) {
     std::auto_ptr<afl::data::Value> result(parseString("{\"qa\":\"x\",\"qa\":null}"));
     Hash& hash = *a.checkNonNull("must be HashValue", dynamic_cast<HashValue*>(result.get())).getValue();
-    a.checkNull("", hash.get("qa"));
+    a.checkEqual("num names", hash.getKeys().getNumNames(), 1U);
+    a.checkNull("check value", hash.get("qa"));
 }
