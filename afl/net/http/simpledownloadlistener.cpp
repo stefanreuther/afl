@@ -11,6 +11,8 @@ afl::net::http::SimpleDownloadListener::SimpleDownloadListener()
     : m_semaphore(0),
       m_sizeLimit(static_cast<afl::io::Stream::FileSize_t>(-1)),
       m_data(),
+      m_headers(),
+      m_statusCode(),
       m_result(Succeeded),
       m_failureReason(),
       m_failureMessage()
@@ -48,6 +50,12 @@ afl::net::http::SimpleDownloadListener::getResponseHeaders() const
     return m_headers;
 }
 
+int
+afl::net::http::SimpleDownloadListener::getStatusCode() const
+{
+    return m_statusCode;
+}
+
 afl::base::ConstBytes_t
 afl::net::http::SimpleDownloadListener::getResponseData() const
 {
@@ -70,6 +78,7 @@ void
 afl::net::http::SimpleDownloadListener::handleResponseHeader(ClientResponse& resp)
 {
     m_headers = resp.getResponseHeaders();
+    m_statusCode = resp.getStatusCode();
 }
 
 void

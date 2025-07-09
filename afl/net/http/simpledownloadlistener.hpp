@@ -28,7 +28,8 @@ namespace afl { namespace net { namespace http {
         /** Download status. */
         enum Status {
             /** Download succeeded.
-                getResponseData() and getResponseHeaders() contain correct information. */
+                getResponseData() and getResponseHeaders() contain correct information.
+                getStatusCode() contains HTTP status code. */
             Succeeded,
 
             /** Download failed.
@@ -73,6 +74,11 @@ namespace afl { namespace net { namespace http {
             \return response headers */
         const HeaderTable& getResponseHeaders() const;
 
+        /** Get status code.
+            Valid after wait() returned Succeeded.
+            \return status code */
+        int getStatusCode() const;
+
         /** Get response data.
             Valid after wait() returned Succeeded.
             \return data */
@@ -100,6 +106,7 @@ namespace afl { namespace net { namespace http {
         afl::io::Stream::FileSize_t m_sizeLimit;
         afl::base::GrowableBytes_t m_data;
         HeaderTable m_headers;
+        int m_statusCode;
         Status m_result;
         ClientRequest::FailureReason m_failureReason;
         String_t m_failureMessage;
