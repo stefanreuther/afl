@@ -131,4 +131,93 @@ AFL_TEST("afl.io.MultiDirectory:empty", a)
     a.checkNonNull("enumerator is non-null", &e.get());
     Ptr<DirectoryEntry> entry;
     a.check("no content", !e->getNextElement(entry));
+
+    // Flush succeeds
+    AFL_CHECK_SUCCEEDS(a("flush"), md->flush());
+}
+
+/*
+ *  Test classes for flush()
+ */
+namespace {
+    // Common
+    class FlushBase : public afl::io::Directory {
+     public:
+        FlushBase(String_t name)
+            : m_name(name)
+            { }
+        virtual afl::base::Ref<afl::io::DirectoryEntry> getDirectoryEntryByName(String_t /*name*/)
+            { throw std::runtime_error("no ref"); }
+        virtual afl::base::Ref<afl::base::Enumerator<afl::base::Ptr<afl::io::DirectoryEntry> > > getDirectoryEntries()
+            { throw std::runtime_error("no ref"); }
+        virtual afl::base::Ptr<afl::io::Directory> getParentDirectory()
+            { return 0; }
+        virtual String_t getDirectoryName()
+            { return m_name; }
+        virtual String_t getTitle()
+            { return m_name; }
+        virtual void flush()
+            { }
+     private:
+        String_t m_name;
+    };
+
+    // An implementation that logs and succeeds its flush()
+    class FlushSucceeds : public FlushBase {
+     public:
+        FlushSucceeds(String_t& acc, String_t name)
+            : FlushBase(name), m_acc(acc)
+            { }
+        virtual void flush()
+            { m_acc += getTitle(); }
+     private:
+        String_t& m_acc;
+    };
+
+    // An implementation that fails its flush()
+    class FlushFails : public FlushBase {
+     public:
+        FlushFails(String_t name)
+            : FlushBase(name)
+            { }
+        virtual void flush()
+            { throw afl::except::FileProblemException(getTitle(), "fail"); }
+    };
+}
+
+/** Test behaviour on flush. */
+AFL_TEST("afl.io.MultiDirectory:flush:success", a)
+{
+    String_t acc;
+    Ref<MultiDirectory> md(MultiDirectory::create());
+    md->addDirectory(*new FlushSucceeds(acc, "a"));
+    md->addDirectory(*new FlushSucceeds(acc, "b"));
+    md->addDirectory(*new FlushSucceeds(acc, "c"));
+
+    md->flush();
+
+    a.checkEqual("sequence", acc, "abc");
+}
+
+/** Test behaviour on flush. */
+AFL_TEST("afl.io.MultiDirectory:flush:fails", a)
+{
+    String_t acc;
+    Ref<MultiDirectory> md(MultiDirectory::create());
+    md->addDirectory(*new FlushSucceeds(acc, "a"));
+    md->addDirectory(*new FlushFails("f1"));
+    md->addDirectory(*new FlushSucceeds(acc, "b"));
+    md->addDirectory(*new FlushFails("f2"));
+    md->addDirectory(*new FlushSucceeds(acc, "c"));
+
+    bool ok = false;
+    try {
+        md->flush();
+    }
+    catch (afl::except::FileProblemException& fpe) {
+        a.checkEqual("exception name", fpe.getFileName(), "f1");
+        ok = true;
+    }
+    a.check("should have thrown", ok);
+    a.checkEqual("sequence", acc, "abc");
 }

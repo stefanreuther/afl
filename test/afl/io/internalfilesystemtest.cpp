@@ -122,6 +122,7 @@ AFL_TEST("afl.io.InternalFileSystem:openRootDirectory", a)
     a.check("03. getTitle", !root->getTitle().empty());
     // - cannot access files
     AFL_CHECK_THROWS(a("04. createAsDirectory"), root->getDirectoryEntryByName("x")->createAsDirectory(), FileProblemException);
+    AFL_CHECK_SUCCEEDS(a("05. flush"), root->flush());
 
     // Enumerate content: must be one
     Ref<afl::base::Enumerator<Ptr<DirectoryEntry> > > entries = root->getDirectoryEntries();
@@ -212,6 +213,7 @@ AFL_TEST("afl.io.InternalFileSystem:getDirectoryEntries", a)
     a.checkEqual("01. getTitle", dir->getTitle(), "d");
     a.checkEqual("02. getDirectoryEntries", dir->getDirectoryName(), "/d");
     a.check("03. getParentDirectory", dir->getParentDirectory().get() != 0);
+    AFL_CHECK_SUCCEEDS(a("04. flush"), dir->flush());
 
     // Retrieve content
     Ref<afl::base::Enumerator<Ptr<DirectoryEntry> > > it = dir->getDirectoryEntries();

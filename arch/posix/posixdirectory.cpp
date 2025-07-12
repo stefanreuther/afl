@@ -418,6 +418,10 @@ arch::posix::PosixDirectory::getTitle()
 {
     return PosixFileSystem().getFileName(m_dirName);
 }
+
+void
+arch::posix::PosixDirectory::flush()
+{ }
 #else
 int g_variableToMakePosixDirectoryObjectFileNotEmpty;
 #endif

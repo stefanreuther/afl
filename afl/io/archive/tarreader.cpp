@@ -412,6 +412,10 @@ afl::io::archive::TarReader::getTitle()
     return m_file->getName();
 }
 
+void
+afl::io::archive::TarReader::flush()
+{ }
+
 bool
 afl::io::archive::TarReader::readNextEntry()
 {

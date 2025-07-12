@@ -469,6 +469,10 @@ afl::io::archive::ArReader::getTitle()
 }
 
 void
+afl::io::archive::ArReader::flush()
+{ }
+
+void
 afl::io::archive::ArReader::readHeader()
 {
     uint8_t tmp[sizeof(FILE_MAGIC)];

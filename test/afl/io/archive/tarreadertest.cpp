@@ -249,6 +249,9 @@ AFL_TEST("afl.io.archive.TarReader:getDirectoryEntries:compressed", a)
     a.check("25. getFlags", e->getFlags() == DirectoryEntry::FileFlags_t(DirectoryEntry::Executable));
 
     a.check("31. getNextElement", !iter->getNextElement(e));
+
+    // Coverage
+    AFL_CHECK_SUCCEEDS(a("41. flush"), testee->flush());
 }
 
 /** Test listing a compressed file, with paths.

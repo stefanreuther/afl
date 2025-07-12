@@ -40,6 +40,7 @@ namespace afl { namespace io { namespace archive {
         virtual afl::base::Ptr<Directory> getParentDirectory();
         virtual String_t getDirectoryName();
         virtual String_t getTitle();
+        virtual void flush();
 
      private:
         /** Underlying file. */

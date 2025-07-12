@@ -218,6 +218,9 @@ AFL_TEST("afl.io.archive.ArReader:getDirectoryEntries", a)
     a.check("15. getFlags", e->getFlags().empty());
 
     a.check("21. getNextElement", !iter->getNextElement(e));
+
+    // Coverage
+    AFL_CHECK_SUCCEEDS(a("31. flush"), testee->flush());
 }
 
 /** Test listing a file.

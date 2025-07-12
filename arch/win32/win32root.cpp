@@ -283,6 +283,11 @@ arch::win32::Win32Root::getTitle()
 {
     return afl::string::Messages::rootDirTitle();
 }
+
+void
+arch::win32::Win32Root::flush()
+{ }
+
 #else
 int g_variableToMakeWin32RootObjectFileNotEmpty;
 #endif

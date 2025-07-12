@@ -59,6 +59,13 @@ namespace afl { namespace io {
             \return Title, UTF-8 encoded */
         virtual String_t getTitle() = 0;
 
+        /** Write back changes.
+            If this Directory object represents content managed in a copy-out-copy-in fashion (e.g. an archive file),
+            this will synchronize the content with the underlying storage.
+            For objects representing actual file system directories, this is a no-op.
+            \throw FileProblemException on error */
+        virtual void flush() = 0;
+
         /*
          *  Convenience Functions
          */

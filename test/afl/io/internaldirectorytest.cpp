@@ -65,6 +65,9 @@ AFL_TEST("afl.io.InternalDirectory:basic", a)
     a.checkEqual("53. eraseStream", md->eraseStream("bar"), false);
     a.checkNull("54. getStream", md->getStream("foo").get());
     a.checkNull("55. getStream", md->getStream("bar").get());
+
+    // Flush
+    AFL_CHECK_SUCCEEDS("61. flush", md->flush());
 }
 
 /** Test that we can create and access files using regular APIs. */

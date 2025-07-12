@@ -273,6 +273,10 @@ afl::io::InternalDirectory::getTitle()
 }
 
 void
+afl::io::InternalDirectory::flush()
+{ }
+
+void
 afl::io::InternalDirectory::addStream(String_t name, afl::base::Ref<Stream> stream)
 {
     NodeList_t::iterator p = findName(name);

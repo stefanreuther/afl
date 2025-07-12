@@ -81,6 +81,8 @@ AFL_TEST_NOARG("afl.io.Directory:interface")
             { return String_t(); }
         virtual String_t getTitle()
             { return String_t(); }
+        virtual void flush()
+            { }
     };
     Tester t;
 }
@@ -134,6 +136,9 @@ AFL_TEST("afl.io.Directory:basic-sequence", a)
         entry->erase();
         a.check("erased getFileType", entry->getFileType() == afl::io::DirectoryEntry::tUnknown);
         AFL_CHECK_THROWS(a("open erased file"), entry->openFile(afl::io::FileSystem::OpenRead), afl::except::FileProblemException);
+
+        // No-op, for coverage
+        AFL_CHECK_SUCCEEDS("flush", dir->flush());
     }
 }
 

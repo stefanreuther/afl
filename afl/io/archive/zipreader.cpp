@@ -490,6 +490,10 @@ afl::io::archive::ZipReader::getTitle()
     return m_file->getName();
 }
 
+void
+afl::io::archive::ZipReader::flush()
+{ }
+
 /** Private constructor.
     Use create(Ptr<Stream>) to create instances of this class.
     \param file Underlying file

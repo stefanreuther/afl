@@ -22,6 +22,7 @@ namespace arch { namespace posix {
         virtual afl::base::Ptr<afl::io::Directory> getParentDirectory();
         virtual String_t getDirectoryName();
         virtual String_t getTitle();
+        virtual void flush();
     };
 
 } }

@@ -147,6 +147,31 @@ afl::io::MultiDirectory::getTitle()
     return result;
 }
 
+void
+afl::io::MultiDirectory::flush()
+{
+    Vector_t::const_iterator it = m_directories.begin();
+    Vector_t::const_iterator e = m_directories.end();
+    try {
+        while (it != e) {
+            (*it)->flush();
+            ++it;
+        }
+    }
+    catch (afl::except::FileProblemException& ex) {
+        ++it;
+        while (it != e) {
+            try {
+                (*it)->flush();
+            }
+            catch (afl::except::FileProblemException&)
+            { }
+            ++it;
+        }
+        throw ex;
+    }
+}
+
 // MultiDirectory:
 void
 afl::io::MultiDirectory::addDirectory(afl::base::Ref<Directory> dir)

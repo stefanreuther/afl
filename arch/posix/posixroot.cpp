@@ -234,6 +234,10 @@ arch::posix::PosixRoot::getTitle()
 {
     return afl::string::Messages::rootDirTitle();
 }
+
+void
+arch::posix::PosixRoot::flush()
+{ }
 #else
 int g_variableToMakePosixRootObjectFileNotEmpty;
 #endif

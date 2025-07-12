@@ -490,6 +490,10 @@ arch::win32::Win32Directory::getTitle()
 {
     return Win32FileSystem().getFileName(m_dirName);
 }
+
+void
+arch::win32::Win32Directory::flush()
+{ }
 #else
 int g_variableToMakeWin32DirectoryObjectFileNotEmpty;
 #endif

@@ -92,6 +92,7 @@ class afl::io::InternalFileSystem::Dir : public Directory {
     virtual Ptr<Directory> getParentDirectory();
     virtual String_t getDirectoryName();
     virtual String_t getTitle();
+    virtual void flush();
 
     NodeList& content()
         { return *m_content; }
@@ -151,6 +152,7 @@ class afl::io::InternalFileSystem::RootDir : public Directory {
     virtual Ptr<Directory> getParentDirectory();
     virtual String_t getDirectoryName();
     virtual String_t getTitle();
+    virtual void flush();
 
     const Ref<NodeList>& content() const
         { return m_content; }
@@ -303,6 +305,10 @@ afl::io::InternalFileSystem::Dir::getTitle()
         ? Messages::rootDirTitle()
         : PosixFileNames().getFileName(m_name);
 }
+
+void
+afl::io::InternalFileSystem::Dir::flush()
+{ }
 
 /* Implementation for Directory::open() and FileSystem::openFile()
    @param name     Local file name
@@ -614,6 +620,10 @@ afl::io::InternalFileSystem::RootDir::getTitle()
 {
     return Messages::rootDirTitle();
 }
+
+void
+afl::io::InternalFileSystem::RootDir::flush()
+{ }
 
 
 /*

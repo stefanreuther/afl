@@ -228,6 +228,9 @@ AFL_TEST("afl.io.archive.ZipReader:read-members", a)
     // We cannot write
     AFL_CHECK_THROWS(a("cannot write"), testee->openFile("hello.txt", afl::io::FileSystem::OpenWrite), afl::except::FileProblemException);
     AFL_CHECK_THROWS(a("cannot create"), testee->openFile("hello.txt", afl::io::FileSystem::Create), afl::except::FileProblemException);
+
+    // Coverage
+    AFL_CHECK_SUCCEEDS(a("flush"), testee->flush());
 }
 
 /** Test bad operations. */
