@@ -20,7 +20,7 @@ AFL_TEST("afl.io.LimitedStream", a)
     }
 
     // Create a view for 10 bytes starting at 20
-    afl::io::LimitedStream testee(is.createChild(), 20, 10);
+    afl::io::LimitedStream testee(is.createChild(0), 20, 10);
     a.checkEqual("01. getPos", testee.getPos(), 0U);
 
     // Read one byte

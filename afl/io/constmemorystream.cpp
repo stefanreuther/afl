@@ -68,7 +68,7 @@ afl::io::ConstMemoryStream::getName()
 }
 
 afl::base::Ref<afl::io::Stream>
-afl::io::ConstMemoryStream::createChild()
+afl::io::ConstMemoryStream::createChild(uint32_t /*flags*/)
 {
     return *new ConstMemoryStream(m_mem);
 }

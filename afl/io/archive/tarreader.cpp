@@ -4,18 +4,18 @@
   */
 
 #include "afl/io/archive/tarreader.hpp"
-#include "afl/io/stream.hpp"
-#include "afl/io/directoryentry.hpp"
 #include "afl/base/staticassert.hpp"
-#include "afl/string/char.hpp"
 #include "afl/except/fileformatexception.hpp"
-#include "afl/string/messages.hpp"
 #include "afl/except/filetooshortexception.hpp"
-#include "afl/sys/time.hpp"
-#include "afl/io/limitedstream.hpp"
-#include "afl/string/posixfilenames.hpp"
+#include "afl/io/directoryentry.hpp"
 #include "afl/io/filemapping.hpp"
+#include "afl/io/limitedstream.hpp"
+#include "afl/io/stream.hpp"
 #include "afl/io/unchangeabledirectoryentry.hpp"
+#include "afl/string/char.hpp"
+#include "afl/string/messages.hpp"
+#include "afl/string/posixfilenames.hpp"
+#include "afl/sys/time.hpp"
 
 using afl::io::Stream;
 
@@ -175,13 +175,13 @@ class afl::io::archive::TarReader::TarStoredMember : public afl::io::Stream {
     virtual size_t write(ConstBytes_t m);
     virtual size_t read(Bytes_t m);
     virtual uint32_t getCapabilities();
-    virtual afl::base::Ref<Stream> createChild();
+    virtual afl::base::Ref<Stream> createChild(uint32_t flags);
     virtual afl::base::Ptr<FileMapping> createFileMapping(FileSize_t limit = FileSize_t(-1));
 
  private:
     afl::base::Ref<Stream> m_file;
+    const IndexEntry m_entry;
     LimitedStream m_worker;
-    String_t m_name;
 };
 
 /************************** TarReader::TarDirEntry *************************/
@@ -277,8 +277,8 @@ afl::io::archive::TarReader::TarDirEnum::getNextElement(afl::base::Ptr<afl::io::
     \param entry Index entry for this member */
 afl::io::archive::TarReader::TarStoredMember::TarStoredMember(afl::base::Ref<Stream> file, const IndexEntry& entry)
     : m_file(file),
-      m_worker(file->createChild(), entry.start, entry.length),
-      m_name(entry.name)
+      m_entry(entry),
+      m_worker(file->createChild(0), entry.start, entry.length)
 { }
 
 afl::io::archive::TarReader::TarStoredMember::~TarStoredMember()
@@ -287,7 +287,7 @@ afl::io::archive::TarReader::TarStoredMember::~TarStoredMember()
 String_t
 afl::io::archive::TarReader::TarStoredMember::getName()
 {
-    return afl::string::PosixFileNames().makePathName(m_file->getName(), m_name);
+    return afl::string::PosixFileNames().makePathName(m_file->getName(), m_entry.name);
 }
 
 afl::io::Stream::FileSize_t
@@ -333,9 +333,9 @@ afl::io::archive::TarReader::TarStoredMember::getCapabilities()
 }
 
 afl::base::Ref<afl::io::Stream>
-afl::io::archive::TarReader::TarStoredMember::createChild()
+afl::io::archive::TarReader::TarStoredMember::createChild(uint32_t /*flags*/)
 {
-    return m_worker.createChild();
+    return *new TarStoredMember(m_file, m_entry);
 }
 
 afl::base::Ptr<afl::io::FileMapping>

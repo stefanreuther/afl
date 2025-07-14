@@ -79,7 +79,7 @@ afl::async::CommunicationStream::getName()
 }
 
 afl::base::Ref<afl::io::Stream>
-afl::async::CommunicationStream::createChild()
+afl::async::CommunicationStream::createChild(uint32_t /*flags*/)
 {
     throw std::runtime_error(afl::string::Messages::invalidOperation());
 }

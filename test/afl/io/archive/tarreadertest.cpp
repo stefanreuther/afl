@@ -11,6 +11,7 @@
 #include "afl/io/inflatetransform.hpp"
 #include "afl/io/stream.hpp"
 #include "afl/io/transformreaderstream.hpp"
+#include "afl/string/posixfilenames.hpp"
 #include "afl/test/testrunner.hpp"
 
 using afl::base::Enumerator;
@@ -399,4 +400,33 @@ AFL_TEST("afl.io.archive.TarReader:getDirectoryEntryByName:compressed", a)
     Ref<DirectoryEntry> e = testee->getDirectoryEntryByName("c.sh");
     a.checkEqual("01. getTitle", e->getTitle(), "c.sh");
     a.checkEqual("02. getFileSize", e->getFileSize(), 8U);
+}
+
+/** Test reading a file, with createChild(). */
+AFL_TEST("afl.io.archive.TarReader:read:createChild", a)
+{
+    Ref<afl::io::archive::TarReader> testee = afl::io::archive::TarReader::open(*new afl::io::ConstMemoryStream(UNCOMPRESSED_FILE), 0);
+
+    uint8_t buf[1];
+    Ref<afl::io::Stream> one = testee->openFile("c.sh", afl::io::FileSystem::OpenRead);
+    Ref<afl::io::Stream> two = one->createChild(0);
+    Ref<afl::io::Stream> three = two->createChild(0);
+
+    one->fullRead(buf);
+    a.checkEqual("01. name", afl::string::PosixFileNames().getFileName(one->getName()), "c.sh");
+    a.checkEqual("02. read", buf[0], 'e');
+    a.checkEqual("03. getSize", one->getSize(), 8U);
+    a.checkEqual("04. getPos", one->getPos(), 1U);
+
+    two->fullRead(buf);
+    a.checkEqual("11. name", afl::string::PosixFileNames().getFileName(two->getName()), "c.sh");
+    a.checkEqual("12. read", buf[0], 'e');
+    a.checkEqual("13. getSize", two->getSize(), 8U);
+    a.checkEqual("14. getPos", two->getPos(), 1U);
+
+    three->fullRead(buf);
+    a.checkEqual("21. name", afl::string::PosixFileNames().getFileName(three->getName()), "c.sh");
+    a.checkEqual("22. read", buf[0], 'e');
+    a.checkEqual("23. getSize", three->getSize(), 8U);
+    a.checkEqual("24. getPos", three->getPos(), 1U);
 }

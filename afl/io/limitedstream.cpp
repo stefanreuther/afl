@@ -132,9 +132,9 @@ afl::io::LimitedStream::getName()
 }
 
 afl::base::Ref<afl::io::Stream>
-afl::io::LimitedStream::createChild()
+afl::io::LimitedStream::createChild(uint32_t flags)
 {
-    return *new LimitedStream(m_parent->createChild(), m_origin, m_length);
+    return *new LimitedStream(m_parent->createChild(flags), m_origin, m_length);
 }
 
 afl::base::Ptr<afl::io::FileMapping>

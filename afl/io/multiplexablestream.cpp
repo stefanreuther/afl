@@ -5,9 +5,11 @@
 
 #include <cassert>
 #include "afl/io/multiplexablestream.hpp"
+#include "afl/except/fileproblemexception.hpp"
+#include "afl/io/filemapping.hpp"
+#include "afl/string/messages.hpp"
 #include "afl/sys/mutex.hpp"
 #include "afl/sys/mutexguard.hpp"
-#include "afl/io/filemapping.hpp"
 
 /** Control Node.
     Manages the parent and children.
@@ -64,7 +66,7 @@ class afl::io::MultiplexableStream::Child : public afl::io::Stream {
     friend class ControlNode;
 
  public:
-    Child(afl::base::Ref<ControlNode> controlNode);
+    Child(afl::base::Ref<ControlNode> controlNode, uint32_t flags);
     virtual ~Child();
 
     virtual size_t read(Bytes_t m);
@@ -75,12 +77,13 @@ class afl::io::MultiplexableStream::Child : public afl::io::Stream {
     virtual FileSize_t getSize();
     virtual uint32_t getCapabilities();
     virtual String_t getName();
-    virtual afl::base::Ref<Stream> createChild();
+    virtual afl::base::Ref<Stream> createChild(uint32_t flags);
     virtual afl::base::Ptr<FileMapping> createFileMapping(FileSize_t limit);
 
  private:
     afl::base::Ref<ControlNode> m_controlNode;
     FileSize_t m_posIfInactive;
+    uint32_t m_flags;
 
     // Managed by ControlNode:
     Child* m_nextChild;
@@ -168,10 +171,11 @@ afl::io::MultiplexableStream::ControlNode::getParent()
 
 /*********************** MultiplexableStream::Child **********************/
 
-afl::io::MultiplexableStream::Child::Child(afl::base::Ref<ControlNode> controlNode)
+afl::io::MultiplexableStream::Child::Child(afl::base::Ref<ControlNode> controlNode, uint32_t flags)
     : Stream(),
       m_controlNode(controlNode),
       m_posIfInactive(0),
+      m_flags(flags),
       m_nextChild(0),
       m_pPrevChild(0)
 {
@@ -200,7 +204,9 @@ size_t
 afl::io::MultiplexableStream::Child::write(ConstBytes_t m)
 {
     afl::sys::MutexGuard g(m_controlNode->m_mutex);
-    if (Stream* w = m_controlNode->activateChild(this, false)) {
+    if ((m_flags & DisableWrite) != 0) {
+        throw afl::except::FileProblemException(*this, afl::string::Messages::cannotWrite());
+    } else if (Stream* w = m_controlNode->activateChild(this, false)) {
         return w->write(m);
     } else {
         return 0;
@@ -252,7 +258,11 @@ afl::io::MultiplexableStream::Child::getCapabilities()
 {
     afl::sys::MutexGuard g(m_controlNode->m_mutex);
     if (Stream* w = m_controlNode->getParent()) {
-        return w->getCapabilities();
+        int n = w->getCapabilities();
+        if ((m_flags & DisableWrite) != 0) {
+            n &= ~CanWrite;
+        }
+        return n;
     } else {
         return 0;
     }
@@ -270,9 +280,9 @@ afl::io::MultiplexableStream::Child::getName()
 }
 
 afl::base::Ref<afl::io::Stream>
-afl::io::MultiplexableStream::Child::createChild()
+afl::io::MultiplexableStream::Child::createChild(uint32_t flags)
 {
-    return *new Child(m_controlNode);
+    return *new Child(m_controlNode, flags | m_flags);
 }
 
 afl::base::Ptr<afl::io::FileMapping>
@@ -299,7 +309,7 @@ afl::io::MultiplexableStream::~MultiplexableStream()
 }
 
 afl::base::Ref<afl::io::Stream>
-afl::io::MultiplexableStream::createChild()
+afl::io::MultiplexableStream::createChild(uint32_t flags)
 {
-    return *new Child(m_controlNode);
+    return *new Child(m_controlNode, flags);
 }

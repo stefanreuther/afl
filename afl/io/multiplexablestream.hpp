@@ -23,7 +23,7 @@ namespace afl { namespace io {
 
         ~MultiplexableStream();
 
-        afl::base::Ref<Stream> createChild();
+        afl::base::Ref<Stream> createChild(uint32_t flags);
 
      private:
         class ControlNode;

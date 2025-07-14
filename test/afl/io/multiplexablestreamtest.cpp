@@ -6,6 +6,8 @@
 #include "afl/io/multiplexablestream.hpp"
 
 #include <stdexcept>
+#include "afl/except/fileproblemexception.hpp"
+#include "afl/io/filemapping.hpp"
 #include "afl/io/memorystream.hpp"
 #include "afl/test/testrunner.hpp"
 
@@ -22,14 +24,14 @@ AFL_TEST_NOARG("afl.io.MultiplexableStream:MemoryStream-is-derived")
 AFL_TEST("afl.io.MultiplexableStream:parallel-access", a)
 {
     // Preinitialize
-    static uint8_t data[] = { 1,2,3,4,5 };
+    uint8_t data[] = { 1,2,3,4,5 };
     afl::io::MemoryStream ms(data);
     a.checkEqual("size of stream", ms.getSize(), 5U);
     ms.setPos(2);
 
     // Create children
-    afl::base::Ref<afl::io::Stream> one = ms.createChild();
-    afl::base::Ref<afl::io::Stream> two = ms.createChild();
+    afl::base::Ref<afl::io::Stream> one = ms.createChild(0);
+    afl::base::Ref<afl::io::Stream> two = ms.createChild(0);
     a.checkNonNull("address one", &one.get());
     a.checkNonNull("address two", &two.get());
 
@@ -67,13 +69,13 @@ AFL_TEST_NOARG("afl.io.MultiplexableStream:lifetime")
         for (size_t freeFirst = 0; freeFirst < COUNT; ++freeFirst) {
             for (size_t freeSecond = 0; freeSecond < COUNT; ++freeSecond) {
                 // Create it
-                static uint8_t data[] = { 1,2,3,4,5 };
+                uint8_t data[] = { 1,2,3,4,5 };
                 afl::io::MemoryStream ms(data);
                 afl::base::Ptr<afl::io::Stream> children[COUNT] = {
-                    ms.createChild().asPtr(),
-                    ms.createChild().asPtr(),
-                    ms.createChild().asPtr(),
-                    ms.createChild().asPtr()
+                    ms.createChild(0).asPtr(),
+                    ms.createChild(0).asPtr(),
+                    ms.createChild(0).asPtr(),
+                    ms.createChild(0).asPtr()
                 };
 
                 // Access and thus activate one
@@ -121,6 +123,66 @@ AFL_TEST("afl.io.MultiplexableStream:setPos", a)
         afl::test::Assert m_assert;
     };
     Tester t(a);
-    afl::base::Ref<afl::io::Stream> child(t.createChild());
+    afl::base::Ref<afl::io::Stream> child(t.createChild(0));
     child->setPos(23);
+}
+
+// Test mode limitation
+AFL_TEST("afl.io.MultiplexableStream:mode-limit", a)
+{
+    // Preinitialize
+    uint8_t data[] = { 1,2,3,4,5 };
+    afl::io::MemoryStream ms(data);
+    a.checkEqual("size of stream", ms.getSize(), 5U);
+
+    // Create children
+    afl::base::Ref<afl::io::Stream> one = ms.createChild(0);
+    afl::base::Ref<afl::io::Stream> two = ms.createChild(afl::io::Stream::DisableWrite);
+    afl::base::Ref<afl::io::Stream> three = two->createChild(0);
+
+    // Capability check
+    a.checkEqual("read capa one",    one->getCapabilities()   & afl::io::Stream::CanRead,  afl::io::Stream::CanRead);
+    a.checkEqual("write capa one",   one->getCapabilities()   & afl::io::Stream::CanWrite, afl::io::Stream::CanWrite);
+    a.checkEqual("read capa two",    two->getCapabilities()   & afl::io::Stream::CanRead,  afl::io::Stream::CanRead);
+    a.checkEqual("write capa two",   two->getCapabilities()   & afl::io::Stream::CanWrite, 0U);
+    a.checkEqual("read capa three",  three->getCapabilities() & afl::io::Stream::CanRead,  afl::io::Stream::CanRead);
+    a.checkEqual("write capa three", three->getCapabilities() & afl::io::Stream::CanWrite, 0U);
+
+    // Attempt to write into 'one'
+    static const uint8_t w1[] = { 77,88 };
+    a.checkEqual("write one", one->write(w1), 2U);
+
+    // Attempt to write onto 'two'
+    static const uint8_t w2[] = { 33,44 };
+    AFL_CHECK_THROWS(a("write two"), two->write(w2), afl::except::FileProblemException);
+
+    // Attempt to write onto 'three'
+    static const uint8_t w3[] = { 55,66 };
+    AFL_CHECK_THROWS(a("write three"), three->write(w3), afl::except::FileProblemException);
+
+    // Verify data
+    a.checkEqual("data 0", data[0], 77);
+    a.checkEqual("data 1", data[1], 88);
+    a.checkEqual("data 2", data[2], 3);
+    a.checkEqual("data 3", data[3], 4);
+    a.checkEqual("data 4", data[4], 5);
+}
+
+// Test mode limitation
+AFL_TEST("afl.io.MultiplexableStream:mapping", a)
+{
+    // Preinitialize
+    uint8_t data[] = { 1,2,3,4,5 };
+    afl::io::MemoryStream ms(data);
+    a.checkEqual("size of stream", ms.getSize(), 5U);
+
+    // Create children
+    afl::base::Ref<afl::io::Stream> one = ms.createChild(0);
+    afl::base::Ref<afl::io::FileMapping> map = one->createVirtualMapping();
+
+    a.checkEqual("data 0", *map->get().at(0), 1);
+    a.checkEqual("data 1", *map->get().at(1), 2);
+    a.checkEqual("data 2", *map->get().at(2), 3);
+    a.checkEqual("data 3", *map->get().at(3), 4);
+    a.checkEqual("data 4", *map->get().at(4), 5);
 }

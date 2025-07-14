@@ -52,7 +52,7 @@ namespace afl { namespace async {
         virtual FileSize_t getSize();
         virtual uint32_t getCapabilities();
         virtual String_t getName();
-        virtual afl::base::Ref<afl::io::Stream> createChild();
+        virtual afl::base::Ref<afl::io::Stream> createChild(uint32_t flags);
         virtual afl::base::Ptr<afl::io::FileMapping> createFileMapping(FileSize_t limit);
 
      private:

@@ -12,6 +12,7 @@
 const uint32_t afl::io::Stream::CanRead;
 const uint32_t afl::io::Stream::CanWrite;
 const uint32_t afl::io::Stream::CanSeek;
+const uint32_t afl::io::Stream::DisableWrite;
 
 void
 afl::io::Stream::fullRead(Bytes_t m)

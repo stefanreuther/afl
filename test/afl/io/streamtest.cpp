@@ -122,7 +122,7 @@ AFL_TEST_NOARG("afl.io.Stream:interface")
             { return 0; }
         virtual String_t getName()
             { return String_t(); }
-        virtual afl::base::Ref<Stream> createChild()
+        virtual afl::base::Ref<Stream> createChild(uint32_t /*flags*/)
             { throw "geht ned"; }
         virtual afl::base::Ptr<afl::io::FileMapping> createFileMapping(FileSize_t /*limit*/)
             { return 0; }

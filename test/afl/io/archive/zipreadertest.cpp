@@ -329,7 +329,7 @@ AFL_TEST("afl.io.archive.ZipReader:uncompressed-member:child", a)
     // Read member "hello.txt" (uncompressed)
     {
         afl::base::Ref<afl::io::Stream> in(testee->openFile("hello.txt", afl::io::FileSystem::OpenRead));
-        afl::base::Ref<afl::io::Stream> child(in->createChild());
+        afl::base::Ref<afl::io::Stream> child(in->createChild(0));
 
         a.checkEqual("getName", in->getName(), child->getName());
         a.checkEqual("getCapabilities", in->getCapabilities(), child->getCapabilities());

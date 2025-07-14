@@ -231,13 +231,13 @@ class afl::io::archive::ArReader::ArMember : public afl::io::Stream {
     virtual size_t write(ConstBytes_t m);
     virtual size_t read(Bytes_t m);
     virtual uint32_t getCapabilities();
-    virtual afl::base::Ref<Stream> createChild();
+    virtual afl::base::Ref<Stream> createChild(uint32_t flags);
     virtual afl::base::Ptr<FileMapping> createFileMapping(FileSize_t limit = FileSize_t(-1));
 
  private:
     afl::base::Ref<Stream> m_file;
+    IndexEntry m_entry;
     LimitedStream m_worker;
-    String_t m_name;
 };
 
 /************************** ArReader::ArDirEntry *************************/
@@ -326,15 +326,15 @@ afl::io::archive::ArReader::ArDirEnum::getNextElement(afl::base::Ptr<afl::io::Di
     return true;
 }
 
-// /************************ ArReader::ArMember ***********************/
+/************************ ArReader::ArMember ***********************/
 
 /** Constructor.
     \param file Underlying file
     \param entry Index entry for this member */
 afl::io::archive::ArReader::ArMember::ArMember(afl::base::Ref<Stream> file, const IndexEntry& entry)
     : m_file(file),
-      m_worker(file->createChild(), entry.start, entry.length),
-      m_name(entry.name)
+      m_entry(entry),
+      m_worker(file->createChild(0), entry.start, entry.length)
 { }
 
 afl::io::archive::ArReader::ArMember::~ArMember()
@@ -343,7 +343,7 @@ afl::io::archive::ArReader::ArMember::~ArMember()
 String_t
 afl::io::archive::ArReader::ArMember::getName()
 {
-    return afl::string::PosixFileNames().makePathName(m_file->getName(), m_name);
+    return afl::string::PosixFileNames().makePathName(m_file->getName(), m_entry.name);
 }
 
 afl::io::Stream::FileSize_t
@@ -389,9 +389,9 @@ afl::io::archive::ArReader::ArMember::getCapabilities()
 }
 
 afl::base::Ref<afl::io::Stream>
-afl::io::archive::ArReader::ArMember::createChild()
+afl::io::archive::ArReader::ArMember::createChild(uint32_t /*flags*/)
 {
-    return m_worker.createChild();
+    return *new ArMember(m_file, m_entry);
 }
 
 afl::base::Ptr<afl::io::FileMapping>

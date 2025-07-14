@@ -34,6 +34,9 @@ namespace afl { namespace io {
         /** "Seek" capability. If set in getCapabilities(), this stream claims to support getPos(), setPos(), and getSize(). */
         static const uint32_t CanSeek = 4;
 
+        /** Prevent writing. If set in createChild(), result will not allow writing. */
+        static const uint32_t DisableWrite = CanWrite;
+
         /*
          *  Types
          */
@@ -101,8 +104,11 @@ namespace afl { namespace io {
               that would interfere with whatever the children do.
               Instead, create a child stream for yourself.
             - the master stream must still be kept open until the last child has stopped using it.
-              The behaviour is undefined if you close (=delete) it too early. */
-        virtual afl::base::Ref<Stream> createChild() = 0;
+              The behaviour is undefined if you close (=delete) it too early.
+
+           \param flags Flags. If DisableWrite is set, tries to prevent the child from writing.
+           \return newly-created stream */
+        virtual afl::base::Ref<Stream> createChild(uint32_t flags) = 0;
 
         /** Create a file mapping.
             The file mapping consists of all bytes from the current file position (getPos()) and includes up to \c limit bytes.

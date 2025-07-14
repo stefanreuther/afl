@@ -333,11 +333,10 @@ afl::io::InternalFileSystem::Dir::open(const String_t& name, const String_t& ful
     switch (mode) {
      case OpenRead:
      case OpenWrite:
-        // For now, we cannot write-protect a stream
         if (fileNode == 0) {
             throw FileProblemException(fullName, Messages::fileNotFound());
         }
-        return fileNode->content->createChild();
+        return fileNode->content->createChild(mode == OpenRead ? Stream::DisableWrite : 0);
 
      case Create:
         // Create or re-use
@@ -348,7 +347,7 @@ afl::io::InternalFileSystem::Dir::open(const String_t& name, const String_t& ful
             fileNode->content.reset(*new InternalStream());
         }
         fileNode->content->setName(fullName);
-        return fileNode->content->createChild();
+        return fileNode->content->createChild(0);
 
      case CreateNew:
         // Always create
@@ -359,7 +358,7 @@ afl::io::InternalFileSystem::Dir::open(const String_t& name, const String_t& ful
         fileNode = new FileNode(name);
         m_content->nodes.pushBackNew(fileNode);
         fileNode->content->setName(fullName);
-        return fileNode->content->createChild();
+        return fileNode->content->createChild(0);
     }
 
     // If we end up here, mode was out-of-range

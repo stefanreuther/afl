@@ -138,7 +138,7 @@ class afl::io::archive::ZipReader::ZipStoredMember : public afl::io::Stream {
     virtual size_t write(ConstBytes_t m);
     virtual size_t read(Bytes_t m);
     virtual uint32_t getCapabilities();
-    virtual Ref<Stream> createChild();
+    virtual Ref<Stream> createChild(uint32_t flags);
     virtual Ptr<FileMapping> createFileMapping(FileSize_t limit);
 
  private:
@@ -269,13 +269,13 @@ afl::io::archive::ZipReader::ZipDirEnum::getNextElement(Ptr<afl::io::DirectoryEn
     \param entry Index entry for this member */
 afl::io::archive::ZipReader::ZipStoredMember::ZipStoredMember(const Ref<Stream>& file, const IndexEntry& entry)
     : m_file(file),
-      m_worker(*new LimitedStream(file->createChild(), entry.start, entry.compressedSize)),
+      m_worker(*new LimitedStream(file->createChild(0), entry.start, entry.compressedSize)),
       m_name(entry.name)
 { }
 
 afl::io::archive::ZipReader::ZipStoredMember::ZipStoredMember(ZipStoredMember& orig)
     : m_file(orig.m_file),
-      m_worker(orig.m_worker->createChild()),
+      m_worker(orig.m_worker->createChild(0)),
       m_name(orig.m_name)
 { }
 
@@ -331,7 +331,7 @@ afl::io::archive::ZipReader::ZipStoredMember::getCapabilities()
 }
 
 Ref<afl::io::Stream>
-afl::io::archive::ZipReader::ZipStoredMember::createChild()
+afl::io::archive::ZipReader::ZipStoredMember::createChild(uint32_t /*flags*/)
 {
     return *new ZipStoredMember(*this);
 }
@@ -346,7 +346,7 @@ afl::io::archive::ZipReader::ZipStoredMember::createFileMapping(FileSize_t limit
 
 afl::io::archive::ZipReader::ZipDeflatedMember::ZipDeflatedMember(const Ref<Stream>& file, const IndexEntry& entry)
     : m_file(file),
-      m_worker(file->createChild(), entry.start, entry.compressedSize),
+      m_worker(file->createChild(0), entry.start, entry.compressedSize),
       m_transform(InflateTransform::Raw),
       m_name(entry.name),
       m_buffer(),
@@ -500,7 +500,7 @@ afl::io::archive::ZipReader::flush()
     \param options Options */
 afl::io::archive::ZipReader::ZipReader(afl::base::Ref<Stream> file, int options)
     : m_file(file),
-      m_view(file->createChild()),
+      m_view(file->createChild(0)),
       m_options(options),
       m_index(),
       m_indexerReachedEnd(false),

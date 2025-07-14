@@ -100,7 +100,7 @@ afl::io::InternalDirectory::Entry::openFile(afl::io::FileSystem::OpenMode mode)
 
     // Create a child for independence
     if (result.get() != 0) {
-        return result->createChild();
+        return result->createChild(mode == FileSystem::OpenRead ? Stream::DisableWrite : 0);
     } else {
         throw afl::except::FileProblemException(m_name, afl::string::Messages::fileNotFound());
     }
@@ -126,7 +126,7 @@ afl::io::InternalDirectory::Entry::updateInfo(uint32_t /*requested*/)
         setFileType(tFile);
 
         // Must create a child for proper interlocking
-        setFileSize((*it)->m_stream->createChild()->getSize());
+        setFileSize((*it)->m_stream->createChild(0)->getSize());
     }
 }
 
