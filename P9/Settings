@@ -16,17 +16,17 @@ PROJ_AUTO += afl:afl/*pp testsuite:test/*pp
 ##  Main Library
 ##
 TARGETS += afl
-FILES_afl = afl/base/signal.cpp afl/io/xml/namednode.cpp \
-    afl/io/xml/namednode.hpp afl/net/internalnetworkstack.cpp \
-    afl/net/internalnetworkstack.hpp afl/net/http/clientrequest.cpp \
-    afl/test/makeprintable.hpp afl/test/testrunner.cpp \
-    afl/test/testrunner.hpp afl/base/vectorenumerator.hpp \
-    afl/test/loglistener.cpp afl/test/loglistener.hpp \
-    afl/sys/internalenvironment.cpp afl/sys/internalenvironment.hpp \
-    afl/io/temporarydirectory.cpp afl/io/temporarydirectory.hpp \
-    afl/io/internalfilesystem.cpp afl/io/internalfilesystem.hpp \
-    afl/io/xml/node.cpp afl/io/xml/writer.cpp afl/io/xml/writer.hpp \
-    arch/textfile.hpp afl/io/archive/arreader.cpp \
+FILES_afl = afl/async/internalinterrupt.cpp afl/async/internalinterrupt.hpp \
+    afl/base/signal.cpp afl/io/xml/namednode.cpp afl/io/xml/namednode.hpp \
+    afl/net/internalnetworkstack.cpp afl/net/internalnetworkstack.hpp \
+    afl/net/http/clientrequest.cpp afl/test/makeprintable.hpp \
+    afl/test/testrunner.cpp afl/test/testrunner.hpp \
+    afl/base/vectorenumerator.hpp afl/test/loglistener.cpp \
+    afl/test/loglistener.hpp afl/sys/internalenvironment.cpp \
+    afl/sys/internalenvironment.hpp afl/io/temporarydirectory.cpp \
+    afl/io/temporarydirectory.hpp afl/io/internalfilesystem.cpp \
+    afl/io/internalfilesystem.hpp afl/io/xml/node.cpp afl/io/xml/writer.cpp \
+    afl/io/xml/writer.hpp arch/textfile.hpp afl/io/archive/arreader.cpp \
     afl/io/archive/arreader.hpp afl/charset/asciitransliterator.cpp \
     afl/charset/asciitransliterator.hpp \
     afl/except/assertionfailedexception.hpp afl/base/uncopyable.hpp \
@@ -370,7 +370,8 @@ DEPEND_unzip = afl
 ##  Testsuite
 ##
 TARGETS += testsuite
-FILES_testsuite = test/afl/io/xml/namednodetest.cpp \
+FILES_testsuite = test/afl/async/internalinterrupttest.cpp \
+    test/afl/io/xml/namednodetest.cpp \
     test/afl/net/internalnetworkstacktest.cpp \
     test/afl/net/http/simpledownloadlistenertest.cpp \
     test/afl/tmp/typelisttest.cpp test/afl/tmp/sizeduinttest.cpp \
