@@ -5,9 +5,10 @@
 
 #include "afl/net/securenetworkstack.hpp"
 #include "afl/async/controller.hpp"
-#include "afl/net/securesocket.hpp"
-#include "afl/net/acceptoperation.hpp"
 #include "afl/async/notifier.hpp"
+#include "afl/net/acceptoperation.hpp"
+#include "afl/net/name.hpp"
+#include "afl/net/securesocket.hpp"
 #include "afl/sys/mutex.hpp"
 #include "afl/sys/mutexguard.hpp"
 
@@ -163,5 +164,5 @@ afl::base::Ref<afl::net::Socket>
 afl::net::SecureNetworkStack::connect(const Name& name, afl::sys::Timeout_t timeout)
 {
     afl::async::Controller ctl;
-    return m_ctx->wrapClient(ctl, m_peer.connect(name, timeout));
+    return m_ctx->wrapClient(ctl, m_peer.connect(name, timeout), name.getName());
 }

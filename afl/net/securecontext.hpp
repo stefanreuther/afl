@@ -36,8 +36,9 @@ namespace afl { namespace net {
             This will perform the SSL/TLS handshake from the client viewpoint.
             \param ctl Controller to perform I/O
             \param peer existing socket
+            \param hostName host name for Server Name Indication extension; leave empty for none
             \return newly-allocated SecureSocket */
-        virtual afl::base::Ref<SecureSocket> wrapClient(afl::async::Controller& ctl, afl::base::Ref<Socket> peer) = 0;
+        virtual afl::base::Ref<SecureSocket> wrapClient(afl::async::Controller& ctl, afl::base::Ref<Socket> peer, String_t hostName) = 0;
 
         /** Wrap server socket into SecureSocket.
             This will perform the SSL/TLS handshake from the server viewpoint.

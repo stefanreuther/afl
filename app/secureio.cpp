@@ -165,12 +165,13 @@ int main(int argc, char** argv)
         }
     } else if (argc == 3 && std::strcmp(argv[1], "connect") == 0) {
         try {
+            Name name = Name::parse(argv[2], "44444");
             Controller ctl;
             Ref<SecureContext> ctx(SecureContext::create());
-            Ref<Socket> sock(NetworkStack::getInstance().connect(Name::parse(argv[2], "44444")));
+            Ref<Socket> sock(NetworkStack::getInstance().connect(name));
             std::cout << "Connected.\n";
 #if SECURE
-            sock.reset(*ctx->wrapClient(ctl, sock));
+            sock.reset(*ctx->wrapClient(ctl, sock, name.getName()));
             std::cout << "Encryption ok.\n";
 #endif
             doClient(ctl, *sock);

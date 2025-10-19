@@ -65,13 +65,13 @@ config::openssl::OpenSSLContext::~OpenSSLContext()
 }
 
 afl::base::Ref<afl::net::SecureSocket>
-config::openssl::OpenSSLContext::wrapClient(afl::async::Controller& ctl, afl::base::Ref<afl::net::Socket> peer)
+config::openssl::OpenSSLContext::wrapClient(afl::async::Controller& ctl, afl::base::Ref<afl::net::Socket> peer, String_t hostName)
 {
     afl::base::Ptr<OpenSSLSocket> result;
 
     {
         afl::sys::MutexGuard g(m_mutex);
-        result = new OpenSSLSocket(*this, peer);
+        result = new OpenSSLSocket(*this, peer, hostName);
     }
 
     result->connect(ctl);
@@ -81,7 +81,7 @@ config::openssl::OpenSSLContext::wrapClient(afl::async::Controller& ctl, afl::ba
 afl::base::Ref<afl::net::SecureSocket>
 config::openssl::OpenSSLContext::wrapServer(afl::async::Controller& ctl, afl::base::Ref<afl::net::Socket> peer)
 {
-    afl::base::Ref<OpenSSLSocket> result(*new OpenSSLSocket(*this, peer));
+    afl::base::Ref<OpenSSLSocket> result(*new OpenSSLSocket(*this, peer, ""));
     result->accept(ctl);
     return result;
 }

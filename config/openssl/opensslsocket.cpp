@@ -18,7 +18,7 @@
 # endif
 
 
-config::openssl::OpenSSLSocket::OpenSSLSocket(afl::base::Ref<OpenSSLContext> ctx, afl::base::Ref<Socket> peer)
+config::openssl::OpenSSLSocket::OpenSSLSocket(afl::base::Ref<OpenSSLContext> ctx, afl::base::Ref<Socket> peer, const String_t& hostName)
     : m_peer(peer),
       m_mutex(),
       m_ssl(0),
@@ -41,6 +41,10 @@ config::openssl::OpenSSLSocket::OpenSSLSocket(afl::base::Ref<OpenSSLContext> ctx
         throw OpenSSLException(ERR_get_error());
     }
     SSL_set_bio(m_ssl, m_sslEnd, m_sslEnd);
+
+    if (!hostName.empty()) {
+        SSL_set_tlsext_host_name(m_ssl, hostName.c_str());
+    }
 }
 
 config::openssl::OpenSSLSocket::~OpenSSLSocket()

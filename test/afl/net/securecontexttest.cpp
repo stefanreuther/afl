@@ -313,7 +313,7 @@ AFL_TEST_NOARG("afl.net.SecureContext:connect")
         ServerRunnable server(pContext, sockA);
         afl::sys::Thread serverThread("Server", server);
         serverThread.start();
-        sockB.reset(*pContext->wrapClient(ctl, sockB));
+        sockB.reset(*pContext->wrapClient(ctl, sockB, ""));
         serverThread.join();
     }
     catch (afl::except::UnsupportedException& /*e*/) {
@@ -368,7 +368,7 @@ AFL_TEST("afl.net.SecureContext:transfer", a)
         ServerRunnable server(a("background thread"), pContext, sockA);
         afl::sys::Thread serverThread("Server", server);
         serverThread.start();
-        sockB.reset(*pContext->wrapClient(ctl, sockB));
+        sockB.reset(*pContext->wrapClient(ctl, sockB, ""));
 
         // Receive data
         uint8_t buf[10];
@@ -439,7 +439,7 @@ AFL_TEST("afl.net.SecureContext:transfer2", a)
         ServerRunnable server(a("background thread"), pContext, sockA);
         afl::sys::Thread serverThread("Server", server);
         serverThread.start();
-        sockB.reset(*pContext->wrapClient(ctl, sockB));
+        sockB.reset(*pContext->wrapClient(ctl, sockB, ""));
 
         // Send data
         const uint8_t dataToSend[] = {'a','b','c'};

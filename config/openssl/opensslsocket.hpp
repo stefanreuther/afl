@@ -31,7 +31,7 @@ namespace config { namespace openssl {
      public:
         /** Constructor.
             \param peer Underlying socket */
-        OpenSSLSocket(afl::base::Ref<OpenSSLContext> ctx, afl::base::Ref<Socket> peer);
+        OpenSSLSocket(afl::base::Ref<OpenSSLContext> ctx, afl::base::Ref<Socket> peer, const String_t& hostName);
 
         /** Virtual destructor. */
         ~OpenSSLSocket();
