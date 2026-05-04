@@ -28,7 +28,7 @@ namespace {
 
     /* Member magic, 2 bytes */
     const uint8_t MEMBER_MAGIC[] = {96,10};
-    static_assert(sizeof(MEMBER_MAGIC) == 2, sizeof(MEMBER_MAGIC));
+    static_assert(sizeof(MEMBER_MAGIC) == 2, "sizeof(MEMBER_MAGIC)");
 
     const size_t NAME_LEN = 16;
     const uint8_t NAME_SEP = 10;

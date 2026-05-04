@@ -28,7 +28,7 @@
 #if !__cplusplus
 /* C version: 'extern' is allowed in global scope and in functions, and allows redefinitions. */
 # define static_assert(expr, msg) extern int static_assert_##__LINE__[(expr) ? 2 : -2]
-#elsif __cplusplus > 199711L
+#elif __cplusplus > 199711L
 /* C++11 version: Nothing to do, compiler has this built in */
 #else
 /* C++98 version: 'typedef' is allowed in global scope, functions, and class definitions,

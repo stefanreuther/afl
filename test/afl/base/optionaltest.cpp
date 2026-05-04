@@ -20,6 +20,8 @@ namespace {
             { ++g_instances; }
         ~TestClass()
             { --g_instances; }
+        TestClass& operator=(const TestClass&)
+            { return *this; }
     };
 }
 
