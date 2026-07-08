@@ -73,6 +73,30 @@ afl::io::Stream::copyFrom(Stream& other, FileSize_t size)
     }
 }
 
+void
+afl::io::Stream::readAll(GrowableBytes_t& m, FileSize_t limit)
+{
+    uint8_t localBuffer[4096];
+    while (limit > 0) {
+        // Figure out how much to read
+        Bytes_t toRead(localBuffer);
+        if (limit < toRead.size()) {
+            toRead.trim(size_t(limit));
+        }
+
+        // Read
+        size_t got = read(toRead);
+        if (got == 0) {
+            // File ends.
+            break;
+        }
+
+        // Update
+        m.append(toRead.trim(got));
+        limit -= got;
+    }
+}
+
 afl::base::Ref<afl::io::FileMapping>
 afl::io::Stream::createVirtualMapping(FileSize_t limit)
 {

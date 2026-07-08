@@ -9,7 +9,7 @@
 afl::io::InternalFileMapping::InternalFileMapping(Stream& stream, Stream::FileSize_t limit)
     : m_data()
 {
-    init(stream, limit);
+    stream.readAll(m_data, limit);
 }
 
 // Construct from memory buffer.
@@ -28,28 +28,4 @@ afl::base::ConstBytes_t
 afl::io::InternalFileMapping::get() const
 {
     return m_data;
-}
-
-void
-afl::io::InternalFileMapping::init(Stream& stream, Stream::FileSize_t limit)
-{
-    uint8_t localBuffer[4096];
-    while (limit > 0) {
-        // Figure out how much to read
-        afl::base::Bytes_t toRead(localBuffer);
-        if (limit < toRead.size()) {
-            toRead.trim(size_t(limit));
-        }
-
-        // Read
-        size_t got = stream.read(toRead);
-        if (got == 0) {
-            // File ends.
-            break;
-        }
-
-        // Update
-        m_data.append(toRead.trim(got));
-        limit -= got;
-    }
 }

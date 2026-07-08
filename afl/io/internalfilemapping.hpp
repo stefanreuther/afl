@@ -36,8 +36,6 @@ namespace afl { namespace io {
 
      private:
         afl::base::GrowableBytes_t m_data;
-
-        void init(Stream& stream, Stream::FileSize_t limit);
     };
 
 } }

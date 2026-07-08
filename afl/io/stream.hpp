@@ -7,6 +7,7 @@
 
 #include "afl/base/refcounted.hpp"
 #include "afl/base/memory.hpp"
+#include "afl/base/growablememory.hpp"
 #include "afl/base/types.hpp"
 #include "afl/string/string.hpp"
 #include "afl/base/ptr.hpp"
@@ -46,6 +47,9 @@ namespace afl { namespace io {
 
         /** Type of constant memory (for write). */
         typedef afl::base::ConstBytes_t ConstBytes_t;
+
+        /** Type of growable memory (for read). */
+        typedef afl::base::GrowableBytes_t GrowableBytes_t;
 
         /** Type of a file position or size. */
         typedef uint64_t FileSize_t;
@@ -159,6 +163,12 @@ namespace afl { namespace io {
             \param other Stream to copy from
             \param size Number of bytes to copy */
         void copyFrom(Stream& other, FileSize_t size);
+
+        /** Read into GrowableBytes_t.
+            Reads from this stream, appending to \c m, until the stream end is reached or \c limit bytes have been read.
+            \param m Memory
+            \param limit Limit */
+        void readAll(GrowableBytes_t& m, FileSize_t limit = FileSize_t(-1));
 
         /** Create a virtual file mapping.
             The file mapping consists of all bytes from the current file position (getPos()) and includes up to \c limit bytes.

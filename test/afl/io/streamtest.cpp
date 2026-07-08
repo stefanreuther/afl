@@ -156,3 +156,29 @@ AFL_TEST("afl.io.Stream:copyFrom", a)
 
     a.check("31. content", out.getContent().equalContent(afl::string::toBytes("lo world")));
 }
+
+/** Test readAll with no limit. */
+AFL_TEST("afl.io.Stream:readAll:unlimited", a)
+{
+    afl::io::InternalStream in;
+    in.write(afl::string::toBytes("hello world"));
+    in.setPos(0);
+
+    afl::base::GrowableBytes_t bytes;
+    in.readAll(bytes);
+
+    a.checkEqualContent("content", afl::base::ConstBytes_t(bytes), afl::string::toBytes("hello world"));
+}
+
+/** Test readAll with limit. */
+AFL_TEST("afl.io.Stream:readAll:limited", a)
+{
+    afl::io::InternalStream in;
+    in.write(afl::string::toBytes("hello world"));
+    in.setPos(0);
+
+    afl::base::GrowableBytes_t bytes;
+    in.readAll(bytes, 5);
+
+    a.checkEqualContent("content", afl::base::ConstBytes_t(bytes), afl::string::toBytes("hello"));
+}
