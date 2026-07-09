@@ -77,3 +77,37 @@ AFL_TEST("afl.bits.Pack:unpackArray", a)
     a.checkEqual("half pad 0", a2[0], 0x2211);
     a.checkEqual("half pad 1", a2[1], 99);
 }
+
+/** Test packValue(). */
+AFL_TEST("afl.bits.Pack:packValue", a)
+{
+    uint8_t data[] = {1, 2, 3, 4, 5};
+    bool ok1 = afl::bits::packValue<afl::bits::UInt16LE>(data, 0x7788, 2);
+    bool ok2 = afl::bits::packValue<afl::bits::UInt16LE>(data, 0x99aa, 4);
+    bool ok3 = afl::bits::packValue<afl::bits::UInt16LE>(data, 0x99aa, 5);
+
+    a.check("ok1",  ok1);
+    a.check("ok2", !ok2);
+    a.check("ok3", !ok3);
+
+    a.checkEqual("index 0", data[0], 1);
+    a.checkEqual("index 1", data[1], 2);
+    a.checkEqual("index 2", data[2], 0x88);
+    a.checkEqual("index 3", data[3], 0x77);
+    a.checkEqual("index 4", data[4], 5);
+}
+
+/** Test packValue(). */
+AFL_TEST("afl.bits.Pack:unpackValue", a)
+{
+    static const uint8_t data[] = {1, 2, 3, 4, 5};
+    uint16_t v = 0;
+    a.check("index 0", afl::bits::unpackValue<afl::bits::UInt16LE>(v, data, 0));
+    a.checkEqual("value 0", v, 0x0201);
+
+    a.check("index 3", afl::bits::unpackValue<afl::bits::UInt16LE>(v, data, 3));
+    a.checkEqual("value 3", v, 0x0504);
+
+    a.check("index 4", !afl::bits::unpackValue<afl::bits::UInt16LE>(v, data, 4));
+    a.check("index 5", !afl::bits::unpackValue<afl::bits::UInt16LE>(v, data, 5));
+}

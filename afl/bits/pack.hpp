@@ -68,6 +68,44 @@ namespace afl { namespace bits {
         out.fill(0);
     }
 
+    /** Pack a value into a byte buffer.
+        \tparam T value descriptor
+        \param out    [out] value
+        \param in     [in]  byte array
+        \param offset [in]  offset into byte array
+        \return true if value could be read, false on error (offset out of range, insufficient bytes) */
+    template<typename Desc>
+    bool
+    unpackValue(typename Desc::Word_t& out, afl::base::ConstBytes_t in, size_t offset)
+    {
+        in.split(offset);
+        if (const typename Desc::Bytes_t* p = in.eatN<sizeof(typename Desc::Bytes_t)>()) {
+            out = Desc::unpack(*p);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /** Unpack a value from a byte buffer.
+        \tparam T value descriptor
+        \param out    [out] byte array
+        \param in     [in]  value
+        \param offset [in]  offset into byte array
+        \return true if value could be stored, false on error (offset out of range, insufficient bytes) */
+    template<typename Desc>
+    bool
+    packValue(afl::base::Bytes_t out, typename Desc::Word_t in, size_t offset)
+    {
+        out.split(offset);
+        if (typename Desc::Bytes_t* p = out.eatN<sizeof(typename Desc::Bytes_t)>()) {
+            Desc::pack(*p, in);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
 } }
 
 #endif
