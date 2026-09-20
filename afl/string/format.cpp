@@ -40,7 +40,13 @@
 afl::string::Format::operator String_t() const
 {
     String_t result;
+    render(result);
+    return result;
+}
 
+void
+afl::string::Format::render(String_t& result) const
+{
     const char* p = m_formatString;
     size_t argIndex = 0;
 
@@ -166,7 +172,6 @@ afl::string::Format::operator String_t() const
         ++p;
     }
     result.append(p);
-    return result;
 }
 
 /* Output formatted */
@@ -174,4 +179,11 @@ std::ostream&
 operator<<(std::ostream& os, const afl::string::Format& fmt)
 {
     return os << String_t(fmt);
+}
+
+/* Append formatted. */
+String_t& operator+=(String_t& result, const afl::string::Format& fmt)
+{
+    fmt.render(result);
+    return result;
 }

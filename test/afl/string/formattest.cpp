@@ -363,3 +363,10 @@ AFL_TEST("afl.string.Format:pointer", a)
     int tmp;
     a.checkEqual("int-as-str", String_t(Format("%s", &tmp)).substr(0, 2), "0x");
 }
+
+AFL_TEST("afl.string.Format:append", a)
+{
+    String_t s = "foo";
+    s += Format("%d", 42);
+    a.checkEqual("", s, "foo42");
+}

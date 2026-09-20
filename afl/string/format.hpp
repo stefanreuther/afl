@@ -284,6 +284,10 @@ namespace afl { namespace string {
             \return formatted text */
         operator String_t() const;
 
+        /** Render into a string.
+            \param [out] String; render result is appended */
+        void render(String_t& result) const;
+
      private:
         /** Argument state. */
         struct Arg {
@@ -301,5 +305,9 @@ namespace afl { namespace string {
 /** Output formatted.
     This outputs the result of the format operation on the specified output stream to the left. */
 std::ostream& operator<<(std::ostream& os, const afl::string::Format& fmt);
+
+/** Append formatted.
+    This appends the format result to the given string without an intermediate result. */
+String_t& operator+=(String_t& result, const afl::string::Format& fmt);
 
 #endif
